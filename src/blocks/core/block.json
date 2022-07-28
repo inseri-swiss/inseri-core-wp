@@ -1,0 +1,17 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "inseri/core",
+	"version": "0.1.0",
+	"title": "Inseri Core",
+	"category": "widgets",
+	"description": "",
+	"icon": "block-default",
+	"supports": {
+		"html": false
+	},
+	"textdomain": "inseri-core",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css"
+}
