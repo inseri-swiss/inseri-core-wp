@@ -7,6 +7,7 @@
 	"category": "widgets",
 	"description": "",
 	"icon": "block-default",
+	"attributes": {},
 	"supports": {
 		"html": false
 	},

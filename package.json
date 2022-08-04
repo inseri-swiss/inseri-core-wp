@@ -17,9 +17,15 @@
 		"start": "wp-scripts start"
 	},
 	"dependencies": {
+		"@types/wordpress__block-editor": "^7.0.0",
+		"@types/wordpress__data": "^6.0.1",
+		"@wordpress/element": "^4.12.0",
+		"@wordpress/i18n": "^4.14.0",
 		"@wordpress/scripts": "^23.6.0",
 		"eslint": "^8.21.0",
-		"prettier": "^2.7.1"
+		"fork-ts-checker-webpack-plugin": "^7.2.13",
+		"prettier": "^2.7.1",
+		"typescript": "^4.7.4"
 	},
 	"devDependencies": {
 		"@wordpress/env": "^4.9.0"
