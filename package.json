@@ -3,18 +3,25 @@
 	"version": "0.1.0",
 	"author": "Inseri Swiss",
 	"license": "GPL-3.0-or-later",
-	"main": "build/index.js",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/inseri-swiss/inseri-core-wp.git"
+	},
 	"scripts": {
 		"build": "wp-scripts build",
+		"lint": "prettier --check . && wp-scripts lint-js",
 		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
-		"lint:js": "wp-scripts lint-js",
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip",
 		"start": "wp-scripts start"
 	},
-	"devDependencies": {
+	"dependencies": {
 		"@wordpress/scripts": "^23.6.0",
+		"eslint": "^8.21.0",
+		"prettier": "^2.7.1"
+	},
+	"devDependencies": {
 		"@wordpress/env": "^4.9.0"
 	}
 }
