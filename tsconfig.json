@@ -1,0 +1,18 @@
+{
+	"compilerOptions": {
+		"outDir": "./build/",
+		"target": "ESNext",
+		"jsx": "react",
+		"module": "ESNext",
+		"moduleResolution": "Node",
+		"esModuleInterop": true,
+		"resolveJsonModule": true,
+		"strict": true,
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"allowJs": true,
+		"allowSyntheticDefaultImports": true
+	},
+	"include": ["./src"],
+	"exclude": ["node_modules"]
+}
