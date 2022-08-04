@@ -2,7 +2,7 @@
 	"compilerOptions": {
 		"outDir": "./build/",
 		"target": "ESNext",
-		"jsx": "react",
+		"jsx": "react-jsx",
 		"module": "ESNext",
 		"moduleResolution": "Node",
 		"esModuleInterop": true,
