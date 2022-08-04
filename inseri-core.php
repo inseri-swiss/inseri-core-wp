@@ -1,12 +1,12 @@
 <?php
 /**
  * Plugin Name:       Inseri Core
- * Description: 	  inseri rocks :)
+ * Description:       inseri rocks :)
  * Requires at least: 5.8
  * Requires PHP:      7.0
  * Version:           0.1.0
  * Author:            Inseri Swiss
- * Author URI: 		  https://inseri.swiss
+ * Author URI:        https://inseri.swiss
  * License:           GPL-3.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain:       inseri-core
@@ -27,14 +27,14 @@
  * along with Inseri Core.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function inseri_core_block_init() {
+require_once plugin_dir_path(__FILE__) . 'includes/utils.php';
 
-	$blocks = array(
-		'core/'
-	);
+function inseri_core_block_init()
+{
+	$blocks = inseri\get_blocks();
 
-	foreach ( $blocks as $block ) {
-		register_block_type( plugin_dir_path(__FILE__) . '/build/blocks/' . $block);
+	foreach ($blocks as $block) {
+		register_block_type($block);
 	}
 }
-add_action( 'init', 'inseri_core_block_init' );
+add_action('init', 'inseri_core_block_init');
