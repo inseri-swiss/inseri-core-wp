@@ -1,0 +1,14 @@
+name: CI
+
+on: [push]
+
+jobs:
+  lint:
+    uses: ./.github/workflows/npm-run.yml
+    with:
+      cmd: lint
+
+  build:
+    uses: ./.github/workflows/npm-run.yml
+    with:
+      cmd: build
