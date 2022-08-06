@@ -1,6 +1,6 @@
 # Inseri Core for WordPress
 
-[![License](https://img.shields.io/github/license/inseri-swiss/inseri-core-wp)](https://github.com/inseri-swiss/inseri-core-wp/blob/main/LICENSE)
+![CI workflow](https://github.com/inseri-swiss/inseri-core-wp/actions/workflows/ci.yml/badge.svg) [![License](https://img.shields.io/github/license/inseri-swiss/inseri-core-wp)](https://github.com/inseri-swiss/inseri-core-wp/blob/main/LICENSE)
 
 ## Development
 
@@ -19,7 +19,7 @@
 - switch to project's node version `nvm use`
 - install dependencies `npm ci`
 - start wp dev environment `npx wp-env start`
-- start dev server `npx wp-env start`
+- start dev server `npm start`
 
 ## Coding Guidelines
 
@@ -28,8 +28,12 @@
 Each commit message must conform to [Conventional Commits spec](https://www.conventionalcommits.org/en/v1.0.0/). A message must be structured as follows:
 
 ```
-<type>(<optional scope>): <description>
+<type>(<scope>): <short summary>
 ```
+
+- The `type` and `short summary` are mandatory
+- The `scope` is optional
+- The `short summary` must be in present tense
 
 example
 
@@ -37,7 +41,7 @@ example
 docs: correct spelling of README
 ```
 
-### Type
+#### Type
 
 Must be one of the following:
 
@@ -52,3 +56,24 @@ Must be one of the following:
 - **test**: Adding missing tests or correcting existing tests
 - **chore**: Other changes that don't modify src or test files
 - **revert**: Reverts a previous commit
+
+### Branch Naming
+
+A branch name should be composed as follows:
+
+```
+<type>/<description>
+```
+
+example
+
+```
+feat/add-blue-button
+```
+
+#### Recommended Types
+
+- **feat**: Adds features or general changes
+- **bugfix**: Fixes a bug
+- **release**: Maintains a specific release version
+- **wip**: unknown, when it will be completed
