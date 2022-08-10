@@ -14,5 +14,5 @@
 	"textdomain": "inseri-core",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css"
+	"style": ["file:./style-index.css", "file:../../global.css"]
 }
