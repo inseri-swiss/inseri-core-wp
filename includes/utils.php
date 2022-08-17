@@ -1,5 +1,5 @@
 <?php
-namespace inseri;
+namespace inseri_core;
 
 function get_blocks()
 {
