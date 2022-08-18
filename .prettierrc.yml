@@ -1,0 +1,8 @@
+# JS settings
+trailingComma: 'es5'
+semi: false
+singleQuote: true
+
+# PHP settings
+phpVersion: '7.0'
+braceStyle: '1tbs'
