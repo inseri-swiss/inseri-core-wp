@@ -1,8 +1,7 @@
 <?php
 namespace inseri_core;
 
-function get_blocks()
-{
+function get_blocks() {
 	$path = plugin_dir_path(__FILE__) . '../build/blocks';
 	$dir_items = scandir($path);
 	$folders = array_filter($dir_items, function ($f) use ($path) {

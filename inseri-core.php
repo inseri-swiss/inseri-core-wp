@@ -33,8 +33,7 @@ require_once plugin_dir_path(__FILE__) . 'includes/db.php';
 register_activation_hook(__FILE__, 'inseri_core\setup_datasources_table');
 add_action('init', 'inseri_core_block_init');
 
-function inseri_core_block_init()
-{
+function inseri_core_block_init() {
 	$blocks = inseri_core\get_blocks();
 
 	foreach ($blocks as $block) {

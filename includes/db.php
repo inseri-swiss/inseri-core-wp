@@ -1,8 +1,7 @@
 <?php
 namespace inseri_core;
 
-function setup_datasources_table()
-{
+function setup_datasources_table() {
 	global $wpdb;
 	$table_name = $wpdb->prefix . 'inseri_datasources';
 	$charset_collate = $wpdb->get_charset_collate();
