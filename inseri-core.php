@@ -29,8 +29,11 @@
 
 require_once plugin_dir_path(__FILE__) . 'includes/utils.php';
 require_once plugin_dir_path(__FILE__) . 'includes/db.php';
+require_once plugin_dir_path(__FILE__) . 'includes/rest_api.php';
 
 register_activation_hook(__FILE__, 'inseri_core\db\setup_table');
+
+add_action('rest_api_init', 'inseri_core\rest\register_api_routes');
 add_action('init', 'inseri_core_block_init');
 
 function inseri_core_block_init() {
