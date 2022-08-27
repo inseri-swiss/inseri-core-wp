@@ -33,19 +33,16 @@ function setup_table() {
  * otherwise 'Array(error_msg, null)' is returned
  */
 function resolve_action($action) {
-	try {
-		global $wpdb;
-		$wpdb->hide_errors();
-		$result = $action($wpdb);
+	global $wpdb;
+	$wpdb->hide_errors();
+	$result = $action($wpdb);
 
-		if ($result === false) {
-			return [$wpdb->last_error, null];
-		}
-
-		return [null, $result];
-	} catch (\Exception $e) {
-		return [$e->getMessage(), null];
+	$last_error = $wpdb->last_error;
+	if (!empty($last_error)) {
+		return [$last_error, null];
 	}
+
+	return [null, $result];
 }
 
 function get_all() {
@@ -68,7 +65,12 @@ function get_one($id) {
 
 function insert_one($item) {
 	$action = function ($wpdb) use ($item) {
-		return $wpdb->insert(TABLE_NAME, $item);
+		$rows_inserted = $wpdb->insert(TABLE_NAME, $item);
+		if ($rows_inserted) {
+			return $wpdb->insert_id;
+		}
+
+		return null;
 	};
 
 	return resolve_action($action);
@@ -84,10 +86,6 @@ function delete_one($id) {
 
 function update_one($item) {
 	$action = function ($wpdb) use ($item) {
-		if (!isset($item['id'])) {
-			throw new \Exception('Id is not set.');
-		}
-
 		return $wpdb->update(TABLE_NAME, $item, ['id' => $item['id']]);
 	};
 
