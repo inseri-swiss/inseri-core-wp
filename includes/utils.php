@@ -30,6 +30,19 @@ abstract class Either {
 	public static function Right($value): Either {
 		return new Right($value);
 	}
+
+	/**
+	 * Initialize Either using empty(right)
+	 * @param left
+	 * @param right
+	 * @return Either
+	 */
+	public static function evaluateValue($left, $right): Either {
+		if (empty($right)) {
+			return new Left($left);
+		}
+		return new Right($right);
+	}
 }
 
 class Left extends Either {
