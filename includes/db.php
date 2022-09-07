@@ -1,6 +1,8 @@
 <?php
 namespace inseri_core\db;
 
+use inseri_core\Either;
+
 global $wpdb;
 define('TABLE_NAME', $wpdb->prefix . 'inseri_datasources');
 
@@ -28,42 +30,34 @@ function setup_table() {
 	dbDelta($sql);
 }
 
-/**
- * if the db execution is successful 'Array(null, result)' is returned
- * otherwise 'Array(error_msg, null)' is returned
- */
-function resolve_action($action) {
+function resolve_action($action): Either {
 	global $wpdb;
 	$wpdb->hide_errors();
 	$result = $action($wpdb);
 
 	$last_error = $wpdb->last_error;
 	if (!empty($last_error)) {
-		return [$last_error, null];
+		return Either::Left($last_error);
 	}
 
-	return [null, $result];
+	return Either::evaluateValue('db execution failed', $result);
 }
 
-function get_all() {
-	$action = function ($wpdb) {
-		$sql = sprintf('SELECT * FROM %s;', TABLE_NAME);
-		return $wpdb->get_results($sql);
-	};
-
+function get_all(): Either {
+	$action = fn($wpdb) => $wpdb->get_results(
+		sprintf('SELECT * FROM %s;', TABLE_NAME)
+	);
 	return resolve_action($action);
 }
 
-function get_one($id) {
-	$action = function ($wpdb) use ($id) {
-		$sql = sprintf('SELECT * FROM %s WHERE id=%d;', TABLE_NAME, $id);
-		return $wpdb->get_row($sql);
-	};
-
+function get_one($id): Either {
+	$action = fn($wpdb) => $wpdb->get_row(
+		sprintf('SELECT * FROM %s WHERE id=%d;', TABLE_NAME, $id)
+	);
 	return resolve_action($action);
 }
 
-function insert_one($item) {
+function insert_one($item): Either {
 	$action = function ($wpdb) use ($item) {
 		$rows_inserted = $wpdb->insert(TABLE_NAME, $item);
 		if ($rows_inserted) {
@@ -76,18 +70,14 @@ function insert_one($item) {
 	return resolve_action($action);
 }
 
-function delete_one($id) {
-	$action = function ($wpdb) use ($id) {
-		return $wpdb->delete(TABLE_NAME, ['id' => $id]);
-	};
-
+function delete_one($id): Either {
+	$action = fn($wpdb) => $wpdb->delete(TABLE_NAME, ['id' => $id]);
 	return resolve_action($action);
 }
 
-function update_one($item) {
-	$action = function ($wpdb) use ($item) {
-		return $wpdb->update(TABLE_NAME, $item, ['id' => $item['id']]);
-	};
-
+function update_one($item): Either {
+	$action = fn($wpdb) => $wpdb->update(TABLE_NAME, $item, [
+		'id' => $item['id'],
+	]);
 	return resolve_action($action);
 }
