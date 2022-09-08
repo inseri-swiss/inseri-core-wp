@@ -40,7 +40,19 @@ function resolve_action($action): Either {
 		return Either::Left($last_error);
 	}
 
-	return Either::evaluateValue('db execution failed', $result);
+	if ($result === false) {
+		return Either::Left('execution-failed');
+	}
+
+	if ($result === 0) {
+		return Either::Left('not-modified');
+	}
+
+	if ($result === null) {
+		return Either::Left('not-found');
+	}
+
+	return Either::Right($result);
 }
 
 function get_all(): Either {
