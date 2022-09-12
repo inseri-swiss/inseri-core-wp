@@ -1,0 +1,169 @@
+openapi: 3.0.0
+info:
+  title: Inseri Core API
+  version: 1.0.0
+
+paths:
+  /wp-json/inseri/v1/datasources:
+    get:
+      tags:
+        - datasources
+      summary: Retrieve all datasources
+      parameters:
+        - name: X-WP-Nonce
+          description: WP authentication token
+          in: header
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Datasource'
+    post:
+      tags:
+        - datasources
+      summary: Create new datasource
+      requestBody:
+        description: Leave the id empty
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Datasource'
+        required: true
+      parameters:
+        - name: X-WP-Nonce
+          description: WP authentication token
+          in: header
+          schema:
+            type: string
+          required: true
+      responses:
+        '201':
+          description: datasource created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Datasource'
+        '400':
+          description: missing required field
+  /wp-json/inseri/v1/datasources/{id}:
+    get:
+      tags:
+        - datasources
+      summary: Retrieve a specific datasource
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: X-WP-Nonce
+          description: WP authentication token
+          in: header
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Datasource'
+        '404':
+          description: not found
+    put:
+      tags:
+        - datasources
+      summary: Update a specific datasource
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: X-WP-Nonce
+          description: WP authentication token
+          in: header
+          schema:
+            type: string
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Datasource'
+        required: true
+      responses:
+        '200':
+          description: successfully updated
+        '400':
+          description: missing required field
+        '404':
+          description: not found
+    delete:
+      tags:
+        - datasources
+      summary: Delete a datasource
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: X-WP-Nonce
+          description: WP authentication token
+          in: header
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Datasource'
+        '404':
+          description: not found
+
+components:
+  schemas:
+    Datasource:
+      type: object
+      required:
+        - id
+        - description
+        - method
+        - url
+      properties:
+        id:
+          type: integer
+          example: 10
+        description:
+          type: string
+          example: Foo Library
+        method:
+          type: string
+          example: POST
+        url:
+          type: string
+          example: 'http://www.inseri.swiss'
+        content_type:
+          type: string
+          example: 'application/json'
+        headers:
+          type: object
+          example: '{content-type: application/json}'
+        query_params:
+          type: object
+          example: '{page_size: 10}'
+        body:
+          type: string
+          example: '{}'
