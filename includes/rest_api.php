@@ -5,10 +5,10 @@ use inseri_core\db as db;
 use inseri_core\Either;
 use \WP_REST_Response;
 
-define('NS', 'inseri/v1');
-define('BASE_ROUTE', '/datasources/');
-
 function register_api_routes() {
+	$namespace = 'inseri/v1';
+	$base_route = '/datasources/';
+
 	$routes = [
 		// [method, endpoint_suffix, callback]
 		['GET', '', 'get_all'],
@@ -19,7 +19,7 @@ function register_api_routes() {
 	];
 
 	foreach ($routes as $r) {
-		register_rest_route(NS, BASE_ROUTE . $r[1], [
+		register_rest_route($namespace, $base_route . $r[1], [
 			'methods' => $r[0],
 			'callback' => 'inseri_core\rest\\' . $r[2],
 			'permission_callback' => '__return_true',
