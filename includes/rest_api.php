@@ -10,19 +10,20 @@ function register_api_routes() {
 	$base_route = '/datasources/';
 
 	$routes = [
-		// [method, endpoint_suffix, callback]
-		['GET', '', 'get_all'],
-		['GET', '(?P<id>[\d]+)', 'get_one'],
-		['POST', '', 'post'],
-		['PUT', '(?P<id>[\d]+)', 'put'],
-		['DELETE', '(?P<id>[\d]+)', 'delete'],
+		// [method, endpoint_suffix, callback, permission capability]
+		['GET', '', 'get_all', ''],
+		['GET', '(?P<id>[\d]+)', 'get_one', ''],
+		['POST', '', 'post', 'publish_posts'],
+		['PUT', '(?P<id>[\d]+)', 'put', 'publish_posts'],
+		['DELETE', '(?P<id>[\d]+)', 'delete', 'delete_others_posts'],
 	];
 
 	foreach ($routes as $r) {
 		register_rest_route($namespace, $base_route . $r[1], [
 			'methods' => $r[0],
 			'callback' => 'inseri_core\rest\\' . $r[2],
-			'permission_callback' => '__return_true',
+			'permission_callback' => fn() => empty($r[3]) ?:
+			current_user_can($r[3]),
 		]);
 	}
 }
