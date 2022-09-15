@@ -29,7 +29,7 @@ function register_api_routes() {
 }
 
 function validate_datasource($body, $check_id = false): Either {
-	$non_empty_fields = ['description', 'method', 'url'];
+	$non_empty_fields = ['description', 'type', 'method', 'url'];
 
 	if ($check_id) {
 		array_push($non_empty_fields, 'id');

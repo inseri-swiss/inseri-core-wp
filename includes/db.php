@@ -11,11 +11,11 @@ function setup_table() {
 	$sql = "CREATE TABLE $table_name (
       id INT UNSIGNED NOT NULL AUTO_INCREMENT,
       description VARCHAR(128) NOT NULL,
+      type VARCHAR(64) NOT NULL,
       method VARCHAR(12) NOT NULL,
       url VARCHAR(255) NOT NULL,
       headers JSON DEFAULT '{}',
       query_params JSON DEFAULT '{}',
-      content_type VARCHAR(64) DEFAULT NULL,
       body MEDIUMTEXT DEFAULT NULL,
       UNIQUE KEY id (id)
     ) $charset_collate;";
