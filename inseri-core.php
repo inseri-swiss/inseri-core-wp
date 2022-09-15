@@ -30,10 +30,18 @@
 require_once plugin_dir_path(__FILE__) . 'includes/utils.php';
 require_once plugin_dir_path(__FILE__) . 'includes/db.php';
 require_once plugin_dir_path(__FILE__) . 'includes/rest_api.php';
+require_once plugin_dir_path(__FILE__) . 'includes/admin_panel.php';
 
 register_activation_hook(__FILE__, 'inseri_core\db\setup_table');
 
+/**
+ * REST API
+ */
 add_action('rest_api_init', 'inseri_core\rest\register_api_routes');
+
+/**
+ * Blocks
+ */
 add_action('init', 'inseri_core_block_init');
 
 function inseri_core_block_init() {
@@ -43,3 +51,11 @@ function inseri_core_block_init() {
 		register_block_type($block);
 	}
 }
+
+/**
+ * Admin Panel
+ */
+
+add_action('init', 'Inseri_Core_Admin::register_ui_script');
+add_action('admin_enqueue_scripts', 'Inseri_Core_Admin::load_script');
+add_action('admin_menu', 'Inseri_Core_Admin::add_menu');

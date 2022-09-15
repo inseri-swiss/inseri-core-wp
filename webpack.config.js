@@ -7,7 +7,10 @@ const tsChecker = new ForkTsCheckerWebpackPlugin({
 	typescript: { diagnosticOptions: { semantic: true, syntactic: true } },
 })
 
-const initialEntrypoints = { global: './src/global.scss' }
+const initialEntrypoints = {
+	global: './src/global.scss',
+	['admin-panel']: './src/admin-panel', // eslint-disable-line
+}
 
 const blockEntrypoints = fs.readdirSync('./src/blocks').reduce(
 	(accumulator, item) => ({
