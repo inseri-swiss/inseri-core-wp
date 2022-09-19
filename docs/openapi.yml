@@ -3,19 +3,15 @@ info:
   title: Inseri Core API
   version: 1.0.0
 
+servers:
+  - url: http://localhost/?rest_route=/
+
 paths:
-  /wp-json/inseri/v1/datasources:
+  /inseri/v1/datasources:
     get:
       tags:
         - datasources
       summary: Retrieve all datasources
-      parameters:
-        - name: X-WP-Nonce
-          description: WP authentication token
-          in: header
-          schema:
-            type: string
-          required: true
       responses:
         '200':
           description: successful operation
@@ -53,7 +49,7 @@ paths:
                 $ref: '#/components/schemas/Datasource'
         '400':
           description: missing required field
-  /wp-json/inseri/v1/datasources/{id}:
+  /inseri/v1/datasources/{id}:
     get:
       tags:
         - datasources
@@ -64,12 +60,6 @@ paths:
           required: true
           schema:
             type: integer
-        - name: X-WP-Nonce
-          description: WP authentication token
-          in: header
-          schema:
-            type: string
-          required: true
       responses:
         '200':
           description: successful
@@ -83,7 +73,7 @@ paths:
       tags:
         - datasources
       summary: Update a specific datasource
-      description: It requires the capability 'publish_posts'. (User with role 'Author')
+      description: If the owner of datasource makes a request, the capability 'publish_posts' is required. (User with role 'Author') Otherwise the capability 'edit_others_posts' is required. (User with role 'Editor')
       parameters:
         - name: id
           in: path
@@ -113,7 +103,7 @@ paths:
       tags:
         - datasources
       summary: Delete a datasource
-      description: It requires the capability 'delete_others_posts'. (User with role 'Editor')
+      description: If the owner of datasource makes a request, the capability 'delete_posts' is required. (User with role 'Author') Otherwise the capability 'delete_others_posts' is required. (User with role 'Editor')
       parameters:
         - name: id
           in: path
@@ -143,6 +133,7 @@ components:
       required:
         - id
         - description
+        - type
         - method
         - url
       properties:
@@ -152,15 +143,18 @@ components:
         description:
           type: string
           example: Foo Library
+        type:
+          type: string
+          example: 'rest'
+        author:
+          type: integer
+          example: 5
         method:
           type: string
           example: POST
         url:
           type: string
           example: 'http://www.inseri.swiss'
-        content_type:
-          type: string
-          example: 'application/json'
         headers:
           type: object
           example: '{content-type: application/json}'
