@@ -12,6 +12,7 @@ function setup_table() {
       id INT UNSIGNED NOT NULL AUTO_INCREMENT,
       description VARCHAR(128) NOT NULL,
       type VARCHAR(64) NOT NULL,
+      author BIGINT(20) UNSIGNED NOT NULL,
       method VARCHAR(12) NOT NULL,
       url VARCHAR(255) NOT NULL,
       headers JSON DEFAULT '{}',
