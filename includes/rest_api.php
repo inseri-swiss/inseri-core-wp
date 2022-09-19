@@ -12,27 +12,77 @@ function register_api_routes() {
 	$routes = [
 		// [method, endpoint_suffix, callback, permission capability]
 		['GET', '', 'get_all', ''],
-		['GET', '(?P<id>[\d]+)', 'get_one', ''],
+		['GET', '(?P<item_id>[\d]+)', 'get_one', ''],
 		['POST', '', 'post', 'publish_posts'],
-		['PUT', '(?P<id>[\d]+)', 'put', 'publish_posts'],
-		['DELETE', '(?P<id>[\d]+)', 'delete', 'delete_others_posts'],
+		['PUT', '(?P<item_id>[\d]+)', 'put', 'publish_posts'],
+		['DELETE', '(?P<item_id>[\d]+)', 'delete', 'delete_others_posts'],
 	];
 
 	foreach ($routes as $r) {
 		register_rest_route($namespace, $base_route . $r[1], [
 			'methods' => $r[0],
 			'callback' => 'inseri_core\rest\\' . $r[2],
-			'permission_callback' => fn() => empty($r[3]) ?:
-			current_user_can($r[3]),
+			'permission_callback' => fn($request) => validate_permission(
+				$request,
+				$r[0]
+			),
 		]);
 	}
 }
 
-function validate_datasource($body, $check_id = false): Either {
+function validate_permission($request, $method): bool {
+	switch (strtoupper($method)) {
+		case 'GET':
+			return true;
+		case 'POST':
+			return current_user_can('publish_posts');
+		case 'PUT':
+			$item_id = $request['item_id'];
+
+			$handle_right = function ($item) {
+				if ($item->author == get_current_user_id()) {
+					return current_user_can('publish_posts');
+				}
+
+				return current_user_can('edit_others_posts');
+			};
+
+			return db\get_one($item_id)->fold(
+				fn($not_found) => true,
+				$handle_right
+			);
+
+		case 'DELETE':
+			$item_id = $request['item_id'];
+
+			$handle_right = function ($item) {
+				if ($item->author == get_current_user_id()) {
+					return current_user_can('delete_posts');
+				}
+
+				return current_user_can('delete_others_posts');
+			};
+
+			return db\get_one($item_id)->fold(
+				fn($not_found) => true,
+				$handle_right
+			);
+
+		default:
+			return true;
+	}
+}
+
+function validate_datasource($request, $check_id = false): Either {
+	$body = $request->get_json_params();
 	$non_empty_fields = ['description', 'type', 'method', 'url'];
 
 	if ($check_id) {
-		array_push($non_empty_fields, 'id');
+		if ($request['item_id'] != $request->get_json_params()['id']) {
+			return Either::Left(
+				'The id from URL does not match with id in body'
+			);
+		}
 	}
 
 	$missing_fields = array_filter(
@@ -71,7 +121,7 @@ function get_all($request) {
 }
 
 function get_one($request) {
-	$id = $request['id'];
+	$id = $request['item_id'];
 
 	return db\get_one($id)->fold(
 		fn($error) => handle_left($error),
@@ -80,10 +130,11 @@ function get_one($request) {
 }
 
 function post($request) {
-	$body = $request->get_json_params();
-
-	return validate_datasource($body)
-		->flatMap(fn($item) => db\insert_one($item))
+	return validate_datasource($request)
+		->flatMap(function ($item) {
+			$item['author'] = get_current_user_id();
+			return db\insert_one($item);
+		})
 		->flatMap(fn($new_id) => db\get_one($new_id))
 		->fold(
 			fn($error) => handle_left($error),
@@ -92,11 +143,10 @@ function post($request) {
 }
 
 function put($request) {
-	$body = $request->get_json_params();
-	$id = $body['id'];
+	$id = $request['item_id'];
 	$custom_codes = ['not-modified' => ['successfully updated', 200]];
 
-	return validate_datasource($body, true)
+	return validate_datasource($request, true)
 		->flatMap(fn($incoming) => db\get_one($id)->map(fn($_) => $incoming))
 		->flatMap(fn($item) => db\update_one($item))
 		->fold(
@@ -106,7 +156,7 @@ function put($request) {
 }
 
 function delete($request) {
-	$id = $request['id'];
+	$id = $request['item_id'];
 
 	return db\get_one($id)
 		->flatMap(fn($item) => db\delete_one($id)->map(fn($_) => $item))
