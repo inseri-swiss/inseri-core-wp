@@ -36,6 +36,9 @@ abstract class Inseri_Core_Admin {
 
 		wp_enqueue_script(self::$script_name);
 		wp_enqueue_style(self::$style_name);
+
+		// needed for CSS variable like --wp-admin-theme-*
+		wp_enqueue_style('wp-block-editor');
 	}
 
 	static function add_menu() {
