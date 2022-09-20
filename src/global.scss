@@ -23,20 +23,14 @@ $admin-small-font-size: 0.85rem;
 	&.is-hovered {
 		background: hsl(0, 0%, 98%);
 		border-width: 1.5px;
-		border-color: var(
-			--wp-admin-theme-color-darker-20,
-			$admin-primary-dark-color
-		);
+		border-color: var(--wp-admin-theme-color-darker-20, $admin-primary-dark-color);
 		color: var(--wp-admin-theme-color-darker-20, $admin-primary-dark-color);
 	}
 	&:focus,
 	&.is-focused {
 		background: hsl(0, 0%, 98%);
 		border-width: 2px;
-		border-color: var(
-			--wp-admin-theme-color-darker-20,
-			$admin-primary-dark-color
-		);
+		border-color: var(--wp-admin-theme-color-darker-20, $admin-primary-dark-color);
 		color: var(--wp-admin-theme-color-darker-20, $admin-primary-dark-color);
 	}
 	&:active,
