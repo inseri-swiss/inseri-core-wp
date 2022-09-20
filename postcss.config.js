@@ -19,7 +19,7 @@ const cssnanoInstance = cssnano({
 module.exports = {
 	plugins: [
 		autoprefixer({ grid: true }),
-		prefixer({ prefix: 'inseri-', ignore: ignoreClasses }),
+		prefixer({ prefix: 'ba-', ignore: ignoreClasses }),
 		cssnanoInstance,
 		maybePurgecss,
 	],

@@ -10,7 +10,7 @@ export default function Edit() {
 				onPress={() => {
 					console.log('Button pressed') // eslint-disable-line no-console
 				}}
-				className={'inseri-is-danger'}
+				className={'ba-is-danger'}
 			>
 				A11y click
 			</Button>
