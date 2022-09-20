@@ -53,16 +53,12 @@ function resolve_action($action): Either {
 }
 
 function get_all(): Either {
-	$action = fn($wpdb, $table_name) => $wpdb->get_results(
-		"SELECT * FROM $table_name;"
-	);
+	$action = fn($wpdb, $table_name) => $wpdb->get_results("SELECT * FROM $table_name;");
 	return resolve_action($action);
 }
 
 function get_one($id): Either {
-	$action = fn($wpdb, $table_name) => $wpdb->get_row(
-		"SELECT * FROM $table_name WHERE id=$id;"
-	);
+	$action = fn($wpdb, $table_name) => $wpdb->get_row("SELECT * FROM $table_name WHERE id=$id;");
 	return resolve_action($action);
 }
 
@@ -80,15 +76,11 @@ function insert_one($item): Either {
 }
 
 function delete_one($id): Either {
-	$action = fn($wpdb, $table_name) => $wpdb->delete($table_name, [
-		'id' => $id,
-	]);
+	$action = fn($wpdb, $table_name) => $wpdb->delete($table_name, ['id' => $id]);
 	return resolve_action($action);
 }
 
 function update_one($item): Either {
-	$action = fn($wpdb, $table_name) => $wpdb->update($table_name, $item, [
-		'id' => $item['id'],
-	]);
+	$action = fn($wpdb, $table_name) => $wpdb->update($table_name, $item, ['id' => $item['id']]);
 	return resolve_action($action);
 }

@@ -4,7 +4,6 @@ const autoprefixer = require('autoprefixer')
 const prefixer = require('postcss-prefixer')
 
 const ignoreClasses = [/wp-block-*/]
-
 const maybePurgecss =
 	process.env.NODE_ENV === 'production'
 		? purgecss({
@@ -14,14 +13,7 @@ const maybePurgecss =
 		: null
 
 const cssnanoInstance = cssnano({
-	preset: [
-		'default',
-		{
-			discardComments: {
-				removeAll: true,
-			},
-		},
-	],
+	preset: ['default', { discardComments: { removeAll: true } }],
 })
 
 module.exports = {
