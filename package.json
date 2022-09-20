@@ -9,7 +9,7 @@
 	},
 	"scripts": {
 		"build": "wp-scripts build",
-		"lint": "prettier --check . && wp-scripts lint-js",
+		"lint": "prettier --plugin=prettier-plugin-multiline-arrays --check . && wp-scripts lint-js",
 		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
 		"packages-update": "wp-scripts packages-update",
@@ -35,6 +35,7 @@
 		"fork-ts-checker-webpack-plugin": "^7.2.13",
 		"postcss-prefixer": "^2.1.3",
 		"prettier": "^2.7.1",
+		"prettier-plugin-multiline-arrays": "^1.1.1",
 		"react-aria": "^3.18.0",
 		"react-stately": "^3.16.0",
 		"typescript": "^4.7.4",

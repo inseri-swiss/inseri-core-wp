@@ -7,20 +7,11 @@ abstract class Inseri_Core_Admin {
 	static $permission = 'publish_posts';
 
 	static function register_ui_script() {
-		$asset_file = include plugin_dir_path(__FILE__) .
-			'../build/admin-panel.asset.php';
+		$asset_file = include plugin_dir_path(__FILE__) . '../build/admin-panel.asset.php';
 
-		wp_register_script(
-			self::$script_name,
-			plugins_url('../build/admin-panel.js', __FILE__),
-			$asset_file['dependencies'],
-			$asset_file['version']
-		);
+		wp_register_script(self::$script_name, plugins_url('../build/admin-panel.js', __FILE__), $asset_file['dependencies'], $asset_file['version']);
 
-		wp_register_style(
-			self::$style_name,
-			plugins_url('../build/global.css', __FILE__)
-		);
+		wp_register_style(self::$style_name, plugins_url('../build/global.css', __FILE__));
 	}
 
 	static function load_script($hook) {

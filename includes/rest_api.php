@@ -22,10 +22,7 @@ function register_api_routes() {
 		register_rest_route($namespace, $base_route . $r[1], [
 			'methods' => $r[0],
 			'callback' => 'inseri_core\rest\\' . $r[2],
-			'permission_callback' => fn($request) => validate_permission(
-				$request,
-				$r[0]
-			),
+			'permission_callback' => fn($request) => validate_permission($request, $r[0]),
 		]);
 	}
 }
@@ -47,10 +44,7 @@ function validate_permission($request, $method): bool {
 				return current_user_can('edit_others_posts');
 			};
 
-			return db\get_one($item_id)->fold(
-				fn($not_found) => true,
-				$handle_right
-			);
+			return db\get_one($item_id)->fold(fn($not_found) => true, $handle_right);
 
 		case 'DELETE':
 			$item_id = $request['item_id'];
@@ -63,10 +57,7 @@ function validate_permission($request, $method): bool {
 				return current_user_can('delete_others_posts');
 			};
 
-			return db\get_one($item_id)->fold(
-				fn($not_found) => true,
-				$handle_right
-			);
+			return db\get_one($item_id)->fold(fn($not_found) => true, $handle_right);
 
 		default:
 			return true;
@@ -79,16 +70,11 @@ function validate_datasource($request, $check_id = false): Either {
 
 	if ($check_id) {
 		if ($request['item_id'] != $request->get_json_params()['id']) {
-			return Either::Left(
-				'The id from URL does not match with id in body'
-			);
+			return Either::Left('The id from URL does not match with id in body');
 		}
 	}
 
-	$missing_fields = array_filter(
-		$non_empty_fields,
-		fn($field) => empty($body[$field])
-	);
+	$missing_fields = array_filter($non_empty_fields, fn($field) => empty($body[$field]));
 
 	if (empty($missing_fields)) {
 		return Either::Right($body);
@@ -114,19 +100,13 @@ function handle_left($value, $custom_codes = []) {
 }
 
 function get_all($request) {
-	return db\get_all()->fold(
-		fn($error) => handle_left($error),
-		fn($item) => new WP_REST_Response($item, 200)
-	);
+	return db\get_all()->fold(fn($error) => handle_left($error), fn($item) => new WP_REST_Response($item, 200));
 }
 
 function get_one($request) {
 	$id = $request['item_id'];
 
-	return db\get_one($id)->fold(
-		fn($error) => handle_left($error),
-		fn($item) => new WP_REST_Response($item, 200)
-	);
+	return db\get_one($id)->fold(fn($error) => handle_left($error), fn($item) => new WP_REST_Response($item, 200));
 }
 
 function post($request) {
@@ -136,10 +116,7 @@ function post($request) {
 			return db\insert_one($item);
 		})
 		->flatMap(fn($new_id) => db\get_one($new_id))
-		->fold(
-			fn($error) => handle_left($error),
-			fn($item) => new WP_REST_Response($item, 201)
-		);
+		->fold(fn($error) => handle_left($error), fn($item) => new WP_REST_Response($item, 201));
 }
 
 function put($request) {
@@ -149,10 +126,7 @@ function put($request) {
 	return validate_datasource($request, true)
 		->flatMap(fn($incoming) => db\get_one($id)->map(fn($_) => $incoming))
 		->flatMap(fn($item) => db\update_one($item))
-		->fold(
-			fn($error) => handle_left($error, $custom_codes),
-			fn($_) => new WP_REST_Response('successfully updated', 200)
-		);
+		->fold(fn($error) => handle_left($error, $custom_codes), fn($_) => new WP_REST_Response('successfully updated', 200));
 }
 
 function delete($request) {
@@ -160,8 +134,5 @@ function delete($request) {
 
 	return db\get_one($id)
 		->flatMap(fn($item) => db\delete_one($id)->map(fn($_) => $item))
-		->fold(
-			fn($error) => handle_left($error),
-			fn($item) => new WP_REST_Response($item, 200)
-		);
+		->fold(fn($error) => handle_left($error), fn($item) => new WP_REST_Response($item, 200));
 }

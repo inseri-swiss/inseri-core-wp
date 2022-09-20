@@ -13,11 +13,7 @@ export const Button: React.FC<AriaButtonProps & OwnProps> = (props) => {
 	const { children, className } = props
 
 	return (
-		<button
-			{...buttonProps}
-			className={classnames(className, 'inseri-button')}
-			ref={ref}
-		>
+		<button {...buttonProps} className={classnames(className, 'inseri-button')} ref={ref}>
 			{children}
 		</button>
 	)

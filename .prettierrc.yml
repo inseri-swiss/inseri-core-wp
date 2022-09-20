@@ -2,6 +2,8 @@
 trailingComma: 'es5'
 semi: false
 singleQuote: true
+printWidth: 160
+multilineArraysWrapThreshold: 4
 
 # PHP settings
 phpVersion: '7.0'
