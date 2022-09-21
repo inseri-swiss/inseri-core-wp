@@ -1,12 +1,12 @@
-import { i18n } from '../utils'
+import { __ } from '@wordpress/i18n'
 
 export default () => {
 	return (
 		<div className="ba-mr-5">
 			<div className="ba-container ba-is-fluid">
 				<div className="ba-my-4 ba-is-flex ba-is-align-items-center">
-					<h1 className="ba-is-size-4">{i18n`Datasources - Inseri`}</h1>
-					<button className="ba-admin-button ba-has-text-weight-bold ba-ml-3">{i18n`Add New`}</button>
+					<h1 className="ba-is-size-4">{__('Datasources - Inseri', 'inseri-core')}</h1>
+					<button className="ba-admin-button ba-has-text-weight-bold ba-ml-3">{__('Add New', 'inseri-core')}</button>
 				</div>
 				<div className="ba-pt-3 ba-my-3 ba-is-flex ba-is-justify-content-space-between">
 					<div>
@@ -22,21 +22,21 @@ export default () => {
 								<option>With options</option>
 							</select>
 						</div>
-						<button className="ba-admin-button ba-has-text-weight-bold">{i18n`Filter`}</button>
+						<button className="ba-admin-button ba-has-text-weight-bold">{__('Filter', 'inseri-core')}</button>
 					</div>
 					<div className="ba-is-flex">
 						<input className="ba-admin-input ba-mx-2" type="text" />
-						<button className="ba-admin-button ba-has-text-weight-bold">{i18n`Search`}</button>
+						<button className="ba-admin-button ba-has-text-weight-bold">{__('Search', 'inseri-core')}</button>
 					</div>
 				</div>
 				<table className="ba-table ba-is-fullwidth ba-is-striped ba-is-bordered ba-is-size-6">
 					<thead>
 						<tr>
-							<th>{i18n`Name`}</th>
-							<th>{i18n`Type`}</th>
-							<th>{i18n`Method`}</th>
-							<th>{i18n`Author`}</th>
-							<th>{i18n`URL`}</th>
+							<th>{__('Name', 'inseri-core')}</th>
+							<th>{__('Type', 'inseri-core')}</th>
+							<th>{__('Method', 'inseri-core')}</th>
+							<th>{__('Author', 'inseri-core')}</th>
+							<th>{__('URL', 'inseri-core')}</th>
 						</tr>
 					</thead>
 					<tbody>
