@@ -41,7 +41,7 @@ $admin-small-font-size: 0.85rem;
 	}
 }
 
-.admin-select {
+.admin-select2 {
 	@extend .select;
 	font-size: $admin-small-font-size;
 
@@ -53,4 +53,54 @@ $admin-small-font-size: 0.85rem;
 .admin-input {
 	@extend .input;
 	font-size: $admin-small-font-size;
+}
+
+.admin-select-wrapper {
+	font-size: $admin-small-font-size;
+	display: inline-block;
+	max-width: 100%;
+	position: relative;
+	vertical-align: top;
+	height: $input-height;
+
+	&::after {
+		@extend %arrow;
+		border-color: $input-arrow;
+		right: 1.125em;
+		z-index: 4;
+	}
+
+	.admin-select {
+		@extend .input;
+		cursor: pointer;
+		display: block;
+		max-width: 100%;
+		outline: none;
+
+		font-size: $admin-small-font-size;
+		padding-right: 2.5em;
+	}
+}
+
+.admin-listbox {
+	@extend %input;
+	cursor: pointer;
+	display: block;
+	font-size: $admin-small-font-size;
+	max-width: 100%;
+	outline: none;
+	height: auto;
+	padding: 0;
+
+	&:hover,
+	&.is-hovered,
+	&:focus,
+	&.is-focused,
+	&:active,
+	&.is-active {
+		border-color: none;
+	}
+
+	&.item {
+	}
 }
