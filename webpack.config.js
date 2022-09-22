@@ -1,6 +1,5 @@
 const defaultConfig = require('@wordpress/scripts/config/webpack.config')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
-const RemoveEmptyScriptsPlugin = require('webpack-remove-empty-scripts')
 const fs = require('fs')
 
 const tsChecker = new ForkTsCheckerWebpackPlugin({
@@ -8,7 +7,6 @@ const tsChecker = new ForkTsCheckerWebpackPlugin({
 })
 
 const initialEntrypoints = {
-	global: './src/global.scss',
 	['admin-panel']: './src/admin-panel', // eslint-disable-line
 }
 
@@ -26,6 +24,5 @@ module.exports = {
 	plugins: [
 		...defaultConfig.plugins,
 		tsChecker,
-		new RemoveEmptyScriptsPlugin(),
 	],
 }
