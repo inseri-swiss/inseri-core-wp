@@ -17,7 +17,9 @@
 		"start": "wp-scripts start"
 	},
 	"dependencies": {
-		"@fullhuman/postcss-purgecss": "^4.1.3",
+		"@emotion/react": "^11.10.4",
+		"@mantine/core": "^5.4.0",
+		"@mantine/hooks": "^5.4.0",
 		"@prettier/plugin-php": "^0.18.9",
 		"@types/wordpress__block-editor": "^7.0.0",
 		"@wordpress/dom-ready": "^3.17.0",
@@ -25,20 +27,11 @@
 		"@wordpress/env": "^4.9.0",
 		"@wordpress/i18n": "^4.14.0",
 		"@wordpress/scripts": "^23.6.0",
-		"autoprefixer": "^10.4.8",
-		"bulma": "^0.9.4",
-		"classnames": "^2.3.1",
-		"cssnano": "^5.1.12",
-		"cssnano-preset-default": "^5.2.12",
 		"eslint": "^8.21.0",
 		"eslint-plugin-prettier": "^4.2.1",
 		"fork-ts-checker-webpack-plugin": "^7.2.13",
-		"postcss-prefixer": "^2.1.3",
 		"prettier": "^2.7.1",
 		"prettier-plugin-multiline-arrays": "^1.1.1",
-		"react-aria": "^3.18.0",
-		"react-stately": "^3.16.0",
-		"typescript": "^4.7.4",
-		"webpack-remove-empty-scripts": "^0.8.1"
+		"typescript": "^4.7.4"
 	}
 }

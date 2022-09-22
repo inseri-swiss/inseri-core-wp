@@ -1,13 +1,13 @@
 import { __ } from '@wordpress/i18n'
 import { useBlockProps } from '@wordpress/block-editor'
 import './editor.scss'
-import { Button } from '../../component-library/button'
+import { Button } from '../../components'
 
 export default function Edit() {
 	return (
 		<p {...useBlockProps()}>
 			<Button
-				onPress={() => {
+				onClick={() => {
 					console.log('Button pressed') // eslint-disable-line no-console
 				}}
 				className={'inseri-is-danger'}
