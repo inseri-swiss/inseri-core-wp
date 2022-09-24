@@ -2,8 +2,22 @@ const defaultConfig = require('@wordpress/scripts/config/webpack.config')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const fs = require('fs')
 
+const isProduction = process.env.NODE_ENV === 'production'
+const configOverwrite = isProduction
+	? {}
+	: {
+			compilerOptions: {
+				strict: false,
+				noUnusedLocals: false,
+				noUnusedParameters: false,
+			},
+	  }
+
 const tsChecker = new ForkTsCheckerWebpackPlugin({
-	typescript: { diagnosticOptions: { semantic: true, syntactic: true } },
+	typescript: {
+		diagnosticOptions: { semantic: true, syntactic: true },
+		configOverwrite,
+	},
 })
 
 const initialEntrypoints = {
