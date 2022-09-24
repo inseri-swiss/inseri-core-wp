@@ -14,13 +14,15 @@
 		"lint:css": "wp-scripts lint-style",
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip",
-		"start": "wp-scripts start"
+		"start": "wp-scripts start",
+		"start:hot": "wp-scripts start --hot"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.10.4",
 		"@mantine/core": "^5.4.0",
 		"@mantine/hooks": "^5.4.0",
 		"@prettier/plugin-php": "^0.18.9",
+		"@tabler/icons": "^1.100.0",
 		"@types/wordpress__block-editor": "^7.0.0",
 		"@wordpress/dom-ready": "^3.17.0",
 		"@wordpress/element": "^4.12.0",
