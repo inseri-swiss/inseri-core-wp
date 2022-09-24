@@ -53,7 +53,16 @@ function resolve_action($action): Either {
 }
 
 function get_all(): Either {
-	$action = fn($wpdb, $table_name) => $wpdb->get_results("SELECT * FROM $table_name;");
+	global $wpdb;
+	$table_name = $wpdb->prefix . 'inseri_datasources';
+	$user_table = $wpdb->prefix . 'users';
+
+	$sql = "SELECT datasources.*, users.user_nicename AS author_name
+	FROM $table_name AS datasources
+	LEFT JOIN $user_table AS users
+	on datasources.author = users.id;";
+
+	$action = fn($wpdb, $table_name) => $wpdb->get_results($sql);
 	return resolve_action($action);
 }
 

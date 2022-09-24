@@ -10,7 +10,6 @@ const useStyles = createStyles({
 		fontSize: '14px',
 	},
 	root: {
-		backgroundColor: '#f6f7f7',
 		fontWeight: 'normal',
 		fontSize: '14px',
 	},
