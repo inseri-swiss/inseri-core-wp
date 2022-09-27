@@ -5,6 +5,7 @@ import { IconX } from '@tabler/icons'
 
 import { Datasource, getData } from './ApiServer'
 import { ContentTableBody, EmptyTableBody, SortableColumns, TableHeader } from './TableComponents'
+import { getHotkeyHandler } from '@mantine/hooks'
 
 const useStyles = createStyles((_theme) => ({
 	compactBtn: {
@@ -160,6 +161,7 @@ export function AdminPanel() {
 					<TextInput
 						aria-label={__('Search Data Sources', 'inseri-core')}
 						ref={searchboxRef}
+						onKeyDown={getHotkeyHandler([['Enter', searchDatasources]])}
 						rightSection={
 							searchboxText && (
 								<ActionIcon size="xs" onClick={clearSearbox}>
