@@ -33,7 +33,7 @@ interface ThProps {
 
 export function SortableTh({ className, children, reversed, sorted, onSort }: ThProps) {
 	const { classes, cx } = useStyles()
-	const Icon = sorted ? (reversed ? IconChevronUp : IconChevronDown) : IconSelector // eslint-disable-line no-nested-ternary
+	const Icon = sorted ? (reversed ? IconChevronDown : IconChevronUp) : IconSelector // eslint-disable-line no-nested-ternary
 
 	return (
 		<th className={cx(classes.th, className)}>
