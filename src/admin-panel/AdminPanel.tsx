@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Box, Button, createStyles, Group, MediaQuery, Select, Table, TextInput, Title } from '../components'
+import { Box, Button, createStyles, Group, MediaQuery, Select, Table, TextInput, Title, ActionIcon } from '../components'
+import { IconX } from '@tabler/icons'
+
 import { Datasource, getData } from './ApiServer'
 import { ContentTableBody, EmptyTableBody, SortableColumns, TableHeader } from './TableComponents'
 
@@ -42,6 +44,8 @@ export function AdminPanel() {
 		'PATCH',
 	]
 
+	const [searchboxText, setSearchboxText] = useState<string>('')
+
 	const [filterByAuthor, setFilterByAuthor] = useState<string>(authors[0])
 	const [filterByType, setFilterByType] = useState<string>(types[0])
 	const [filterByMethod, setFilterByMethod] = useState<string>(methods[0])
@@ -69,6 +73,13 @@ export function AdminPanel() {
 			}
 		})
 
+		if (searchboxText) {
+			rearrangedData = rearrangedData.filter(({ description, url }) => {
+				const searchKey = searchboxText.toLowerCase()
+				return description.toLowerCase().includes(searchKey) || url.toLowerCase().includes(searchKey)
+			})
+		}
+
 		if (sortDataBy !== null) {
 			rearrangedData = rearrangedData.sort((a, b) => a[sortDataBy]?.localeCompare(b[sortDataBy]))
 
@@ -85,6 +96,7 @@ export function AdminPanel() {
 		filterByType,
 		sortDataBy,
 		isReversed,
+		searchboxText,
 	])
 
 	useEffect(() => {
@@ -104,11 +116,23 @@ export function AdminPanel() {
 	const authorSelectRef = useRef<HTMLInputElement>(null)
 	const typeSelectRef = useRef<HTMLInputElement>(null)
 	const methodSelectRef = useRef<HTMLInputElement>(null)
+	const searchboxRef = useRef<HTMLInputElement>(null)
 
 	const chooseFilters = () => {
 		setFilterByAuthor(authorSelectRef.current?.value ?? ALL_AUTHORS)
 		setFilterByType(typeSelectRef.current?.value ?? ALL_TYPES)
 		setFilterByMethod(methodSelectRef.current?.value ?? ALL_METHODS)
+	}
+
+	const searchDatasources = () => {
+		setSearchboxText(searchboxRef.current?.value ?? '')
+	}
+
+	const clearSearbox = () => {
+		if (searchboxRef.current) {
+			searchboxRef.current.value = ''
+		}
+		setSearchboxText('')
 	}
 
 	return (
@@ -133,8 +157,18 @@ export function AdminPanel() {
 
 					<div style={{ flex: 1 }} />
 
-					<TextInput aria-label={__('Search Data Sources', 'inseri-core')} />
-					<Button variant="outline" classNames={{ root: secondaryBtn }} onClick={() => {}}>
+					<TextInput
+						aria-label={__('Search Data Sources', 'inseri-core')}
+						ref={searchboxRef}
+						rightSection={
+							searchboxText && (
+								<ActionIcon size="xs" onClick={clearSearbox}>
+									<IconX />
+								</ActionIcon>
+							)
+						}
+					/>
+					<Button variant="outline" classNames={{ root: secondaryBtn }} onClick={searchDatasources}>
 						{__('Search Data Sources', 'inseri-core')}
 					</Button>
 				</Group>
