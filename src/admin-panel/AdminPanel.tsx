@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from '@wordpress/element'
+import { useEffect, useRef, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Box, Table, Select, Group, Button, createStyles, Title, TextInput, MediaQuery, SortableTh, Stack, Text } from '../components'
+import { Box, Button, createStyles, Group, MediaQuery, Select, Table, TextInput, Title } from '../components'
 import { Datasource, getData } from './ApiServer'
+import { ContentTableBody, EmptyTableBody, SortableColumns, TableHeader } from './TableComponents'
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles((_theme) => ({
 	compactBtn: {
 		fontWeight: 600,
 		backgroundColor: '#f6f7f7',
@@ -16,53 +17,14 @@ const useStyles = createStyles((theme) => ({
 		background: '#fff',
 		width: '100%',
 	},
-	col0: {
-		minWidth: '120px',
-		width: '20%',
-		[theme.fn.smallerThan('sm')]: {
-			width: '70%',
-		},
-	},
-	col1: {
-		minWidth: '120px',
-		width: '15%',
-		[theme.fn.smallerThan('sm')]: {
-			width: '30%',
-		},
-	},
-	col2: {
-		minWidth: '120px',
-		width: '10%',
-		[theme.fn.smallerThan('sm')]: {
-			display: 'none',
-		},
-	},
-	col3: {
-		minWidth: '120px',
-		width: '10%',
-		[theme.fn.smallerThan('sm')]: {
-			display: 'none',
-		},
-	},
-	col4: {
-		maxWidth: '0',
-		overflow: 'hidden',
-		textOverflow: 'ellipsis',
-		whiteSpace: 'nowrap',
-		[theme.fn.smallerThan('sm')]: {
-			display: 'none',
-		},
-	},
 }))
-
-type SortableColumns = null | 'description' | 'type' | 'author_name' | 'method' | 'url'
 
 const ALL_AUTHORS = __('All Authors', 'inseri-core')
 const ALL_TYPES = __('All Types', 'inseri_core')
 const ALL_METHODS = __('All Methods', 'inseri_core')
 
 export function AdminPanel() {
-	const { compactBtn, secondaryBtn, table: tableClass, col0, col1, col2, col3, col4 } = useStyles().classes
+	const { compactBtn, secondaryBtn, table: tableClass } = useStyles().classes
 
 	const [rawDatasources, setRawDatasources] = useState<Datasource[]>([])
 	const [datasources, setDatasources] = useState<Datasource[]>([])
@@ -126,13 +88,12 @@ export function AdminPanel() {
 	])
 
 	useEffect(() => {
-		getData().then((data) => {
-			setDatasources(data)
-			setRawDatasources(data)
-		})
+		getData().then((data) => setRawDatasources(data))
 	}, [])
 
 	useEffect(() => {
+		setDatasources(rawDatasources)
+
 		const uniqueAuthors = new Set(rawDatasources.map((d) => d.author_name ?? ''))
 		setAuthors([ALL_AUTHORS, ...Array.from(uniqueAuthors)])
 
@@ -179,52 +140,24 @@ export function AdminPanel() {
 				</Group>
 			</MediaQuery>
 			<Table striped className={tableClass} verticalSpacing="md">
-				<thead>
-					<tr>
-						<SortableTh className={col0} sorted={sortDataBy === 'description'} reversed={isReversed} onSort={sortData('description')}>
-							{__('Name', 'inseri-core')}
-						</SortableTh>
-						<SortableTh className={col1} sorted={sortDataBy === 'author_name'} reversed={isReversed} onSort={sortData('author_name')}>
-							{__('Author', 'inseri-core')}
-						</SortableTh>
-						<SortableTh className={col2} sorted={sortDataBy === 'type'} reversed={isReversed} onSort={sortData('type')}>
-							{__('Type', 'inseri-core')}
-						</SortableTh>
-						<SortableTh className={col3} sorted={sortDataBy === 'method'} reversed={isReversed} onSort={sortData('method')}>
-							{__('Method', 'inseri-core')}
-						</SortableTh>
-						<SortableTh className={col4} sorted={sortDataBy === 'url'} reversed={isReversed} onSort={sortData('url')}>
-							{__('URL', 'inseri-core')}
-						</SortableTh>
-					</tr>
-				</thead>
-				<tbody>
-					{datasources.length > 0 ? (
-						datasources.map((d) => (
-							<tr key={d.id}>
-								<td className={col0}>{d.description}</td>
-								<td className={col1}>{d.author_name}</td>
-								<td className={col2}>{d.type}</td>
-								<td className={col3}>{d.method}</td>
-								<td className={col4}>{d.url}</td>
-							</tr>
-						))
+				<TableHeader sortBy={sortDataBy} isReversed={isReversed} sortData={sortData} />
+				{
+					// eslint-disable-next-line no-nested-ternary
+					datasources.length > 0 ? (
+						<ContentTableBody datasources={datasources} />
+					) : rawDatasources.length > 0 ? (
+						<EmptyTableBody
+							title={__('No data sources found', 'inseri-core')}
+							description={__('Try adjusting your search or filters', 'inseri-core')}
+						></EmptyTableBody>
 					) : (
-						<tr>
-							<td colSpan={5}>
-								<Stack align="center" spacing={1}>
-									<Title order={2} size="h4">
-										{__('No data sources found', 'inseri-core')}
-									</Title>
-									<Text>{__('To fetch data in posts or in pages, add new data repository', 'inseri-core')}</Text>
-									<Button size="sm" mt="sm">
-										{__('Add New Data Source', 'inseri-core')}
-									</Button>
-								</Stack>
-							</td>
-						</tr>
-					)}
-				</tbody>
+						<EmptyTableBody
+							title={__('No data sources yet', 'inseri-core')}
+							description={__('To fetch data in posts or in pages, add new data repository', 'inseri-core')}
+							buttonText={__('Add New Data Source', 'inseri-core')}
+						></EmptyTableBody>
+					)
+				}
 			</Table>
 		</Box>
 	)
