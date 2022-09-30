@@ -2,8 +2,11 @@
 
 abstract class Inseri_Core_Admin {
 	static $script_name = 'inseri-core-admin-panel-script';
-	static $menu_slug = 'inseri-core-page';
+	static $top_menu_title = 'Inseri';
 	static $permission = 'publish_posts';
+
+	static $top_menu_slug = 'inseri-core-page';
+	static $add_new_menu_slug = 'inseri-core-add-new-page';
 
 	static function register_ui_script() {
 		$asset_file = include plugin_dir_path(__FILE__) . '../build/admin-panel.asset.php';
@@ -12,8 +15,10 @@ abstract class Inseri_Core_Admin {
 	}
 
 	static function load_script($hook) {
-		// Load only on ?page=inseri-core-page.
-		if ('toplevel_page_' . self::$menu_slug !== $hook) {
+		$top_hook = 'toplevel_page_' . self::$top_menu_slug;
+		$add_new_hook = strtolower(self::$top_menu_title) . '_page_' . self::$add_new_menu_slug;
+
+		if ($top_hook !== $hook && $add_new_hook !== $hook) {
 			return;
 		}
 
@@ -27,19 +32,22 @@ abstract class Inseri_Core_Admin {
 
 	static function add_menu() {
 		$icon = trim(file_get_contents(plugin_dir_path(__FILE__) . 'icon.b64'));
+		$main_page_title = __('Data Sources - Inseri', 'inseri-core');
+		$render_root = function () {
+			?>
+				<div id="inseri-core-root"></div>
+			<?php
+		};
 
-		add_menu_page(
-			__('Datasources - Inseri', 'inseri-core'),
-			'Inseri',
+		add_menu_page($main_page_title, self::$top_menu_title, self::$permission, self::$top_menu_slug, $render_root, 'data:image/svg+xml;base64,' . $icon, 3);
+		add_submenu_page(self::$top_menu_slug, $main_page_title, __('All Data Sources', 'inseri-core'), self::$permission, self::$top_menu_slug, $render_root);
+		add_submenu_page(
+			self::$top_menu_slug,
+			__('Add New Data Source - Inseri', 'inseri-core'),
+			__('Add New', 'inseri-core'),
 			self::$permission,
-			self::$menu_slug,
-			function () {
-				?>
-					<div id="inseri-core-root"></div>
-			 	<?php
-			},
-			'data:image/svg+xml;base64,' . $icon,
-			3
+			self::$add_new_menu_slug,
+			$render_root
 		);
 	}
 }
