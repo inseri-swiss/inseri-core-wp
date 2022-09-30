@@ -1,67 +1,82 @@
 import { render } from '@wordpress/element'
 import domReady from '@wordpress/dom-ready'
-import { MantineProvider, Global, createStyles } from '../components'
+import { MantineProvider, Global, createStyles, MantineThemeOverride } from '../components'
 import { AdminPanel } from './AdminPanel'
 
-const useStyles = createStyles({
+const useStyles = createStyles((theme, _params, getRef) => ({
 	input: {
-		backgroundColor: '#fff !important',
-		borderRadius: '3px !important',
-		fontSize: '14px',
+		ref: getRef('input'),
 	},
-	root: {
+	inputWrapper: {
+		[`& > .${getRef('input')}`]: {
+			backgroundColor: '#fff',
+			borderRadius: '3px',
+			fontSize: '14px',
+		},
+	},
+	buttonRoot: {
 		fontWeight: 'normal',
 		fontSize: '14px',
 	},
-})
+	checkboxInner: {
+		[`& > input[type="checkbox"]`]: {
+			border: '1px solid' + theme.colors.gray[4],
+			margin: 0,
+			width: '20px',
+			height: '20px',
+			borderRadius: '3px',
+		},
+
+		[`& > input[type="checkbox"]:checked::before`]: {
+			content: 'unset',
+		},
+
+		[`& > input[type="checkbox"]:focus`]: {
+			boxShadow: 'unset',
+		},
+	},
+}))
 
 const AdminGlobalStyles = () => (
 	<Global
 		styles={(_theme) => ({
 			body: { backgroundColor: '#f0f0f1' },
+
+			'#wpcontent': {
+				paddingLeft: '0',
+			},
 		})}
 	/>
 )
 
 function Root() {
-	const { input, root } = useStyles().classes
+	const { classes } = useStyles()
+	const { inputWrapper, input, buttonRoot, checkboxInner } = classes
+
+	const themeOverride: MantineThemeOverride = {
+		defaultRadius: 3,
+		primaryShade: 8,
+		components: {
+			Select: {
+				defaultProps: { size: 'xs', labelProps: { size: 'sm' } },
+				classNames: { input, wrapper: inputWrapper },
+			},
+			TextInput: {
+				defaultProps: { size: 'xs', labelProps: { size: 'sm' } },
+				classNames: { input, wrapper: inputWrapper },
+			},
+			Button: {
+				defaultProps: { size: 'xs' },
+				classNames: { root: buttonRoot },
+			},
+			Checkbox: {
+				classNames: { inner: checkboxInner },
+			},
+		},
+	}
+
 	return (
-		<MantineProvider
-			withNormalizeCSS
-			withGlobalStyles
-			theme={{
-				colors: {
-					main: [
-						'#e7f5ff',
-						'#d0ebff',
-						'#a5d8ff',
-						'#74c0fc',
-						'#4dabf7',
-						'#339af0',
-						'#2271b1',
-						'#1c7ed6',
-						'#1971c2',
-						'#1864ab',
-					],
-				},
-				primaryColor: 'main',
-				defaultRadius: 3,
-				components: {
-					Select: {
-						defaultProps: { size: 'xs' },
-						classNames: { input },
-					},
-					TextInput: {
-						defaultProps: { size: 'xs' },
-						classNames: { input },
-					},
-					Button: {
-						defaultProps: { size: 'xs' },
-						classNames: { root },
-					},
-				},
-			}}
-		>
+		<MantineProvider withNormalizeCSS withGlobalStyles theme={themeOverride}>
 			<AdminGlobalStyles />
 			<AdminPanel />
 		</MantineProvider>
