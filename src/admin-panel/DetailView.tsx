@@ -1,7 +1,8 @@
 import { useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Accordion, Box, Button, createStyles, Group, Select, Tabs, TextInput, Title } from '../components'
+import { Accordion, Box, Button, createStyles, Group, SegmentedControl, Select, Tabs, Textarea, TextInput, Title } from '../components'
 import { Params, ParamsTable } from './ParamsTable'
+import { RequestBody } from './RequestBody'
 
 const useStyles = createStyles((theme, _params, getRef) => ({
 	primaryBtn: {
@@ -86,6 +87,7 @@ export function DetailView(_props: Props) {
 	} = useStyles().classes
 	const [queryParams, setQueryParams] = useState<Params>({})
 	const [headerParams, setHeaderParams] = useState<Params>({})
+	const [requestBody, setRequestBody] = useState<string | Params>('')
 	const [openAccordionItems, setOpenAccordionItems] = useState<string[]>(['request'])
 
 	return (
@@ -160,8 +162,8 @@ export function DetailView(_props: Props) {
 									<ParamsTable onChange={setHeaderParams} />
 								</Tabs.Panel>
 
-								<Tabs.Panel value="body" pt="xs">
-									Settings tab content
+								<Tabs.Panel value="body" py="sm" px="md">
+									<RequestBody onChange={setRequestBody} />
 								</Tabs.Panel>
 							</Tabs>
 						</Accordion.Panel>
