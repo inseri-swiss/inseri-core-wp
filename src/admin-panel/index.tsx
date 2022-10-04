@@ -25,6 +25,7 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 			width: '20px',
 			height: '20px',
 			borderRadius: '3px',
+			verticalAlign: 'unset',
 		},
 
 		[`& > input[type="checkbox"]:checked::before`]: {
