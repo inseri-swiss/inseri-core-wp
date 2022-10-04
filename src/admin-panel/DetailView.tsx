@@ -1,5 +1,7 @@
+import { useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Box, Group, TextInput, Title, Select, Button, createStyles, Accordion, Tabs, Table, Checkbox } from '../components'
+import { Accordion, Box, Button, createStyles, Group, Select, Tabs, TextInput, Title } from '../components'
+import { Params, ParamsTable } from './ParamsTable'
 
 const useStyles = createStyles((theme, _params, getRef) => ({
 	primaryBtn: {
@@ -38,30 +40,21 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 		flex: 1,
 	},
 
-	table: {
-		[`& td:nth-child(1)`]: {
-			width: '20px',
-			paddingLeft: theme.spacing.md,
-		},
-
-		[`& td:nth-child(3)`]: {
-			width: '60%',
-			paddingRight: theme.spacing.md,
-		},
+	titleBar: {
+		border: '1px solid' + theme.colors.gray[4],
+		background: '#fff',
 	},
-
-	paramInput: {
-		ref: getRef('param-input'),
+	whiteBox: {
+		border: '1px solid' + theme.colors.gray[4],
+		background: '#fff',
 	},
-	paramWrapper: {
-		[`& > .${getRef('param-input')}`]: {
-			border: 'none',
-			['&:focus']: {
-				border: '1px solid #8c8f94',
-				boxShadow: 'none',
-			},
-		},
+	accordionLabel: {
+		fontWeight: 'bold',
 	},
+	accordionContent: {
+		padding: 0,
+	},
+	tab: { borderWidth: '4px' },
 }))
 
 interface EditProps {
@@ -76,7 +69,24 @@ interface CreateProps {
 type Props = CreateProps | EditProps
 
 export function DetailView(_props: Props) {
-	const { primaryBtn, sendBtn, methodRoot, methodInput, methodWrapper, urlInput, urlWrapper, urlRoot, table, paramInput, paramWrapper } = useStyles().classes
+	const {
+		primaryBtn,
+		sendBtn,
+		methodRoot,
+		methodInput,
+		methodWrapper,
+		urlInput,
+		urlWrapper,
+		urlRoot,
+		titleBar,
+		whiteBox,
+		accordionContent,
+		accordionLabel,
+		tab,
+	} = useStyles().classes
+	const [queryParams, setQueryParams] = useState<Params>({})
+	const [headerParams, setHeaderParams] = useState<Params>({})
+	const [openAccordionItems, setOpenAccordionItems] = useState<string[]>(['request'])
 
 	return (
 		<>
@@ -84,7 +94,7 @@ export function DetailView(_props: Props) {
 				<Group px={36} py="md">
 					Inseri
 				</Group>
-				<Group px={36} py="sm" position="apart" sx={(theme) => ({ border: '1px solid' + theme.colors.gray[4], background: '#fff' })}>
+				<Group px={36} py="sm" position="apart" className={titleBar}>
 					<Title order={1} size="h3">
 						{__('Add New Data Source', 'inseri-core')}
 					</Title>
@@ -100,14 +110,7 @@ export function DetailView(_props: Props) {
 				</Group>
 			</Box>
 
-			<Box
-				mt="lg"
-				mx={36}
-				sx={(theme) => ({
-					border: '1px solid' + theme.colors.gray[4],
-					background: '#fff',
-				})}
-			>
+			<Box mt="lg" mx={36} className={whiteBox}>
 				<Group px="md" py="lg">
 					<Group spacing={0} style={{ flex: 1 }}>
 						<Select
@@ -132,62 +135,32 @@ export function DetailView(_props: Props) {
 				<Accordion
 					multiple
 					variant="default"
-					styles={(_theme) => ({
-						label: {
-							fontWeight: 'bold',
-						},
-						content: {
-							padding: 0,
-						},
-					})}
+					classNames={{
+						label: accordionLabel,
+						content: accordionContent,
+					}}
+					value={openAccordionItems}
+					onChange={setOpenAccordionItems}
 				>
-					<Accordion.Item value="customization">
+					<Accordion.Item value="request" defaultChecked={true}>
 						<Accordion.Control>Request Parameters</Accordion.Control>
 						<Accordion.Panel>
-							<Tabs
-								styles={{
-									tab: {
-										borderWidth: '4px',
-									},
-								}}
-								defaultValue="gallery"
-							>
+							<Tabs classNames={{ tab }} defaultValue="query-params">
 								<Tabs.List>
-									<Tabs.Tab value="gallery">Query Params</Tabs.Tab>
-									<Tabs.Tab value="messages">Headers</Tabs.Tab>
-									<Tabs.Tab value="settings">Body</Tabs.Tab>
+									<Tabs.Tab value="query-params">{__('Query Params', 'inseri-core')}</Tabs.Tab>
+									<Tabs.Tab value="headers">{__('Headers', 'inseri-core')}</Tabs.Tab>
+									<Tabs.Tab value="body">{__('Body', 'inseri-core')}</Tabs.Tab>
 								</Tabs.List>
 
-								<Tabs.Panel value="gallery" pt="xs">
-									<Table className={table}>
-										<thead>
-											<tr>
-												<th></th>
-												<th>Key</th>
-												<th>Value</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td>
-													<Checkbox color="gray" />
-												</td>
-												<td>
-													<TextInput classNames={{ input: paramInput, wrapper: paramWrapper }} placeholder="key" />
-												</td>
-												<td>
-													<TextInput classNames={{ input: paramInput, wrapper: paramWrapper }} placeholder="value" />
-												</td>
-											</tr>
-										</tbody>
-									</Table>
+								<Tabs.Panel value="query-params" pt="xs">
+									<ParamsTable onChange={setQueryParams} />
 								</Tabs.Panel>
 
-								<Tabs.Panel value="messages" pt="xs">
-									Messages tab content
+								<Tabs.Panel value="headers" pt="xs">
+									<ParamsTable onChange={setHeaderParams} />
 								</Tabs.Panel>
 
-								<Tabs.Panel value="settings" pt="xs">
+								<Tabs.Panel value="body" pt="xs">
 									Settings tab content
 								</Tabs.Panel>
 							</Tabs>
