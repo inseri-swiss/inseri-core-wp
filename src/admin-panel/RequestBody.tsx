@@ -1,7 +1,8 @@
 import { useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { createStyles, SegmentedControl, Text, Textarea } from '../components'
+import { createStyles, Group, SegmentedControl, Text, Textarea } from '../components'
 import { Params, ParamsTable } from './ParamsTable'
+import { IconCircleOff } from '@tabler/icons'
 
 const useStyles = createStyles({
 	input: {
@@ -26,20 +27,23 @@ export function RequestBody({ onChange }: Props) {
 		'Text',
 		'XML',
 		'JSON',
-		'x-www-form-urlencoded',
+		'form-urlencoded',
 		'form-data',
 	]
 	const [bodyType, setBodyType] = useState<string>(BODY_TYPES[1])
 
-	const isFormType = (type: string) => ['x-www-form-urlencoded', 'form-data'].some((i) => i === type)
+	const isFormType = (type: string) => ['form-urlencoded', 'form-data'].some((i) => i === type)
 
 	return (
 		<>
 			<SegmentedControl value={bodyType} onChange={setBodyType} data={BODY_TYPES} />
 			{bodyType === NONE ? (
-				<Text size="md" color="dimmed" my="lg">
-					{__('Empty body', 'inseri_core')}
-				</Text>
+				<Group m="lg">
+					<IconCircleOff size={24} color="gray" />
+					<Text size="md" color="gray">
+						{__('no body', 'inseri_core')}
+					</Text>
+				</Group>
 			) : isFormType(bodyType) ? (
 				<ParamsTable onChange={onChange} />
 			) : (

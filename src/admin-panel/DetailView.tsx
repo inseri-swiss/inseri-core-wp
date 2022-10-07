@@ -1,6 +1,6 @@
 import { useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Accordion, Box, Button, createStyles, Group, SegmentedControl, Select, Tabs, Textarea, TextInput, Title } from '../components'
+import { Accordion, Box, Button, createStyles, Group, Select, Tabs, TextInput, Title } from '../components'
 import { Params, ParamsTable } from './ParamsTable'
 import { RequestBody } from './RequestBody'
 
@@ -85,9 +85,9 @@ export function DetailView(_props: Props) {
 		accordionLabel,
 		tab,
 	} = useStyles().classes
-	const [queryParams, setQueryParams] = useState<Params>({})
-	const [headerParams, setHeaderParams] = useState<Params>({})
-	const [requestBody, setRequestBody] = useState<string | Params>('')
+	const [_queryParams, setQueryParams] = useState<Params>({})
+	const [_headerParams, setHeaderParams] = useState<Params>({})
+	const [_requestBody, setRequestBody] = useState<string | Params>('')
 	const [openAccordionItems, setOpenAccordionItems] = useState<string[]>(['request'])
 
 	return (
