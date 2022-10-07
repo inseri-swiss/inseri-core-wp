@@ -2,6 +2,7 @@
 
 abstract class Inseri_Core_Admin {
 	static $script_name = 'inseri-core-admin-panel-script';
+	static $style_name = 'inseri-core-admin-panel-style';
 	static $top_menu_title = 'Inseri';
 	static $permission = 'publish_posts';
 
@@ -12,6 +13,7 @@ abstract class Inseri_Core_Admin {
 		$asset_file = include plugin_dir_path(__FILE__) . '../build/admin-panel.asset.php';
 
 		wp_register_script(self::$script_name, plugins_url('../build/admin-panel.js', __FILE__), $asset_file['dependencies'], $asset_file['version']);
+		wp_register_style(self::$style_name, plugins_url('../build/admin-panel.css', __FILE__));
 	}
 
 	static function load_script($hook) {
@@ -28,6 +30,7 @@ abstract class Inseri_Core_Admin {
 		]);
 
 		wp_enqueue_script(self::$script_name);
+		wp_enqueue_style(self::$style_name);
 	}
 
 	static function add_menu() {

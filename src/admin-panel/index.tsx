@@ -2,6 +2,7 @@ import { render } from '@wordpress/element'
 import domReady from '@wordpress/dom-ready'
 import { MantineProvider, Global, createStyles, MantineThemeOverride } from '../components'
 import { AdminPanel } from './AdminPanel'
+import './editor.scss'
 
 const useStyles = createStyles((theme, _params, getRef) => ({
 	input: {
