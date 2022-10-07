@@ -181,23 +181,20 @@ export function ListView({ addNewPath }: Props) {
 			</MediaQuery>
 			<Table striped className={tableClass} verticalSpacing="md">
 				<TableHeader sortBy={sortDataBy} isReversed={isReversed} sortData={sortData} />
-				{
-					// eslint-disable-next-line no-nested-ternary
-					datasources.length > 0 ? (
-						<ContentTableBody datasources={datasources} />
-					) : rawDatasources.length > 0 ? (
-						<EmptyTableBody
-							title={__('No data sources found', 'inseri-core')}
-							description={__('Try adjusting your search or filters', 'inseri-core')}
-						></EmptyTableBody>
-					) : (
-						<EmptyTableBody
-							title={__('No data sources yet', 'inseri-core')}
-							description={__('To fetch data in posts or in pages, add new data repository', 'inseri-core')}
-							buttonText={__('Add New Data Source', 'inseri-core')}
-						></EmptyTableBody>
-					)
-				}
+				{datasources.length > 0 ? (
+					<ContentTableBody datasources={datasources} />
+				) : rawDatasources.length > 0 ? (
+					<EmptyTableBody
+						title={__('No data sources found', 'inseri-core')}
+						description={__('Try adjusting your search or filters', 'inseri-core')}
+					></EmptyTableBody>
+				) : (
+					<EmptyTableBody
+						title={__('No data sources yet', 'inseri-core')}
+						description={__('To fetch data in posts or in pages, add new data repository', 'inseri-core')}
+						buttonText={__('Add New Data Source', 'inseri-core')}
+					></EmptyTableBody>
+				)}
 			</Table>
 		</Box>
 	)

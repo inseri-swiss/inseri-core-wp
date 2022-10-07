@@ -46,6 +46,12 @@ const AdminGlobalStyles = () => (
 			'#wpcontent': {
 				paddingLeft: '0',
 			},
+
+			'@media screen and (max-width: 782px)': {
+				'.auto-fold #wpcontent': {
+					paddingLeft: '0',
+				},
+			},
 		})}
 	/>
 )
