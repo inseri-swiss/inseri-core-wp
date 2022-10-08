@@ -12,7 +12,6 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 		[`& > .${getRef('input')}`]: {
 			backgroundColor: '#fff',
 			borderRadius: '3px',
-			fontSize: '14px',
 		},
 	},
 	buttonRoot: {
@@ -66,15 +65,12 @@ function Root() {
 		primaryShade: 8,
 		components: {
 			Select: {
-				defaultProps: { size: 'xs', labelProps: { size: 'sm' } },
 				classNames: { input, wrapper: inputWrapper },
 			},
 			TextInput: {
-				defaultProps: { size: 'xs', labelProps: { size: 'sm' } },
 				classNames: { input, wrapper: inputWrapper },
 			},
 			Button: {
-				defaultProps: { size: 'xs' },
 				classNames: { root: buttonRoot },
 			},
 			Checkbox: {

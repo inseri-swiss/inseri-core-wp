@@ -3,44 +3,12 @@ import { __ } from '@wordpress/i18n'
 import { Accordion, Box, Button, createStyles, Group, Select, Tabs, TextInput, Title } from '../components'
 import { Params, ParamsTable } from './ParamsTable'
 import { RequestBody } from './RequestBody'
+import { UrlBar } from './UrlBar'
 
-const useStyles = createStyles((theme, _params, getRef) => ({
+const useStyles = createStyles((theme) => ({
 	primaryBtn: {
 		fontWeight: 'bold',
 	},
-
-	sendBtn: {
-		fontWeight: 'bold',
-		background: theme.colors.blue[1],
-		color: '#0d3459',
-	},
-
-	methodRoot: {
-		width: '8em',
-	},
-	methodInput: {
-		ref: getRef('method-input'),
-	},
-	methodWrapper: {
-		[`& > .${getRef('method-input')}`]: {
-			borderTopRightRadius: 0,
-			borderBottomRightRadius: 0,
-		},
-	},
-	urlInput: {
-		ref: getRef('url-input'),
-	},
-	urlWrapper: {
-		[`& > .${getRef('url-input')}`]: {
-			borderTopLeftRadius: 0,
-			borderBottomLeftRadius: 0,
-			borderLeftWidth: 0,
-		},
-	},
-	urlRoot: {
-		flex: 1,
-	},
-
 	titleBar: {
 		border: '1px solid' + theme.colors.gray[4],
 		background: '#fff',
@@ -69,22 +37,13 @@ interface CreateProps {
 
 type Props = CreateProps | EditProps
 
+const DATASOURCE_TYPES = ['General']
+
 export function DetailView(_props: Props) {
-	const {
-		primaryBtn,
-		sendBtn,
-		methodRoot,
-		methodInput,
-		methodWrapper,
-		urlInput,
-		urlWrapper,
-		urlRoot,
-		titleBar,
-		whiteBox,
-		accordionContent,
-		accordionLabel,
-		tab,
-	} = useStyles().classes
+	const { primaryBtn, titleBar, whiteBox, accordionContent, accordionLabel, tab } = useStyles().classes
+
+	const [method, setMethod] = useState('GET')
+	const [url, setUrl] = useState('')
 	const [_queryParams, setQueryParams] = useState<Params>({})
 	const [_headerParams, setHeaderParams] = useState<Params>({})
 	const [_requestBody, setRequestBody] = useState<string | Params>('')
@@ -107,32 +66,13 @@ export function DetailView(_props: Props) {
 				</Group>
 
 				<Group px={36} mt="md">
-					<Select label={__('Type', 'inseri-core')} withAsterisk data={['REST-API']} />
+					<Select label={__('Type', 'inseri-core')} data={DATASOURCE_TYPES} value={DATASOURCE_TYPES[0]} />
 					<TextInput label={__('Name', 'inseri-core')} sx={{ flex: 1 }} withAsterisk />
 				</Group>
 			</Box>
 
 			<Box mt="lg" mx={36} className={whiteBox}>
-				<Group px="md" py="lg">
-					<Group spacing={0} style={{ flex: 1 }}>
-						<Select
-							classNames={{ root: methodRoot, wrapper: methodWrapper, input: methodInput }}
-							aria-label={__('Type', 'inseri-core')}
-							data={['GET', 'DELETE']}
-							size="sm"
-						/>
-						<TextInput
-							classNames={{ root: urlRoot, wrapper: urlWrapper, input: urlInput }}
-							aria-label={__('Name', 'inseri-core')}
-							placeholder={__('Enter your URL', 'inseri-core')}
-							variant="filled"
-							size="sm"
-						/>
-					</Group>
-					<Button classNames={{ root: sendBtn }} variant="light" size="sm" uppercase>
-						{__('Try Request', 'inseri-core')}
-					</Button>
-				</Group>
+				<UrlBar method={method} onMethodChange={setMethod} url={url} onUrlChange={setUrl} />
 
 				<Accordion
 					multiple
