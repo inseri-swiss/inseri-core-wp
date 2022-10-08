@@ -1,5 +1,4 @@
 import { IconX } from '@tabler/icons'
-import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { ActionIcon, Checkbox, createStyles, Table, TextInput } from '../components'
 
@@ -41,59 +40,46 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 	},
 }))
 
-interface RowItem {
+export interface ParamItem {
 	isChecked: boolean
 	key: string
 	value: string
 }
 
-export interface Params {
-	[key: string]: string
-}
-
 interface Props {
-	onChange: (obj: Params) => void
+	items: ParamItem[]
+	onItemsChange: (params: ParamItem[]) => void
 }
 
-export function ParamsTable({ onChange }: Props) {
-	const [rowData, setRowData] = useState<RowItem[]>([{ isChecked: true, key: '', value: '' }])
-
+export function ParamsTable({ onItemsChange, items: inputItems }: Props) {
 	const { table, paramInput, paramWrapper } = useStyles().classes
-
-	useEffect(() => {
-		const paramsObject: Params = rowData
-			.filter((i) => i.isChecked)
-			.filter((i) => i.key || i.value)
-			.reduce((acc, i) => ({ ...acc, [i.key]: i.value }), {})
-
-		onChange(paramsObject)
-	}, [rowData])
+	const items = inputItems.length > 0 ? inputItems : [{ isChecked: true, key: '', value: '' }]
 
 	const updateParams = ({ key, value, isChecked }: { key?: string; value?: string; isChecked?: boolean }, index: number) => {
 		let tail = null
-		if (index === rowData.length - 1) {
+		if (index === items.length - 1) {
 			tail = { isChecked: true, key: '', value: '' }
 		}
 
-		const item = rowData[index]
+		const item = items[index]
 		const updatedItem = {
 			key: key ?? item.key,
 			value: value ?? item.value,
 			isChecked: isChecked ?? item.isChecked,
 		}
 
-		const updatedData = [...rowData.slice(0, index), updatedItem, ...rowData.slice(index + 1), tail].filter(Boolean) as RowItem[]
+		const updatedData = [...items.slice(0, index), updatedItem, ...items.slice(index + 1), tail].filter(Boolean) as ParamItem[]
 
-		setRowData(updatedData)
+		onItemsChange(updatedData)
 	}
 
 	const removeParam = (index: number) => () => {
-		const updatedData = [...rowData]
+		const updatedData = [...items]
 		updatedData.splice(index, 1)
-		setRowData(updatedData)
+		onItemsChange(updatedData)
 	}
 
-	const isNotLastIndex = (index: number) => index !== rowData.length - 1
+	const isNotLastIndex = (index: number) => index !== items.length - 1
 
 	return (
 		<Table className={table}>
@@ -106,7 +92,7 @@ export function ParamsTable({ onChange }: Props) {
 				</tr>
 			</thead>
 			<tbody>
-				{rowData.map(({ key, value, isChecked }, index) => (
+				{items.map(({ key, value, isChecked }, index) => (
 					<tr key={index}>
 						<td>
 							{isNotLastIndex(index) && (
