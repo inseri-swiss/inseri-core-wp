@@ -1,10 +1,11 @@
-import { useState } from '@wordpress/element'
+import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Accordion, Box, Button, createStyles, Group, SegmentedControl, Select, Tabs, TextInput, Title, Text, CodeEditor } from '../components'
 import { ParamItem, ParamsTable } from './ParamsTable'
 import { UrlBar } from './UrlBar'
-import xmlFormatter from 'xml-formatter'
 import { IconCircleOff } from '@tabler/icons'
+import { formatCode, getPropertyCaseInsensitive, mapParamsToObject } from '../utils'
+import { fireRequest } from './ApiServer'
 
 const useStyles = createStyles((theme) => ({
 	primaryBtn: {
@@ -49,10 +50,7 @@ const BODY_TYPES = [
 	'form-data',
 ]
 
-const XML_FORMAT_OPTION = {
-	collapseContent: true,
-	lineSeparator: '\n',
-}
+const RESPONSE_AREA_ID = 'response-textarea'
 
 const isFormType = (type: string) => ['form-urlencoded', 'form-data'].some((i) => i === type)
 const isBeautifyType = (type: string) => ['XML', 'JSON'].some((i) => i === type)
@@ -65,30 +63,72 @@ export function DetailView(_props: Props) {
 	const [queryParams, setQueryParams] = useState<ParamItem[]>([])
 	const [headerParams, setHeaderParams] = useState<ParamItem[]>([])
 
-	const [bodyType, setBodyType] = useState<string>(BODY_TYPES[1])
+	const [requestBodyType, setRequestBodyType] = useState<string>(BODY_TYPES[1])
 	const [requestTextBody, setRequestTextBody] = useState<string>('')
 	const [requestParamsBody, setRequestParamsBody] = useState<ParamItem[]>([])
 	const [bodyError, setBodyError] = useState<string>('')
 
 	const [openAccordionItems, setOpenAccordionItems] = useState<string[]>(['request'])
 
-	const beautify = () => {
-		if (bodyType === 'JSON') {
-			try {
-				const value = JSON.stringify(JSON.parse(requestTextBody), null, 2)
-				setRequestTextBody(value)
-			} catch (exception) {
-				setBodyError(__('invalid JSON', 'inseri-core'))
+	const [responseStatus, setResponseStatus] = useState<string>('')
+	const [responseHeaders, setResponseHeaders] = useState<ParamItem[]>([])
+	const [responseBody, setResponseBody] = useState<string>('')
+	const [responseBodyType, setResponseBodyType] = useState<string>('')
+
+	const tryRequest = async () => {
+		// TODO validate url
+		try {
+			let body = null
+			if (isFormType(requestBodyType)) {
+				body = mapParamsToObject(requestParamsBody)
+			} else if (requestBodyType !== NONE) {
+				body = requestTextBody
 			}
-		}
-		if (bodyType === 'XML') {
-			try {
-				setRequestTextBody(xmlFormatter(requestTextBody, XML_FORMAT_OPTION))
-			} catch (exception) {
-				setBodyError(__('invalid XML', 'inseri-core'))
+
+			const { status, statusText, data, headers } = await fireRequest(method, url, mapParamsToObject(queryParams), mapParamsToObject(headerParams), body)
+
+			const isResponsePanelOpen = openAccordionItems.some((i) => i === 'response')
+			if (!isResponsePanelOpen) {
+				setOpenAccordionItems([...openAccordionItems, 'response'])
 			}
+
+			setResponseStatus(`${status} ${statusText}`)
+			const responseHeaders: ParamItem[] = Object.keys(headers).map((key) => ({ isChecked: true, key: key, value: headers[key] ?? '' }))
+			setResponseHeaders(responseHeaders)
+
+			const contentType: string = getPropertyCaseInsensitive(headers, 'content-type')
+			let bodyType = ''
+			if (contentType.includes('application/json')) {
+				bodyType = 'json'
+			}
+
+			if (contentType.includes('xml')) {
+				bodyType = 'xml'
+			}
+
+			const [_error, formattedCode] = formatCode(bodyType, data)
+			setResponseBody(formattedCode ?? data)
+			setResponseBodyType(bodyType)
+		} catch (exception) {
+			// TODO handle request failure
 		}
 	}
+
+	const beautify = () => {
+		const [errorMsg, formattedCode] = formatCode(requestBodyType.toLowerCase(), requestTextBody)
+
+		const error = errorMsg ?? ''
+		setBodyError(error)
+
+		if (formattedCode) {
+			setRequestTextBody(formattedCode)
+		}
+	}
+
+	useEffect(() => {
+		const responseTextarea = document.getElementById(RESPONSE_AREA_ID)
+		responseTextarea?.setAttribute('readonly', 'true')
+	}, [])
 
 	return (
 		<>
@@ -113,7 +153,7 @@ export function DetailView(_props: Props) {
 			</Box>
 
 			<Box mt="lg" mx={36} className={whiteBox}>
-				<UrlBar method={method} onMethodChange={setMethod} url={url} onUrlChange={setUrl} />
+				<UrlBar method={method} onMethodChange={setMethod} url={url} onUrlChange={setUrl} onTryClick={tryRequest} />
 
 				<Accordion
 					multiple
@@ -145,21 +185,21 @@ export function DetailView(_props: Props) {
 
 								<Tabs.Panel value="body" py="sm" px="md">
 									<Group position="apart">
-										<SegmentedControl value={bodyType} onChange={setBodyType} data={BODY_TYPES} />
-										{isBeautifyType(bodyType) && (
+										<SegmentedControl value={requestBodyType} onChange={setRequestBodyType} data={BODY_TYPES} />
+										{isBeautifyType(requestBodyType) && (
 											<Button variant="subtle" onClick={beautify}>
 												{__('Beautify', 'inseri-core')}
 											</Button>
 										)}
 									</Group>
-									{bodyType === NONE ? (
+									{requestBodyType === NONE ? (
 										<Group m="lg">
 											<IconCircleOff size={24} color="gray" />
 											<Text size="md" color="gray">
 												{__('no body', 'inseri-core')}
 											</Text>
 										</Group>
-									) : isFormType(bodyType) ? (
+									) : isFormType(requestBodyType) ? (
 										<ParamsTable items={requestParamsBody} onItemsChange={setRequestParamsBody} />
 									) : (
 										<Box mt="sm">
@@ -169,7 +209,7 @@ export function DetailView(_props: Props) {
 												</Text>
 											)}
 											<CodeEditor
-												type={bodyType.toLowerCase()}
+												type={requestBodyType.toLowerCase()}
 												value={requestTextBody}
 												onChange={(val) => {
 													setBodyError('')
@@ -185,7 +225,34 @@ export function DetailView(_props: Props) {
 
 					<Accordion.Item value="response">
 						<Accordion.Control>{__('Response', 'inseri-core')}</Accordion.Control>
-						<Accordion.Panel>Colors, fonts, shadows and many other parts are customizable to fit your design needs</Accordion.Panel>
+						<Accordion.Panel>
+							<Tabs classNames={{ tab }} defaultValue="body">
+								<Tabs.List>
+									<Tabs.Tab value="headers">{__('Headers', 'inseri-core')}</Tabs.Tab>
+									<Tabs.Tab value="body">{__('Body', 'inseri-core')}</Tabs.Tab>
+									<Group position="right" style={{ flex: 1 }} px="md" spacing={0}>
+										{responseStatus && (
+											<>
+												<Text size="sm" color="blue" weight="bold">
+													<Text component="span" color="gray" weight="normal">
+														Status:{' '}
+													</Text>
+													{responseStatus}
+												</Text>
+											</>
+										)}
+									</Group>
+								</Tabs.List>
+
+								<Tabs.Panel value="headers" pt="xs">
+									<ParamsTable items={responseHeaders} readonly />
+								</Tabs.Panel>
+
+								<Tabs.Panel value="body" py="sm" px="md">
+									<CodeEditor type={responseBodyType} value={responseBody} onChange={() => {}} textareaId={RESPONSE_AREA_ID} />
+								</Tabs.Panel>
+							</Tabs>
+						</Accordion.Panel>
 					</Accordion.Item>
 				</Accordion>
 			</Box>

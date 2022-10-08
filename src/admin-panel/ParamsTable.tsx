@@ -48,10 +48,11 @@ export interface ParamItem {
 
 interface Props {
 	items: ParamItem[]
-	onItemsChange: (params: ParamItem[]) => void
+	onItemsChange?: (params: ParamItem[]) => void
+	readonly?: boolean
 }
 
-export function ParamsTable({ onItemsChange, items: inputItems }: Props) {
+export function ParamsTable({ onItemsChange, items: inputItems, readonly }: Props) {
 	const { table, paramInput, paramWrapper } = useStyles().classes
 	const items = inputItems.length > 0 ? inputItems : [{ isChecked: true, key: '', value: '' }]
 
@@ -70,13 +71,18 @@ export function ParamsTable({ onItemsChange, items: inputItems }: Props) {
 
 		const updatedData = [...items.slice(0, index), updatedItem, ...items.slice(index + 1), tail].filter(Boolean) as ParamItem[]
 
-		onItemsChange(updatedData)
+		if (onItemsChange) {
+			onItemsChange(updatedData)
+		}
 	}
 
 	const removeParam = (index: number) => () => {
 		const updatedData = [...items]
 		updatedData.splice(index, 1)
-		onItemsChange(updatedData)
+
+		if (onItemsChange) {
+			onItemsChange(updatedData)
+		}
 	}
 
 	const isNotLastIndex = (index: number) => index !== items.length - 1
@@ -95,7 +101,7 @@ export function ParamsTable({ onItemsChange, items: inputItems }: Props) {
 				{items.map(({ key, value, isChecked }, index) => (
 					<tr key={index}>
 						<td>
-							{isNotLastIndex(index) && (
+							{isNotLastIndex(index) && !readonly && (
 								<Checkbox color="gray" checked={isChecked} onChange={(event) => updateParams({ isChecked: event.target.checked }, index)} />
 							)}
 						</td>
@@ -105,6 +111,7 @@ export function ParamsTable({ onItemsChange, items: inputItems }: Props) {
 								value={key}
 								onChange={(event) => updateParams({ key: event.target.value }, index)}
 								placeholder="key"
+								readOnly={readonly}
 							/>
 						</td>
 						<td>
@@ -113,10 +120,11 @@ export function ParamsTable({ onItemsChange, items: inputItems }: Props) {
 								value={value}
 								onChange={(event) => updateParams({ value: event.target.value }, index)}
 								placeholder="value"
+								readOnly={readonly}
 							/>
 						</td>
 						<td>
-							{isNotLastIndex(index) && (
+							{isNotLastIndex(index) && !readonly && (
 								<ActionIcon onClick={removeParam(index)}>
 									<IconX size={16} />
 								</ActionIcon>

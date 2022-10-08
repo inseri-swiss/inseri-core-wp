@@ -34,9 +34,10 @@ interface Props {
 	value: string
 	onChange: (code: string) => void
 	type: string
+	textareaId?: string
 }
 
-export function CodeEditor({ value, onChange, type }: Props) {
+export function CodeEditor({ value, onChange, type, textareaId }: Props) {
 	const { editor, editorLineNumber } = useStyles().classes
 
 	const processCode = (code: string) => {
@@ -68,6 +69,7 @@ export function CodeEditor({ value, onChange, type }: Props) {
 				fontFamily: 'monospace',
 				minHeight: '128px',
 			}}
+			textareaId={textareaId}
 		/>
 	)
 }

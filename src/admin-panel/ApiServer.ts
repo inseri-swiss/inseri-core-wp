@@ -1,4 +1,5 @@
-import apiFetch from '@wordpress/api-fetch'
+import axios, { AxiosResponse } from 'axios'
+import { ParamsObject } from '../utils'
 
 declare const wpApiSettings: {
 	root: string
@@ -20,7 +21,20 @@ export interface Datasource {
 	body?: string
 }
 
-export const getData = async () => {
-	const response = await apiFetch<Datasource[]>({ path: wpApiSettings.root + ROUTE })
-	return response
+export const fireRequest = async (method: string, url: string, queryParams: ParamsObject, headers: ParamsObject, body: any) => {
+	const urlObject = new URL(url)
+	const queries = new URLSearchParams(queryParams)
+	urlObject.search = queries.toString()
+
+	return axios({
+		method: method,
+		url: urlObject.toString(),
+		headers,
+		data: body,
+		transformResponse: (i) => i, // do not transform json to js-object
+	})
+}
+
+export const getData = async (): Promise<AxiosResponse<Datasource[]>> => {
+	return axios.get<Datasource[]>(wpApiSettings.root + ROUTE)
 }
