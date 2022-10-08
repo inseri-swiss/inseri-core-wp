@@ -54,6 +54,9 @@ const XML_FORMAT_OPTION = {
 	lineSeparator: '\n',
 }
 
+const isFormType = (type: string) => ['form-urlencoded', 'form-data'].some((i) => i === type)
+const isBeautifyType = (type: string) => ['XML', 'JSON'].some((i) => i === type)
+
 export function DetailView(_props: Props) {
 	const { primaryBtn, titleBar, whiteBox, accordionContent, accordionLabel, tab } = useStyles().classes
 
@@ -68,8 +71,6 @@ export function DetailView(_props: Props) {
 	const [bodyError, setBodyError] = useState<string>('')
 
 	const [openAccordionItems, setOpenAccordionItems] = useState<string[]>(['request'])
-
-	const isFormType = (type: string) => ['form-urlencoded', 'form-data'].some((i) => i === type)
 
 	const beautify = () => {
 		if (bodyType === 'JSON') {
@@ -145,9 +146,11 @@ export function DetailView(_props: Props) {
 								<Tabs.Panel value="body" py="sm" px="md">
 									<Group position="apart">
 										<SegmentedControl value={bodyType} onChange={setBodyType} data={BODY_TYPES} />
-										<Button variant="subtle" onClick={beautify}>
-											{__('Beautify', 'inseri-core')}
-										</Button>
+										{isBeautifyType(bodyType) && (
+											<Button variant="subtle" onClick={beautify}>
+												{__('Beautify', 'inseri-core')}
+											</Button>
+										)}
 									</Group>
 									{bodyType === NONE ? (
 										<Group m="lg">
