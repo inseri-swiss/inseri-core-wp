@@ -27,8 +27,8 @@ const useStyles = createStyles((_theme) => ({
 }))
 
 const ALL_AUTHORS = __('All Authors', 'inseri-core')
-const ALL_TYPES = __('All Types', 'inseri_core')
-const ALL_METHODS = __('All Methods', 'inseri_core')
+const ALL_TYPES = __('All Types', 'inseri-core')
+const ALL_METHODS = __('All Methods', 'inseri-core')
 
 export function ListView({ addNewPath }: Props) {
 	const { compactBtn, secondaryBtn, table: tableClass } = useStyles().classes
