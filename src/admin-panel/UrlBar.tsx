@@ -50,14 +50,14 @@ export function UrlBar({ method, onMethodChange, url, onUrlChange }: Props) {
 			<Group spacing={0} style={{ flex: 1 }}>
 				<Select
 					classNames={{ root: methodRoot, wrapper: methodWrapper, input: methodInput }}
-					aria-label={__('Type', 'inseri-core')}
+					aria-label={__('HTTP Method', 'inseri-core')}
 					data={HTTP_METHODS}
 					value={method}
 					onChange={onMethodChange}
 				/>
 				<TextInput
 					classNames={{ root: urlRoot, wrapper: urlWrapper, input: urlInput }}
-					aria-label={__('Name', 'inseri-core')}
+					aria-label={__('URL', 'inseri-core')}
 					placeholder={__('Enter your URL', 'inseri-core')}
 					value={url}
 					onChange={(e) => onUrlChange(e.currentTarget.value)}

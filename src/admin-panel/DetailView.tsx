@@ -1,9 +1,11 @@
 import { useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Accordion, Box, Button, createStyles, Group, Select, Tabs, TextInput, Title } from '../components'
-import { Params, ParamsTable } from './ParamsTable'
-import { RequestBody } from './RequestBody'
+import { Accordion, Box, Button, createStyles, Group, SegmentedControl, Select, Tabs, TextInput, Title, Text } from '../components'
+import { ParamItem, ParamsTable } from './ParamsTable'
 import { UrlBar } from './UrlBar'
+import xmlFormatter from 'xml-formatter'
+import { IconCircleOff } from '@tabler/icons'
+import { CodeEditor } from '../components/CodeEditor'
 
 const useStyles = createStyles((theme) => ({
 	primaryBtn: {
@@ -38,16 +40,66 @@ interface CreateProps {
 type Props = CreateProps | EditProps
 
 const DATASOURCE_TYPES = ['General']
+const NONE = __('None', 'inseri-core')
+const BODY_TYPES = [
+	NONE,
+	'Text',
+	'XML',
+	'JSON',
+	'form-urlencoded',
+	'form-data',
+]
+
+const XML_FORMAT_OPTION = {
+	collapseContent: true,
+	lineSeparator: '\n',
+}
 
 export function DetailView(_props: Props) {
 	const { primaryBtn, titleBar, whiteBox, accordionContent, accordionLabel, tab } = useStyles().classes
 
 	const [method, setMethod] = useState('GET')
 	const [url, setUrl] = useState('')
-	const [_queryParams, setQueryParams] = useState<Params>({})
-	const [_headerParams, setHeaderParams] = useState<Params>({})
-	const [_requestBody, setRequestBody] = useState<string | Params>('')
+	const [queryParams, setQueryParams] = useState<ParamItem[]>([])
+	const [headerParams, setHeaderParams] = useState<ParamItem[]>([])
+
+	const [bodyType, setBodyType] = useState<string>(BODY_TYPES[1])
+	const [requestTextBody, setRequestTextBody] = useState<string>('')
+	const [requestParamsBody, setRequestParamsBody] = useState<ParamItem[]>([])
+	const [bodyError, setBodyError] = useState<string>('')
+
 	const [openAccordionItems, setOpenAccordionItems] = useState<string[]>(['request'])
+
+	const isFormType = (type: string) => ['form-urlencoded', 'form-data'].some((i) => i === type)
+
+	const getCodeType = (selectedBodyType: string) => {
+		switch (selectedBodyType) {
+			case 'XML':
+				return 'xml'
+			case 'JSON':
+				return 'json'
+			default:
+				return 'text'
+		}
+	}
+
+	const beautify = () => {
+		if (bodyType === 'JSON') {
+			try {
+				const value = JSON.stringify(JSON.parse(requestTextBody), null, 2)
+				setRequestTextBody(value)
+			} catch (exception) {
+				setBodyError(__('invalid JSON', 'inseri-core'))
+			}
+		}
+		if (bodyType === 'XML') {
+			try {
+				setRequestTextBody(xmlFormatter(requestTextBody, XML_FORMAT_OPTION))
+			} catch (exception) {
+				setBodyError(__('invalid XML', 'inseri-core'))
+			}
+		}
+	}
 
 	return (
 		<>
@@ -85,7 +137,7 @@ export function DetailView(_props: Props) {
 					onChange={setOpenAccordionItems}
 				>
 					<Accordion.Item value="request" defaultChecked={true}>
-						<Accordion.Control>Request Parameters</Accordion.Control>
+						<Accordion.Control>{__('Parameters', 'inseri-core')}</Accordion.Control>
 						<Accordion.Panel>
 							<Tabs classNames={{ tab }} defaultValue="query-params">
 								<Tabs.List>
@@ -95,22 +147,53 @@ export function DetailView(_props: Props) {
 								</Tabs.List>
 
 								<Tabs.Panel value="query-params" pt="xs">
-									<ParamsTable onChange={setQueryParams} />
+									<ParamsTable items={queryParams} onItemsChange={setQueryParams} />
 								</Tabs.Panel>
 
 								<Tabs.Panel value="headers" pt="xs">
-									<ParamsTable onChange={setHeaderParams} />
+									<ParamsTable items={headerParams} onItemsChange={setHeaderParams} />
 								</Tabs.Panel>
 
 								<Tabs.Panel value="body" py="sm" px="md">
-									<RequestBody onChange={setRequestBody} />
+									<Group position="apart">
+										<SegmentedControl value={bodyType} onChange={setBodyType} data={BODY_TYPES} />
+										<Button variant="subtle" onClick={beautify}>
+											{__('Beautify', 'inseri-core')}
+										</Button>
+									</Group>
+									{bodyType === NONE ? (
+										<Group m="lg">
+											<IconCircleOff size={24} color="gray" />
+											<Text size="md" color="gray">
+												{__('no body', 'inseri-core')}
+											</Text>
+										</Group>
+									) : isFormType(bodyType) ? (
+										<ParamsTable items={requestParamsBody} onItemsChange={setRequestParamsBody} />
+									) : (
+										<Box mt="sm">
+											{bodyError && (
+												<Text mt="xs" color="red" size="sm">
+													{bodyError}
+												</Text>
+											)}
+											<CodeEditor
+												type={getCodeType(bodyType)}
+												value={requestTextBody}
+												onChange={(val) => {
+													setBodyError('')
+													setRequestTextBody(val)
+												}}
+											/>
+										</Box>
+									)}
 								</Tabs.Panel>
 							</Tabs>
 						</Accordion.Panel>
 					</Accordion.Item>
 
 					<Accordion.Item value="response">
-						<Accordion.Control>Response</Accordion.Control>
+						<Accordion.Control>{__('Response', 'inseri-core')}</Accordion.Control>
 						<Accordion.Panel>Colors, fonts, shadows and many other parts are customizable to fit your design needs</Accordion.Panel>
 					</Accordion.Item>
 				</Accordion>
