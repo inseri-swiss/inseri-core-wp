@@ -40,9 +40,10 @@ interface Props {
 	onMethodChange: (method: string) => void
 	url: string
 	onUrlChange: (url: string) => void
+	onTryClick: () => void
 }
 
-export function UrlBar({ method, onMethodChange, url, onUrlChange }: Props) {
+export function UrlBar({ method, onMethodChange, url, onUrlChange, onTryClick }: Props) {
 	const { sendBtn, methodRoot, methodInput, methodWrapper, urlInput, urlWrapper, urlRoot } = useStyles().classes
 
 	return (
@@ -63,7 +64,7 @@ export function UrlBar({ method, onMethodChange, url, onUrlChange }: Props) {
 					onChange={(e) => onUrlChange(e.currentTarget.value)}
 				/>
 			</Group>
-			<Button classNames={{ root: sendBtn }} variant="light" size="sm" uppercase>
+			<Button classNames={{ root: sendBtn }} variant="light" size="sm" onClick={onTryClick} uppercase>
 				{__('Try Request', 'inseri-core')}
 			</Button>
 		</Group>

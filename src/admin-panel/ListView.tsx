@@ -97,7 +97,7 @@ export function ListView({ addNewPath }: Props) {
 	])
 
 	useEffect(() => {
-		getData().then((data) => setRawDatasources(data))
+		getData().then((response) => setRawDatasources(response.data))
 	}, [])
 
 	useEffect(() => {
