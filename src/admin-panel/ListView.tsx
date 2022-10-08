@@ -6,6 +6,7 @@ import { ActionIcon, Box, Button, createStyles, Group, MediaQuery, Select, Table
 import { getHotkeyHandler } from '@mantine/hooks'
 import { Datasource, getData } from './ApiServer'
 import { ContentTableBody, EmptyTableBody, SortableColumns, TableHeader } from './TableComponents'
+import { HTTP_METHODS } from './config'
 
 interface Props {
 	addNewPath: string
@@ -29,6 +30,7 @@ const useStyles = createStyles((_theme) => ({
 const ALL_AUTHORS = __('All Authors', 'inseri-core')
 const ALL_TYPES = __('All Types', 'inseri-core')
 const ALL_METHODS = __('All Methods', 'inseri-core')
+const methods = [ALL_METHODS, ...HTTP_METHODS]
 
 export function ListView({ addNewPath }: Props) {
 	const { compactBtn, secondaryBtn, table: tableClass } = useStyles().classes
@@ -38,16 +40,6 @@ export function ListView({ addNewPath }: Props) {
 
 	const [authors, setAuthors] = useState<string[]>([ALL_AUTHORS])
 	const [types, setTypes] = useState<string[]>([ALL_TYPES])
-	const methods = [
-		ALL_METHODS,
-		'GET',
-		'HEAD',
-		'POST',
-		'PUT',
-		'DELETE',
-		'OPTIONS',
-		'PATCH',
-	]
 
 	const [searchboxText, setSearchboxText] = useState<string>('')
 
