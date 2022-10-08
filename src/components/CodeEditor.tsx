@@ -33,7 +33,7 @@ const useStyles = createStyles((theme) => ({
 interface Props {
 	value: string
 	onChange: (code: string) => void
-	type: 'json' | 'xml' | 'text'
+	type: string
 }
 
 export function CodeEditor({ value, onChange, type }: Props) {
@@ -42,9 +42,10 @@ export function CodeEditor({ value, onChange, type }: Props) {
 	const processCode = (code: string) => {
 		let processedCode = code
 
-		if (type !== 'text') {
+		if (type === 'json' || type === 'xml') {
 			processedCode = highlight(code, languages[type], type)
-		} else {
+		}
+		if (type === 'text') {
 			processedCode = escapeHtml(processedCode)
 		}
 
