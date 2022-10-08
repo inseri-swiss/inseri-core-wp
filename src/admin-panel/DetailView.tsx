@@ -1,11 +1,10 @@
 import { useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Accordion, Box, Button, createStyles, Group, SegmentedControl, Select, Tabs, TextInput, Title, Text } from '../components'
+import { Accordion, Box, Button, createStyles, Group, SegmentedControl, Select, Tabs, TextInput, Title, Text, CodeEditor } from '../components'
 import { ParamItem, ParamsTable } from './ParamsTable'
 import { UrlBar } from './UrlBar'
 import xmlFormatter from 'xml-formatter'
 import { IconCircleOff } from '@tabler/icons'
-import { CodeEditor } from '../components/CodeEditor'
 
 const useStyles = createStyles((theme) => ({
 	primaryBtn: {
@@ -71,17 +70,6 @@ export function DetailView(_props: Props) {
 	const [openAccordionItems, setOpenAccordionItems] = useState<string[]>(['request'])
 
 	const isFormType = (type: string) => ['form-urlencoded', 'form-data'].some((i) => i === type)
-
-	const getCodeType = (selectedBodyType: string) => {
-		switch (selectedBodyType) {
-			case 'XML':
-				return 'xml'
-			case 'JSON':
-				return 'json'
-			default:
-				return 'text'
-		}
-	}
 
 	const beautify = () => {
 		if (bodyType === 'JSON') {
@@ -178,7 +166,7 @@ export function DetailView(_props: Props) {
 												</Text>
 											)}
 											<CodeEditor
-												type={getCodeType(bodyType)}
+												type={bodyType.toLowerCase()}
 												value={requestTextBody}
 												onChange={(val) => {
 													setBodyError('')
