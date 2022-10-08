@@ -38,6 +38,7 @@
 		"prettier-plugin-multiline-arrays": "^1.1.1",
 		"prismjs": "^1.29.0",
 		"react-simple-code-editor": "^0.13.1",
-		"typescript": "^4.7.4"
+		"typescript": "^4.7.4",
+		"xml-formatter": "^2.6.1"
 	}
 }
