@@ -77,6 +77,7 @@ export function DetailView(_props: Props) {
 	const [bodyError, setBodyError] = useState<string>('')
 
 	const [openAccordionItems, setOpenAccordionItems] = useState<string[]>(['request'])
+	const [isLoadingRequest, setLoadingRequest] = useState(false)
 
 	const [responseStatus, setResponseStatus] = useState<string>('')
 	const [responseHeaders, setResponseHeaders] = useState<ParamItem[]>([])
@@ -84,11 +85,20 @@ export function DetailView(_props: Props) {
 	const [responseBodyType, setResponseBodyType] = useState<string>('')
 
 	const tryRequest = async () => {
-		// TODO validate url
-		let body = null
-		if (isFormType(requestBodyType)) {
-			body = mapParamsToObject(requestParamsBody)
-		} else if (requestBodyType !== 'none') {
+		setLoadingRequest(true)
+
+		let body: any = null
+		if (requestBodyType === 'form-urlencoded') {
+			body = new URLSearchParams(mapParamsToObject(requestParamsBody))
+		}
+		if (requestBodyType === 'form-data') {
+			const bodyFormData = new FormData()
+			const paramsObject = mapParamsToObject(requestParamsBody)
+			Object.keys(paramsObject).forEach((k) => bodyFormData.append(k, paramsObject[k]))
+
+			body = bodyFormData
+		}
+		if (requestBodyType === 'json' || requestBodyType === 'xml') {
 			body = requestTextBody
 		}
 
@@ -116,6 +126,7 @@ export function DetailView(_props: Props) {
 		const [_error, formattedCode] = formatCode(bodyType, data)
 		setResponseBody(formattedCode ?? data)
 		setResponseBodyType(bodyType)
+		setLoadingRequest(false)
 	}
 
 	const beautify = () => {
@@ -171,7 +182,7 @@ export function DetailView(_props: Props) {
 			</Box>
 
 			<Box mt="lg" mx={36} className={whiteBox}>
-				<UrlBar method={method} onMethodChange={setMethod} url={url} onUrlChange={setUrl} onTryClick={tryRequest} />
+				<UrlBar method={method} onMethodChange={setMethod} url={url} onUrlChange={setUrl} onTryClick={tryRequest} isLoadingRequest={isLoadingRequest} />
 
 				<Accordion
 					multiple
