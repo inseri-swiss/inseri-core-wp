@@ -41,6 +41,7 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 }))
 
 export interface ParamItem {
+	isPreset?: boolean
 	isChecked: boolean
 	key: string
 	value: string

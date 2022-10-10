@@ -40,15 +40,23 @@ interface CreateProps {
 type Props = CreateProps | EditProps
 
 const DATASOURCE_TYPES = ['General']
-const NONE = __('None', 'inseri-core')
 const BODY_TYPES = [
-	NONE,
-	'Text',
-	'XML',
-	'JSON',
-	'form-urlencoded',
-	'form-data',
+	{ label: __('None', 'inseri-core'), value: 'none' },
+	{ label: 'Text', value: 'text' },
+	{ label: 'XML', value: 'xml' },
+	{ label: 'JSON', value: 'json' },
+	{ label: 'Form-Urlencoded', value: 'form-urlencoded' },
+	{ label: 'Form-Data', value: 'form-data' },
 ]
+
+const BODY_TYPE_TO_CONTENT_TYPE: any = {
+	none: null,
+	text: 'text/plain',
+	json: 'application/json',
+	xml: 'application/xml',
+	'form-urlencoded': 'application/x-www-form-urlencoded',
+	'form-data': 'multipart/form-data',
+}
 
 const RESPONSE_AREA_ID = 'response-textarea'
 
@@ -61,9 +69,9 @@ export function DetailView(_props: Props) {
 	const [method, setMethod] = useState('GET')
 	const [url, setUrl] = useState('')
 	const [queryParams, setQueryParams] = useState<ParamItem[]>([])
-	const [headerParams, setHeaderParams] = useState<ParamItem[]>([])
+	const [headerParams, setHeaderParams] = useState<ParamItem[]>([{ isChecked: true, key: '', value: '' }])
 
-	const [requestBodyType, setRequestBodyType] = useState<string>(BODY_TYPES[1])
+	const [requestBodyType, setRequestBodyType] = useState<string>(BODY_TYPES[0].value)
 	const [requestTextBody, setRequestTextBody] = useState<string>('')
 	const [requestParamsBody, setRequestParamsBody] = useState<ParamItem[]>([])
 	const [bodyError, setBodyError] = useState<string>('')
@@ -81,7 +89,7 @@ export function DetailView(_props: Props) {
 			let body = null
 			if (isFormType(requestBodyType)) {
 				body = mapParamsToObject(requestParamsBody)
-			} else if (requestBodyType !== NONE) {
+			} else if (requestBodyType !== 'none') {
 				body = requestTextBody
 			}
 
@@ -93,8 +101,8 @@ export function DetailView(_props: Props) {
 			}
 
 			setResponseStatus(`${status} ${statusText}`)
-			const responseHeaders: ParamItem[] = Object.keys(headers).map((key) => ({ isChecked: true, key: key, value: headers[key] ?? '' }))
-			setResponseHeaders(responseHeaders)
+			const responseHeadersParams: ParamItem[] = Object.keys(headers).map((key) => ({ isChecked: true, key, value: headers[key] ?? '' }))
+			setResponseHeaders(responseHeadersParams)
 
 			const contentType: string = getPropertyCaseInsensitive(headers, 'content-type')
 			let bodyType = ''
@@ -115,7 +123,7 @@ export function DetailView(_props: Props) {
 	}
 
 	const beautify = () => {
-		const [errorMsg, formattedCode] = formatCode(requestBodyType.toLowerCase(), requestTextBody)
+		const [errorMsg, formattedCode] = formatCode(requestBodyType, requestTextBody)
 
 		const error = errorMsg ?? ''
 		setBodyError(error)
@@ -124,6 +132,20 @@ export function DetailView(_props: Props) {
 			setRequestTextBody(formattedCode)
 		}
 	}
+
+	useEffect(() => {
+		let updatedHeaders = headerParams.filter((i) => !i.isPreset && i.key !== 'Content-Type')
+
+		if (requestBodyType !== 'none') {
+			const defaultEntry = { isPreset: true, isChecked: true, key: 'Content-Type', value: '' }
+			const contentType = headerParams.find((i) => i.isPreset && i.key === 'Content-Type') ?? defaultEntry
+			const updatedContentType = { ...contentType, value: BODY_TYPE_TO_CONTENT_TYPE[requestBodyType] }
+
+			updatedHeaders = [updatedContentType, ...updatedHeaders]
+		}
+
+		setHeaderParams(updatedHeaders)
+	}, [requestBodyType])
 
 	useEffect(() => {
 		const responseTextarea = document.getElementById(RESPONSE_AREA_ID)
@@ -192,7 +214,7 @@ export function DetailView(_props: Props) {
 											</Button>
 										)}
 									</Group>
-									{requestBodyType === NONE ? (
+									{requestBodyType === 'none' ? (
 										<Group m="lg">
 											<IconCircleOff size={24} color="gray" />
 											<Text size="md" color="gray">
@@ -209,7 +231,7 @@ export function DetailView(_props: Props) {
 												</Text>
 											)}
 											<CodeEditor
-												type={requestBodyType.toLowerCase()}
+												type={requestBodyType}
 												value={requestTextBody}
 												onChange={(val) => {
 													setBodyError('')

@@ -1,4 +1,5 @@
-import axios, { AxiosResponse } from 'axios'
+import axios from 'axios'
+import type { AxiosResponse } from 'axios'
 import { ParamsObject } from '../utils'
 
 declare const wpApiSettings: {
@@ -27,7 +28,7 @@ export const fireRequest = async (method: string, url: string, queryParams: Para
 	urlObject.search = queries.toString()
 
 	return axios({
-		method: method,
+		method,
 		url: urlObject.toString(),
 		headers,
 		data: body,
