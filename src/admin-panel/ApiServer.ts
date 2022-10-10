@@ -23,11 +23,11 @@ export interface Datasource {
 }
 
 export const fireRequest = async (method: string, url: string, queryParams: ParamsObject, headers: ParamsObject, body: any) => {
-	const urlObject = new URL(url)
-	const queries = new URLSearchParams(queryParams)
-	urlObject.search = queries.toString()
-
 	try {
+		const urlObject = new URL(url)
+		const queries = new URLSearchParams(queryParams)
+		urlObject.search = queries.toString()
+
 		const response = await axios({
 			method,
 			url: urlObject.toString(),

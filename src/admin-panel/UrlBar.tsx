@@ -43,13 +43,15 @@ interface Props {
 	url: string
 	onUrlChange: (url: string) => void
 	onTryClick: () => void
+	isLoadingRequest: boolean
 }
 
-export function UrlBar({ method, onMethodChange, url, onUrlChange, onTryClick }: Props) {
+export function UrlBar({ method, onMethodChange, url, onUrlChange, onTryClick, isLoadingRequest }: Props) {
 	const { sendBtn, methodRoot, methodInput, methodWrapper, urlInput, urlWrapper, urlRoot } = useStyles().classes
 
 	const [urlError, setUrlError] = useState('')
 	const [debouncedUrl] = useDebouncedValue(url, 500)
+	const isNotReady = !url || !!urlError
 
 	useEffect(() => {
 		try {
@@ -62,7 +64,7 @@ export function UrlBar({ method, onMethodChange, url, onUrlChange, onTryClick }:
 	}, [debouncedUrl])
 
 	return (
-		<Group px="md" pt="lg" pb="xs" align="baseline">
+		<Group px="md" pt="lg" pb="xs" align="flex-start">
 			<Group spacing={0} style={{ flex: 1, alignItems: 'baseline' }}>
 				<Select
 					classNames={{ root: methodRoot, wrapper: methodWrapper, input: methodInput }}
@@ -83,7 +85,7 @@ export function UrlBar({ method, onMethodChange, url, onUrlChange, onTryClick }:
 					error={urlError}
 				/>
 			</Group>
-			<Button classNames={{ root: sendBtn }} variant="light" size="sm" onClick={onTryClick} uppercase>
+			<Button classNames={{ root: sendBtn }} variant="light" size="sm" onClick={onTryClick} uppercase disabled={isNotReady} loading={isLoadingRequest}>
 				{__('Try Request', 'inseri-core')}
 			</Button>
 		</Group>
