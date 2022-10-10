@@ -27,13 +27,26 @@ export const fireRequest = async (method: string, url: string, queryParams: Para
 	const queries = new URLSearchParams(queryParams)
 	urlObject.search = queries.toString()
 
-	return axios({
-		method,
-		url: urlObject.toString(),
-		headers,
-		data: body,
-		transformResponse: (i) => i, // do not transform json to js-object
-	})
+	try {
+		const response = await axios({
+			method,
+			url: urlObject.toString(),
+			headers,
+			data: body,
+			transformResponse: (i) => i, // do not transform json to js-object
+		})
+
+		const status = `${response.status} ${response.statusText}`
+		return [status, response.headers, response.data]
+	} catch (exception) {
+		if (exception instanceof axios.AxiosError && exception.response) {
+			const response = exception.response
+			const status = `${response.status} ${response.statusText}`
+			return [status, response.headers, response.data]
+		}
+	}
+
+	return ['', {}, '']
 }
 
 export const getData = async (): Promise<AxiosResponse<Datasource[]>> => {
