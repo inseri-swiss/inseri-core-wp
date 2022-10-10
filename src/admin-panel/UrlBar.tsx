@@ -1,6 +1,8 @@
 import { Group, Select, TextInput, Button, createStyles } from '../components'
 import { __ } from '@wordpress/i18n'
 import { HTTP_METHODS } from './config'
+import { useEffect, useState } from '@wordpress/element'
+import { useDebouncedValue } from '@mantine/hooks'
 
 const useStyles = createStyles((theme, _params, getRef) => ({
 	sendBtn: {
@@ -46,9 +48,22 @@ interface Props {
 export function UrlBar({ method, onMethodChange, url, onUrlChange, onTryClick }: Props) {
 	const { sendBtn, methodRoot, methodInput, methodWrapper, urlInput, urlWrapper, urlRoot } = useStyles().classes
 
+	const [urlError, setUrlError] = useState('')
+	const [debouncedUrl] = useDebouncedValue(url, 500)
+
+	useEffect(() => {
+		try {
+			if (debouncedUrl) {
+				new URL(debouncedUrl)
+			}
+		} catch (exception) {
+			setUrlError(__('invalid URL', 'inseri-core'))
+		}
+	}, [debouncedUrl])
+
 	return (
-		<Group px="md" py="lg">
-			<Group spacing={0} style={{ flex: 1 }}>
+		<Group px="md" pt="lg" pb="xs" align="baseline">
+			<Group spacing={0} style={{ flex: 1, alignItems: 'baseline' }}>
 				<Select
 					classNames={{ root: methodRoot, wrapper: methodWrapper, input: methodInput }}
 					aria-label={__('HTTP Method', 'inseri-core')}
@@ -61,7 +76,11 @@ export function UrlBar({ method, onMethodChange, url, onUrlChange, onTryClick }:
 					aria-label={__('URL', 'inseri-core')}
 					placeholder={__('Enter your URL', 'inseri-core')}
 					value={url}
-					onChange={(e) => onUrlChange(e.currentTarget.value)}
+					onChange={(e) => {
+						onUrlChange(e.currentTarget.value)
+						setUrlError('')
+					}}
+					error={urlError}
 				/>
 			</Group>
 			<Button classNames={{ root: sendBtn }} variant="light" size="sm" onClick={onTryClick} uppercase>

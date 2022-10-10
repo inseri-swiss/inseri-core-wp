@@ -1,11 +1,11 @@
+import { IconCircleOff } from '@tabler/icons'
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Accordion, Box, Button, createStyles, Group, SegmentedControl, Select, Tabs, TextInput, Title, Text, CodeEditor } from '../components'
-import { ParamItem, ParamsTable } from './ParamsTable'
-import { UrlBar } from './UrlBar'
-import { IconCircleOff } from '@tabler/icons'
+import { Accordion, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Select, Tabs, Text, TextInput, Title } from '../components'
 import { formatCode, getPropertyCaseInsensitive, mapParamsToObject } from '../utils'
 import { fireRequest } from './ApiServer'
+import { ParamItem, ParamsTable } from './ParamsTable'
+import { UrlBar } from './UrlBar'
 
 const useStyles = createStyles((theme) => ({
 	primaryBtn: {
@@ -61,7 +61,7 @@ const BODY_TYPE_TO_CONTENT_TYPE: any = {
 const RESPONSE_AREA_ID = 'response-textarea'
 
 const isFormType = (type: string) => ['form-urlencoded', 'form-data'].some((i) => i === type)
-const isBeautifyType = (type: string) => ['XML', 'JSON'].some((i) => i === type)
+const isBeautifyType = (type: string) => ['xml', 'json'].some((i) => i === type)
 
 export function DetailView(_props: Props) {
 	const { primaryBtn, titleBar, whiteBox, accordionContent, accordionLabel, tab } = useStyles().classes
@@ -85,41 +85,37 @@ export function DetailView(_props: Props) {
 
 	const tryRequest = async () => {
 		// TODO validate url
-		try {
-			let body = null
-			if (isFormType(requestBodyType)) {
-				body = mapParamsToObject(requestParamsBody)
-			} else if (requestBodyType !== 'none') {
-				body = requestTextBody
-			}
-
-			const { status, statusText, data, headers } = await fireRequest(method, url, mapParamsToObject(queryParams), mapParamsToObject(headerParams), body)
-
-			const isResponsePanelOpen = openAccordionItems.some((i) => i === 'response')
-			if (!isResponsePanelOpen) {
-				setOpenAccordionItems([...openAccordionItems, 'response'])
-			}
-
-			setResponseStatus(`${status} ${statusText}`)
-			const responseHeadersParams: ParamItem[] = Object.keys(headers).map((key) => ({ isChecked: true, key, value: headers[key] ?? '' }))
-			setResponseHeaders(responseHeadersParams)
-
-			const contentType: string = getPropertyCaseInsensitive(headers, 'content-type')
-			let bodyType = ''
-			if (contentType.includes('application/json')) {
-				bodyType = 'json'
-			}
-
-			if (contentType.includes('xml')) {
-				bodyType = 'xml'
-			}
-
-			const [_error, formattedCode] = formatCode(bodyType, data)
-			setResponseBody(formattedCode ?? data)
-			setResponseBodyType(bodyType)
-		} catch (exception) {
-			// TODO handle request failure
+		let body = null
+		if (isFormType(requestBodyType)) {
+			body = mapParamsToObject(requestParamsBody)
+		} else if (requestBodyType !== 'none') {
+			body = requestTextBody
 		}
+
+		const [status, headers, data] = await fireRequest(method, url, mapParamsToObject(queryParams), mapParamsToObject(headerParams), body)
+
+		const isResponsePanelOpen = openAccordionItems.some((i) => i === 'response')
+		if (!isResponsePanelOpen) {
+			setOpenAccordionItems([...openAccordionItems, 'response'])
+		}
+
+		setResponseStatus(status)
+		const responseHeadersParams: ParamItem[] = Object.keys(headers).map((key) => ({ isChecked: true, key, value: headers[key] ?? '' }))
+		setResponseHeaders(responseHeadersParams)
+
+		const contentType: string | undefined = getPropertyCaseInsensitive(headers, 'content-type')
+		let bodyType = ''
+		if (contentType?.includes('application/json')) {
+			bodyType = 'json'
+		}
+
+		if (contentType?.includes('xml')) {
+			bodyType = 'xml'
+		}
+
+		const [_error, formattedCode] = formatCode(bodyType, data)
+		setResponseBody(formattedCode ?? data)
+		setResponseBodyType(bodyType)
 	}
 
 	const beautify = () => {
