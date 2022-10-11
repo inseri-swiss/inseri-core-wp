@@ -1,8 +1,6 @@
-import { Group, Select, TextInput, Button, createStyles } from '../components'
 import { __ } from '@wordpress/i18n'
+import { Button, createStyles, Group, Select, TextInput } from '../components'
 import { HTTP_METHODS } from './config'
-import { useEffect, useState } from '@wordpress/element'
-import { useDebouncedValue } from '@mantine/hooks'
 
 const useStyles = createStyles((theme, _params, getRef) => ({
 	sendBtn: {
@@ -41,27 +39,16 @@ interface Props {
 	method: string
 	onMethodChange: (method: string) => void
 	url: string
+	urlError: string
 	onUrlChange: (url: string) => void
+	setUrlError: (error: string) => void
 	onTryClick: () => void
 	isLoadingRequest: boolean
 }
 
-export function UrlBar({ method, onMethodChange, url, onUrlChange, onTryClick, isLoadingRequest }: Props) {
+export function UrlBar({ method, onMethodChange, url, onUrlChange, onTryClick, isLoadingRequest, urlError, setUrlError }: Props) {
 	const { sendBtn, methodRoot, methodInput, methodWrapper, urlInput, urlWrapper, urlRoot } = useStyles().classes
-
-	const [urlError, setUrlError] = useState('')
-	const [debouncedUrl] = useDebouncedValue(url, 500)
 	const isNotReady = !url || !!urlError
-
-	useEffect(() => {
-		try {
-			if (debouncedUrl) {
-				new URL(debouncedUrl)
-			}
-		} catch (exception) {
-			setUrlError(__('invalid URL', 'inseri-core'))
-		}
-	}, [debouncedUrl])
 
 	return (
 		<Group px="md" pt="lg" pb="xs" align="flex-start">

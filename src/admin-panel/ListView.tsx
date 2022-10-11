@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n'
 import { ActionIcon, Box, Button, createStyles, Group, MediaQuery, Select, Table, TextInput, Title } from '../components'
 
 import { getHotkeyHandler } from '@mantine/hooks'
-import { Datasource, getData } from './ApiServer'
+import { Datasource, getAllItems } from './ApiServer'
 import { ContentTableBody, EmptyTableBody, SortableColumns, TableHeader } from './TableComponents'
 import { HTTP_METHODS } from './config'
 
@@ -97,7 +97,7 @@ export function ListView({ addNewPath }: Props) {
 	])
 
 	useEffect(() => {
-		getData().then((response) => setRawDatasources(response.data))
+		getAllItems().then((response) => setRawDatasources(response.data))
 	}, [])
 
 	useEffect(() => {

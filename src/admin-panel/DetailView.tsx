@@ -1,9 +1,10 @@
+import { useDebouncedValue } from '@mantine/hooks'
 import { IconCircleOff } from '@tabler/icons'
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Accordion, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Select, Tabs, Text, TextInput, Title } from '../components'
 import { formatCode, getPropertyCaseInsensitive, mapParamsToObject } from '../utils'
-import { fireRequest } from './ApiServer'
+import { addNewItem, DatasourceWithoutId, fireRequest } from './ApiServer'
 import { ParamItem, ParamsTable } from './ParamsTable'
 import { UrlBar } from './UrlBar'
 
@@ -66,8 +67,14 @@ const isBeautifyType = (type: string) => ['xml', 'json'].some((i) => i === type)
 export function DetailView(_props: Props) {
 	const { primaryBtn, titleBar, whiteBox, accordionContent, accordionLabel, tab } = useStyles().classes
 
+	const [datasourceName, setDatasourceName] = useState('')
+	const [datasourceType, setDatasourceType] = useState<string | null>(DATASOURCE_TYPES[0])
+
 	const [method, setMethod] = useState('GET')
 	const [url, setUrl] = useState('')
+	const [debouncedUrl] = useDebouncedValue(url, 500)
+	const [urlError, setUrlError] = useState('')
+
 	const [queryParams, setQueryParams] = useState<ParamItem[]>([])
 	const [headerParams, setHeaderParams] = useState<ParamItem[]>([{ isChecked: true, key: '', value: '' }])
 
@@ -83,6 +90,8 @@ export function DetailView(_props: Props) {
 	const [responseHeaders, setResponseHeaders] = useState<ParamItem[]>([])
 	const [responseBody, setResponseBody] = useState<string>('')
 	const [responseBodyType, setResponseBodyType] = useState<string>('')
+
+	const isNotReadyForSubmit = !!urlError || !url || !datasourceName
 
 	const tryRequest = async () => {
 		setLoadingRequest(true)
@@ -129,6 +138,24 @@ export function DetailView(_props: Props) {
 		setLoadingRequest(false)
 	}
 
+	const createDatasource = () => {
+		const newItem: DatasourceWithoutId = {
+			method,
+			url,
+			description: datasourceName,
+			headers: mapParamsToObject(headerParams),
+			query_params: mapParamsToObject(queryParams),
+			type: datasourceType ?? DATASOURCE_TYPES[0],
+		}
+
+		try {
+			addNewItem(newItem).then((res) => console.log(res))
+			//TODO navigate
+		} catch (exception) {
+			//TODO error handling
+		}
+	}
+
 	const beautify = () => {
 		const [errorMsg, formattedCode] = formatCode(requestBodyType, requestTextBody)
 
@@ -159,6 +186,16 @@ export function DetailView(_props: Props) {
 		responseTextarea?.setAttribute('readonly', 'true')
 	}, [])
 
+	useEffect(() => {
+		try {
+			if (debouncedUrl) {
+				new URL(debouncedUrl)
+			}
+		} catch (exception) {
+			setUrlError(__('invalid URL', 'inseri-core'))
+		}
+	}, [debouncedUrl])
+
 	return (
 		<>
 			<Box>
@@ -170,19 +207,34 @@ export function DetailView(_props: Props) {
 						{__('Add New Data Source', 'inseri-core')}
 					</Title>
 
-					<Button classNames={{ root: primaryBtn }} size="sm">
+					<Button classNames={{ root: primaryBtn }} size="sm" disabled={isNotReadyForSubmit} onClick={createDatasource}>
 						{__('Create', 'inseri-core')}
 					</Button>
 				</Group>
 
 				<Group px={36} mt="md">
-					<Select label={__('Type', 'inseri-core')} data={DATASOURCE_TYPES} value={DATASOURCE_TYPES[0]} />
-					<TextInput label={__('Name', 'inseri-core')} sx={{ flex: 1 }} withAsterisk />
+					<Select label={__('Type', 'inseri-core')} data={DATASOURCE_TYPES} value={datasourceType} onChange={setDatasourceType} />
+					<TextInput
+						label={__('Name', 'inseri-core')}
+						sx={{ flex: 1 }}
+						value={datasourceName}
+						onChange={(e) => setDatasourceName(e.currentTarget.value)}
+						withAsterisk
+					/>
 				</Group>
 			</Box>
 
 			<Box mt="lg" mx={36} className={whiteBox}>
-				<UrlBar method={method} onMethodChange={setMethod} url={url} onUrlChange={setUrl} onTryClick={tryRequest} isLoadingRequest={isLoadingRequest} />
+				<UrlBar
+					method={method}
+					onMethodChange={setMethod}
+					url={url}
+					onUrlChange={setUrl}
+					urlError={urlError}
+					setUrlError={setUrlError}
+					onTryClick={tryRequest}
+					isLoadingRequest={isLoadingRequest}
+				/>
 
 				<Accordion
 					multiple

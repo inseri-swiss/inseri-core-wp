@@ -9,12 +9,15 @@ declare const wpApiSettings: {
 
 const ROUTE = 'inseri/v1/datasources/'
 
-export interface Datasource {
+export type Datasource = DatasourceWithoutId & {
 	id: number
-	description: string
-	type: string
 	author: number
 	author_name: string
+}
+
+export interface DatasourceWithoutId {
+	description: string
+	type: string
 	method: string
 	url: string
 	headers: Record<string, string>
@@ -49,6 +52,10 @@ export const fireRequest = async (method: string, url: string, queryParams: Para
 	return ['', {}, '']
 }
 
-export const getData = async (): Promise<AxiosResponse<Datasource[]>> => {
+export const getAllItems = async (): Promise<AxiosResponse<Datasource[]>> => {
 	return axios.get<Datasource[]>(wpApiSettings.root + ROUTE)
+}
+
+export const addNewItem = async (newItem: DatasourceWithoutId): Promise<AxiosResponse<Datasource>> => {
+	return axios.post<Datasource>(wpApiSettings.root + ROUTE, newItem, { headers: { 'X-WP-Nonce': wpApiSettings.nonce } })
 }
