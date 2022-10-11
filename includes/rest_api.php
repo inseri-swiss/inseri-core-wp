@@ -67,6 +67,13 @@ function validate_permission($request, $method): bool {
 function validate_datasource($request, $check_id = false): Either {
 	$body = $request->get_json_params();
 	$non_empty_fields = ['description', 'type', 'method', 'url'];
+	$json_fields = ['headers', 'query_params'];
+
+	foreach ($json_fields as $field) {
+		if (isset($body[$field])) {
+			$body[$field] = json_encode($body[$field]);
+		}
+	}
 
 	if ($check_id) {
 		if ($request['item_id'] != $request->get_json_params()['id']) {
