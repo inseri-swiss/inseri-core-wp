@@ -2,11 +2,6 @@ import axios from 'axios'
 import type { AxiosResponse } from 'axios'
 import { ParamsObject } from '../utils'
 
-declare const wpApiSettings: {
-	root: string
-	nonce: string
-}
-
 const ROUTE = 'inseri/v1/datasources/'
 
 export type Datasource = DatasourceWithoutId & {
