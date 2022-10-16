@@ -8,6 +8,7 @@ import { addNewItem, DatasourceWithoutId, fireRequest } from './ApiServer'
 import { PAGES } from './config'
 import { ParamItem, ParamsTable } from './ParamsTable'
 import { UrlBar } from './UrlBar'
+import logo from '../assets/inseri_logo.png'
 
 const useStyles = createStyles((theme) => ({
 	primaryBtn: {
@@ -157,7 +158,7 @@ export function DetailView(_props: Props) {
 		try {
 			await addNewItem(newItem)
 			const currentUrl = new URL(window.location.href)
-			currentUrl.searchParams.set('page', PAGES['home'])
+			currentUrl.searchParams.set('page', PAGES.home)
 			window.location.href = currentUrl.toString()
 		} catch (exception) {
 			setPageError(__('Refresh the page and try it again.', 'inseri-core'))
@@ -208,7 +209,7 @@ export function DetailView(_props: Props) {
 		<>
 			<Box>
 				<Group px={36} py="md">
-					Inseri
+					<img src={logo} height="36" alt="inseri logo" />
 				</Group>
 				<Group px={36} py="sm" position="apart" className={titleBar}>
 					<Title order={1} size="h3">
