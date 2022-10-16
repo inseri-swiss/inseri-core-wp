@@ -7,3 +7,8 @@ export const HTTP_METHODS = [
 	'OPTIONS',
 	'PATCH',
 ]
+
+export const PAGES = {
+	home: 'inseri-core-page',
+	'add-new': 'inseri-core-add-new-page',
+}
