@@ -1,4 +1,5 @@
 import { useDebouncedValue } from '@mantine/hooks'
+import axios from 'axios'
 import { IconCircleOff } from '@tabler/icons'
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
@@ -161,7 +162,12 @@ export function DetailView(_props: Props) {
 			currentUrl.searchParams.set('page', PAGES.home)
 			window.location.href = currentUrl.toString()
 		} catch (exception) {
-			setPageError(__('Refresh the page and try it again.', 'inseri-core'))
+			if (exception instanceof axios.AxiosError && exception.response && exception.response.data.message) {
+				const { data, status, statusText } = exception.response
+				setPageError(`${status} ${statusText}: ${data.message}`)
+			} else {
+				setPageError(__('Refresh the page and try it again.', 'inseri-core'))
+			}
 		}
 	}
 
