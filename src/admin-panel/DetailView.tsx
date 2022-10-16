@@ -2,9 +2,10 @@ import { useDebouncedValue } from '@mantine/hooks'
 import { IconCircleOff } from '@tabler/icons'
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Accordion, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Select, Tabs, Text, TextInput, Title } from '../components'
+import { Accordion, Alert, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Select, Tabs, Text, TextInput, Title } from '../components'
 import { formatCode, getPropertyCaseInsensitive, mapParamsToObject } from '../utils'
 import { addNewItem, DatasourceWithoutId, fireRequest } from './ApiServer'
+import { PAGES } from './config'
 import { ParamItem, ParamsTable } from './ParamsTable'
 import { UrlBar } from './UrlBar'
 
@@ -27,6 +28,9 @@ const useStyles = createStyles((theme) => ({
 		padding: 0,
 	},
 	tab: { borderWidth: '4px' },
+	alertRoot: {
+		borderWidth: '2px',
+	},
 }))
 
 interface EditProps {
@@ -40,7 +44,7 @@ interface CreateProps {
 
 type Props = CreateProps | EditProps
 
-const DATASOURCE_TYPES = ['General']
+const DATASOURCE_TYPES = [{ label: __('General', 'inseri-core'), value: 'general' }]
 const BODY_TYPES = [
 	{ label: __('None', 'inseri-core'), value: 'none' },
 	{ label: 'Text', value: 'text' },
@@ -65,10 +69,10 @@ const isFormType = (type: string) => ['form-urlencoded', 'form-data'].some((i) =
 const isBeautifyType = (type: string) => ['xml', 'json'].some((i) => i === type)
 
 export function DetailView(_props: Props) {
-	const { primaryBtn, titleBar, whiteBox, accordionContent, accordionLabel, tab } = useStyles().classes
+	const { primaryBtn, titleBar, whiteBox, accordionContent, accordionLabel, tab, alertRoot } = useStyles().classes
 
 	const [datasourceName, setDatasourceName] = useState('')
-	const [datasourceType, setDatasourceType] = useState<string | null>(DATASOURCE_TYPES[0])
+	const [datasourceType, setDatasourceType] = useState<string | null>(DATASOURCE_TYPES[0].value)
 
 	const [method, setMethod] = useState('GET')
 	const [url, setUrl] = useState('')
@@ -90,6 +94,8 @@ export function DetailView(_props: Props) {
 	const [responseHeaders, setResponseHeaders] = useState<ParamItem[]>([])
 	const [responseBody, setResponseBody] = useState<string>('')
 	const [responseBodyType, setResponseBodyType] = useState<string>('')
+
+	const [pageError, setPageError] = useState<string>('')
 
 	const isNotReadyForSubmit = !!urlError || !url || !datasourceName
 
@@ -123,7 +129,7 @@ export function DetailView(_props: Props) {
 		setResponseHeaders(responseHeadersParams)
 
 		const contentType: string | undefined = getPropertyCaseInsensitive(headers, 'content-type')
-		let bodyType = ''
+		let bodyType = 'text'
 		if (contentType?.includes('application/json')) {
 			bodyType = 'json'
 		}
@@ -138,21 +144,23 @@ export function DetailView(_props: Props) {
 		setLoadingRequest(false)
 	}
 
-	const createDatasource = () => {
+	const createDatasource = async () => {
 		const newItem: DatasourceWithoutId = {
 			method,
 			url,
 			description: datasourceName,
 			headers: mapParamsToObject(headerParams),
 			query_params: mapParamsToObject(queryParams),
-			type: datasourceType ?? DATASOURCE_TYPES[0],
+			type: datasourceType ?? DATASOURCE_TYPES[0].value,
 		}
 
 		try {
-			addNewItem(newItem).then((res) => console.log(res))
-			//TODO navigate
+			await addNewItem(newItem)
+			const currentUrl = new URL(window.location.href)
+			currentUrl.searchParams.set('page', PAGES['home'])
+			window.location.href = currentUrl.toString()
 		} catch (exception) {
-			//TODO error handling
+			setPageError(__('Refresh the page and try it again.', 'inseri-core'))
 		}
 	}
 
@@ -211,6 +219,21 @@ export function DetailView(_props: Props) {
 						{__('Create', 'inseri-core')}
 					</Button>
 				</Group>
+
+				{pageError && (
+					<Alert
+						mt="sm"
+						mx={36}
+						title={__('An error occurred', 'inseri-core')}
+						variant="outline"
+						color="red"
+						classNames={{ root: alertRoot }}
+						onClose={() => setPageError('')}
+						withCloseButton
+					>
+						{pageError}
+					</Alert>
+				)}
 
 				<Group px={36} mt="md">
 					<Select label={__('Type', 'inseri-core')} data={DATASOURCE_TYPES} value={datasourceType} onChange={setDatasourceType} />
