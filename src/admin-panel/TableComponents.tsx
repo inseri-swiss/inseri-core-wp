@@ -113,7 +113,7 @@ export function EmptyTableBody({ title, description, buttonText, onClick }: Empt
 						</Title>
 						<Text>{description}</Text>
 						{buttonText && (
-							<Button size="sm" mt="sm" onClick={onClick}>
+							<Button size="sm" style={{ fontWeight: 'bold' }} mt="sm" onClick={onClick}>
 								{buttonText}
 							</Button>
 						)}
