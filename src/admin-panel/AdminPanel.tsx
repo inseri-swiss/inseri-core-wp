@@ -4,11 +4,7 @@ import { ListView } from './ListView'
 
 export function AdminPanel() {
 	const queryParams = new URLSearchParams(document.location.search)
+	const showAddNew = queryParams.get('page') === PAGES['add-new']
 
-	const addNewMenuSlug = PAGES['add-new']
-	const addNewPath = 'admin.php?page=' + addNewMenuSlug
-
-	const showAddNew = queryParams.get('page') === addNewMenuSlug
-
-	return showAddNew ? <DetailView mode="create" /> : <ListView addNewPath={addNewPath} />
+	return showAddNew ? <DetailView mode="create" /> : <ListView />
 }
