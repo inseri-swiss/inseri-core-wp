@@ -54,3 +54,7 @@ export const getAllItems = async (): Promise<AxiosResponse<Datasource[]>> => {
 export const addNewItem = async (newItem: DatasourceWithoutId): Promise<AxiosResponse<Datasource>> => {
 	return axios.post<Datasource>(wpApiSettings.root + ROUTE, newItem, { headers: { 'X-WP-Nonce': wpApiSettings.nonce } })
 }
+
+export const removeItem = async (id: number): Promise<AxiosResponse<Datasource>> => {
+	return axios.delete<Datasource>(wpApiSettings.root + ROUTE + id, { headers: { 'X-WP-Nonce': wpApiSettings.nonce } })
+}
