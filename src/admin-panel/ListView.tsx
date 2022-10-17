@@ -1,12 +1,13 @@
+import { getHotkeyHandler } from '@mantine/hooks'
 import { IconX } from '@tabler/icons'
 import { useEffect, useRef, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { ActionIcon, Box, Button, createStyles, Group, MediaQuery, Select, Table, TextInput, Title } from '../components'
+import axios from 'axios'
 import logo from '../assets/inseri_logo.png'
-import { getHotkeyHandler } from '@mantine/hooks'
-import { Datasource, getAllItems } from './ApiServer'
-import { ContentTableBody, EmptyTableBody, SortableColumns, TableHeader } from './TableComponents'
+import { ActionIcon, Alert, Box, Button, createStyles, Group, MediaQuery, Select, Table, TextInput, Title } from '../components'
+import { Datasource, getAllItems, removeItem } from './ApiServer'
 import { HTTP_METHODS, PAGES } from './config'
+import { ContentTableBody, EmptyTableBody, SortableColumns, TableHeader } from './TableComponents'
 
 interface Props {}
 
@@ -17,13 +18,13 @@ const useStyles = createStyles((theme) => ({
 	},
 	primaryBtn: {
 		fontWeight: 'bold',
-		['&:hover']: {
+		'&:hover': {
 			color: '#fff',
 		},
-		['&:focus']: {
+		'&:focus': {
 			color: '#fff',
 		},
-		['&:active']: {
+		'&:active': {
 			color: '#fff',
 		},
 	},
@@ -35,6 +36,9 @@ const useStyles = createStyles((theme) => ({
 		background: '#fff',
 		width: '100%',
 	},
+	alertRoot: {
+		borderWidth: '2px',
+	},
 }))
 
 const ALL_AUTHORS = __('All Authors', 'inseri-core')
@@ -44,7 +48,7 @@ const methods = [ALL_METHODS, ...HTTP_METHODS]
 const ADD_NEW_PATH = 'admin.php?page=' + PAGES['add-new']
 
 export function ListView({}: Props) {
-	const { secondaryBtn, table: tableClass, titleBar, primaryBtn } = useStyles().classes
+	const { secondaryBtn, table: tableClass, titleBar, primaryBtn, alertRoot } = useStyles().classes
 
 	const [rawDatasources, setRawDatasources] = useState<Datasource[]>([])
 	const [datasources, setDatasources] = useState<Datasource[]>([])
@@ -59,6 +63,8 @@ export function ListView({}: Props) {
 	const [filterByMethod, setFilterByMethod] = useState<string>(methods[0])
 	const [sortDataBy, setSortDataBy] = useState<SortableColumns>(null)
 	const [isReversed, setSortDirection] = useState(false)
+
+	const [pageError, setPageError] = useState('')
 
 	const sortData = (column: SortableColumns) => () => {
 		const newReversed = column === sortDataBy ? !isReversed : false
@@ -108,7 +114,7 @@ export function ListView({}: Props) {
 	])
 
 	useEffect(() => {
-		getAllItems().then((response) => setRawDatasources(response.data))
+		loadDatasources()
 	}, [])
 
 	useEffect(() => {
@@ -143,6 +149,25 @@ export function ListView({}: Props) {
 		setSearchboxText('')
 	}
 
+	const loadDatasources = async () => {
+		const response = await getAllItems()
+		setRawDatasources(response.data)
+	}
+
+	const deleteDatasource = (id: number) => async () => {
+		try {
+			await removeItem(id)
+			loadDatasources()
+		} catch (exception) {
+			if (exception instanceof axios.AxiosError && exception.response && exception.response.data.message) {
+				const { data, status, statusText } = exception.response
+				setPageError(`${status} ${statusText}: ${data.message}`)
+			} else {
+				setPageError(__('Refresh the page and try it again.', 'inseri-core'))
+			}
+		}
+	}
+
 	return (
 		<>
 			<Group px={36} py="md">
@@ -156,6 +181,21 @@ export function ListView({}: Props) {
 					{__('Add New', 'inseri-core')}
 				</Button>
 			</Group>
+
+			{pageError && (
+				<Alert
+					mt="sm"
+					mx={36}
+					title={__('An error occurred', 'inseri-core')}
+					variant="outline"
+					color="red"
+					classNames={{ root: alertRoot }}
+					onClose={() => setPageError('')}
+					withCloseButton
+				>
+					{pageError}
+				</Alert>
+			)}
 
 			<Box px={36} mt="md">
 				<MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
@@ -189,7 +229,7 @@ export function ListView({}: Props) {
 				<Table striped className={tableClass} verticalSpacing="md">
 					<TableHeader sortBy={sortDataBy} isReversed={isReversed} sortData={sortData} />
 					{datasources.length > 0 ? (
-						<ContentTableBody datasources={datasources} />
+						<ContentTableBody datasources={datasources} onDelete={deleteDatasource} />
 					) : rawDatasources.length > 0 ? (
 						<EmptyTableBody
 							title={__('No data sources found', 'inseri-core')}
