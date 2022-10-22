@@ -149,6 +149,9 @@ components:
         author:
           type: integer
           example: 5
+        author_name:
+          type: string
+          example: admin
         method:
           type: string
           example: POST
