@@ -2,7 +2,6 @@ import { getHotkeyHandler } from '@mantine/hooks'
 import { IconX } from '@tabler/icons'
 import { useEffect, useRef, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import axios from 'axios'
 import logo from '../assets/inseri_logo.png'
 import { ActionIcon, Alert, Box, Button, createStyles, Group, MediaQuery, Select, Table, TextInput, Title } from '../components'
 import { Datasource, getAllItems, removeItem } from './ApiServer'
@@ -156,16 +155,11 @@ export function ListView({ onItemClick }: Props) {
 	}
 
 	const deleteDatasource = (id: number) => async () => {
-		try {
-			await removeItem(id)
+		const [errorMsg, _] = await removeItem(id)
+		if (errorMsg) {
+			setPageError(errorMsg)
+		} else {
 			loadDatasources()
-		} catch (exception) {
-			if (exception instanceof axios.AxiosError && exception.response && exception.response.data.message) {
-				const { data, status, statusText } = exception.response
-				setPageError(`${status} ${statusText}: ${data.message}`)
-			} else {
-				setPageError(__('Refresh the page and try it again.', 'inseri-core'))
-			}
 		}
 	}
 
