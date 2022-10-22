@@ -1,6 +1,5 @@
 import axios from 'axios'
 import type { AxiosResponse } from 'axios'
-import { ParamsObject } from '../utils'
 import { __ } from '@wordpress/i18n'
 
 const ROUTE = 'inseri/v1/datasources/'
@@ -16,12 +15,12 @@ export interface DatasourceWithoutId {
 	type: string
 	method: string
 	url: string
-	headers: Record<string, string>
-	query_params: Record<string, string>
+	headers: string
+	query_params: string
 	body?: string
 }
 
-export const fireRequest = async (method: string, url: string, queryParams: ParamsObject, headers: ParamsObject, body: any) => {
+export const fireRequest = async (method: string, url: string, queryParams: Record<string, string>, headers: Record<string, string>, body: any) => {
 	try {
 		const urlObject = new URL(url)
 		const queries = new URLSearchParams(queryParams)
@@ -75,5 +74,10 @@ export const addNewItem = async (newItem: DatasourceWithoutId): Promise<[string?
 
 export const removeItem = async (id: number): Promise<[string?, Datasource?]> => {
 	const action = () => axios.delete<Datasource>(wpApiSettings.root + ROUTE + id, { headers: { 'X-WP-Nonce': wpApiSettings.nonce } })
+	return generalRequest(action)
+}
+
+export const getItem = async (id: number): Promise<[string?, Datasource?]> => {
+	const action = () => axios.get<Datasource>(wpApiSettings.root + ROUTE + id)
 	return generalRequest(action)
 }

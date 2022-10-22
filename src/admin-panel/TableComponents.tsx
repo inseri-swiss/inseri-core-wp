@@ -134,7 +134,7 @@ interface ContentProps {
 	datasources: Datasource[]
 	onDelete: (id: number) => () => Promise<void>
 	onNameClick: (id: number) => void
-	onSelectClick: (type: SortableColumns) => (value: string) => void
+	onSelectClick: (type: 'author_name' | 'type' | 'method') => (value: string) => void
 }
 export function ContentTableBody({ datasources, onDelete, onNameClick, onSelectClick }: ContentProps) {
 	const { col0, col1, col2, col3, col4, col5 } = useStyles().classes

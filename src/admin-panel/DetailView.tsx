@@ -3,8 +3,8 @@ import { IconCircleOff } from '@tabler/icons'
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Accordion, Alert, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Select, Tabs, Text, TextInput, Title } from '../components'
-import { formatCode, getPropertyCaseInsensitive, mapParamsToObject } from '../utils'
-import { addNewItem, DatasourceWithoutId, fireRequest } from './ApiServer'
+import { formatCode, getPropertyCaseInsensitive, mapObjectToParams, mapParamsToObject } from '../utils'
+import { addNewItem, Datasource, DatasourceWithoutId, fireRequest, getItem } from './ApiServer'
 import { PAGES } from './config'
 import { ParamItem, ParamsTable } from './ParamsTable'
 import { UrlBar } from './UrlBar'
@@ -82,12 +82,15 @@ const BODY_TYPE_TO_CONTENT_TYPE: any = {
 }
 
 const RESPONSE_AREA_ID = 'response-textarea'
+const CONTENT_TYPE = 'content-type'
 
 const isFormType = (type: string) => ['form-urlencoded', 'form-data'].some((i) => i === type)
 const isBeautifyType = (type: string) => ['xml', 'json'].some((i) => i === type)
+const createParamItem = () => ({ isChecked: true, key: '', value: '' })
 
-export function DetailView({ mode }: Props) {
+export function DetailView(props: Props) {
 	const { primaryBtn, titleBar, whiteBox, accordionContent, accordionLabel, tab, alertRoot, midSizeField, idField, readonlyWrapper } = useStyles().classes
+	const { mode } = props
 	const isEdit = mode === 'edit'
 
 	const [datasourceName, setDatasourceName] = useState('')
@@ -98,12 +101,12 @@ export function DetailView({ mode }: Props) {
 	const [debouncedUrl] = useDebouncedValue(url, 500)
 	const [urlError, setUrlError] = useState('')
 
-	const [queryParams, setQueryParams] = useState<ParamItem[]>([])
-	const [headerParams, setHeaderParams] = useState<ParamItem[]>([{ isChecked: true, key: '', value: '' }])
+	const [queryParams, setQueryParams] = useState<ParamItem[]>([createParamItem()])
+	const [headerParams, setHeaderParams] = useState<ParamItem[]>([createParamItem()])
 
 	const [requestBodyType, setRequestBodyType] = useState<string>(BODY_TYPES[0].value)
 	const [requestTextBody, setRequestTextBody] = useState<string>('')
-	const [requestParamsBody, setRequestParamsBody] = useState<ParamItem[]>([])
+	const [requestParamsBody, setRequestParamsBody] = useState<ParamItem[]>([createParamItem()])
 	const [bodyError, setBodyError] = useState<string>('')
 
 	const [openAccordionItems, setOpenAccordionItems] = useState<string[]>(['request'])
@@ -115,6 +118,7 @@ export function DetailView({ mode }: Props) {
 	const [responseBodyType, setResponseBodyType] = useState<string>('')
 
 	const [pageError, setPageError] = useState<string>('')
+	const [item, setItem] = useState<Datasource | null>(null)
 
 	const isNotReadyForSubmit = !!urlError || !url || !datasourceName
 
@@ -168,8 +172,8 @@ export function DetailView({ mode }: Props) {
 			method,
 			url,
 			description: datasourceName,
-			headers: mapParamsToObject(headerParams),
-			query_params: mapParamsToObject(queryParams),
+			headers: JSON.stringify(mapParamsToObject(headerParams)),
+			query_params: JSON.stringify(mapParamsToObject(queryParams)),
 			type: datasourceType ?? DATASOURCE_TYPES[0].value,
 		}
 
@@ -195,11 +199,11 @@ export function DetailView({ mode }: Props) {
 	}
 
 	useEffect(() => {
-		let updatedHeaders = headerParams.filter((i) => !i.isPreset && i.key !== 'Content-Type')
+		let updatedHeaders = headerParams.filter((i) => !i.isPreset && i.key !== CONTENT_TYPE)
 
 		if (requestBodyType !== 'none') {
-			const defaultEntry = { isPreset: true, isChecked: true, key: 'Content-Type', value: '' }
-			const contentType = headerParams.find((i) => i.isPreset && i.key === 'Content-Type') ?? defaultEntry
+			const defaultEntry = { isPreset: true, isChecked: true, key: CONTENT_TYPE, value: '' }
+			const contentType = headerParams.find((i) => i.isPreset && i.key === CONTENT_TYPE) ?? defaultEntry
 			const updatedContentType = { ...contentType, value: BODY_TYPE_TO_CONTENT_TYPE[requestBodyType] }
 
 			updatedHeaders = [updatedContentType, ...updatedHeaders]
@@ -211,6 +215,33 @@ export function DetailView({ mode }: Props) {
 	useEffect(() => {
 		const responseTextarea = document.getElementById(RESPONSE_AREA_ID)
 		responseTextarea?.setAttribute('readonly', 'true')
+
+		if (mode === 'edit') {
+			getItem(props.itemId).then(([errorMsg, data]) => {
+				if (errorMsg) {
+					setPageError(errorMsg)
+				}
+				if (data) {
+					const { description, url, method, headers, query_params, type, body } = data
+					setItem(data)
+
+					setDatasourceName(description)
+					setUrl(url)
+					setMethod(method)
+					setDatasourceType(type)
+					const queryParams = [...mapObjectToParams(JSON.parse(query_params)), createParamItem()]
+					setQueryParams(queryParams)
+
+					const headerParams: ParamItem[] = [...mapObjectToParams(JSON.parse(headers)), createParamItem()]
+					const contentTypeItem = headerParams.find((i) => i.key.toLowerCase() === CONTENT_TYPE)
+					if (contentTypeItem) {
+						contentTypeItem.isPreset = true
+					}
+
+					setHeaderParams(headerParams)
+				}
+			})
+		}
 	}, [])
 
 	useEffect(() => {
@@ -258,7 +289,7 @@ export function DetailView({ mode }: Props) {
 				)}
 
 				<Group px={36} mt="md" spacing="xs">
-					{isEdit && <TextInput label={__('ID', 'inseri-core')} readOnly classNames={{ root: idField, wrapper: readonlyWrapper }} />}
+					{isEdit && <TextInput label={__('ID', 'inseri-core')} readOnly classNames={{ root: idField, wrapper: readonlyWrapper }} value={item?.id} />}
 
 					<TextInput
 						label={__('Name', 'inseri-core')}
@@ -277,7 +308,9 @@ export function DetailView({ mode }: Props) {
 						readOnly={isEdit}
 					/>
 
-					{isEdit && <TextInput label={__('Author', 'inseri-core')} readOnly classNames={{ root: midSizeField, wrapper: readonlyWrapper }} />}
+					{isEdit && (
+						<TextInput label={__('Author', 'inseri-core')} readOnly classNames={{ root: midSizeField, wrapper: readonlyWrapper }} value={item?.author_name} />
+					)}
 				</Group>
 			</Box>
 

@@ -53,9 +53,8 @@ interface Props {
 	readonly?: boolean
 }
 
-export function ParamsTable({ onItemsChange, items: inputItems, readonly }: Props) {
+export function ParamsTable({ onItemsChange, items, readonly }: Props) {
 	const { table, paramInput, paramWrapper } = useStyles().classes
-	const items = inputItems.length > 0 ? inputItems : [{ isChecked: true, key: '', value: '' }]
 
 	const updateParams = ({ key, value, isChecked }: { key?: string; value?: string; isChecked?: boolean }, index: number) => {
 		let tail = null
