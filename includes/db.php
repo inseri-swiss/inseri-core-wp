@@ -1,95 +1,102 @@
 <?php
-namespace inseri_core\db;
-
 use inseri_core\Either;
 
-function setup_table() {
-	global $wpdb;
-	$table_name = $wpdb->prefix . 'inseri_datasources';
-	$charset_collate = $wpdb->get_charset_collate();
+class Inseri_Core_DB {
+	private $wpdb;
+	private $charset_collate;
+	private $table_name;
+	private $user_name;
 
-	$sql = "CREATE TABLE $table_name (
-      id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-      description VARCHAR(128) NOT NULL,
-      type VARCHAR(64) NOT NULL,
-      author BIGINT(20) UNSIGNED NOT NULL,
-      method VARCHAR(12) NOT NULL,
-      url VARCHAR(255) NOT NULL,
-      headers JSON DEFAULT '{}',
-      query_params JSON DEFAULT '{}',
-      body MEDIUMTEXT DEFAULT NULL,
-      UNIQUE KEY id (id)
-    ) $charset_collate;";
-
-	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
-	dbDelta($sql);
-}
-
-function resolve_action($action): Either {
-	global $wpdb;
-	$wpdb->hide_errors();
-	$table_name = $wpdb->prefix . 'inseri_datasources';
-
-	$result = $action($wpdb, $table_name);
-
-	$last_error = $wpdb->last_error;
-	if (!empty($last_error)) {
-		return Either::Left($last_error);
+	function __construct($wpdb) {
+		$this->wpdb = $wpdb;
+		$this->table_name = $wpdb->prefix . 'inseri_datasources';
+		$this->user_table = $wpdb->prefix . 'users';
+		$this->charset_collate = $wpdb->get_charset_collate();
 	}
 
-	if ($result === false) {
-		return Either::Left('execution-failed');
+	function setup_table() {
+		$sql = "CREATE TABLE $this->table_name (
+				id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+				description VARCHAR(128) NOT NULL,
+				type VARCHAR(64) NOT NULL,
+				author BIGINT(20) UNSIGNED NOT NULL,
+				method VARCHAR(12) NOT NULL,
+				url VARCHAR(255) NOT NULL,
+				headers JSON DEFAULT '{}',
+				query_params JSON DEFAULT '{}',
+				body MEDIUMTEXT DEFAULT NULL,
+				UNIQUE KEY id (id)
+				) $this->charset_collate;";
+
+		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+		dbDelta($sql);
 	}
 
-	if ($result === 0) {
-		return Either::Left('not-modified');
-	}
+	private function resolve_action($action): Either {
+		$this->wpdb->hide_errors();
+		$result = $action();
 
-	if ($result === null) {
-		return Either::Left('not-found');
-	}
-
-	return Either::Right($result);
-}
-
-function get_all(): Either {
-	global $wpdb;
-	$table_name = $wpdb->prefix . 'inseri_datasources';
-	$user_table = $wpdb->prefix . 'users';
-
-	$sql = "SELECT datasources.*, users.user_nicename AS author_name
-	FROM $table_name AS datasources
-	LEFT JOIN $user_table AS users
-	on datasources.author = users.id;";
-
-	$action = fn($wpdb, $table_name) => $wpdb->get_results($sql);
-	return resolve_action($action);
-}
-
-function get_one($id): Either {
-	$action = fn($wpdb, $table_name) => $wpdb->get_row("SELECT * FROM $table_name WHERE id=$id;");
-	return resolve_action($action);
-}
-
-function insert_one($item): Either {
-	$action = function ($wpdb, $table_name) use ($item) {
-		$rows_inserted = $wpdb->insert($table_name, $item);
-		if ($rows_inserted) {
-			return $wpdb->insert_id;
+		$last_error = $this->wpdb->last_error;
+		if (!empty($last_error)) {
+			return Either::Left($last_error);
 		}
 
-		return null;
-	};
+		if ($result === false) {
+			return Either::Left('execution-failed');
+		}
 
-	return resolve_action($action);
-}
+		if ($result === 0) {
+			return Either::Left('not-modified');
+		}
 
-function delete_one($id): Either {
-	$action = fn($wpdb, $table_name) => $wpdb->delete($table_name, ['id' => $id]);
-	return resolve_action($action);
-}
+		if ($result === null) {
+			return Either::Left('not-found');
+		}
 
-function update_one($item): Either {
-	$action = fn($wpdb, $table_name) => $wpdb->update($table_name, $item, ['id' => $item['id']]);
-	return resolve_action($action);
+		return Either::Right($result);
+	}
+
+	function get_all(): Either {
+		$sql = "SELECT datasources.*, users.user_nicename AS author_name
+				FROM $this->table_name AS datasources
+				LEFT JOIN $this->user_table AS users
+				on datasources.author = users.id;";
+
+		$action = fn() => $this->wpdb->get_results($sql);
+		return $this->resolve_action($action);
+	}
+
+	function get_one($id): Either {
+		$sql = "SELECT datasources.*, users.user_nicename AS author_name
+				FROM $this->table_name AS datasources
+				LEFT JOIN $this->user_table AS users
+				on datasources.author = users.id
+				WHERE datasources.id=$id;";
+
+		$action = fn() => $this->wpdb->get_row($sql);
+		return $this->resolve_action($action);
+	}
+
+	function insert_one($item): Either {
+		$action = function () use ($item) {
+			$rows_inserted = $this->wpdb->insert($this->table_name, $item);
+			if ($rows_inserted) {
+				return $this->wpdb->insert_id;
+			}
+
+			return null;
+		};
+
+		return $this->resolve_action($action);
+	}
+
+	function delete_one($id): Either {
+		$action = fn() => $this->wpdb->delete($this->table_name, ['id' => $id]);
+		return $this->resolve_action($action);
+	}
+
+	function update_one($item): Either {
+		$action = fn() => $this->wpdb->update($this->table_name, $item, ['id' => $item['id']]);
+		return $this->resolve_action($action);
+	}
 }
