@@ -2,10 +2,12 @@ import { useInterval } from '@mantine/hooks'
 import { IconTrash } from '@tabler/icons'
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Button, createStyles, SortableTh, Stack, Text, Title, useMantineTheme } from '../components'
+import { Button, createStyles, SortableTh, Stack, Text, Title } from '../components'
 import { Datasource } from './ApiServer'
 
-const useStyles = createStyles((theme) => ({
+const DELAY_TIME = 5
+
+const useStyles = createStyles((theme, _t, getRef) => ({
 	col0: {
 		minWidth: '120px',
 		width: '20%',
@@ -50,11 +52,13 @@ const useStyles = createStyles((theme) => ({
 		},
 	},
 	removeBtn: {
+		ref: getRef('remove-btn'),
 		border: '0',
 		minWidth: '90px',
 
 		background: `linear-gradient(to left, transparent 50%, ${theme.colors.yellow[1]} 50%) right`,
 		backgroundSize: '200%',
+		transition: 'none',
 
 		'&:hover': {
 			border: '1px solid ' + theme.colors.red[7],
@@ -64,9 +68,14 @@ const useStyles = createStyles((theme) => ({
 	},
 
 	removeBtnActive: {
-		'&:hover': {
-			background: theme.colors.yellow[2],
-			color: 'inherit',
+		[`&.${getRef('remove-btn')}`]: {
+			transition: `${DELAY_TIME + 1}s ease-out background-position`,
+			border: '2px solid ' + theme.colors.yellow[3],
+
+			'&:hover': {
+				background: theme.colors.yellow[2],
+				color: 'inherit',
+			},
 		},
 	},
 }))
@@ -137,14 +146,14 @@ function DeleteButton({ onDelete }: DeleteButtonProps) {
 	const { classes, cx } = useStyles()
 	const { removeBtn, removeBtnActive } = classes
 
-	const [countdown, setCountdown] = useState(5)
+	const [countdown, setCountdown] = useState(DELAY_TIME)
 	const interval = useInterval(() => setCountdown((s) => s - 1), 1000)
 	const [isTriggered, setTriggered] = useState(false)
 
 	useEffect(() => {
-		if (countdown === 0) {
+		if (countdown < 0) {
 			interval.stop()
-			setCountdown(5)
+			setCountdown(DELAY_TIME)
 			setTriggered(false)
 
 			onDelete()
@@ -155,21 +164,17 @@ function DeleteButton({ onDelete }: DeleteButtonProps) {
 		if (isTriggered) {
 			setTriggered(false)
 			interval.stop()
-			setCountdown(5)
+			setCountdown(DELAY_TIME)
 		} else {
 			setTriggered(true)
 			interval.start()
 		}
 	}
 
-	const theme = useMantineTheme()
-
 	return (
 		<Button
 			classNames={{ root: cx(removeBtn, isTriggered && removeBtnActive) }}
 			style={{
-				border: isTriggered ? '2px solid ' + theme.colors.yellow[3] : '0',
-				transition: isTriggered ? '5s ease-out background-position' : 'none',
 				backgroundPosition: isTriggered ? 'left' : 'right',
 			}}
 			onClick={deleteClick}
