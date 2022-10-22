@@ -71,12 +71,6 @@ class Inseri_Core_Rest {
 		$non_empty_fields = ['description', 'type', 'method', 'url'];
 		$json_fields = ['headers', 'query_params'];
 
-		foreach ($json_fields as $field) {
-			if (isset($body[$field])) {
-				$body[$field] = json_encode($body[$field]);
-			}
-		}
-
 		if ($check_id) {
 			if ($request['item_id'] != $request->get_json_params()['id']) {
 				return Either::Left('The id from URL does not match with id in body');

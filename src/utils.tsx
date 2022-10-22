@@ -2,7 +2,7 @@ import { ParamItem } from './admin-panel/ParamsTable'
 import xmlFormatter from 'xml-formatter'
 import { __ } from '@wordpress/i18n'
 
-const htmlEscapesMap: ParamsObject = {
+const htmlEscapesMap: Record<string, string> = {
 	'&': '&amp;',
 	'<': '&lt;',
 	'>': '&gt;',
@@ -19,15 +19,16 @@ export const escapeHtml = (input: string): string => {
 	return Object.keys(htmlEscapesMap).reduce((acc, search) => acc.replaceAll(search, htmlEscapesMap[search]), input)
 }
 
-export interface ParamsObject {
-	[key: string]: string
-}
-
-export const mapParamsToObject = (params: ParamItem[]): ParamsObject =>
-	params
+export const mapParamsToObject = (params: ParamItem[]): Record<string, string> => {
+	return params
 		.filter((i) => i.isChecked)
 		.filter((i) => i.key || i.value)
 		.reduce((acc, i) => ({ ...acc, [i.key]: i.value }), {})
+}
+
+export const mapObjectToParams = (obj: Record<string, string>): ParamItem[] => {
+	return Object.keys(obj).map((key) => ({ key, value: obj[key], isChecked: true }))
+}
 
 export const formatCode = (type: string, code: string): [string | null, string | null] => {
 	if (type === 'json') {

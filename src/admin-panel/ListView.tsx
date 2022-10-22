@@ -124,18 +124,14 @@ export function ListView({ onItemClick }: Props) {
 
 	const searchboxRef = useRef<HTMLInputElement>(null)
 
-	const setFilterByString = (filterType: SortableColumns) => (value: string) => {
-		if (filterType === 'author_name') {
-			setFilterByAuthor(value)
+	const setFilterByString = (filterType: 'author_name' | 'type' | 'method') => (value: string) => {
+		const filterMap = {
+			author_name: setFilterByAuthor,
+			type: setFilterByType,
+			method: setFilterByMethod,
 		}
 
-		if (filterType === 'type') {
-			setFilterByType(value)
-		}
-
-		if (filterType === 'method') {
-			setFilterByMethod(value)
-		}
+		filterMap[filterType](value)
 	}
 
 	const searchDatasources = () => {
