@@ -217,10 +217,9 @@ function DeleteButton({ onDelete }: DeleteButtonProps) {
 interface EmptyProps {
 	title: string
 	description: string
-	buttonText?: string
-	onClick?: () => {}
+	children?: JSX.Element
 }
-export function EmptyTableBody({ title, description, buttonText, onClick }: EmptyProps) {
+export function EmptyTableBody({ title, description, children }: EmptyProps) {
 	return (
 		<tbody>
 			<tr>
@@ -230,11 +229,7 @@ export function EmptyTableBody({ title, description, buttonText, onClick }: Empt
 							{title}
 						</Title>
 						<Text>{description}</Text>
-						{buttonText && (
-							<Button size="sm" style={{ fontWeight: 'bold' }} mt="sm" onClick={onClick}>
-								{buttonText}
-							</Button>
-						)}
+						{children}
 					</Stack>
 				</td>
 			</tr>

@@ -20,13 +20,7 @@ const useStyles = createStyles((theme) => ({
 	},
 	primaryBtn: {
 		fontWeight: 'bold',
-		'&:hover': {
-			color: '#fff',
-		},
-		'&:focus': {
-			color: '#fff',
-		},
-		'&:active': {
+		'&:hover, &:focus, &:active': {
 			color: '#fff',
 		},
 	},
@@ -243,8 +237,11 @@ export function ListView({ onItemClick }: Props) {
 						<EmptyTableBody
 							title={__('No data sources yet', 'inseri-core')}
 							description={__('To fetch data in posts or in pages, add new data repository', 'inseri-core')}
-							buttonText={__('Add New Data Source', 'inseri-core')}
-						></EmptyTableBody>
+						>
+							<Button size="sm" classNames={{ root: primaryBtn }} component="a" href={ADD_NEW_PATH} mt="sm">
+								{__('Add New Data Source', 'inseri-core')}
+							</Button>
+						</EmptyTableBody>
 					)}
 				</Table>
 			</Box>
