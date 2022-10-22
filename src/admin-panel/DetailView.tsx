@@ -11,7 +11,7 @@ import { ParamItem, ParamsTable } from './ParamsTable'
 import { UrlBar } from './UrlBar'
 import logo from '../assets/inseri_logo.png'
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles((theme, _params, getRef) => ({
 	primaryBtn: {
 		fontWeight: 'bold',
 	},
@@ -32,6 +32,23 @@ const useStyles = createStyles((theme) => ({
 	tab: { borderWidth: '4px' },
 	alertRoot: {
 		borderWidth: '2px',
+	},
+	midSizeField: {
+		minWidth: '180px',
+	},
+	idField: {
+		width: '60px',
+	},
+	readonlyWrapper: {
+		[`& > .${getRef('input')}`]: {
+			background: '#F9F9F9',
+			cursor: 'text',
+
+			['&:hover, &:focus']: {
+				border: '1px solid #8c8f94',
+				boxShadow: 'none',
+			},
+		},
 	},
 }))
 
@@ -70,8 +87,9 @@ const RESPONSE_AREA_ID = 'response-textarea'
 const isFormType = (type: string) => ['form-urlencoded', 'form-data'].some((i) => i === type)
 const isBeautifyType = (type: string) => ['xml', 'json'].some((i) => i === type)
 
-export function DetailView(_props: Props) {
-	const { primaryBtn, titleBar, whiteBox, accordionContent, accordionLabel, tab, alertRoot } = useStyles().classes
+export function DetailView({ mode }: Props) {
+	const { primaryBtn, titleBar, whiteBox, accordionContent, accordionLabel, tab, alertRoot, midSizeField, idField, readonlyWrapper } = useStyles().classes
+	const isEdit = mode === 'edit'
 
 	const [datasourceName, setDatasourceName] = useState('')
 	const [datasourceType, setDatasourceType] = useState<string | null>(DATASOURCE_TYPES[0].value)
@@ -211,6 +229,9 @@ export function DetailView(_props: Props) {
 		}
 	}, [debouncedUrl])
 
+	const title = isEdit ? __('Edit Data Source', 'inseri-core') : __('Add New Data Source', 'inseri-core')
+	const primaryBtnText = isEdit ? __('Save', 'inseri-core') : __('Create', 'inseri-core')
+
 	return (
 		<>
 			<Box>
@@ -219,11 +240,11 @@ export function DetailView(_props: Props) {
 				</Group>
 				<Group px={36} py="sm" position="apart" className={titleBar}>
 					<Title order={1} size="h3">
-						{__('Add New Data Source', 'inseri-core')}
+						{title}
 					</Title>
 
 					<Button classNames={{ root: primaryBtn }} size="sm" disabled={isNotReadyForSubmit} onClick={createDatasource}>
-						{__('Create', 'inseri-core')}
+						{primaryBtnText}
 					</Button>
 				</Group>
 
@@ -242,15 +263,27 @@ export function DetailView(_props: Props) {
 					</Alert>
 				)}
 
-				<Group px={36} mt="md">
-					<Select label={__('Type', 'inseri-core')} data={DATASOURCE_TYPES} value={datasourceType} onChange={setDatasourceType} />
+				<Group px={36} mt="md" spacing="xs">
+					{isEdit && <TextInput label={__('ID', 'inseri-core')} readOnly classNames={{ root: idField, wrapper: readonlyWrapper }} />}
+
 					<TextInput
 						label={__('Name', 'inseri-core')}
-						sx={{ flex: 1 }}
+						className={midSizeField}
+						style={{ flex: 1 }}
 						value={datasourceName}
 						onChange={(e) => setDatasourceName(e.currentTarget.value)}
 						withAsterisk
 					/>
+					<Select
+						label={__('Type', 'inseri-core')}
+						data={DATASOURCE_TYPES}
+						value={datasourceType}
+						onChange={setDatasourceType}
+						classNames={{ root: midSizeField, wrapper: isEdit ? readonlyWrapper : undefined }}
+						readOnly={isEdit}
+					/>
+
+					{isEdit && <TextInput label={__('Author', 'inseri-core')} readOnly classNames={{ root: midSizeField, wrapper: readonlyWrapper }} />}
 				</Group>
 			</Box>
 

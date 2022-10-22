@@ -11,6 +11,10 @@ const useStyles = createStyles((theme, _t, getRef) => ({
 	col0: {
 		minWidth: '120px',
 		width: '20%',
+		['> span']: {
+			color: theme.colors.blue[9],
+			cursor: 'pointer',
+		},
 		[theme.fn.smallerThan('sm')]: {
 			width: '70%',
 		},
@@ -18,6 +22,10 @@ const useStyles = createStyles((theme, _t, getRef) => ({
 	col1: {
 		minWidth: '120px',
 		width: '15%',
+		['> span']: {
+			color: theme.colors.blue[9],
+			cursor: 'pointer',
+		},
 		[theme.fn.smallerThan('sm')]: {
 			width: '30%',
 		},
@@ -25,6 +33,10 @@ const useStyles = createStyles((theme, _t, getRef) => ({
 	col2: {
 		minWidth: '120px',
 		width: '10%',
+		['> span']: {
+			color: theme.colors.blue[9],
+			cursor: 'pointer',
+		},
 		[theme.fn.smallerThan('sm')]: {
 			display: 'none',
 		},
@@ -32,6 +44,10 @@ const useStyles = createStyles((theme, _t, getRef) => ({
 	col3: {
 		minWidth: '120px',
 		width: '10%',
+		['> span']: {
+			color: theme.colors.blue[9],
+			cursor: 'pointer',
+		},
 		[theme.fn.smallerThan('sm')]: {
 			display: 'none',
 		},
@@ -117,18 +133,28 @@ export function TableHeader({ sortBy, isReversed, sortData }: HeaderProps) {
 interface ContentProps {
 	datasources: Datasource[]
 	onDelete: (id: number) => () => Promise<void>
+	onNameClick: (id: number) => void
+	onSelectClick: (type: SortableColumns) => (value: string) => void
 }
-export function ContentTableBody({ datasources, onDelete }: ContentProps) {
+export function ContentTableBody({ datasources, onDelete, onNameClick, onSelectClick }: ContentProps) {
 	const { col0, col1, col2, col3, col4, col5 } = useStyles().classes
 
 	return (
 		<tbody>
 			{datasources.map((d) => (
 				<tr key={d.id}>
-					<td className={col0}>{d.description}</td>
-					<td className={col1}>{d.author_name}</td>
-					<td className={col2}>{d.type}</td>
-					<td className={col3}>{d.method}</td>
+					<td className={col0}>
+						<span onClick={() => onNameClick(d.id)}>{d.description}</span>
+					</td>
+					<td className={col1}>
+						<span onClick={() => onSelectClick('author_name')(d.author_name)}>{d.author_name}</span>
+					</td>
+					<td className={col2}>
+						<span onClick={() => onSelectClick('type')(d.type)}>{d.type}</span>
+					</td>
+					<td className={col3}>
+						<span onClick={() => onSelectClick('method')(d.method)}>{d.method}</span>
+					</td>
 					<td className={col4}>{d.url}</td>
 					<td className={col5}>
 						<DeleteButton onDelete={onDelete(d.id)} />

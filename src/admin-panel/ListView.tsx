@@ -9,7 +9,9 @@ import { Datasource, getAllItems, removeItem } from './ApiServer'
 import { HTTP_METHODS, PAGES } from './config'
 import { ContentTableBody, EmptyTableBody, SortableColumns, TableHeader } from './TableComponents'
 
-interface Props {}
+interface Props {
+	onItemClick: (id: number) => void
+}
 
 const useStyles = createStyles((theme) => ({
 	titleBar: {
@@ -47,7 +49,7 @@ const ALL_METHODS = __('All Methods', 'inseri-core')
 const methods = [ALL_METHODS, ...HTTP_METHODS]
 const ADD_NEW_PATH = 'admin.php?page=' + PAGES['add-new']
 
-export function ListView({}: Props) {
+export function ListView({ onItemClick }: Props) {
 	const { secondaryBtn, table: tableClass, titleBar, primaryBtn, alertRoot } = useStyles().classes
 
 	const [rawDatasources, setRawDatasources] = useState<Datasource[]>([])
@@ -58,9 +60,9 @@ export function ListView({}: Props) {
 
 	const [searchboxText, setSearchboxText] = useState<string>('')
 
-	const [filterByAuthor, setFilterByAuthor] = useState<string>(authors[0])
-	const [filterByType, setFilterByType] = useState<string>(types[0])
-	const [filterByMethod, setFilterByMethod] = useState<string>(methods[0])
+	const [filterByAuthor, setFilterByAuthor] = useState<string | null>(authors[0])
+	const [filterByType, setFilterByType] = useState<string | null>(types[0])
+	const [filterByMethod, setFilterByMethod] = useState<string | null>(methods[0])
 	const [sortDataBy, setSortDataBy] = useState<SortableColumns>(null)
 	const [isReversed, setSortDirection] = useState(false)
 
@@ -127,15 +129,20 @@ export function ListView({}: Props) {
 		setTypes([ALL_TYPES, ...Array.from(uniqueTypes)])
 	}, [rawDatasources])
 
-	const authorSelectRef = useRef<HTMLInputElement>(null)
-	const typeSelectRef = useRef<HTMLInputElement>(null)
-	const methodSelectRef = useRef<HTMLInputElement>(null)
 	const searchboxRef = useRef<HTMLInputElement>(null)
 
-	const chooseFilters = () => {
-		setFilterByAuthor(authorSelectRef.current?.value ?? ALL_AUTHORS)
-		setFilterByType(typeSelectRef.current?.value ?? ALL_TYPES)
-		setFilterByMethod(methodSelectRef.current?.value ?? ALL_METHODS)
+	const setFilterByString = (filterType: SortableColumns) => (value: string) => {
+		if (filterType === 'author_name') {
+			setFilterByAuthor(value)
+		}
+
+		if (filterType === 'type') {
+			setFilterByType(value)
+		}
+
+		if (filterType === 'method') {
+			setFilterByMethod(value)
+		}
 	}
 
 	const searchDatasources = () => {
@@ -200,12 +207,9 @@ export function ListView({}: Props) {
 			<Box px={36} mt="md">
 				<MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
 					<Group my="xs" spacing={6}>
-						<Select aria-label={__('Filter by Author', 'inseri-core')} defaultValue={ALL_AUTHORS} ref={authorSelectRef} data={authors} />
-						<Select aria-label={__('Filter by Type', 'inseri-core')} defaultValue={ALL_TYPES} ref={typeSelectRef} data={types} />
-						<Select aria-label={__('Filter by Method', 'inseri-core')} defaultValue={ALL_METHODS} ref={methodSelectRef} data={methods} />
-						<Button variant="outline" classNames={{ root: secondaryBtn }} onClick={chooseFilters}>
-							{__('Filter', 'inseri-core')}
-						</Button>
+						<Select aria-label={__('Filter by Author', 'inseri-core')} value={filterByAuthor} onChange={setFilterByAuthor} data={authors} />
+						<Select aria-label={__('Filter by Type', 'inseri-core')} value={filterByType} onChange={setFilterByType} data={types} />
+						<Select aria-label={__('Filter by Method', 'inseri-core')} value={filterByMethod} onChange={setFilterByMethod} data={methods} />
 
 						<div style={{ flex: 1 }} />
 
@@ -229,7 +233,7 @@ export function ListView({}: Props) {
 				<Table striped className={tableClass} verticalSpacing="md">
 					<TableHeader sortBy={sortDataBy} isReversed={isReversed} sortData={sortData} />
 					{datasources.length > 0 ? (
-						<ContentTableBody datasources={datasources} onDelete={deleteDatasource} />
+						<ContentTableBody datasources={datasources} onDelete={deleteDatasource} onNameClick={onItemClick} onSelectClick={setFilterByString} />
 					) : rawDatasources.length > 0 ? (
 						<EmptyTableBody
 							title={__('No data sources found', 'inseri-core')}

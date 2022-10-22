@@ -51,7 +51,7 @@ export function UrlBar({ method, onMethodChange, url, onUrlChange, onTryClick, i
 	const isNotReady = !url || !!urlError
 
 	return (
-		<Group px="md" pt="lg" pb="xs" align="flex-start">
+		<Group px="md" pt="lg" pb="xs" align="flex-start" spacing="sm">
 			<Group spacing={0} style={{ flex: 1, alignItems: 'baseline' }}>
 				<Select
 					classNames={{ root: methodRoot, wrapper: methodWrapper, input: methodInput }}
@@ -72,7 +72,7 @@ export function UrlBar({ method, onMethodChange, url, onUrlChange, onTryClick, i
 					error={urlError}
 				/>
 			</Group>
-			<Button classNames={{ root: sendBtn }} variant="light" size="sm" onClick={onTryClick} uppercase disabled={isNotReady} loading={isLoadingRequest}>
+			<Button classNames={{ root: sendBtn }} variant="light" onClick={onTryClick} uppercase disabled={isNotReady} loading={isLoadingRequest}>
 				{__('Try Request', 'inseri-core')}
 			</Button>
 		</Group>
