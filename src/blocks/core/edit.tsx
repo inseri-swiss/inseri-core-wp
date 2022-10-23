@@ -14,7 +14,7 @@ export default function Edit() {
 			>
 				A11y click
 			</Button>
-			{__('Inseri Core – hello from the editor!', 'core')}
+			{__('inseri core – hello from the editor!', 'core')}
 		</p>
 	)
 }
