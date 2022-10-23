@@ -56,3 +56,29 @@ export const getPropertyCaseInsensitive = (object: any, key: string) => {
 	const index = Object.keys(object).find((k) => k.toLowerCase() === key.toLowerCase()) as string
 	return object[index]
 }
+
+export const BODY_TYPE_TO_CONTENT_TYPE: Record<string, string> = {
+	text: 'text/plain',
+	json: 'application/json',
+	xml: 'application/xml',
+	'form-urlencoded': 'application/x-www-form-urlencoded',
+	'form-data': 'multipart/form-data',
+} as any
+
+export const getBodyTypeByContenType = (contentType?: string): string => {
+	const contentTypeMap: Record<string, string> = {
+		'application/x-www-form-urlencoded': 'form-urlencoded',
+		'multipart/form-data': 'form-data',
+		xml: 'xml',
+		json: 'json',
+		'text/': 'text',
+		'image/': 'image',
+	}
+
+	const found = Object.keys(contentTypeMap).find((k) => contentType?.includes(k))
+	if (found) {
+		return contentTypeMap[found]
+	}
+
+	return 'raw'
+}
