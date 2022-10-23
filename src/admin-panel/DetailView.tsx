@@ -13,6 +13,9 @@ import logo from '../assets/inseri_logo.png'
 const useStyles = createStyles((theme, _params, getRef) => ({
 	primaryBtn: {
 		fontWeight: 'bold',
+		'&:hover, &:focus, &:active': {
+			color: '#fff',
+		},
 	},
 	titleBar: {
 		border: '1px solid' + theme.colors.gray[4],
@@ -105,7 +108,7 @@ export function DetailView(props: Props) {
 
 	const [responseStatus, setResponseStatus] = useState<string>('')
 	const [responseHeaders, setResponseHeaders] = useState<ParamItem[]>([createParamItem()])
-	const [responseBody, setResponseBody] = useState<string>('')
+	const [responseBody, setResponseBody] = useState<any>('')
 	const [responseBodyType, setResponseBodyType] = useState<string>('')
 
 	const [pageError, setPageError] = useState<string>('')
@@ -144,16 +147,27 @@ export function DetailView(props: Props) {
 
 		const contentType: string | undefined = getPropertyCaseInsensitive(headers, 'content-type')
 		const bodyType = getBodyTypeByContenType(contentType)
-		let preparedBody = null
+		let preparedBody: any = ''
 
 		if (bodyType === 'image') {
 			preparedBody = url
+		} else if (bodyType === 'raw') {
+			const urlObject = URL.createObjectURL(new Blob([data]))
+			const parts = url.split('/')
+			const lastPart = parts[parts.length - 1]
+			preparedBody = { url: urlObject, filename: lastPart }
 		} else {
-			preparedBody = formatCode(bodyType, data)[1]
+			const textBlob = new Blob([data])
+			preparedBody = await textBlob.text()
 		}
 
-		setResponseBody(preparedBody ?? data)
+		if (bodyType === 'json' || bodyType === 'xml') {
+			const formattedCode = formatCode(bodyType, preparedBody)[1]
+			preparedBody = formattedCode ?? preparedBody
+		}
+
 		setResponseBodyType(bodyType)
+		setResponseBody(preparedBody)
 		setLoadingRequest(false)
 	}
 
@@ -421,6 +435,10 @@ export function DetailView(props: Props) {
 								<Tabs.Panel value="body" py="sm" px="md">
 									{responseBodyType === 'image' ? (
 										<img style={{ maxWidth: '100%' }} src={responseBody} alt={__('response image', 'inseri-core')} />
+									) : responseBodyType === 'raw' ? (
+										<Button classNames={{ root: primaryBtn }} component="a" href={responseBody.url} download={responseBody.filename}>
+											{__('Download File', 'inseri-core')}
+										</Button>
 									) : (
 										<CodeEditor type={responseBodyType} value={responseBody} onChange={() => {}} textareaId={RESPONSE_AREA_ID} />
 									)}
