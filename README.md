@@ -1,4 +1,4 @@
-# Inseri Core for WordPress
+# inseri core for WordPress
 
 ![CI workflow](https://github.com/inseri-swiss/inseri-core-wp/actions/workflows/ci.yml/badge.svg) [![License](https://img.shields.io/github/license/inseri-swiss/inseri-core-wp)](https://github.com/inseri-swiss/inseri-core-wp/blob/main/LICENSE)
 

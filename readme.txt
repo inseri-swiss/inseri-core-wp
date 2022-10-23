@@ -1,5 +1,5 @@
-=== Inseri Core ===
-Contributors: Inseri Swiss
+=== inseri core ===
+Contributors: inseri swiss
 Tags: block, inseri
 Requires at least: 5.8
 Requires PHP: 7.0
