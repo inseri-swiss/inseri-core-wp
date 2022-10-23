@@ -32,6 +32,7 @@ export const fireRequest = async (method: string, url: string, queryParams: Reco
 			headers,
 			data: body,
 			transformResponse: (i) => i, // do not transform json to js-object
+			responseType: 'blob',
 		})
 
 		const status = `${response.status} ${response.statusText}`
