@@ -65,7 +65,7 @@ export const BODY_TYPE_TO_CONTENT_TYPE: Record<string, string> = {
 	'form-data': 'multipart/form-data',
 } as any
 
-export const getBodyTypeByContenType = (contentType?: string): string => {
+export const getBodyTypeByContenType = (contentType?: string): string | undefined => {
 	const contentTypeMap: Record<string, string> = {
 		'application/x-www-form-urlencoded': 'form-urlencoded',
 		'multipart/form-data': 'form-data',
@@ -80,5 +80,5 @@ export const getBodyTypeByContenType = (contentType?: string): string => {
 		return contentTypeMap[found]
 	}
 
-	return 'raw'
+	return undefined
 }
