@@ -9,7 +9,7 @@ const useStyles = createStyles((theme) => ({
 	control: {
 		width: '100%',
 		color: 'inherit',
-		padding: `${theme.spacing.xs}px ${theme.spacing.md}px`,
+		padding: `${theme.spacing.xs}px ${theme.spacing.xs}px`,
 
 		'&:hover': {
 			backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],

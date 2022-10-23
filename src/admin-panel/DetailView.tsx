@@ -43,7 +43,7 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 			background: '#F9F9F9',
 			cursor: 'text',
 
-			['&:hover, &:focus']: {
+			'&:hover, &:focus': {
 				border: '1px solid #8c8f94',
 				boxShadow: 'none',
 			},
@@ -222,6 +222,7 @@ export function DetailView(props: Props) {
 					setPageError(errorMsg)
 				}
 				if (data) {
+					// eslint-disable-next-line
 					const { description, url, method, headers, query_params, type, body } = data
 					setItem(data)
 
@@ -229,16 +230,16 @@ export function DetailView(props: Props) {
 					setUrl(url)
 					setMethod(method)
 					setDatasourceType(type)
-					const queryParams = [...mapObjectToParams(JSON.parse(query_params)), createParamItem()]
-					setQueryParams(queryParams)
+					const queryParamItems = [...mapObjectToParams(JSON.parse(query_params)), createParamItem()]
+					setQueryParams(queryParamItems)
 
-					const headerParams: ParamItem[] = [...mapObjectToParams(JSON.parse(headers)), createParamItem()]
+					const headerParamItems: ParamItem[] = [...mapObjectToParams(JSON.parse(headers)), createParamItem()]
 					const contentTypeItem = headerParams.find((i) => i.key.toLowerCase() === CONTENT_TYPE)
 					if (contentTypeItem) {
 						contentTypeItem.isPreset = true
 					}
 
-					setHeaderParams(headerParams)
+					setHeaderParams(headerParamItems)
 				}
 			})
 		}
@@ -309,7 +310,15 @@ export function DetailView(props: Props) {
 					/>
 
 					{isEdit && (
-						<TextInput label={__('Author', 'inseri-core')} readOnly classNames={{ root: midSizeField, wrapper: readonlyWrapper }} value={item?.author_name} />
+						<TextInput
+							label={__('Author', 'inseri-core')}
+							readOnly
+							classNames={{
+								root: midSizeField,
+								wrapper: readonlyWrapper,
+							}}
+							value={item?.author_name}
+						/>
 					)}
 				</Group>
 			</Box>
