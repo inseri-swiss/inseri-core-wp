@@ -3,7 +3,7 @@ import { IconCircleOff } from '@tabler/icons'
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Accordion, Alert, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Select, Tabs, Text, TextInput, Title } from '../components'
-import { formatCode, getPropertyCaseInsensitive, mapObjectToParams, mapParamsToObject } from '../utils'
+import { BODY_TYPE_TO_CONTENT_TYPE, formatCode, getBodyTypeByContenType, getPropertyCaseInsensitive, mapObjectToParams, mapParamsToObject } from '../utils'
 import { addNewItem, Datasource, DatasourceWithoutId, fireRequest, getItem } from './ApiServer'
 import { PAGES } from './config'
 import { ParamItem, ParamsTable } from './ParamsTable'
@@ -72,15 +72,6 @@ const BODY_TYPES = [
 	{ label: 'Form-Data', value: 'form-data' },
 ]
 
-const BODY_TYPE_TO_CONTENT_TYPE: any = {
-	none: null,
-	text: 'text/plain',
-	json: 'application/json',
-	xml: 'application/xml',
-	'form-urlencoded': 'application/x-www-form-urlencoded',
-	'form-data': 'multipart/form-data',
-}
-
 const RESPONSE_AREA_ID = 'response-textarea'
 const CONTENT_TYPE = 'content-type'
 
@@ -113,7 +104,7 @@ export function DetailView(props: Props) {
 	const [isLoadingRequest, setLoadingRequest] = useState(false)
 
 	const [responseStatus, setResponseStatus] = useState<string>('')
-	const [responseHeaders, setResponseHeaders] = useState<ParamItem[]>([])
+	const [responseHeaders, setResponseHeaders] = useState<ParamItem[]>([createParamItem()])
 	const [responseBody, setResponseBody] = useState<string>('')
 	const [responseBodyType, setResponseBodyType] = useState<string>('')
 
@@ -152,17 +143,16 @@ export function DetailView(props: Props) {
 		setResponseHeaders(responseHeadersParams)
 
 		const contentType: string | undefined = getPropertyCaseInsensitive(headers, 'content-type')
-		let bodyType = 'text'
-		if (contentType?.includes('application/json')) {
-			bodyType = 'json'
+		const bodyType = getBodyTypeByContenType(contentType)
+		let preparedBody = null
+
+		if (bodyType === 'image') {
+			preparedBody = url
+		} else {
+			preparedBody = formatCode(bodyType, data)[1]
 		}
 
-		if (contentType?.includes('xml')) {
-			bodyType = 'xml'
-		}
-
-		const [_error, formattedCode] = formatCode(bodyType, data)
-		setResponseBody(formattedCode ?? data)
+		setResponseBody(preparedBody ?? data)
 		setResponseBodyType(bodyType)
 		setLoadingRequest(false)
 	}
@@ -429,7 +419,11 @@ export function DetailView(props: Props) {
 								</Tabs.Panel>
 
 								<Tabs.Panel value="body" py="sm" px="md">
-									<CodeEditor type={responseBodyType} value={responseBody} onChange={() => {}} textareaId={RESPONSE_AREA_ID} />
+									{responseBodyType === 'image' ? (
+										<img style={{ maxWidth: '100%' }} src={responseBody} alt={__('response image', 'inseri-core')} />
+									) : (
+										<CodeEditor type={responseBodyType} value={responseBody} onChange={() => {}} textareaId={RESPONSE_AREA_ID} />
+									)}
 								</Tabs.Panel>
 							</Tabs>
 						</Accordion.Panel>
