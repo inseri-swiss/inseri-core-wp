@@ -56,10 +56,10 @@ export const generalRequest = async <T>(action: () => Promise<AxiosResponse<T>>)
 			const { data, status, statusText } = exception.response
 			const msg = `${status} ${statusText}: ${data.message}`
 			return [msg, undefined]
-		} else {
-			const msg = __('Refresh the page and try it again.', 'inseri-core')
-			return [msg, undefined]
 		}
+
+		const msg = __('Refresh the page and try it again.', 'inseri-core')
+		return [msg, undefined]
 	}
 }
 

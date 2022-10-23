@@ -11,10 +11,6 @@ const useStyles = createStyles((theme, _t, getRef) => ({
 	col0: {
 		minWidth: '120px',
 		width: '20%',
-		['> span']: {
-			color: theme.colors.blue[9],
-			cursor: 'pointer',
-		},
 		[theme.fn.smallerThan('sm')]: {
 			width: '70%',
 		},
@@ -22,10 +18,6 @@ const useStyles = createStyles((theme, _t, getRef) => ({
 	col1: {
 		minWidth: '120px',
 		width: '15%',
-		['> span']: {
-			color: theme.colors.blue[9],
-			cursor: 'pointer',
-		},
 		[theme.fn.smallerThan('sm')]: {
 			width: '30%',
 		},
@@ -33,10 +25,6 @@ const useStyles = createStyles((theme, _t, getRef) => ({
 	col2: {
 		minWidth: '120px',
 		width: '10%',
-		['> span']: {
-			color: theme.colors.blue[9],
-			cursor: 'pointer',
-		},
 		[theme.fn.smallerThan('sm')]: {
 			display: 'none',
 		},
@@ -44,10 +32,12 @@ const useStyles = createStyles((theme, _t, getRef) => ({
 	col3: {
 		minWidth: '120px',
 		width: '10%',
-		['> span']: {
-			color: theme.colors.blue[9],
-			cursor: 'pointer',
+		[theme.fn.smallerThan('sm')]: {
+			display: 'none',
 		},
+	},
+	col4Th: {
+		maxWidth: '0',
 		[theme.fn.smallerThan('sm')]: {
 			display: 'none',
 		},
@@ -94,6 +84,18 @@ const useStyles = createStyles((theme, _t, getRef) => ({
 			},
 		},
 	},
+
+	seamlessBtn: {
+		color: theme.colors.blue[9],
+		background: 'transparent',
+		border: '0',
+		padding: '0',
+
+		'&:hover, &:focus, &:active': {
+			border: '0',
+			background: 'transparent',
+		},
+	},
 }))
 
 export type SortableColumns = null | 'description' | 'type' | 'author_name' | 'method' | 'url'
@@ -105,7 +107,7 @@ interface HeaderProps {
 }
 
 export function TableHeader({ sortBy, isReversed, sortData }: HeaderProps) {
-	const { col0, col1, col2, col3, col4, col5 } = useStyles().classes
+	const { col0, col1, col2, col3, col4Th, col5 } = useStyles().classes
 	return (
 		<thead>
 			<tr>
@@ -121,7 +123,7 @@ export function TableHeader({ sortBy, isReversed, sortData }: HeaderProps) {
 				<SortableTh className={col3} sorted={sortBy === 'method'} reversed={isReversed} onSort={sortData('method')}>
 					{__('Method', 'inseri-core')}
 				</SortableTh>
-				<SortableTh className={col4} sorted={sortBy === 'url'} reversed={isReversed} onSort={sortData('url')}>
+				<SortableTh className={col4Th} sorted={sortBy === 'url'} reversed={isReversed} onSort={sortData('url')}>
 					{__('URL', 'inseri-core')}
 				</SortableTh>
 				<th className={col5}></th>
@@ -137,23 +139,31 @@ interface ContentProps {
 	onSelectClick: (type: 'author_name' | 'type' | 'method') => (value: string) => void
 }
 export function ContentTableBody({ datasources, onDelete, onNameClick, onSelectClick }: ContentProps) {
-	const { col0, col1, col2, col3, col4, col5 } = useStyles().classes
+	const { col0, col1, col2, col3, col4, col5, seamlessBtn } = useStyles().classes
 
 	return (
 		<tbody>
 			{datasources.map((d) => (
 				<tr key={d.id}>
 					<td className={col0}>
-						<span onClick={() => onNameClick(d.id)}>{d.description}</span>
+						<Button className={seamlessBtn} onClick={() => onNameClick(d.id)}>
+							{d.description}
+						</Button>
 					</td>
 					<td className={col1}>
-						<span onClick={() => onSelectClick('author_name')(d.author_name)}>{d.author_name}</span>
+						<Button className={seamlessBtn} onClick={() => onSelectClick('author_name')(d.author_name)}>
+							{d.author_name}
+						</Button>
 					</td>
 					<td className={col2}>
-						<span onClick={() => onSelectClick('type')(d.type)}>{d.type}</span>
+						<Button className={seamlessBtn} onClick={() => onSelectClick('type')(d.type)}>
+							{d.type}
+						</Button>
 					</td>
 					<td className={col3}>
-						<span onClick={() => onSelectClick('method')(d.method)}>{d.method}</span>
+						<Button className={seamlessBtn} onClick={() => onSelectClick('method')(d.method)}>
+							{d.method}
+						</Button>
 					</td>
 					<td className={col4}>{d.url}</td>
 					<td className={col5}>
