@@ -82,3 +82,8 @@ export const getItem = async (id: number): Promise<[string?, Datasource?]> => {
 	const action = () => axios.get<Datasource>(wpApiSettings.root + ROUTE + id)
 	return generalRequest(action)
 }
+
+export const updateNewItem = async (newItem: Datasource): Promise<[string?, Datasource?]> => {
+	const action = () => axios.put<Datasource>(wpApiSettings.root + ROUTE + newItem.id, newItem, { headers: { 'X-WP-Nonce': wpApiSettings.nonce } })
+	return generalRequest(action)
+}

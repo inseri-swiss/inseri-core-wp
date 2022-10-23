@@ -4,7 +4,7 @@ import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Accordion, Alert, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Select, Tabs, Text, TextInput, Title } from '../components'
 import { BODY_TYPE_TO_CONTENT_TYPE, formatCode, getBodyTypeByContenType, getPropertyCaseInsensitive, mapObjectToParams, mapParamsToObject } from '../utils'
-import { addNewItem, Datasource, DatasourceWithoutId, fireRequest, getItem } from './ApiServer'
+import { addNewItem, Datasource, DatasourceWithoutId, fireRequest, getItem, updateNewItem } from './ApiServer'
 import { PAGES } from './config'
 import { ParamItem, ParamsTable } from './ParamsTable'
 import { UrlBar } from './UrlBar'
@@ -146,7 +146,7 @@ export function DetailView(props: Props) {
 		setResponseHeaders(responseHeadersParams)
 
 		const contentType: string | undefined = getPropertyCaseInsensitive(headers, 'content-type')
-		const bodyType = getBodyTypeByContenType(contentType)
+		const bodyType = getBodyTypeByContenType(contentType) ?? 'raw'
 		let preparedBody: any = ''
 
 		if (bodyType === 'image') {
@@ -171,17 +171,38 @@ export function DetailView(props: Props) {
 		setLoadingRequest(false)
 	}
 
-	const createDatasource = async () => {
-		const newItem: DatasourceWithoutId = {
+	const createOrUpdateDatasource = async () => {
+		let body: string | undefined
+
+		if (isFormType(requestBodyType)) {
+			body = JSON.stringify(mapParamsToObject(requestParamsBody))
+		} else if (requestBodyType !== 'none') {
+			body = requestTextBody
+		}
+
+		const payload: DatasourceWithoutId = {
 			method,
 			url,
 			description: datasourceName,
 			headers: JSON.stringify(mapParamsToObject(headerParams)),
 			query_params: JSON.stringify(mapParamsToObject(queryParams)),
 			type: datasourceType ?? DATASOURCE_TYPES[0].value,
+			body,
 		}
 
-		const [errorMsg, _] = await addNewItem(newItem)
+		let result: any = [undefined, undefined]
+
+		if (isEdit && item) {
+			const updatePayload: Datasource = {
+				...item,
+				...payload,
+			}
+			result = await updateNewItem(updatePayload)
+		} else {
+			result = await addNewItem(payload)
+		}
+
+		const errorMsg = result[0]
 		if (errorMsg) {
 			setPageError(errorMsg)
 		} else {
@@ -238,11 +259,22 @@ export function DetailView(props: Props) {
 					setQueryParams(queryParamItems)
 
 					const headerParamItems: ParamItem[] = [...mapObjectToParams(JSON.parse(headers)), createParamItem()]
-					const contentTypeItem = headerParams.find((i) => i.key.toLowerCase() === CONTENT_TYPE)
+					const contentTypeItem = headerParamItems.find((i) => i.key.toLowerCase() === CONTENT_TYPE)
+					const bodyType = getBodyTypeByContenType(contentTypeItem?.value) ?? 'none'
+
 					if (contentTypeItem) {
 						contentTypeItem.isPreset = true
 					}
 
+					if (isFormType(bodyType) && body) {
+						setRequestParamsBody([...mapObjectToParams(JSON.parse(body)), createParamItem()])
+					}
+
+					if (!isFormType(bodyType) && body) {
+						setRequestTextBody(body)
+					}
+
+					setRequestBodyType(bodyType)
 					setHeaderParams(headerParamItems)
 				}
 			})
@@ -273,7 +305,7 @@ export function DetailView(props: Props) {
 						{title}
 					</Title>
 
-					<Button classNames={{ root: primaryBtn }} size="sm" disabled={isNotReadyForSubmit} onClick={createDatasource}>
+					<Button classNames={{ root: primaryBtn }} size="sm" disabled={isNotReadyForSubmit} onClick={createOrUpdateDatasource}>
 						{primaryBtnText}
 					</Button>
 				</Group>
@@ -294,7 +326,17 @@ export function DetailView(props: Props) {
 				)}
 
 				<Group px={36} mt="md" spacing="xs">
-					{isEdit && <TextInput label={__('ID', 'inseri-core')} readOnly classNames={{ root: idField, wrapper: readonlyWrapper }} value={item?.id} />}
+					{isEdit && (
+						<TextInput
+							label={__('ID', 'inseri-core')}
+							readOnly
+							classNames={{
+								root: idField,
+								wrapper: readonlyWrapper,
+							}}
+							value={item?.id ?? ''}
+						/>
+					)}
 
 					<TextInput
 						label={__('Name', 'inseri-core')}
@@ -321,7 +363,7 @@ export function DetailView(props: Props) {
 								root: midSizeField,
 								wrapper: readonlyWrapper,
 							}}
-							value={item?.author_name}
+							value={item?.author_name ?? ''}
 						/>
 					)}
 				</Group>

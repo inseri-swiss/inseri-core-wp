@@ -75,6 +75,9 @@ class Inseri_Core_Rest {
 			if ($request['item_id'] != $request->get_json_params()['id']) {
 				return Either::Left('The id from URL does not match with id in body');
 			}
+
+			// remove author_name property so that db does not throw error
+			unset($body['author_name']);
 		}
 
 		$missing_fields = array_filter($non_empty_fields, fn($field) => empty($body[$field]));
