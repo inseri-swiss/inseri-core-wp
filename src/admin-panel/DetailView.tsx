@@ -136,38 +136,42 @@ export function DetailView(props: Props) {
 
 		const [status, headers, data] = await fireRequest(method, url, mapParamsToObject(queryParams), mapParamsToObject(headerParams), body)
 
-		const isResponsePanelOpen = openAccordionItems.some((i) => i === 'response')
-		if (!isResponsePanelOpen) {
-			setOpenAccordionItems([...openAccordionItems, 'response'])
-		}
-
-		setResponseStatus(status)
-		const responseHeadersParams: ParamItem[] = Object.keys(headers).map((key) => ({ isChecked: true, key, value: headers[key] ?? '' }))
-		setResponseHeaders(responseHeadersParams)
-
-		const contentType: string | undefined = getPropertyCaseInsensitive(headers, 'content-type')
-		const bodyType = getBodyTypeByContenType(contentType) ?? 'raw'
-		let preparedBody: any = ''
-
-		if (bodyType === 'image') {
-			preparedBody = url
-		} else if (bodyType === 'raw') {
-			const urlObject = URL.createObjectURL(new Blob([data]))
-			const parts = url.split('/')
-			const lastPart = parts[parts.length - 1]
-			preparedBody = { url: urlObject, filename: lastPart }
+		if (!status || status === 'ERR_NETWORK') {
+			setPageError(__('The request failed (maybe the request was blocked by CORS). Open the browser dev tools for more information.', 'inseri-core'))
 		} else {
-			const textBlob = new Blob([data])
-			preparedBody = await textBlob.text()
+			const isResponsePanelOpen = openAccordionItems.some((i) => i === 'response')
+			if (!isResponsePanelOpen) {
+				setOpenAccordionItems([...openAccordionItems, 'response'])
+			}
+
+			setResponseStatus(status)
+			setResponseHeaders(mapObjectToParams(headers))
+
+			const contentType: string | undefined = getPropertyCaseInsensitive(headers, CONTENT_TYPE)
+			const bodyType = getBodyTypeByContenType(contentType) ?? 'raw'
+			let preparedBody: string | { url: string; filename: string } = ''
+
+			if (bodyType === 'image') {
+				preparedBody = url
+			} else if (bodyType === 'raw') {
+				const urlObject = URL.createObjectURL(new Blob([data]))
+				const parts = url.split('/')
+				const lastPart = parts[parts.length - 1]
+				preparedBody = { url: urlObject, filename: lastPart }
+			} else {
+				const textBlob = new Blob([data])
+				preparedBody = await textBlob.text()
+			}
+
+			if (bodyType === 'json' || bodyType === 'xml') {
+				const formattedCode = formatCode(bodyType, preparedBody as string)[1]
+				preparedBody = formattedCode ?? preparedBody
+			}
+
+			setResponseBodyType(bodyType)
+			setResponseBody(preparedBody)
 		}
 
-		if (bodyType === 'json' || bodyType === 'xml') {
-			const formattedCode = formatCode(bodyType, preparedBody)[1]
-			preparedBody = formattedCode ?? preparedBody
-		}
-
-		setResponseBodyType(bodyType)
-		setResponseBody(preparedBody)
 		setLoadingRequest(false)
 	}
 

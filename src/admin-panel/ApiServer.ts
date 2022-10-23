@@ -43,6 +43,10 @@ export const fireRequest = async (method: string, url: string, queryParams: Reco
 			const status = `${response.status} ${response.statusText}`
 			return [status, response.headers, response.data]
 		}
+
+		if (exception instanceof axios.AxiosError) {
+			return [exception.code, {}, '']
+		}
 	}
 
 	return ['', {}, '']
