@@ -159,10 +159,10 @@ components:
           type: string
           example: 'http://www.inseri.swiss'
         headers:
-          type: object
+          type: string
           example: '{content-type: application/json}'
         query_params:
-          type: object
+          type: string
           example: '{page_size: 10}'
         body:
           type: string
