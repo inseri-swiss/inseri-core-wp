@@ -20,7 +20,7 @@ export interface DatasourceWithoutId {
 	body?: string
 }
 
-export const fireRequest = async (method: string, url: string, queryParams: Record<string, string>, headers: Record<string, string>, body: any) => {
+export const handleTryRequest = async (method: string, url: string, queryParams: Record<string, string>, headers: Record<string, string>, body: any) => {
 	try {
 		const urlObject = new URL(url)
 		const queries = new URLSearchParams(queryParams)
@@ -31,7 +31,6 @@ export const fireRequest = async (method: string, url: string, queryParams: Reco
 			url: urlObject.toString(),
 			headers,
 			data: body,
-			transformResponse: (i) => i, // do not transform json to js-object
 			responseType: 'blob',
 		})
 
@@ -52,19 +51,28 @@ export const fireRequest = async (method: string, url: string, queryParams: Reco
 	return ['', {}, '']
 }
 
-export const generalRequest = async <T>(action: () => Promise<AxiosResponse<T>>): Promise<[string?, T?]> => {
+const handleRequest = async <T>(action: () => Promise<AxiosResponse<T>>): Promise<[string?, T?]> => {
 	try {
 		const response = await action()
 		return [undefined, response.data]
 	} catch (exception) {
-		if (exception instanceof axios.AxiosError && exception.response && exception.response.data.message) {
+		if (exception instanceof axios.AxiosError && exception.response) {
 			const { data, status, statusText } = exception.response
-			const msg = `${status} ${statusText}: ${data.message}`
+			let body = ''
+
+			if (data.message) {
+				body = data.message
+			} else if (typeof data === 'string') {
+				body = data
+			} else {
+				body = JSON.stringify(data)
+			}
+
+			const msg = `${status} ${statusText}: ${body}`
 			return [msg, undefined]
 		}
 
-		const msg = __('Refresh the page and try it again.', 'inseri-core')
-		return [msg, undefined]
+		return [__('Refresh the page and try it again.', 'inseri-core'), undefined]
 	}
 }
 
@@ -74,20 +82,20 @@ export const getAllItems = async (): Promise<AxiosResponse<Datasource[]>> => {
 
 export const addNewItem = async (newItem: DatasourceWithoutId): Promise<[string?, Datasource?]> => {
 	const action = () => axios.post<Datasource>(wpApiSettings.root + ROUTE, newItem, { headers: { 'X-WP-Nonce': wpApiSettings.nonce } })
-	return generalRequest(action)
+	return handleRequest(action)
 }
 
 export const removeItem = async (id: number): Promise<[string?, Datasource?]> => {
 	const action = () => axios.delete<Datasource>(wpApiSettings.root + ROUTE + id, { headers: { 'X-WP-Nonce': wpApiSettings.nonce } })
-	return generalRequest(action)
+	return handleRequest(action)
 }
 
 export const getItem = async (id: number): Promise<[string?, Datasource?]> => {
 	const action = () => axios.get<Datasource>(wpApiSettings.root + ROUTE + id)
-	return generalRequest(action)
+	return handleRequest(action)
 }
 
 export const updateNewItem = async (newItem: Datasource): Promise<[string?, Datasource?]> => {
 	const action = () => axios.put<Datasource>(wpApiSettings.root + ROUTE + newItem.id, newItem, { headers: { 'X-WP-Nonce': wpApiSettings.nonce } })
-	return generalRequest(action)
+	return handleRequest(action)
 }

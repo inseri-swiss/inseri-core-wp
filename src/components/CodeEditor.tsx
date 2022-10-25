@@ -32,12 +32,12 @@ const useStyles = createStyles((theme) => ({
 
 interface Props {
 	value: string
-	onChange: (code: string) => void
+	onChange?: (code: string) => void
 	type: string
 	textareaId?: string
 }
 
-export function CodeEditor({ value, onChange, type, textareaId }: Props) {
+export function CodeEditor({ value, onChange = () => {}, type, textareaId }: Props) {
 	const { editor, editorLineNumber } = useStyles().classes
 
 	const processCode = (code: string) => {

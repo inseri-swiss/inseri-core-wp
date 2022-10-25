@@ -218,6 +218,7 @@ function DeleteButton({ onDelete }: DeleteButtonProps) {
 			variant="outline"
 			color="dark"
 			data-active={isTriggered}
+			aria-label={__('Delete', 'inseri-core')}
 		>
 			{isTriggered ? __('cancel', 'inseri-core') + ` (${countdown})` : <IconTrash size={18} />}
 		</Button>

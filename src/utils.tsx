@@ -30,26 +30,26 @@ export const mapObjectToParams = (obj: Record<string, string>): ParamItem[] => {
 	return Object.keys(obj).map((key) => ({ key, value: obj[key], isChecked: true }))
 }
 
-export const formatCode = (type: string, code: string): [string | null, string | null] => {
+export const formatCode = (type: string, code: string): [string?, string?] => {
 	if (type === 'json') {
 		try {
 			const formattedJson = JSON.stringify(JSON.parse(code), null, 2)
-			return [null, formattedJson]
+			return [undefined, formattedJson]
 		} catch (exception) {
-			return [__('invalid JSON', 'inseri-core'), null]
+			return [__('invalid JSON', 'inseri-core'), undefined]
 		}
 	}
 
 	if (type === 'xml') {
 		try {
 			const formattedXml = xmlFormatter(code, XML_FORMAT_OPTION)
-			return [null, formattedXml]
+			return [undefined, formattedXml]
 		} catch (exception) {
-			return [__('invalid XML', 'inseri-core'), null]
+			return [__('invalid XML', 'inseri-core'), undefined]
 		}
 	}
 
-	return [null, null]
+	return []
 }
 
 export const getPropertyCaseInsensitive = (object: any, key: string) => {
@@ -63,7 +63,7 @@ export const BODY_TYPE_TO_CONTENT_TYPE: Record<string, string> = {
 	xml: 'application/xml',
 	'form-urlencoded': 'application/x-www-form-urlencoded',
 	'form-data': 'multipart/form-data',
-} as any
+}
 
 export const getBodyTypeByContenType = (contentType?: string): string | undefined => {
 	const contentTypeMap: Record<string, string> = {
@@ -76,9 +76,5 @@ export const getBodyTypeByContenType = (contentType?: string): string | undefine
 	}
 
 	const found = Object.keys(contentTypeMap).find((k) => contentType?.includes(k))
-	if (found) {
-		return contentTypeMap[found]
-	}
-
-	return undefined
+	return found ? contentTypeMap[found] : undefined
 }
