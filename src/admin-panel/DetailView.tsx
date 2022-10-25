@@ -4,7 +4,7 @@ import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Accordion, Alert, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Select, Tabs, Text, TextInput, Title } from '../components'
 import { BODY_TYPE_TO_CONTENT_TYPE, formatCode, getBodyTypeByContenType, getPropertyCaseInsensitive, mapObjectToParams, mapParamsToObject } from '../utils'
-import { addNewItem, Datasource, DatasourceWithoutId, fireRequest, getItem, updateNewItem } from './ApiServer'
+import { addNewItem, Datasource, DatasourceWithoutId, handleTryRequest, getItem, updateNewItem } from './ApiServer'
 import { PAGES } from './config'
 import { ParamItem, ParamsTable } from './ParamsTable'
 import { UrlBar } from './UrlBar'
@@ -78,8 +78,9 @@ const BODY_TYPES = [
 const RESPONSE_AREA_ID = 'response-textarea'
 const CONTENT_TYPE = 'content-type'
 
-const isFormType = (type: string) => ['form-urlencoded', 'form-data'].some((i) => i === type)
-const isBeautifyType = (type: string) => ['xml', 'json'].some((i) => i === type)
+const isFormType = (bodyType: string) => ['form-urlencoded', 'form-data'].some((i) => i === bodyType)
+const isTextType = (bodyType: string) => ['xml', 'json'].some((i) => i === bodyType)
+const isBeautifyType = isTextType
 const createParamItem = () => ({ isChecked: true, key: '', value: '' })
 
 export function DetailView(props: Props) {
@@ -130,11 +131,11 @@ export function DetailView(props: Props) {
 
 			body = bodyFormData
 		}
-		if (requestBodyType === 'json' || requestBodyType === 'xml') {
+		if (isTextType(requestBodyType)) {
 			body = requestTextBody
 		}
 
-		const [status, headers, data] = await fireRequest(method, url, mapParamsToObject(queryParams), mapParamsToObject(headerParams), body)
+		const [status, headers, data] = await handleTryRequest(method, url, mapParamsToObject(queryParams), mapParamsToObject(headerParams), body)
 
 		if (!status || status === 'ERR_NETWORK') {
 			setPageError(__('The request failed (maybe the request was blocked by CORS). Open the browser dev tools for more information.', 'inseri-core'))
@@ -163,8 +164,8 @@ export function DetailView(props: Props) {
 				preparedBody = await textBlob.text()
 			}
 
-			if (bodyType === 'json' || bodyType === 'xml') {
-				const formattedCode = formatCode(bodyType, preparedBody as string)[1]
+			if (isBeautifyType(bodyType) && typeof preparedBody === 'string') {
+				const formattedCode = formatCode(bodyType, preparedBody)[1]
 				preparedBody = formattedCode ?? preparedBody
 			}
 
@@ -194,7 +195,7 @@ export function DetailView(props: Props) {
 			body,
 		}
 
-		let result: any = [undefined, undefined]
+		let result: [string?, Datasource?]
 
 		if (isEdit && item) {
 			const updatePayload: Datasource = {
@@ -486,7 +487,7 @@ export function DetailView(props: Props) {
 											{__('Download File', 'inseri-core')}
 										</Button>
 									) : (
-										<CodeEditor type={responseBodyType} value={responseBody} onChange={() => {}} textareaId={RESPONSE_AREA_ID} />
+										<CodeEditor type={responseBodyType} value={responseBody} textareaId={RESPONSE_AREA_ID} />
 									)}
 								</Tabs.Panel>
 							</Tabs>
