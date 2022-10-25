@@ -76,11 +76,11 @@ const BODY_TYPES = [
 ]
 
 const RESPONSE_AREA_ID = 'response-textarea'
-const CONTENT_TYPE = 'content-type'
+const CONTENT_TYPE = 'Content-Type'
 
 const isFormType = (bodyType: string) => ['form-urlencoded', 'form-data'].some((i) => i === bodyType)
-const isTextType = (bodyType: string) => ['xml', 'json'].some((i) => i === bodyType)
-const isBeautifyType = isTextType
+const isTextType = (bodyType: string) => ['xml', 'json', 'text'].some((i) => i === bodyType)
+const isBeautifyType = (bodyType: string) => ['xml', 'json'].some((i) => i === bodyType)
 const createParamItem = () => ({ isChecked: true, key: '', value: '' })
 
 export function DetailView(props: Props) {
@@ -229,14 +229,11 @@ export function DetailView(props: Props) {
 	}
 
 	useEffect(() => {
-		let updatedHeaders = headerParams.filter((i) => !i.isPreset && i.key !== CONTENT_TYPE)
+		let updatedHeaders = headerParams.filter((i) => i.key.toLowerCase() !== CONTENT_TYPE.toLowerCase())
 
 		if (requestBodyType !== 'none') {
-			const defaultEntry = { isPreset: true, isChecked: true, key: CONTENT_TYPE, value: '' }
-			const contentType = headerParams.find((i) => i.isPreset && i.key === CONTENT_TYPE) ?? defaultEntry
-			const updatedContentType = { ...contentType, value: BODY_TYPE_TO_CONTENT_TYPE[requestBodyType] }
-
-			updatedHeaders = [updatedContentType, ...updatedHeaders]
+			const updatedContentType = { isChecked: true, key: CONTENT_TYPE, value: BODY_TYPE_TO_CONTENT_TYPE[requestBodyType] }
+			updatedHeaders.push(updatedContentType)
 		}
 
 		setHeaderParams(updatedHeaders)
@@ -264,12 +261,8 @@ export function DetailView(props: Props) {
 					setQueryParams(queryParamItems)
 
 					const headerParamItems: ParamItem[] = [...mapObjectToParams(JSON.parse(headers)), createParamItem()]
-					const contentTypeItem = headerParamItems.find((i) => i.key.toLowerCase() === CONTENT_TYPE)
+					const contentTypeItem = headerParamItems.find((i) => i.key.toLowerCase() === CONTENT_TYPE.toLowerCase())
 					const bodyType = getBodyTypeByContenType(contentTypeItem?.value) ?? 'none'
-
-					if (contentTypeItem) {
-						contentTypeItem.isPreset = true
-					}
 
 					if (isFormType(bodyType) && body) {
 						setRequestParamsBody([...mapObjectToParams(JSON.parse(body)), createParamItem()])
