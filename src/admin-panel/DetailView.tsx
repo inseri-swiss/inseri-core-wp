@@ -229,12 +229,14 @@ export function DetailView(props: Props) {
 	}
 
 	useEffect(() => {
-		let updatedHeaders = headerParams.filter((i) => i.key.toLowerCase() !== CONTENT_TYPE.toLowerCase())
+		const foundIndex = headerParams.findIndex((i) => i.key.toLowerCase() === CONTENT_TYPE.toLowerCase())
+		const newContentType = { isChecked: true, key: CONTENT_TYPE, value: BODY_TYPE_TO_CONTENT_TYPE[requestBodyType] }
+		const itemsToInsert = [requestBodyType === 'none' ? null : newContentType].filter(Boolean) as ParamItem[]
 
-		if (requestBodyType !== 'none') {
-			const updatedContentType = { isChecked: true, key: CONTENT_TYPE, value: BODY_TYPE_TO_CONTENT_TYPE[requestBodyType] }
-			updatedHeaders.push(updatedContentType)
-		}
+		// if found then replace
+		// otherwise insert at 2nd last place (because last item is an empty item)
+		const beginIndex = foundIndex >= 0 ? foundIndex + 1 : -1
+		const updatedHeaders = [...headerParams.slice(0, foundIndex), ...itemsToInsert, ...headerParams.slice(beginIndex)]
 
 		setHeaderParams(updatedHeaders)
 	}, [requestBodyType])
