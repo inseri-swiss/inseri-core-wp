@@ -44,6 +44,14 @@ register_activation_hook(__FILE__, [$inseri_core_db, 'setup_table']);
 add_action('rest_api_init', [$inseri_core_rest, 'register_api_routes']);
 
 /**
+ * main script
+ */
+add_action('init', function () {
+	$asset_file_inseri = include plugin_dir_path(__FILE__) . 'build/inseri-core.asset.php';
+	wp_register_script('inseri-core', plugins_url('build/inseri-core.js', __FILE__), $asset_file_inseri['dependencies'], $asset_file_inseri['version']);
+});
+
+/**
  * Blocks
  */
 add_action('init', 'inseri_core_block_init');
