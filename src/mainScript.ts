@@ -11,31 +11,36 @@ declare global {
 interface Source {
 	contentType: string
 	isContentTypeDynamic?: boolean
-	key: string
 	description: string
 	status: 'initial' | 'loading' | 'ready' | 'error'
+}
+type SourceWithKey = Source & {
+	key: string
+}
+
+interface StoreWrapper {
+	meta: Record<string, { blockName: string; description: string }>
+	stores: Record<string, Source>
 }
 
 class InseriCore {
 	#internalStore
-	useStore
 
 	constructor() {
-		this.#internalStore = create(immer<any>((_set) => ({ meta: {} })))
-		this.useStore = this.#internalStore
+		this.#internalStore = create(immer<StoreWrapper>((_set) => ({ meta: {}, stores: {} })))
 	}
 
 	#generateToken = () => Math.random().toString(36).slice(2)
 
-	addBlock(blockName: string, fields: Source[]): string {
+	addBlock(blockName: string, fields: SourceWithKey[]): string {
 		let blockHandle = this.#generateToken()
-		const state = this.#internalStore.getState()
+		const currentState = this.#internalStore.getState()
 
-		while (state[blockHandle]) {
+		while (currentState.stores[blockHandle]) {
 			blockHandle = this.#generateToken()
 		}
 
-		this.#internalStore.setState((state: any) => {
+		this.#internalStore.setState((state) => {
 			const slice: any = {}
 			fields.forEach((field) => {
 				const { key, ...rest } = field
@@ -47,11 +52,17 @@ class InseriCore {
 				description: '',
 			}
 
-			state[blockHandle] = slice
-			return state
+			state.stores[blockHandle] = slice
 		})
 
 		return blockHandle
+	}
+
+	removeBlock(blockHandle: string) {
+		this.#internalStore.setState((state) => {
+			delete state.meta[blockHandle]
+			delete state.stores[blockHandle]
+		})
 	}
 }
 
