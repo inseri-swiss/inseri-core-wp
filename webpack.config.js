@@ -21,8 +21,8 @@ const tsChecker = new ForkTsCheckerWebpackPlugin({
 })
 
 const initialEntrypoints = {
-	['inseri-core']: './src/mainScript',
-	['admin-panel']: './src/admin-panel', // eslint-disable-line
+	'inseri-core': './src/mainScript',
+	'admin-panel': './src/admin-panel',
 }
 
 const blockEntrypoints = fs.readdirSync('./src/blocks').reduce(
