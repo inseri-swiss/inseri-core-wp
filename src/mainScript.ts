@@ -1,6 +1,8 @@
 import domReady from '@wordpress/dom-ready'
 import create from 'zustand'
 import { immer } from 'zustand/middleware/immer'
+import { devtools } from 'zustand/middleware'
+import { nanoid } from 'nanoid/non-secure'
 
 declare global {
 	interface Window {
@@ -8,43 +10,44 @@ declare global {
 	}
 }
 
-interface Source {
+interface StoreSource {
 	contentType: string
 	isContentTypeDynamic?: boolean
 	description: string
-	status: 'initial' | 'loading' | 'ready' | 'error'
+	status: 'initial' | 'loading' | 'ready' | 'error' | 'unavailable'
 }
-type SourceWithKey = Source & {
+type InsertSource = Omit<StoreSource, 'status'> & {
 	key: string
 }
 
 interface StoreWrapper {
 	meta: Record<string, { blockName: string; description: string }>
-	stores: Record<string, Source>
+	//             slice          key
+	stores: Record<string, Record<string, StoreSource>>
 }
 
 class InseriCore {
 	#internalStore
 
 	constructor() {
-		this.#internalStore = create(immer<StoreWrapper>((_set) => ({ meta: {}, stores: {} })))
+		this.#internalStore = create(
+			devtools(
+				immer<StoreWrapper>((_set) => ({ meta: {}, stores: {} })),
+				{ name: 'inseri-store' }
+			)
+		)
 	}
 
-	#generateToken = () => Math.random().toString(36).slice(2)
+	#generateToken = () => nanoid()
 
-	addBlock(blockName: string, fields: SourceWithKey[]): string {
-		let blockHandle = this.#generateToken()
-		const currentState = this.#internalStore.getState()
-
-		while (currentState.stores[blockHandle]) {
-			blockHandle = this.#generateToken()
-		}
+	addBlock(blockName: string, fields: InsertSource[]): string {
+		const blockHandle = this.#generateToken()
 
 		this.#internalStore.setState((state) => {
-			const slice: any = {}
+			const slice: Record<string, StoreSource> = {}
 			fields.forEach((field) => {
 				const { key, ...rest } = field
-				slice[key] = rest
+				slice[key] = { ...rest, status: 'initial' }
 			})
 
 			state.meta[blockHandle] = {
@@ -60,8 +63,23 @@ class InseriCore {
 
 	removeBlock(blockHandle: string) {
 		this.#internalStore.setState((state) => {
-			delete state.meta[blockHandle]
-			delete state.stores[blockHandle]
+			const slice = state.stores[blockHandle]
+			Object.keys(slice).forEach((k) => {
+				slice[k].status = 'unavailable'
+			})
+		})
+	}
+
+	addField(blockHandle: string, field: InsertSource) {
+		this.#internalStore.setState((state) => {
+			const { key, ...rest } = field
+			state.stores[blockHandle][key] = { ...rest, status: 'initial' }
+		})
+	}
+
+	removeField(blockHandle: string, key: string) {
+		this.#internalStore.setState((state) => {
+			state.stores[blockHandle][key].status = 'unavailable'
 		})
 	}
 }
