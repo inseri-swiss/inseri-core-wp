@@ -291,7 +291,7 @@ export function DetailView(props: Props) {
 		}
 	}, [debouncedUrl])
 
-	const title = isEdit ? __('Edit Data Source', 'inseri-core') : __('Add New Data Source', 'inseri-core')
+	const title = isEdit ? __('Edit Web API', 'inseri-core') : __('Add New Web API', 'inseri-core')
 	const primaryBtnText = isEdit ? __('Save', 'inseri-core') : __('Create', 'inseri-core')
 
 	return (
