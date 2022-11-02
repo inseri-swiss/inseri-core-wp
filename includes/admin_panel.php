@@ -35,7 +35,7 @@ abstract class Inseri_Core_Admin {
 
 	static function add_menu() {
 		$icon = trim(file_get_contents(plugin_dir_path(__FILE__) . 'icon.b64'));
-		$main_page_title = __('Data Sources - inseri', 'inseri-core');
+		$main_page_title = __('Web APIs - inseri', 'inseri-core');
 		$render_root = function () {
 			?>
 				<div id="inseri-core-root"></div>
@@ -43,10 +43,10 @@ abstract class Inseri_Core_Admin {
 		};
 
 		add_menu_page($main_page_title, self::$top_menu_title, self::$permission, self::$top_menu_slug, $render_root, 'data:image/svg+xml;base64,' . $icon, 3);
-		add_submenu_page(self::$top_menu_slug, $main_page_title, __('All Data Sources', 'inseri-core'), self::$permission, self::$top_menu_slug, $render_root);
+		add_submenu_page(self::$top_menu_slug, $main_page_title, __('All Web APIs', 'inseri-core'), self::$permission, self::$top_menu_slug, $render_root);
 		add_submenu_page(
 			self::$top_menu_slug,
-			__('Add New Data Source - inseri', 'inseri-core'),
+			__('Add New Web API - inseri', 'inseri-core'),
 			__('Add New', 'inseri-core'),
 			self::$permission,
 			self::$add_new_menu_slug,

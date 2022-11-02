@@ -166,7 +166,7 @@ export function ListView({ onItemClick }: Props) {
 			</Group>
 			<Group px={36} py="sm" className={titleBar}>
 				<Title order={1} size="h3">
-					{__('All Data Sources', 'inseri-core')}
+					{__('All Web APIs', 'inseri-core')}
 				</Title>
 				<Button classNames={{ root: primaryBtn }} size="sm" component="a" href={ADD_NEW_PATH}>
 					{__('Add New', 'inseri-core')}
@@ -198,7 +198,7 @@ export function ListView({ onItemClick }: Props) {
 						<div style={{ flex: 1 }} />
 
 						<TextInput
-							aria-label={__('Search Data Sources', 'inseri-core')}
+							aria-label={__('Search Web APIs', 'inseri-core')}
 							ref={searchboxRef}
 							onKeyDown={getHotkeyHandler([['Enter', searchDatasources]])}
 							rightSection={
@@ -210,7 +210,7 @@ export function ListView({ onItemClick }: Props) {
 							}
 						/>
 						<Button variant="outline" classNames={{ root: secondaryBtn }} onClick={searchDatasources}>
-							{__('Search Data Sources', 'inseri-core')}
+							{__('Search Web APIs', 'inseri-core')}
 						</Button>
 					</Group>
 				</MediaQuery>
@@ -220,16 +220,16 @@ export function ListView({ onItemClick }: Props) {
 						<ContentTableBody datasources={datasources} onDelete={deleteDatasource} onNameClick={onItemClick} onSelectClick={setFilterByString} />
 					) : rawDatasources.length > 0 ? (
 						<EmptyTableBody
-							title={__('No data sources found', 'inseri-core')}
+							title={__('No Web APIs found', 'inseri-core')}
 							description={__('Try adjusting your search or filters', 'inseri-core')}
 						></EmptyTableBody>
 					) : (
 						<EmptyTableBody
-							title={__('No data sources yet', 'inseri-core')}
+							title={__('No Web APIs yet', 'inseri-core')}
 							description={__('To fetch data in posts or in pages, add new data repository', 'inseri-core')}
 						>
 							<Button size="sm" classNames={{ root: primaryBtn }} component="a" href={ADD_NEW_PATH} mt="sm">
-								{__('Add New Data Source', 'inseri-core')}
+								{__('Add New Web API', 'inseri-core')}
 							</Button>
 						</EmptyTableBody>
 					)}
