@@ -1,85 +1,107 @@
 import domReady from '@wordpress/dom-ready'
-import create from 'zustand'
-import { immer } from 'zustand/middleware/immer'
-import { devtools } from 'zustand/middleware'
 import { nanoid } from 'nanoid/non-secure'
-
+import create from 'zustand'
+import { devtools } from 'zustand/middleware'
+import { immer } from 'zustand/middleware/immer'
 declare global {
 	interface Window {
 		InseriCore: InseriCore
 	}
 }
 
-interface StoreSource {
+interface Field {
 	contentType: string
 	isContentTypeDynamic?: boolean
 	description: string
 	status: 'initial' | 'loading' | 'ready' | 'error' | 'unavailable'
+	value?: any
 }
-type InsertSource = Omit<StoreSource, 'status'> & {
+type FieldWithKey = Omit<Field, 'status' | 'value'> & {
 	key: string
 }
 
+type SourceDTO = FieldWithKey & {
+	slice: string
+}
+
 interface StoreWrapper {
-	meta: Record<string, { blockName: string; description: string }>
+	blockTypeByHandle: Record<string, string>
 	//             slice          key
-	stores: Record<string, Record<string, StoreSource>>
+	mainStore: Record<string, Record<string, Field>>
 }
 
 class InseriCore {
-	#internalStore
+	#useInternalStore
 
 	constructor() {
-		this.#internalStore = create(
-			devtools(
-				immer<StoreWrapper>((_set) => ({ meta: {}, stores: {} })),
-				{ name: 'inseri-store' }
-			)
-		)
+		let store: any = (_set: any) => ({ blockTypeByHandle: {}, mainStore: {} })
+
+		if (process.env.NODE_ENV !== 'production') {
+			store = devtools(store, { name: 'inseri-store' })
+		}
+
+		this.#useInternalStore = create(immer<StoreWrapper>(store))
 	}
 
 	#generateToken = () => nanoid()
 
-	addBlock(blockName: string, fields: InsertSource[]): string {
+	useInseriStore({ slice, key }: SourceDTO): Field {
+		return this.#useInternalStore((state) => {
+			if (state.mainStore[slice]) {
+				return state.mainStore[slice][key]
+			}
+			return { contentType: '', status: 'initial', description: '' }
+		})
+	}
+
+	createDispatch = (blockHandle: string, fieldKey: string) => (field: Partial<Omit<Field, 'isContentTypeDynamic'>>) => {
+		this.#useInternalStore.setState((state: any) => {
+			const properties: any = field
+
+			Object.keys(field).forEach((itemKey) => {
+				if (properties[itemKey]) {
+					state.mainStore[blockHandle][fieldKey][itemKey] = properties[itemKey]
+				}
+			})
+		})
+	}
+
+	addBlock(blockName: string, fields: FieldWithKey[]): string {
 		const blockHandle = this.#generateToken()
 
-		this.#internalStore.setState((state) => {
-			const slice: Record<string, StoreSource> = {}
+		this.#useInternalStore.setState((state) => {
+			const slice: Record<string, Field> = {}
 			fields.forEach((field) => {
 				const { key, ...rest } = field
 				slice[key] = { ...rest, status: 'initial' }
 			})
 
-			state.meta[blockHandle] = {
-				blockName,
-				description: '',
-			}
-
-			state.stores[blockHandle] = slice
+			state.blockTypeByHandle[blockHandle] = blockName
+			state.mainStore[blockHandle] = slice
 		})
 
 		return blockHandle
 	}
 
 	removeBlock(blockHandle: string) {
-		this.#internalStore.setState((state) => {
-			const slice = state.stores[blockHandle]
+		this.#useInternalStore.setState((state) => {
+			const slice = state.mainStore[blockHandle]
 			Object.keys(slice).forEach((k) => {
 				slice[k].status = 'unavailable'
 			})
 		})
 	}
 
-	addField(blockHandle: string, field: InsertSource) {
-		this.#internalStore.setState((state) => {
+	addField(blockHandle: string, field: FieldWithKey) {
+		this.#useInternalStore.setState((state) => {
 			const { key, ...rest } = field
-			state.stores[blockHandle][key] = { ...rest, status: 'initial' }
+			state.mainStore[blockHandle][key] = { ...rest, status: 'initial' }
 		})
 	}
 
 	removeField(blockHandle: string, key: string) {
-		this.#internalStore.setState((state) => {
-			state.stores[blockHandle][key].status = 'unavailable'
+		this.#useInternalStore.setState((state) => {
+			state.mainStore[blockHandle][key].status = 'unavailable'
 		})
 	}
 }
