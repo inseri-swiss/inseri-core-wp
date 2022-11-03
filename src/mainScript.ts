@@ -58,9 +58,10 @@ class InseriCore {
 
 	useAvailableSources(contentTypeFilter?: string | ((contentType: string) => boolean)) {
 		const totalFields = this.#useInternalStore((state) => state.totalFields)
+		// eslint-disable-next-line react-hooks/rules-of-hooks
 		return useMemo(() => {
 			const mainStore = this.#useInternalStore.getState().mainStore
-			let sources: SourceDTO[] = Object.entries(mainStore).flatMap(([handle, slice]) => {
+			return Object.entries(mainStore).flatMap(([handle, slice]) => {
 				let sourcesOfSlice = Object.entries(slice).filter(([_, field]) => field.status !== 'unavailable')
 				if (contentTypeFilter) {
 					const filterByContentType = typeof contentTypeFilter === 'string' ? (ct: string) => ct.includes(contentTypeFilter) : contentTypeFilter
@@ -69,8 +70,6 @@ class InseriCore {
 
 				return sourcesOfSlice.map(([key, { status, value, ...rest }]) => ({ ...rest, key, slice: handle }))
 			})
-
-			return sources
 		}, [totalFields, contentTypeFilter])
 	}
 
