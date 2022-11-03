@@ -54,16 +54,30 @@ class InseriCore {
 		})
 	}
 
-	createDispatch = (blockHandle: string, fieldKey: string) => (field: Partial<Omit<Field, 'isContentTypeDynamic'>>) => {
-		this.#useInternalStore.setState((state: any) => {
-			const properties: any = field
+	useAvailableSources(contentTypeFilter?: string | ((contentType: string) => boolean)) {
+		const mainStore = this.#useInternalStore((state) => state.mainStore)
 
-			Object.keys(field).forEach((itemKey) => {
-				if (properties[itemKey]) {
-					state.mainStore[blockHandle][fieldKey][itemKey] = properties[itemKey]
-				}
-			})
+		let sources: SourceDTO[] = Object.entries(mainStore).flatMap(([handle, slice]) => {
+			let sourcesOfSlice = Object.entries(slice).filter(([_, field]) => field.status !== 'unavailable')
+			if (contentTypeFilter) {
+				const filterByContentType = typeof contentTypeFilter === 'string' ? (ct: string) => ct.includes(contentTypeFilter) : contentTypeFilter
+				sourcesOfSlice = sourcesOfSlice.filter(([_, field]) => filterByContentType(field.contentType))
+			}
+
+			return sourcesOfSlice.map(([key, { status, value, ...rest }]) => ({ ...rest, key, slice: handle }))
 		})
+
+		return sources
+	}
+
+	createDispatch = (blockHandle: string, fieldKey: string) => (updateField: Partial<Omit<Field, 'isContentTypeDynamic'>>) => {
+		this.#useInternalStore.setState((state: any) =>
+			Object.entries(updateField)
+				.filter(([_, itemVal]) => !!itemVal)
+				.forEach(([itemKey, itemVal]) => {
+					state.mainStore[blockHandle][fieldKey][itemKey] = itemVal
+				})
+		)
 	}
 
 	addBlock(blockName: string, fields: FieldWithKey[]): string {
