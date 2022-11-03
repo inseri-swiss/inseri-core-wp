@@ -8,7 +8,7 @@ declare module '*.svg' {
 	export = value
 }
 
-declare const wpApiSettings: {
+declare const inseriApiSettings: {
 	root: string
 	nonce: string
 }

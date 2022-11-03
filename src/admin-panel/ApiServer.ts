@@ -77,25 +77,25 @@ const handleRequest = async <T>(action: () => Promise<AxiosResponse<T>>): Promis
 }
 
 export const getAllItems = async (): Promise<AxiosResponse<Datasource[]>> => {
-	return axios.get<Datasource[]>(wpApiSettings.root + ROUTE)
+	return axios.get<Datasource[]>(inseriApiSettings.root + ROUTE)
 }
 
 export const addNewItem = async (newItem: DatasourceWithoutId): Promise<[string?, Datasource?]> => {
-	const action = () => axios.post<Datasource>(wpApiSettings.root + ROUTE, newItem, { headers: { 'X-WP-Nonce': wpApiSettings.nonce } })
+	const action = () => axios.post<Datasource>(inseriApiSettings.root + ROUTE, newItem, { headers: { 'X-WP-Nonce': inseriApiSettings.nonce } })
 	return handleRequest(action)
 }
 
 export const removeItem = async (id: number): Promise<[string?, Datasource?]> => {
-	const action = () => axios.delete<Datasource>(wpApiSettings.root + ROUTE + id, { headers: { 'X-WP-Nonce': wpApiSettings.nonce } })
+	const action = () => axios.delete<Datasource>(inseriApiSettings.root + ROUTE + id, { headers: { 'X-WP-Nonce': inseriApiSettings.nonce } })
 	return handleRequest(action)
 }
 
 export const getItem = async (id: number): Promise<[string?, Datasource?]> => {
-	const action = () => axios.get<Datasource>(wpApiSettings.root + ROUTE + id)
+	const action = () => axios.get<Datasource>(inseriApiSettings.root + ROUTE + id)
 	return handleRequest(action)
 }
 
 export const updateNewItem = async (newItem: Datasource): Promise<[string?, Datasource?]> => {
-	const action = () => axios.put<Datasource>(wpApiSettings.root + ROUTE + newItem.id, newItem, { headers: { 'X-WP-Nonce': wpApiSettings.nonce } })
+	const action = () => axios.put<Datasource>(inseriApiSettings.root + ROUTE + newItem.id, newItem, { headers: { 'X-WP-Nonce': inseriApiSettings.nonce } })
 	return handleRequest(action)
 }
