@@ -6,8 +6,10 @@ import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 declare global {
 	interface Window {
-		InseriCore: InseriCore
+		InseriCore: InseriCoreImpl
 	}
+
+	const InseriCore: InseriCoreImpl
 }
 
 interface Field {
@@ -32,7 +34,7 @@ interface StoreWrapper {
 	totalFields: number
 }
 
-class InseriCore {
+class InseriCoreImpl {
 	#useInternalStore
 
 	constructor() {
@@ -131,5 +133,5 @@ class InseriCore {
 }
 
 domReady(() => {
-	window.InseriCore = new InseriCore()
+	window.InseriCore = new InseriCoreImpl()
 })
