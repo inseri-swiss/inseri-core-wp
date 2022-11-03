@@ -24,7 +24,7 @@ abstract class Inseri_Core_Admin {
 			return;
 		}
 
-		wp_localize_script(self::$script_name, 'wpApiSettings', [
+		wp_localize_script(self::$script_name, 'inseriApiSettings', [
 			'root' => esc_url_raw(rest_url()),
 			'nonce' => wp_create_nonce('wp_rest'),
 		]);
