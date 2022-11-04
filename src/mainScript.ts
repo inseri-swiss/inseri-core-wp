@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid/non-secure'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-import { getAllMedia } from './ApiServer'
+import { getAllItems, getAllMedia } from './ApiServer'
 declare global {
 	interface Window {
 		InseriCore: InseriCoreImpl
@@ -59,24 +59,36 @@ class InseriCoreImpl {
 		this.#useInternalStore = create(immer<StoreWrapper>(store))
 
 		if (window.wp.blockEditor) {
-			this.#fetchMediaAndFileSources()
+			this.#fetchMediaAndWebapiSources()
 		}
 	}
 
 	#generateToken = () => nanoid()
 
-	async #fetchMediaAndFileSources() {
-		const [_, mediaData] = await getAllMedia()
+	#fetchMediaAndWebapiSources() {
+		getAllMedia().then(([_, mediaData]) => {
+			if (mediaData) {
+				const mediaFields: FieldWithKey[] = mediaData.map((m) => ({
+					key: String(m.id),
+					contentType: m.mime_type,
+					description: m.title.rendered,
+				}))
 
-		if (mediaData) {
-			const mediaFields: FieldWithKey[] = mediaData.map((m) => ({
-				key: String(m.id),
-				contentType: m.mime_type,
-				description: m.title.rendered,
-			}))
+				this.#useInternalStore.setState((state) => this.#addFieldsCallback(this.#media, mediaFields, state))
+			}
+		})
 
-			this.#useInternalStore.setState((state) => this.#addFieldsCallback(this.#media, mediaFields, state))
-		}
+		getAllItems().then(([_, webapiData]) => {
+			if (webapiData) {
+				const webapiFields: FieldWithKey[] = webapiData.map((m) => ({
+					key: String(m.id),
+					contentType: m.content_type,
+					description: m.description,
+				}))
+
+				this.#useInternalStore.setState((state) => this.#addFieldsCallback(this.#webapi, webapiFields, state))
+			}
+		})
 	}
 
 	useInseriStore({ slice, key }: SourceDTO): Field {

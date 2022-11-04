@@ -3,7 +3,7 @@ import { IconTrash } from '@tabler/icons'
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Button, createStyles, SortableTh, Stack, Text, Title } from '../components'
-import { Datasource } from './ApiServer'
+import { Datasource } from '../ApiServer'
 
 const DELAY_TIME = 5
 
