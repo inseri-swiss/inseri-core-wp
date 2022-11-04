@@ -146,8 +146,13 @@ export function ListView({ onItemClick }: Props) {
 	}
 
 	const loadDatasources = async () => {
-		const response = await getAllItems()
-		setRawDatasources(response.data)
+		const [errorMsg, data] = await getAllItems()
+		if (errorMsg) {
+			setPageError(errorMsg)
+		}
+		if (data) {
+			setRawDatasources(data)
+		}
 	}
 
 	const deleteDatasource = (id: number) => async () => {

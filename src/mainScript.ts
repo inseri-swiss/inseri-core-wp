@@ -1,12 +1,15 @@
 import domReady from '@wordpress/dom-ready'
 import { useMemo } from '@wordpress/element'
+import { Draft } from 'immer'
 import { nanoid } from 'nanoid/non-secure'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
+import { getAllMedia } from './ApiServer'
 declare global {
 	interface Window {
 		InseriCore: InseriCoreImpl
+		wp: { blockEditor: any }
 	}
 
 	const InseriCore: InseriCoreImpl
@@ -36,18 +39,45 @@ interface StoreWrapper {
 
 class InseriCoreImpl {
 	#useInternalStore
+	readonly #media = 'media'
+	readonly #webapi = 'webapi'
 
 	constructor() {
-		let store: any = (_set: any) => ({ blockTypeByHandle: {}, mainStore: {}, totalFields: 0 })
+		let store: any = (_set: any) => ({
+			blockTypeByHandle: {},
+			mainStore: {
+				[this.#media]: {},
+				[this.#webapi]: {},
+			},
+			totalFields: 0,
+		})
 
 		if (process.env.NODE_ENV !== 'production') {
 			store = devtools(store, { name: 'inseri-store' })
 		}
 
 		this.#useInternalStore = create(immer<StoreWrapper>(store))
+
+		if (window.wp.blockEditor) {
+			this.#fetchMediaAndFileSources()
+		}
 	}
 
 	#generateToken = () => nanoid()
+
+	async #fetchMediaAndFileSources() {
+		const [_, mediaData] = await getAllMedia()
+
+		if (mediaData) {
+			const mediaFields: FieldWithKey[] = mediaData.map((m) => ({
+				key: String(m.id),
+				contentType: m.mime_type,
+				description: m.title.rendered,
+			}))
+
+			this.#useInternalStore.setState((state) => this.#addFieldsCallback(this.#media, mediaFields, state))
+		}
+	}
 
 	useInseriStore({ slice, key }: SourceDTO): Field {
 		return this.#useInternalStore((state) => {
@@ -58,21 +88,37 @@ class InseriCoreImpl {
 		})
 	}
 
-	useAvailableSources(contentTypeFilter?: string | ((contentType: string) => boolean)) {
+	useAvailableSources(category: 'all' | 'media' | 'webApi' | 'block', contentTypeFilter?: string | ((contentType: string) => boolean)) {
 		const totalFields = this.#useInternalStore((state) => state.totalFields)
+
+		const filterByCategory = (handle: string) => {
+			switch (category) {
+				case 'media':
+					return handle === this.#media
+				case 'webApi':
+					return handle === this.#webapi
+				case 'block':
+					return handle !== this.#media && handle !== this.#webapi
+				default:
+					return true
+			}
+		}
+
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		return useMemo(() => {
 			const mainStore = this.#useInternalStore.getState().mainStore
-			return Object.entries(mainStore).flatMap(([handle, slice]) => {
-				let sourcesOfSlice = Object.entries(slice).filter(([_, field]) => field.status !== 'unavailable')
-				if (contentTypeFilter) {
-					const filterByContentType = typeof contentTypeFilter === 'string' ? (ct: string) => ct.includes(contentTypeFilter) : contentTypeFilter
-					sourcesOfSlice = sourcesOfSlice.filter(([_, field]) => filterByContentType(field.contentType))
-				}
+			return Object.entries(mainStore)
+				.filter(([handle, _]) => filterByCategory(handle))
+				.flatMap(([handle, slice]) => {
+					let sources = Object.entries(slice).filter(([_, field]) => field.status !== 'unavailable')
+					if (contentTypeFilter) {
+						const filterByContentType = typeof contentTypeFilter === 'string' ? (ct: string) => ct.includes(contentTypeFilter) : contentTypeFilter
+						sources = sources.filter(([_, field]) => filterByContentType(field.contentType))
+					}
 
-				return sourcesOfSlice.map(([key, { status, value, ...rest }]) => ({ ...rest, key, slice: handle }))
-			})
-		}, [totalFields, contentTypeFilter])
+					return sources.map(([key, { status, value, ...rest }]) => ({ ...rest, key, slice: handle }))
+				})
+		}, [totalFields, contentTypeFilter, category])
 	}
 
 	createDispatch = (blockHandle: string, fieldKey: string) => (updateField: Partial<Omit<Field, 'isContentTypeDynamic'>>) => {
@@ -85,19 +131,30 @@ class InseriCoreImpl {
 		)
 	}
 
+	#addFieldsCallback = (blockHandle: string, fields: FieldWithKey[], state: Draft<StoreWrapper>) => {
+		if (!state.mainStore[blockHandle]) {
+			state.mainStore[blockHandle] = {}
+		}
+
+		fields.forEach((field) => {
+			const { key, ...rest } = field
+			state.mainStore[blockHandle][key] = { ...rest, status: 'initial' }
+		})
+		state.totalFields += fields.length
+	}
+
+	#removeFieldsCallback = (blockHandle: string, fields: string[], state: Draft<StoreWrapper>) => {
+		fields.forEach((k) => {
+			state.mainStore[blockHandle][k].status = 'unavailable'
+		})
+		state.totalFields -= fields.length
+	}
+
 	addBlock(blockName: string, fields: FieldWithKey[]): string {
 		const blockHandle = this.#generateToken()
-
 		this.#useInternalStore.setState((state) => {
-			const slice: Record<string, Field> = {}
-			fields.forEach((field) => {
-				const { key, ...rest } = field
-				slice[key] = { ...rest, status: 'initial' }
-			})
-
 			state.blockTypeByHandle[blockHandle] = blockName
-			state.mainStore[blockHandle] = slice
-			state.totalFields += fields.length
+			this.#addFieldsCallback(blockHandle, fields, state)
 		})
 
 		return blockHandle
@@ -107,28 +164,16 @@ class InseriCoreImpl {
 		this.#useInternalStore.setState((state) => {
 			const slice = state.mainStore[blockHandle]
 			const fields = Object.keys(slice)
-
-			fields.forEach((k) => {
-				slice[k].status = 'unavailable'
-			})
-
-			state.totalFields -= fields.length
+			this.#removeFieldsCallback(blockHandle, fields, state)
 		})
 	}
 
 	addField(blockHandle: string, field: FieldWithKey) {
-		this.#useInternalStore.setState((state) => {
-			const { key, ...rest } = field
-			state.mainStore[blockHandle][key] = { ...rest, status: 'initial' }
-			state.totalFields++
-		})
+		this.#useInternalStore.setState((state) => this.#addFieldsCallback(blockHandle, [field], state))
 	}
 
 	removeField(blockHandle: string, key: string) {
-		this.#useInternalStore.setState((state) => {
-			state.mainStore[blockHandle][key].status = 'unavailable'
-			state.totalFields--
-		})
+		this.#useInternalStore.setState((state) => this.#removeFieldsCallback(blockHandle, [key], state))
 	}
 }
 

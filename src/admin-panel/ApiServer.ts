@@ -1,6 +1,6 @@
 import axios from 'axios'
-import type { AxiosResponse } from 'axios'
 import { __ } from '@wordpress/i18n'
+import { handleRequest } from '../utils'
 
 const ROUTE = 'inseri/v1/datasources/'
 
@@ -51,33 +51,9 @@ export const handleTryRequest = async (method: string, url: string, queryParams:
 	return ['', {}, '']
 }
 
-const handleRequest = async <T>(action: () => Promise<AxiosResponse<T>>): Promise<[string?, T?]> => {
-	try {
-		const response = await action()
-		return [undefined, response.data]
-	} catch (exception) {
-		if (exception instanceof axios.AxiosError && exception.response) {
-			const { data, status, statusText } = exception.response
-			let body = ''
-
-			if (data.message) {
-				body = data.message
-			} else if (typeof data === 'string') {
-				body = data
-			} else {
-				body = JSON.stringify(data)
-			}
-
-			const msg = `${status} ${statusText}: ${body}`
-			return [msg, undefined]
-		}
-
-		return [__('Refresh the page and try it again.', 'inseri-core'), undefined]
-	}
-}
-
-export const getAllItems = async (): Promise<AxiosResponse<Datasource[]>> => {
-	return axios.get<Datasource[]>(inseriApiSettings.root + ROUTE)
+export const getAllItems = async (): Promise<[string?, Datasource[]?]> => {
+	const action = () => axios.get<Datasource[]>(inseriApiSettings.root + ROUTE)
+	return handleRequest(action)
 }
 
 export const addNewItem = async (newItem: DatasourceWithoutId): Promise<[string?, Datasource?]> => {
