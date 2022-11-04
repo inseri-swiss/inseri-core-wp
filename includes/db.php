@@ -19,6 +19,7 @@ class Inseri_Core_DB {
 				id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 				description VARCHAR(128) NOT NULL,
 				type VARCHAR(64) NOT NULL,
+				content_type VARCHAR(64) NOT NULL,
 				author BIGINT(20) UNSIGNED NOT NULL,
 				method VARCHAR(12) NOT NULL,
 				url VARCHAR(255) NOT NULL,

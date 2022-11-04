@@ -1,6 +1,4 @@
 import { __ } from '@wordpress/i18n'
-import type { AxiosResponse } from 'axios'
-import axios from 'axios'
 import xmlFormatter from 'xml-formatter'
 import { ParamItem } from './admin-panel/ParamsTable'
 
@@ -79,29 +77,4 @@ export const getBodyTypeByContenType = (contentType?: string): string | undefine
 
 	const found = Object.keys(contentTypeMap).find((k) => contentType?.includes(k))
 	return found ? contentTypeMap[found] : undefined
-}
-
-export const handleRequest = async <T,>(action: () => Promise<AxiosResponse<T>>): Promise<[string?, T?]> => {
-	try {
-		const response = await action()
-		return [undefined, response.data]
-	} catch (exception) {
-		if (exception instanceof axios.AxiosError && exception.response) {
-			const { data, status, statusText } = exception.response
-			let body = ''
-
-			if (data.message) {
-				body = data.message
-			} else if (typeof data === 'string') {
-				body = data
-			} else {
-				body = JSON.stringify(data)
-			}
-
-			const msg = `${status} ${statusText}: ${body}`
-			return [msg, undefined]
-		}
-
-		return [__('Refresh the page and try it again.', 'inseri-core'), undefined]
-	}
 }

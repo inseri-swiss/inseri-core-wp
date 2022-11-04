@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import logo from '../assets/inseri_logo.png'
 import { ActionIcon, Alert, Box, Button, createStyles, Group, MediaQuery, Select, Table, TextInput, Title } from '../components'
-import { Datasource, getAllItems, removeItem } from './ApiServer'
+import { Datasource, getAllItems, removeItem } from '../ApiServer'
 import { HTTP_METHODS, PAGES } from './config'
 import { ContentTableBody, EmptyTableBody, SortableColumns, TableHeader } from './TableComponents'
 

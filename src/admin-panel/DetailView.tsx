@@ -4,7 +4,7 @@ import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Accordion, Alert, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Select, Tabs, Text, TextInput, Title } from '../components'
 import { BODY_TYPE_TO_CONTENT_TYPE, formatCode, getBodyTypeByContenType, getPropertyCaseInsensitive, mapObjectToParams, mapParamsToObject } from '../utils'
-import { addNewItem, Datasource, DatasourceWithoutId, handleTryRequest, getItem, updateNewItem } from './ApiServer'
+import { addNewItem, Datasource, DatasourceWithoutId, handleTryRequest, getItem, updateNewItem } from '../ApiServer'
 import { PAGES } from './config'
 import { ParamItem, ParamsTable } from './ParamsTable'
 import { UrlBar } from './UrlBar'
@@ -111,6 +111,7 @@ export function DetailView(props: Props) {
 	const [responseHeaders, setResponseHeaders] = useState<ParamItem[]>([createParamItem()])
 	const [responseBody, setResponseBody] = useState<any>('')
 	const [responseBodyType, setResponseBodyType] = useState<string>('')
+	const [responseContentType, setResponseContentType] = useState<string | undefined>(undefined)
 
 	const [pageError, setPageError] = useState<string>('')
 	const [item, setItem] = useState<Datasource | null>(null)
@@ -169,6 +170,7 @@ export function DetailView(props: Props) {
 				preparedBody = formattedCode ?? preparedBody
 			}
 
+			setResponseContentType(contentType)
 			setResponseBodyType(bodyType)
 			setResponseBody(preparedBody)
 		}
@@ -177,6 +179,11 @@ export function DetailView(props: Props) {
 	}
 
 	const createOrUpdateDatasource = async () => {
+		if (!responseContentType) {
+			setPageError(__(`Click once on 'Try Request'`, 'inseri-core'))
+			return
+		}
+
 		let body: string | undefined
 
 		if (isFormType(requestBodyType)) {
@@ -193,6 +200,7 @@ export function DetailView(props: Props) {
 			query_params: JSON.stringify(mapParamsToObject(queryParams)),
 			type: datasourceType ?? DATASOURCE_TYPES[0].value,
 			body,
+			content_type: responseContentType,
 		}
 
 		let result: [string?, Datasource?]
@@ -252,9 +260,9 @@ export function DetailView(props: Props) {
 				}
 				if (data) {
 					// eslint-disable-next-line
-					const { description, url, method, headers, query_params, type, body } = data
+					const { description, url, method, headers, query_params, type, body, content_type } = data
 					setItem(data)
-
+					setResponseContentType(content_type)
 					setDatasourceName(description)
 					setUrl(url)
 					setMethod(method)

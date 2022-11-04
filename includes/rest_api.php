@@ -68,7 +68,7 @@ class Inseri_Core_Rest {
 
 	function validate_datasource($request, $check_id = false): Either {
 		$body = $request->get_json_params();
-		$non_empty_fields = ['description', 'type', 'method', 'url'];
+		$non_empty_fields = ['description', 'type', 'content_type', 'method', 'url'];
 		$json_fields = ['headers', 'query_params'];
 
 		if ($check_id) {
