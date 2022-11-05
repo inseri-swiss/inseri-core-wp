@@ -1,6 +1,6 @@
 import domReady from '@wordpress/dom-ready'
 import { useEffect, useMemo } from '@wordpress/element'
-import { Draft } from 'immer'
+import type { Draft } from 'immer'
 import { nanoid } from 'nanoid/non-secure'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
@@ -114,6 +114,7 @@ class InseriCoreImpl {
 	}
 
 	useInseriStore({ slice, key, contentType, description }: SourceDTO): Field {
+		// eslint-disable-next-line react-hooks/rules-of-hooks
 		useEffect(() => {
 			const currentState = this.#useInternalStore.getState()
 			let initSlice = (_state: Draft<StoreWrapper>) => {}

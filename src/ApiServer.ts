@@ -24,11 +24,11 @@ export interface DatasourceWithoutId {
 }
 
 export const callWebApi = async (datasource: Datasource) => {
-	const { method, url, headers, query_params, body } = datasource
+	const { method, url, headers, query_params: queryParams, body } = datasource
 
 	const urlObject = new URL(url)
-	const queryParams = new URLSearchParams(JSON.parse(query_params))
-	urlObject.search = queryParams.toString()
+	const queryParamsObj = new URLSearchParams(JSON.parse(queryParams))
+	urlObject.search = queryParamsObj.toString()
 
 	const headersObj = JSON.parse(headers)
 	const requestContentType = getPropertyCaseInsensitive(headersObj, 'content-type')
@@ -49,7 +49,7 @@ export const callWebApi = async (datasource: Datasource) => {
 			method,
 			url: urlObject.toString(),
 			headers: headersObj,
-			data: body,
+			data: requestBody,
 			responseType: 'blob',
 		})
 
@@ -61,7 +61,7 @@ export const callWebApi = async (datasource: Datasource) => {
 			responseBody = JSON.parse(await textBlob.text())
 		}
 
-		if (responseContentType?.includes('text/') | responseContentType?.includes('application/xml')) {
+		if (responseContentType?.includes('text/') || responseContentType?.includes('application/xml')) {
 			const textBlob = new Blob([responseBody])
 			responseBody = await textBlob.text()
 		}
