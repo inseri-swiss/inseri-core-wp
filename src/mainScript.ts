@@ -1,5 +1,5 @@
 import domReady from '@wordpress/dom-ready'
-import { useMemo } from '@wordpress/element'
+import { useEffect, useMemo } from '@wordpress/element'
 import { Draft } from 'immer'
 import { nanoid } from 'nanoid/non-secure'
 import create from 'zustand'
@@ -114,15 +114,29 @@ class InseriCoreImpl {
 	}
 
 	useInseriStore({ slice, key, contentType, description }: SourceDTO): Field {
-		return this.#useInternalStore((state) => {
-			if (state.mainStore[slice]?.[key]) {
-				return state.mainStore[slice][key]
-			} else if (slice === this.#webapi) {
-				state.mainStore[slice][key] = { contentType, status: 'initial', description }
-				this.#initWebapi(key)
+		useEffect(() => {
+			const currentState = this.#useInternalStore.getState()
+			let initSlice = (_state: Draft<StoreWrapper>) => {}
+
+			if (!currentState.mainStore[slice]) {
+				initSlice = (state) => {
+					state.mainStore[slice] = {}
+				}
 			}
-			return { contentType: '', status: 'initial', description: '' }
-		})
+
+			if (!currentState.mainStore[slice]?.[key]) {
+				this.#useInternalStore.setState((state) => {
+					initSlice(state)
+					state.mainStore[slice][key] = { contentType, status: 'initial', description }
+				})
+
+				if (slice === this.#webapi) {
+					this.#initWebapi(key)
+				}
+			}
+		}, [])
+
+		return this.#useInternalStore((state) => state.mainStore[slice]?.[key] ?? { contentType: '', status: 'initial', description: '' })
 	}
 
 	useAvailableSources(category: 'all' | 'media' | 'webapi' | 'block', contentTypeFilter?: string | ((contentType: string) => boolean)) {
