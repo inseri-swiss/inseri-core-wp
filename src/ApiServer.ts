@@ -1,6 +1,7 @@
 import axios from 'axios'
 import type { AxiosResponse } from 'axios'
 import { __ } from '@wordpress/i18n'
+import { getPropertyCaseInsensitive } from './utils'
 
 const MEDIA_ROUTE = 'wp/v2/media/'
 const INSERI_ROUTE = 'inseri/v1/datasources/'
@@ -20,6 +21,59 @@ export interface DatasourceWithoutId {
 	headers: string
 	query_params: string
 	body?: string
+}
+
+export const callWebApi = async (datasource: Datasource) => {
+	const { method, url, headers, query_params, body } = datasource
+
+	const urlObject = new URL(url)
+	const queryParams = new URLSearchParams(JSON.parse(query_params))
+	urlObject.search = queryParams.toString()
+
+	const headersObj = JSON.parse(headers)
+	const requestContentType = getPropertyCaseInsensitive(headersObj, 'content-type')
+	let requestBody: any = body
+
+	if (body && requestContentType?.includes('application/x-www-form-urlencoded')) {
+		requestBody = new URLSearchParams(JSON.parse(body))
+	}
+	if (body && requestContentType?.includes('multipart/form-data')) {
+		requestBody = Object.entries(JSON.parse(body)).reduce((bodyFormData, [key, value]: any) => {
+			bodyFormData.append(key, value)
+			return bodyFormData
+		}, new FormData())
+	}
+
+	try {
+		const response = await axios({
+			method,
+			url: urlObject.toString(),
+			headers: headersObj,
+			data: body,
+			responseType: 'blob',
+		})
+
+		let responseBody = response.data
+		const responseContentType = getPropertyCaseInsensitive(response.headers, 'content-type')
+
+		if (responseContentType?.includes('application/json')) {
+			const textBlob = new Blob([responseBody])
+			responseBody = JSON.parse(await textBlob.text())
+		}
+
+		if (responseContentType?.includes('text/') | responseContentType?.includes('application/xml')) {
+			const textBlob = new Blob([responseBody])
+			responseBody = await textBlob.text()
+		}
+
+		return [undefined, responseBody]
+	} catch (exception) {
+		if (exception instanceof axios.AxiosError) {
+			return [exception.message, undefined]
+		}
+
+		return ['Unknown error occurred', undefined]
+	}
 }
 
 export const handleTryRequest = async (method: string, url: string, queryParams: Record<string, string>, headers: Record<string, string>, body: any) => {
