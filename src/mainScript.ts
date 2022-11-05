@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid/non-secure'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-import { getAllItems, getAllMedia } from './ApiServer'
+import { callWebApi, getAllItems, getAllMedia, getItem } from './ApiServer'
 declare global {
 	interface Window {
 		InseriCore: InseriCoreImpl
@@ -20,9 +20,10 @@ interface Field {
 	isContentTypeDynamic?: boolean
 	description: string
 	status: 'initial' | 'loading' | 'ready' | 'error' | 'unavailable'
+	error?: string
 	value?: any
 }
-type FieldWithKey = Omit<Field, 'status' | 'value'> & {
+type FieldWithKey = Omit<Field, 'status' | 'value' | 'error'> & {
 	key: string
 }
 
@@ -91,23 +92,47 @@ class InseriCoreImpl {
 		})
 	}
 
-	useInseriStore({ slice, key }: SourceDTO): Field {
+	async #initWebapi(id: string) {
+		const itemId = Number(id)
+		const dispatch = this.createDispatch(this.#webapi, id)
+
+		dispatch({ status: 'loading' })
+		let [error, webapi] = await getItem(itemId)
+
+		if (webapi) {
+			const [errorRequest, data] = await callWebApi(webapi)
+			if (data) {
+				dispatch({ value: data, status: 'ready' })
+			}
+
+			error = errorRequest
+		}
+
+		if (error) {
+			dispatch({ error, status: 'error' })
+		}
+	}
+
+	useInseriStore({ slice, key, contentType, description }: SourceDTO): Field {
 		return this.#useInternalStore((state) => {
-			if (state.mainStore[slice]) {
+			if (state.mainStore[slice]?.[key]) {
 				return state.mainStore[slice][key]
+			} else if (slice === this.#webapi) {
+				state.mainStore[slice][key] = { contentType, status: 'initial', description }
+				this.#initWebapi(key)
 			}
 			return { contentType: '', status: 'initial', description: '' }
 		})
 	}
 
-	useAvailableSources(category: 'all' | 'media' | 'webApi' | 'block', contentTypeFilter?: string | ((contentType: string) => boolean)) {
+	useAvailableSources(category: 'all' | 'media' | 'webapi' | 'block', contentTypeFilter?: string | ((contentType: string) => boolean)) {
 		const totalFields = this.#useInternalStore((state) => state.totalFields)
 
 		const filterByCategory = (handle: string) => {
 			switch (category) {
 				case 'media':
 					return handle === this.#media
-				case 'webApi':
+				case 'webapi':
 					return handle === this.#webapi
 				case 'block':
 					return handle !== this.#media && handle !== this.#webapi
