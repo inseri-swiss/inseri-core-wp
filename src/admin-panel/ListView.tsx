@@ -37,7 +37,7 @@ const useStyles = createStyles((theme) => ({
 }))
 
 const ALL_AUTHORS = __('All Authors', 'inseri-core')
-const ALL_TYPES = __('All Types', 'inseri-core')
+const ALL_TYPES = __('All Web API Types', 'inseri-core')
 const ALL_METHODS = __('All Methods', 'inseri-core')
 const methods = [ALL_METHODS, ...HTTP_METHODS]
 const ADD_NEW_PATH = 'admin.php?page=' + PAGES['add-new']

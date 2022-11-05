@@ -116,7 +116,7 @@ export function DetailView(props: Props) {
 	const [pageError, setPageError] = useState<string>('')
 	const [item, setItem] = useState<Datasource | null>(null)
 
-	const isNotReadyForSubmit = !!urlError || !url || !datasourceName
+	const isNotReadyForSubmit = !!urlError || !url || !datasourceName || !responseContentType
 
 	const tryRequest = async () => {
 		setLoadingRequest(true)
@@ -179,11 +179,6 @@ export function DetailView(props: Props) {
 	}
 
 	const createOrUpdateDatasource = async () => {
-		if (!responseContentType) {
-			setPageError(__(`Click once on 'Try Request'`, 'inseri-core'))
-			return
-		}
-
 		let body: string | undefined
 
 		if (isFormType(requestBodyType)) {
@@ -200,7 +195,7 @@ export function DetailView(props: Props) {
 			query_params: JSON.stringify(mapParamsToObject(queryParams)),
 			type: datasourceType ?? DATASOURCE_TYPES[0].value,
 			body,
-			content_type: responseContentType,
+			content_type: responseContentType ?? '',
 		}
 
 		let result: [string?, Datasource?]
@@ -346,6 +341,16 @@ export function DetailView(props: Props) {
 						/>
 					)}
 
+					<Select
+						label={__('Web API Type', 'inseri-core')}
+						data={DATASOURCE_TYPES}
+						value={datasourceType}
+						onChange={setDatasourceType}
+						classNames={{ wrapper: isEdit ? readonlyWrapper : undefined }}
+						readOnly={isEdit}
+						withAsterisk={!isEdit}
+					/>
+
 					<TextInput
 						label={__('Name', 'inseri-core')}
 						className={midSizeField}
@@ -354,13 +359,13 @@ export function DetailView(props: Props) {
 						onChange={(e) => setDatasourceName(e.currentTarget.value)}
 						withAsterisk
 					/>
-					<Select
-						label={__('Type', 'inseri-core')}
-						data={DATASOURCE_TYPES}
-						value={datasourceType}
-						onChange={setDatasourceType}
-						classNames={{ root: midSizeField, wrapper: isEdit ? readonlyWrapper : undefined }}
-						readOnly={isEdit}
+					<TextInput
+						label={__('Content Type', 'inseri-core')}
+						placeholder={__('generate with Try Request', 'inseri-core')}
+						className={midSizeField}
+						value={responseContentType}
+						onChange={(e) => setResponseContentType(e.currentTarget.value)}
+						withAsterisk
 					/>
 
 					{isEdit && (
