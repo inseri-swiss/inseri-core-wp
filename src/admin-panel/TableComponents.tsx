@@ -17,7 +17,7 @@ const useStyles = createStyles((theme, _t, getRef) => ({
 	},
 	col1: {
 		minWidth: '120px',
-		width: '15%',
+		width: '10%',
 		[theme.fn.smallerThan('sm')]: {
 			width: '30%',
 		},
@@ -118,7 +118,7 @@ export function TableHeader({ sortBy, isReversed, sortData }: HeaderProps) {
 					{__('Author', 'inseri-core')}
 				</SortableTh>
 				<SortableTh className={col2} sorted={sortBy === 'type'} reversed={isReversed} onSort={sortData('type')}>
-					{__('Type', 'inseri-core')}
+					{__('Web API Type', 'inseri-core')}
 				</SortableTh>
 				<SortableTh className={col3} sorted={sortBy === 'method'} reversed={isReversed} onSort={sortData('method')}>
 					{__('Method', 'inseri-core')}
