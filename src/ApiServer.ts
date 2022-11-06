@@ -23,28 +23,43 @@ export interface DatasourceWithoutId {
 	body?: string
 }
 
-export const callWebApi = async (datasource: Datasource) => {
-	const { method, url, headers, query_params: queryParams, body } = datasource
-
-	const urlObject = new URL(url)
-	const queryParamsObj = new URLSearchParams(JSON.parse(queryParams))
-	urlObject.search = queryParamsObj.toString()
-
-	const headersObj = JSON.parse(headers)
-	const requestContentType = getPropertyCaseInsensitive(headersObj, 'content-type')
-	let requestBody: any = body
-
-	if (body && requestContentType?.includes('application/x-www-form-urlencoded')) {
-		requestBody = new URLSearchParams(JSON.parse(body))
-	}
-	if (body && requestContentType?.includes('multipart/form-data')) {
-		requestBody = Object.entries(JSON.parse(body)).reduce((bodyFormData, [key, value]: any) => {
-			bodyFormData.append(key, value)
-			return bodyFormData
-		}, new FormData())
-	}
-
+export const callMediaFile = async (mediaId: string): Promise<[string?, Blob?]> => {
 	try {
+		const metaResponse = await axios.get<Media>(inseriApiSettings.root + MEDIA_ROUTE + mediaId)
+		const mediaResponse = await axios.get<Blob>(metaResponse.data.source_url, { responseType: 'blob' })
+		return [undefined, mediaResponse.data]
+	} catch (exception) {
+		if (exception instanceof axios.AxiosError) {
+			return [exception.message, undefined]
+		}
+
+		return ['Unknown error occurred', undefined]
+	}
+}
+
+export const callWebApi = async (datasourceId: string) => {
+	try {
+		const datasource = await axios.get<Datasource>(inseriApiSettings.root + INSERI_ROUTE + datasourceId)
+		const { method, url, headers, query_params: queryParams, body } = datasource.data
+
+		const urlObject = new URL(url)
+		const queryParamsObj = new URLSearchParams(JSON.parse(queryParams))
+		urlObject.search = queryParamsObj.toString()
+
+		const headersObj = JSON.parse(headers)
+		const requestContentType = getPropertyCaseInsensitive(headersObj, 'content-type')
+		let requestBody: any = body
+
+		if (body && requestContentType?.includes('application/x-www-form-urlencoded')) {
+			requestBody = new URLSearchParams(JSON.parse(body))
+		}
+		if (body && requestContentType?.includes('multipart/form-data')) {
+			requestBody = Object.entries(JSON.parse(body)).reduce((bodyFormData, [key, value]: any) => {
+				bodyFormData.append(key, value)
+				return bodyFormData
+			}, new FormData())
+		}
+
 		const response = await axios({
 			method,
 			url: urlObject.toString(),

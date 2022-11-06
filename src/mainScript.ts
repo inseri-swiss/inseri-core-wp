@@ -5,7 +5,7 @@ import { nanoid } from 'nanoid/non-secure'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-import { callWebApi, getAllItems, getAllMedia, getItem } from './ApiServer'
+import { callMediaFile, callWebApi, getAllItems, getAllMedia } from './ApiServer'
 declare global {
 	interface Window {
 		InseriCore: InseriCoreImpl
@@ -92,20 +92,14 @@ class InseriCoreImpl {
 		})
 	}
 
-	async #initWebapi(id: string) {
-		const itemId = Number(id)
-		const dispatch = this.createDispatch(this.#webapi, id)
+	async #initSource(slice: string, id: string) {
+		const dispatch = this.createDispatch(slice, id)
 
 		dispatch({ status: 'loading' })
-		let [error, webapi] = await getItem(itemId)
+		const [error, data] = slice === this.#media ? await callMediaFile(id) : await callWebApi(id)
 
-		if (webapi) {
-			const [errorRequest, data] = await callWebApi(webapi)
-			if (data) {
-				dispatch({ value: data, status: 'ready' })
-			}
-
-			error = errorRequest
+		if (data) {
+			dispatch({ value: data, status: 'ready' })
 		}
 
 		if (error) {
@@ -131,8 +125,8 @@ class InseriCoreImpl {
 					state.mainStore[slice][key] = { contentType, status: 'initial', description }
 				})
 
-				if (slice === this.#webapi) {
-					this.#initWebapi(key)
+				if (slice === this.#webapi || slice === this.#media) {
+					this.#initSource(slice, key)
 				}
 			}
 		}, [])
