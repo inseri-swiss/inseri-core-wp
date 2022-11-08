@@ -3,7 +3,15 @@ import { IconCircleOff } from '@tabler/icons'
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Accordion, Alert, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Select, Tabs, Text, TextInput, Title } from '../components'
-import { BODY_TYPE_TO_CONTENT_TYPE, formatCode, getBodyTypeByContenType, getPropertyCaseInsensitive, mapObjectToParams, mapParamsToObject } from '../utils'
+import {
+	BODY_TYPE_TO_CONTENT_TYPE,
+	COMMON_CONTENT_TYPES,
+	formatCode,
+	getBodyTypeByContenType,
+	getPropertyCaseInsensitive,
+	mapObjectToParams,
+	mapParamsToObject,
+} from '../utils'
 import { addNewItem, Datasource, DatasourceWithoutId, handleTryRequest, getItem, updateNewItem } from '../ApiServer'
 import { PAGES } from './config'
 import { ParamItem, ParamsTable } from './ParamsTable'
@@ -120,6 +128,7 @@ export function DetailView(props: Props) {
 
 	const tryRequest = async () => {
 		setLoadingRequest(true)
+		setPageError('')
 
 		let body: any = null
 		if (requestBodyType === 'form-urlencoded') {
@@ -297,6 +306,11 @@ export function DetailView(props: Props) {
 	const title = isEdit ? __('Edit Web API', 'inseri-core') : __('Add New Web API', 'inseri-core')
 	const primaryBtnText = isEdit ? __('Save', 'inseri-core') : __('Create', 'inseri-core')
 
+	const foundContentType = COMMON_CONTENT_TYPES.find((c) => c.value === responseContentType)
+	const contentTypesSelection = foundContentType
+		? COMMON_CONTENT_TYPES
+		: [{ label: responseContentType ?? '', value: responseContentType ?? '' }, ...COMMON_CONTENT_TYPES]
+
 	return (
 		<>
 			<Box>
@@ -359,12 +373,15 @@ export function DetailView(props: Props) {
 						onChange={(e) => setDatasourceName(e.currentTarget.value)}
 						withAsterisk
 					/>
-					<TextInput
+
+					<Select
 						label={__('Content Type', 'inseri-core')}
 						placeholder={__('generate with Try Request', 'inseri-core')}
 						className={midSizeField}
+						searchable
+						data={contentTypesSelection}
 						value={responseContentType}
-						onChange={(e) => setResponseContentType(e.currentTarget.value)}
+						onChange={(val) => setResponseContentType(val!)}
 						withAsterisk
 					/>
 
