@@ -57,6 +57,29 @@ export const getPropertyCaseInsensitive = (object: any, key: string) => {
 	return object[index]
 }
 
+export const COMMON_CONTENT_TYPES = [
+	{ label: 'Text', value: 'text/plain' },
+	{ label: 'HTML', value: 'text/html' },
+	{ label: 'JSON', value: 'application/json' },
+	{ label: 'XML', value: 'application/xml' },
+	{ label: 'SVG', value: 'image/svg+xml' },
+	{ label: 'GIF', value: 'image/gif' },
+	{ label: 'JPEG', value: 'image/jpeg' },
+	{ label: 'PNG', value: 'image/png' },
+	{ label: 'TIFF', value: 'image/tiff' },
+	{ label: 'PDF', value: 'application/pdf' },
+	{ label: 'MP3', value: 'audio/mp3' },
+	{ label: 'MP4', value: 'video/mp4' },
+	{ label: 'MPEG', value: 'video/mpg' },
+	{ label: 'Zip', value: 'application/zip' },
+	{ label: 'TAR', value: 'application/x-tar' },
+	{ label: 'GZip', value: 'application/gzip' },
+	{ label: 'BZip', value: 'application/x-bzip' },
+	{ label: '7-Zip', value: 'application/x-7z-compressed' },
+	{ label: 'Form-urlencoded', value: 'application/x-www-form-urlencoded' },
+	{ label: 'Form-data', value: 'multipart/form-data' },
+]
+
 export const BODY_TYPE_TO_CONTENT_TYPE: Record<string, string> = {
 	text: 'text/plain',
 	json: 'application/json',
