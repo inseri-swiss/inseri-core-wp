@@ -129,7 +129,7 @@ class InseriCoreImpl {
 					this.#initSource(slice, key)
 				}
 			}
-		}, [])
+		}, [slice, key])
 
 		return this.#useInternalStore((state) => state.mainStore[slice]?.[key] ?? { contentType: '', status: 'initial', description: '' })
 	}
