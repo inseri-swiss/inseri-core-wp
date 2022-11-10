@@ -92,11 +92,11 @@ class InseriCoreImpl {
 		})
 	}
 
-	async #initSource(slice: string, id: string) {
+	async #initSource({ slice, key: id, contentType }: SourceDTO) {
 		const dispatch = this.createDispatch(slice, id)
 
 		dispatch({ status: 'loading' })
-		const [error, data] = slice === this.#media ? await callMediaFile(id) : await callWebApi(id)
+		const [error, data] = slice === this.#media ? await callMediaFile(id, contentType) : await callWebApi(id, contentType)
 
 		if (data) {
 			dispatch({ value: data, status: 'ready' })
@@ -107,7 +107,8 @@ class InseriCoreImpl {
 		}
 	}
 
-	useInseriStore({ slice, key, contentType, description }: SourceDTO): Field {
+	useInseriStore(source: SourceDTO): Field {
+		const { slice, key, contentType, description } = source
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		useEffect(() => {
 			const currentState = this.#useInternalStore.getState()
@@ -126,7 +127,7 @@ class InseriCoreImpl {
 				})
 
 				if (slice === this.#webapi || slice === this.#media) {
-					this.#initSource(slice, key)
+					this.#initSource(source)
 				}
 			}
 		}, [slice, key])
