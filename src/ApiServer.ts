@@ -23,11 +23,29 @@ export interface DatasourceWithoutId {
 	body?: string
 }
 
-export const callMediaFile = async (mediaId: string): Promise<[string?, Blob?]> => {
+const handleBody = async (blob: Blob, contentType: string) => {
+	let responseBody: any = blob
+
+	if (contentType.includes('application/json')) {
+		const textBlob = new Blob([responseBody])
+		responseBody = JSON.parse(await textBlob.text())
+	}
+
+	if (contentType.includes('text/') || contentType.includes('application/xml')) {
+		const textBlob = new Blob([responseBody])
+		responseBody = await textBlob.text()
+	}
+
+	return responseBody
+}
+
+export const callMediaFile = async (mediaId: string, responseContentType: string): Promise<[string?, Blob?]> => {
 	try {
 		const metaResponse = await axios.get<Media>(inseriApiSettings.root + MEDIA_ROUTE + mediaId)
 		const mediaResponse = await axios.get<Blob>(metaResponse.data.source_url, { responseType: 'blob' })
-		return [undefined, mediaResponse.data]
+		const responseBody = await handleBody(mediaResponse.data, responseContentType)
+
+		return [undefined, responseBody]
 	} catch (exception) {
 		if (exception instanceof axios.AxiosError) {
 			return [exception.message, undefined]
@@ -37,7 +55,7 @@ export const callMediaFile = async (mediaId: string): Promise<[string?, Blob?]> 
 	}
 }
 
-export const callWebApi = async (datasourceId: string) => {
+export const callWebApi = async (datasourceId: string, responseContentType: string) => {
 	try {
 		const datasource = await axios.get<Datasource>(inseriApiSettings.root + INSERI_ROUTE + datasourceId)
 		const { method, url, headers, query_params: queryParams, body } = datasource.data
@@ -68,18 +86,7 @@ export const callWebApi = async (datasourceId: string) => {
 			responseType: 'blob',
 		})
 
-		let responseBody = response.data
-		const responseContentType = getPropertyCaseInsensitive(response.headers, 'content-type')
-
-		if (responseContentType?.includes('application/json')) {
-			const textBlob = new Blob([responseBody])
-			responseBody = JSON.parse(await textBlob.text())
-		}
-
-		if (responseContentType?.includes('text/') || responseContentType?.includes('application/xml')) {
-			const textBlob = new Blob([responseBody])
-			responseBody = await textBlob.text()
-		}
+		const responseBody = await handleBody(response.data, responseContentType)
 
 		return [undefined, responseBody]
 	} catch (exception) {
