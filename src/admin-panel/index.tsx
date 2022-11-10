@@ -13,6 +13,10 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 			backgroundColor: '#fff',
 			borderRadius: '3px',
 		},
+		[`& > .${getRef('input')}:focus`]: {
+			boxShadow: 'none',
+			borderColor: theme.colors.blue[8],
+		},
 	},
 	buttonRoot: {
 		fontWeight: 'normal',

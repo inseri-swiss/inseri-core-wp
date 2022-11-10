@@ -1,8 +1,23 @@
 import { useDebouncedValue } from '@mantine/hooks'
-import { IconCircleOff } from '@tabler/icons'
+import { IconCircleOff, IconLock, IconLockOpen } from '@tabler/icons'
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Accordion, Alert, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Select, Tabs, Text, TextInput, Title } from '../components'
+import {
+	Accordion,
+	ActionIcon,
+	Alert,
+	Box,
+	Button,
+	CodeEditor,
+	createStyles,
+	Group,
+	SegmentedControl,
+	Select,
+	Tabs,
+	Text,
+	TextInput,
+	Title,
+} from '../components'
 import {
 	BODY_TYPE_TO_CONTENT_TYPE,
 	COMMON_CONTENT_TYPES,
@@ -60,6 +75,21 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 			},
 		},
 	},
+	ctInputWrapper: {
+		[`& > .${getRef('input')}`]: {
+			borderTopRightRadius: '0',
+			borderBottomRightRadius: '0',
+		},
+	},
+	lockWrapper: {
+		background: '#fff',
+		height: '36px',
+		border: '1px solid #8c8f94',
+		borderLeft: '0',
+		borderTopLeftRadius: '0',
+		borderBottomLeftRadius: '0',
+		color: '#868E96',
+	},
 }))
 
 interface EditProps {
@@ -92,7 +122,20 @@ const isBeautifyType = (bodyType: string) => ['xml', 'json'].some((i) => i === b
 const createParamItem = () => ({ isChecked: true, key: '', value: '' })
 
 export function DetailView(props: Props) {
-	const { primaryBtn, titleBar, whiteBox, accordionContent, accordionLabel, tab, alertRoot, midSizeField, idField, readonlyWrapper } = useStyles().classes
+	const {
+		primaryBtn,
+		titleBar,
+		whiteBox,
+		accordionContent,
+		accordionLabel,
+		tab,
+		alertRoot,
+		midSizeField,
+		idField,
+		readonlyWrapper,
+		ctInputWrapper,
+		lockWrapper,
+	} = useStyles().classes
 	const { mode } = props
 	const isEdit = mode === 'edit'
 
@@ -119,7 +162,9 @@ export function DetailView(props: Props) {
 	const [responseHeaders, setResponseHeaders] = useState<ParamItem[]>([createParamItem()])
 	const [responseBody, setResponseBody] = useState<any>('')
 	const [responseBodyType, setResponseBodyType] = useState<string>('')
+
 	const [responseContentType, setResponseContentType] = useState<string | undefined>(undefined)
+	const [isContentTypeLock, setContentTypeLock] = useState(false)
 
 	const [pageError, setPageError] = useState<string>('')
 	const [item, setItem] = useState<Datasource | null>(null)
@@ -179,7 +224,9 @@ export function DetailView(props: Props) {
 				preparedBody = formattedCode ?? preparedBody
 			}
 
-			setResponseContentType(contentType)
+			if (!isContentTypeLock) {
+				setResponseContentType(contentType)
+			}
 			setResponseBodyType(bodyType)
 			setResponseBody(preparedBody)
 		}
@@ -288,6 +335,7 @@ export function DetailView(props: Props) {
 
 					setRequestBodyType(bodyType)
 					setHeaderParams(headerParamItems)
+					setContentTypeLock(true)
 				}
 			})
 		}
@@ -307,9 +355,8 @@ export function DetailView(props: Props) {
 	const primaryBtnText = isEdit ? __('Save', 'inseri-core') : __('Create', 'inseri-core')
 
 	const foundContentType = COMMON_CONTENT_TYPES.find((c) => c.value === responseContentType)
-	const contentTypesSelection = foundContentType
-		? COMMON_CONTENT_TYPES
-		: [{ label: responseContentType ?? '', value: responseContentType ?? '' }, ...COMMON_CONTENT_TYPES]
+	const contentTypesSelection =
+		!foundContentType && responseContentType ? [{ label: responseContentType, value: responseContentType }, ...COMMON_CONTENT_TYPES] : COMMON_CONTENT_TYPES
 
 	return (
 		<>
@@ -374,16 +421,21 @@ export function DetailView(props: Props) {
 						withAsterisk
 					/>
 
-					<Select
-						label={__('Content Type', 'inseri-core')}
-						placeholder={__('generate with Try Request', 'inseri-core')}
-						className={midSizeField}
-						searchable
-						data={contentTypesSelection}
-						value={responseContentType}
-						onChange={(val) => setResponseContentType(val!)}
-						withAsterisk
-					/>
+					<Group spacing={0} align={'flex-end'}>
+						<Select
+							label={__('Content Type', 'inseri-core')}
+							placeholder={isContentTypeLock ? __('Pick one', 'inseri-core') : __('generate with Try Request', 'inseri-core')}
+							classNames={{ root: midSizeField, wrapper: ctInputWrapper }}
+							searchable
+							data={contentTypesSelection}
+							value={responseContentType}
+							onChange={(val) => setResponseContentType(val!)}
+							withAsterisk
+						/>
+						<ActionIcon onClick={() => setContentTypeLock(!isContentTypeLock)} className={lockWrapper}>
+							{isContentTypeLock ? <IconLock size={18} /> : <IconLockOpen size={18} />}
+						</ActionIcon>
+					</Group>
 
 					{isEdit && (
 						<TextInput
