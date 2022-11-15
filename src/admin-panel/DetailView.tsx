@@ -80,6 +80,9 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 			borderTopRightRadius: '0',
 			borderBottomRightRadius: '0',
 		},
+		[`& > .${getRef('input')}:read-only`]: {
+			cursor: 'not-allowed',
+		},
 	},
 	lockWrapper: {
 		background: '#fff',
@@ -424,11 +427,12 @@ export function DetailView(props: Props) {
 					<Group spacing={0} align={'flex-end'}>
 						<Select
 							label={__('Content Type', 'inseri-core')}
-							placeholder={isContentTypeLock ? __('Pick one', 'inseri-core') : __('generate with Try Request', 'inseri-core')}
+							placeholder={isContentTypeLock ? '' : __('generate with Try Request', 'inseri-core')}
 							classNames={{ root: midSizeField, wrapper: ctInputWrapper }}
 							searchable
 							data={contentTypesSelection}
 							value={responseContentType}
+							readOnly={isContentTypeLock}
 							onChange={(val) => setResponseContentType(val!)}
 							withAsterisk
 						/>
