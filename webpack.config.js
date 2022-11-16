@@ -40,4 +40,7 @@ module.exports = {
 		...defaultConfig.plugins,
 		tsChecker,
 	],
+	externals: [
+		{ '@inseri/lighthouse': 'window.inseri.lighthouse' },
+	],
 }

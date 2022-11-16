@@ -11,7 +11,11 @@
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"allowJs": true,
-		"allowSyntheticDefaultImports": true
+		"allowSyntheticDefaultImports": true,
+		"baseUrl": "./src",
+		"paths": {
+			"@inseri/lighthouse": ["./globalScript/lighthouse"]
+		}
 	},
 	"include": ["./src"],
 	"exclude": ["node_modules"]
