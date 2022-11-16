@@ -33,6 +33,7 @@ type SourceDTO = FieldWithKey & {
 
 interface StoreWrapper {
 	blockTypeByHandle: Record<string, string>
+	nameByHandle: Record<string, string>
 	//             slice          key
 	mainStore: Record<string, Record<string, Field>>
 	totalFields: number
@@ -46,6 +47,10 @@ class InseriCoreImpl {
 	constructor() {
 		let store: any = (_set: any) => ({
 			blockTypeByHandle: {},
+			nameByHandle: {
+				[this.#media]: this.#media,
+				[this.#webapi]: this.#webapi,
+			},
 			mainStore: {
 				[this.#media]: {},
 				[this.#webapi]: {},
@@ -153,7 +158,8 @@ class InseriCoreImpl {
 
 		// eslint-disable-next-line react-hooks/rules-of-hooks
 		return useMemo(() => {
-			const mainStore = this.#useInternalStore.getState().mainStore
+			const store = this.#useInternalStore.getState()
+			const mainStore = store.mainStore
 			return Object.entries(mainStore)
 				.filter(([handle, _]) => filterByCategory(handle))
 				.flatMap(([handle, slice]) => {
@@ -163,7 +169,12 @@ class InseriCoreImpl {
 						sources = sources.filter(([_, field]) => filterByContentType(field.contentType))
 					}
 
-					return sources.map(([key, { status, value, ...rest }]) => ({ ...rest, key, slice: handle }))
+					return sources.map(([key, { status, value, description, ...rest }]) => ({
+						...rest,
+						key,
+						slice: handle,
+						description: `${store.nameByHandle[handle]}: ${description}`,
+					}))
 				})
 		}, [totalFields, contentTypeFilter, category])
 	}
@@ -200,11 +211,19 @@ class InseriCoreImpl {
 	addBlock(blockName: string, fields: FieldWithKey[]): string {
 		const blockHandle = this.#generateToken()
 		this.#useInternalStore.setState((state) => {
+			const l = Object.values(state.blockTypeByHandle).filter((i) => i === blockName).length
 			state.blockTypeByHandle[blockHandle] = blockName
+			state.nameByHandle[blockHandle] = `${blockName}-${l + 1}`
 			this.#addFieldsCallback(blockHandle, fields, state)
 		})
 
 		return blockHandle
+	}
+
+	changeName(blockHandle: string, name: string) {
+		this.#useInternalStore.setState((state) => {
+			state.nameByHandle[blockHandle] = name
+		})
 	}
 
 	removeBlock(blockHandle: string) {

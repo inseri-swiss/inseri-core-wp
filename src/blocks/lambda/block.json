@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "inseri-core/block-js-lambda",
+	"version": "0.1.0",
+	"title": "JS Lambda",
+	"category": "widgets",
+	"description": "",
+	"icon": "editor-code",
+	"attributes": {
+		"source": {
+			"type": "object",
+			"default": {}
+		},
+		"code": {
+			"type": "string",
+			"default": ""
+		},
+		"handle": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"textdomain": "inseri-core",
+	"editorScript": "file:./index.js",
+	"style": "file:./index.css",
+	"editorStyle": ["file:./style-index.css"],
+	"viewScript": "file:./hydration.js",
+	"script": "inseri-core"
+}

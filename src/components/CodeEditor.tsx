@@ -4,6 +4,7 @@ import { createStyles } from '../components'
 
 // before a language can be highlighted, it must be imported as follows
 import 'prismjs/components/prism-json'
+import 'prismjs/components/prism-javascript'
 import 'prismjs/components/prism-xml-doc'
 import { escapeHtml } from '../utils'
 
@@ -43,7 +44,7 @@ export function CodeEditor({ value, onChange = () => {}, type, textareaId }: Pro
 	const processCode = (code: string) => {
 		let processedCode = code
 
-		if (type === 'json' || type === 'xml') {
+		if (type === 'json' || type === 'xml' || type === 'javascript') {
 			processedCode = highlight(code, languages[type], type)
 		}
 		if (type === 'text') {

@@ -1,0 +1,69 @@
+import { createStyles, MantineProvider } from './components'
+
+export const useStyles = createStyles((theme, _params, getRef) => ({
+	input: {
+		ref: getRef('input'),
+	},
+	inputWrapper: {
+		[`& > .${getRef('input')}`]: {
+			backgroundColor: '#fff',
+			borderRadius: '3px',
+		},
+		[`& > .${getRef('input')}:focus`]: {
+			boxShadow: 'none',
+			borderColor: theme.colors.blue[8],
+		},
+	},
+	buttonRoot: {
+		fontWeight: 'normal',
+		fontSize: '14px',
+	},
+	checkboxInner: {
+		[`& > input[type="checkbox"]`]: {
+			border: '1px solid' + theme.colors.gray[4],
+			margin: 0,
+			width: '20px',
+			height: '20px',
+			borderRadius: '3px',
+			verticalAlign: 'unset',
+		},
+
+		[`& > input[type="checkbox"]:checked::before`]: {
+			content: 'unset',
+		},
+
+		[`& > input[type="checkbox"]:focus`]: {
+			boxShadow: 'unset',
+		},
+	},
+}))
+
+export function Provider({ children }: any) {
+	const { classes } = useStyles()
+	const { inputWrapper, input, buttonRoot, checkboxInner } = classes
+
+	const themeOverride: any = {
+		defaultRadius: 3,
+		primaryShade: 8,
+		components: {
+			Select: {
+				classNames: { input, wrapper: inputWrapper },
+			},
+			TextInput: {
+				classNames: { input, wrapper: inputWrapper },
+			},
+			Button: {
+				classNames: { root: buttonRoot },
+			},
+			Checkbox: {
+				classNames: { inner: checkboxInner },
+			},
+		},
+	}
+
+	return (
+		<MantineProvider withNormalizeCSS withGlobalStyles theme={themeOverride}>
+			{children}
+		</MantineProvider>
+	)
+}
