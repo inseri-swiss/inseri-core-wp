@@ -18,7 +18,7 @@ export function Component({ attributes }: { attributes: any }) {
 	}, [val.status, val.value])
 	return (
 		<Provider>
-			<Stack style={{ padding: '8px', border: '2px solid ' + attributes.color }}>
+			<Stack style={{ border: '2px solid ' + attributes.color }}>
 				<Box p="md">
 					Plaintext
 					<CodeEditor type="text" value={content} />

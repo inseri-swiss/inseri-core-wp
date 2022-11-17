@@ -27,7 +27,7 @@ export default function Edit({ attributes, setAttributes, isSelected }: BlockEdi
 	}, [])
 
 	useEffect(() => {
-		const h = InseriCore.addBlock('dropdown', [{ description: 'selected', contentType: 'application/json', key: 'selected' }])
+		const h = InseriCore.addBlock('dropdown', [{ description: 'selected', contentType: 'application/json', key: 'selected' }], attributes.handle)
 		setAttributes({ handle: h })
 
 		return () => InseriCore.removeBlock(h)

@@ -163,6 +163,7 @@ class InseriCoreImpl {
 			const mainStore = store.mainStore
 			return Object.entries(mainStore)
 				.filter(([handle, _]) => filterByCategory(handle))
+				.filter(([handle, _]) => handle !== 'undefined')
 				.flatMap(([handle, slice]) => {
 					let sources = Object.entries(slice).filter(([_, field]) => field.status !== 'unavailable')
 					if (contentTypeFilter) {
@@ -174,7 +175,7 @@ class InseriCoreImpl {
 						...rest,
 						key,
 						slice: handle,
-						description: `${store.nameByHandle[handle]}: ${description}`,
+						description: store.nameByHandle[handle] ? `${store.nameByHandle[handle]}: ${description}` : description,
 					}))
 				})
 		}, [totalFields, contentTypeFilter, category])
@@ -182,11 +183,11 @@ class InseriCoreImpl {
 
 	createDispatch = (blockHandle: string, fieldKey: string) => (updateField: Partial<Omit<Field, 'isContentTypeDynamic'>>) => {
 		this.#useInternalStore.setState((state: any) => {
-			if (!state.mainStore[blockHandle]) {
+			if (blockHandle && !state.mainStore[blockHandle]) {
 				state.mainStore[blockHandle] = {}
 			}
 
-			if (!state.mainStore[blockHandle][fieldKey]) {
+			if (blockHandle && fieldKey && !state.mainStore[blockHandle][fieldKey]) {
 				state.mainStore[blockHandle][fieldKey] = { status: 'initial', contentType: '', description: '' }
 			}
 
@@ -217,8 +218,8 @@ class InseriCoreImpl {
 		state.totalFields -= fields.length
 	}
 
-	addBlock(blockName: string, fields: FieldWithKey[]): string {
-		const blockHandle = this.#generateToken()
+	addBlock(blockName: string, fields: FieldWithKey[], handle?: string): string {
+		const blockHandle = !handle ? this.#generateToken() : handle
 		this.#useInternalStore.setState((state) => {
 			const l = Object.values(state.blockTypeByHandle).filter((i) => i === blockName).length
 			state.blockTypeByHandle[blockHandle] = blockName
@@ -238,8 +239,10 @@ class InseriCoreImpl {
 	removeBlock(blockHandle: string) {
 		this.#useInternalStore.setState((state) => {
 			const slice = state.mainStore[blockHandle]
+			//if (slice) {
 			const fields = Object.keys(slice)
 			this.#removeFieldsCallback(blockHandle, fields, state)
+			//}
 		})
 	}
 

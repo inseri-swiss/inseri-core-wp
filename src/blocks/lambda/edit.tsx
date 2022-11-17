@@ -13,13 +13,14 @@ export default function Edit({ attributes, setAttributes, isSelected }: BlockEdi
 	const [result, setResult] = useState('')
 	const [code, setCode] = useState(
 		attributes.code ||
-			`(input) => {
+			`(input1, input2) => {
   //TODO
   return input
 }`
 	)
 
-	const val = InseriCore.useInseriStore(attributes.source)
+	const val1 = InseriCore.useInseriStore(attributes.source)
+	const val2 = InseriCore.useInseriStore(attributes.source2)
 
 	useEffect(() => {
 		if (!attributes.color) {
@@ -29,7 +30,7 @@ export default function Edit({ attributes, setAttributes, isSelected }: BlockEdi
 	}, [])
 
 	useEffect(() => {
-		const h = InseriCore.addBlock('js-lambda', [{ description: 'result', contentType: 'application/json', key: 'result' }])
+		const h = InseriCore.addBlock('js-lambda', [{ description: 'result', contentType: 'application/json', key: 'result' }], attributes.handle)
 		setAttributes({ handle: h })
 
 		return () => InseriCore.removeBlock(h)
@@ -39,10 +40,17 @@ export default function Edit({ attributes, setAttributes, isSelected }: BlockEdi
 
 	const run = () => {
 		const fun = eval(code)
-		if (val?.value && val.status === 'ready') {
-			const res = fun(val.value)
+		if (val1.value && val1.status === 'ready' && val2.value && val2.status === 'ready') {
+			const res = fun(val1.value, val2.value)
 			dispatch({ value: res, status: 'ready' })
 			setResult(JSON.stringify(res))
+		} else if (val1.value && val1.status === 'ready') {
+			const res = fun(val1.value)
+			dispatch({ value: res, status: 'ready' })
+			setResult(JSON.stringify(res))
+		} else if (!attributes.source && !attributes.source2) {
+			const res = fun(val1.value)
+			dispatch({ value: res, status: 'ready' })
 		}
 	}
 
@@ -51,10 +59,16 @@ export default function Edit({ attributes, setAttributes, isSelected }: BlockEdi
 			<Stack {...useBlockProps()} style={{ border: '2px solid ' + attributes.color }} spacing={0}>
 				<Transition transition="fade" mounted={isSelected}>
 					{(styles) => (
-						<Box style={{ ...styles }} px="md" pt="md">
-							Input
-							<Select data={selectOptions} value={attributes.source} onChange={(picked) => setAttributes({ source: picked })} />
-						</Box>
+						<>
+							<Box style={{ ...styles }} px="md" pt="md">
+								1. Input
+								<Select data={selectOptions} value={attributes.source} onChange={(picked) => setAttributes({ source: picked })} />
+							</Box>
+							<Box style={{ ...styles }} px="md" pt="md">
+								2. Input
+								<Select data={selectOptions} value={attributes.source2} onChange={(picked) => setAttributes({ source2: picked })} />
+							</Box>
+						</>
 					)}
 				</Transition>
 

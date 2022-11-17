@@ -15,7 +15,12 @@ export default function Edit({ attributes, setAttributes, isSelected }: BlockEdi
 
 	useEffect(() => {
 		if (status === 'ready' && value) {
-			setUrl(URL.createObjectURL(value))
+			if (typeof value === 'object') {
+				setUrl(URL.createObjectURL(value))
+			}
+			if (typeof value === 'string') {
+				setUrl(value)
+			}
 		}
 	}, [value, status])
 
