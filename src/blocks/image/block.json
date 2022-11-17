@@ -1,24 +1,16 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
-	"name": "inseri-core/block-dropdown",
+	"name": "inseri-core/block-image",
 	"version": "0.1.0",
-	"title": "Dropdown",
+	"title": "Image",
 	"category": "widgets",
 	"description": "",
-	"icon": "menu-alt2",
+	"icon": "format-image",
 	"attributes": {
 		"source": {
 			"type": "object",
 			"default": {}
-		},
-		"handle": {
-			"type": "string",
-			"default": ""
-		},
-		"color": {
-			"type": "string",
-			"default": ""
 		}
 	},
 	"supports": {

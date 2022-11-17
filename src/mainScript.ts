@@ -115,6 +115,7 @@ class InseriCoreImpl {
 	useInseriStore(source: SourceDTO): Field {
 		const { slice, key, contentType, description } = source
 		// eslint-disable-next-line react-hooks/rules-of-hooks
+
 		useEffect(() => {
 			const currentState = this.#useInternalStore.getState()
 			let initSlice = (_state: Draft<StoreWrapper>) => {}
@@ -125,16 +126,16 @@ class InseriCoreImpl {
 				}
 			}
 
-			if (!currentState.mainStore[slice]?.[key]) {
-				this.#useInternalStore.setState((state) => {
+			this.#useInternalStore.setState((state) => {
+				if (!state.mainStore[slice]?.[key]) {
 					initSlice(state)
 					state.mainStore[slice][key] = { contentType, status: 'initial', description }
-				})
+				}
 
-				if (slice === this.#webapi || slice === this.#media) {
+				if (state.mainStore[slice]?.[key]?.status === 'initial' && (slice === this.#webapi || slice === this.#media)) {
 					this.#initSource(source)
 				}
-			}
+			})
 		}, [slice, key])
 
 		return this.#useInternalStore((state) => state.mainStore[slice]?.[key] ?? { contentType: '', status: 'initial', description: '' })
