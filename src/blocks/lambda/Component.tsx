@@ -1,46 +1,27 @@
-import { useState } from '@wordpress/element'
-import { CodeEditor } from '../../components'
+import { useEffect } from '@wordpress/element'
+import { Provider } from '../../blockUtils'
+import { CodeEditor, Stack, Box } from '../../components'
 
 export function Component({ attributes }: { attributes: any }) {
-	const { contentType, description, value, status } = InseriCore.useInseriStore(attributes?.source)
-	const [url, setUrl] = useState('')
+	const { value, status } = InseriCore.useInseriStore(attributes?.source)
+	const dispatch = InseriCore.createDispatch(attributes.handle, 'result')
 
-	if (contentType.includes('image/') && !url && value) {
-		setUrl(URL.createObjectURL(value))
-	}
+	useEffect(() => {
+		const fun = eval(attributes.code)
+		if (value && status === 'ready') {
+			const res = fun(value)
+			dispatch({ value: res, status: 'ready' })
+		}
+	}, [status, value])
 
 	return (
-		<div>
-			<strong>{description}</strong>
-			<p>
-				Content Type: <strong>{contentType} </strong>
-			</p>
-			<p>
-				Current status: <strong>{status}</strong>
-			</p>
-
-			{contentType.includes('text/') ? (
-				<p>
-					Value <br />
-					<strong>{value}</strong>
-				</p>
-			) : contentType.includes('application/json') ? (
-				<div>
-					Value <br />
-					<CodeEditor type={'json'} value={value ? JSON.stringify(value) : ''} />
-				</div>
-			) : contentType.includes('image/') && url ? (
-				<div>
-					Value <br />
-					<img src={url} />
-				</div>
-			) : (
-				<div>
-					Value Size
-					<br />
-					<strong>{(value as Blob)?.size}</strong>
-				</div>
-			)}
-		</div>
+		<Provider>
+			<Stack style={{ padding: '8px', border: '2px solid ' + attributes.color }}>
+				<Box>
+					Transform
+					<CodeEditor type="javascript" value={attributes.code} />
+				</Box>
+			</Stack>
+		</Provider>
 	)
 }

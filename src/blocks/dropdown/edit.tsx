@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n'
 import { useBlockProps } from '@wordpress/block-editor'
 import { BlockEditProps } from '@wordpress/blocks'
 import './editor.scss'
-import { Stack, CodeEditor, Select, Box, Button, Transition } from '../../components'
+import { Stack, Select, Box, Transition } from '../../components'
 import { Provider } from '../../blockUtils'
 import { useEffect, useState } from '@wordpress/element'
 
@@ -10,16 +10,14 @@ export default function Edit({ attributes, setAttributes, isSelected }: BlockEdi
 	const sources = InseriCore.useAvailableSources('all')
 
 	const selectOptions = sources.map((a: any) => ({ label: a.description, value: a }))
-	const [result, setResult] = useState('')
-	const [code, setCode] = useState(
-		attributes.code ||
-			`(input) => {
-  //TODO
-  return input
-}`
-	)
-
+	const [dropdownOptions, setDropdownOptions] = useState([])
 	const val = InseriCore.useInseriStore(attributes.source)
+
+	useEffect(() => {
+		if (val.status === 'ready') {
+			setDropdownOptions(val.value)
+		}
+	}, [val.value, val.status])
 
 	useEffect(() => {
 		if (!attributes.color) {
@@ -29,20 +27,17 @@ export default function Edit({ attributes, setAttributes, isSelected }: BlockEdi
 	}, [])
 
 	useEffect(() => {
-		const h = InseriCore.addBlock('js-lambda', [{ description: 'result', contentType: 'application/json', key: 'result' }])
+		const h = InseriCore.addBlock('dropdown', [{ description: 'selected', contentType: 'application/json', key: 'selected' }])
 		setAttributes({ handle: h })
 
 		return () => InseriCore.removeBlock(h)
 	}, [])
 
-	const dispatch = InseriCore.createDispatch(attributes.handle, 'result')
+	const dispatch = InseriCore.createDispatch(attributes.handle, 'selected')
 
-	const run = () => {
-		const fun = eval(code)
-		if (val?.value && val.status === 'ready') {
-			const res = fun(val.value)
-			dispatch({ value: res, status: 'ready' })
-			setResult(JSON.stringify(res))
+	const onDropdownChange = (picked: string | null) => {
+		if (picked) {
+			dispatch({ value: picked, status: 'ready' })
 		}
 	}
 
@@ -51,7 +46,7 @@ export default function Edit({ attributes, setAttributes, isSelected }: BlockEdi
 			<Stack {...useBlockProps()} style={{ border: '2px solid ' + attributes.color }} spacing={0}>
 				<Transition transition="fade" mounted={isSelected}>
 					{(styles) => (
-						<Box style={{ ...styles }} px="md" pt="md">
+						<Box style={{ ...styles }} p="md">
 							Input
 							<Select data={selectOptions} value={attributes.source} onChange={(picked) => setAttributes({ source: picked })} />
 						</Box>
@@ -59,32 +54,9 @@ export default function Edit({ attributes, setAttributes, isSelected }: BlockEdi
 				</Transition>
 
 				<Box p="md">
-					Transform
-					<CodeEditor
-						type="javascript"
-						value={code}
-						onChange={(code) => {
-							setAttributes({ code })
-							setCode(code)
-						}}
-					/>
+					Choose one
+					<Select data={dropdownOptions} onChange={onDropdownChange} />
 				</Box>
-				<Transition transition="fade" mounted={isSelected}>
-					{(styles) => (
-						<Stack style={styles} px="md">
-							<Button onClick={run}>Run</Button>
-						</Stack>
-					)}
-				</Transition>
-
-				<Transition transition="fade" mounted={isSelected}>
-					{(styles) => (
-						<Box style={{ ...styles }} p="md">
-							Output
-							<CodeEditor type="json" value={result} />
-						</Box>
-					)}
-				</Transition>
 			</Stack>
 		</Provider>
 	)

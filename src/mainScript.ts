@@ -180,13 +180,21 @@ class InseriCoreImpl {
 	}
 
 	createDispatch = (blockHandle: string, fieldKey: string) => (updateField: Partial<Omit<Field, 'isContentTypeDynamic'>>) => {
-		this.#useInternalStore.setState((state: any) =>
+		this.#useInternalStore.setState((state: any) => {
+			if (!state.mainStore[blockHandle]) {
+				state.mainStore[blockHandle] = {}
+			}
+
+			if (!state.mainStore[blockHandle][fieldKey]) {
+				state.mainStore[blockHandle][fieldKey] = { status: 'initial', contentType: '', description: '' }
+			}
+
 			Object.entries(updateField)
 				.filter(([_, itemVal]) => !!itemVal)
 				.forEach(([itemKey, itemVal]) => {
 					state.mainStore[blockHandle][fieldKey][itemKey] = itemVal
 				})
-		)
+		})
 	}
 
 	#addFieldsCallback = (blockHandle: string, fields: FieldWithKey[], state: Draft<StoreWrapper>) => {
