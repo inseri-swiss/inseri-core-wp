@@ -21,7 +21,13 @@ const tsChecker = new ForkTsCheckerWebpackPlugin({
 })
 
 const initialEntrypoints = {
-	'inseri-core': './src/globalScript',
+	'inseri-core': {
+		import: './src/globalScript',
+		library: {
+			name: 'inseri',
+			type: 'window',
+		},
+	},
 	'admin-panel': './src/admin-panel',
 }
 
