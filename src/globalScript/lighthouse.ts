@@ -6,6 +6,11 @@ import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import { callMediaFile, callWebApi, getAllItems, getAllMedia } from '../ApiServer'
 
+declare global {
+	interface Window {
+		wp: { blockEditor: any }
+	}
+}
 interface Field {
 	contentType: string
 	isContentTypeDynamic?: boolean
