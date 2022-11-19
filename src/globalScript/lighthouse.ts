@@ -4,13 +4,8 @@ import { nanoid } from 'nanoid/non-secure'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-import { callMediaFile, callWebApi, getAllItems, getAllMedia } from '../ApiServer'
+import { callMediaFile, callWebApi } from '../ApiServer'
 
-declare global {
-	interface Window {
-		wp: { blockEditor: any }
-	}
-}
 interface Field {
 	contentType: string
 	isContentTypeDynamic?: boolean
@@ -54,36 +49,6 @@ if (process.env.NODE_ENV !== 'production') {
 
 const useInternalStore = create(immer<StoreWrapper>(store))
 
-if (window.wp.blockEditor) {
-	fetchMediaAndWebapiSources()
-}
-
-function fetchMediaAndWebapiSources() {
-	getAllMedia().then(([_, mediaData]) => {
-		if (mediaData) {
-			const mediaFields: FieldWithKey[] = mediaData.map((m) => ({
-				key: String(m.id),
-				contentType: m.mime_type,
-				description: m.title.rendered,
-			}))
-
-			useInternalStore.setState((state) => addFieldsCallback(MEDIA, mediaFields, state))
-		}
-	})
-
-	getAllItems().then(([_, webapiData]) => {
-		if (webapiData) {
-			const webapiFields: FieldWithKey[] = webapiData.map((m) => ({
-				key: String(m.id),
-				contentType: m.content_type,
-				description: m.description,
-			}))
-
-			useInternalStore.setState((state) => addFieldsCallback(WEBAPI, webapiFields, state))
-		}
-	})
-}
-
 async function initSource({ slice, key: id, contentType }: SourceDTO) {
 	const dispatch = createDispatch(slice, id)
 
@@ -103,60 +68,38 @@ function useInseriStore(source: SourceDTO): Field {
 	const { slice, key, contentType, description } = source
 
 	useEffect(() => {
-		const currentState = useInternalStore.getState()
-		let initSlice = (_state: Draft<StoreWrapper>) => {}
-
-		if (!currentState.mainStore[slice]) {
-			initSlice = (state) => {
+		useInternalStore.setState((state) => {
+			if (!state.mainStore[slice]) {
 				state.mainStore[slice] = {}
 			}
-		}
-
-		if (!currentState.mainStore[slice]?.[key]) {
-			useInternalStore.setState((state) => {
-				initSlice(state)
+			if (!state.mainStore[slice]?.[key]) {
 				state.mainStore[slice][key] = { contentType, status: 'initial', description }
-			})
-
-			if (slice === WEBAPI || slice === MEDIA) {
-				initSource(source)
 			}
+		})
+
+		if (slice === WEBAPI || slice === MEDIA) {
+			initSource(source)
 		}
 	}, [slice, key])
 
 	return useInternalStore((state) => state.mainStore[slice]?.[key] ?? { contentType: '', status: 'initial', description: '' })
 }
 
-function useAvailableSources(category: 'all' | 'media' | 'webapi' | 'block', contentTypeFilter?: string | ((contentType: string) => boolean)) {
+function useAvailableSources(contentTypeFilter?: string | ((contentType: string) => boolean)) {
 	const totalFields = useInternalStore((state) => state.totalFields)
-
-	const filterByCategory = (handle: string) => {
-		switch (category) {
-			case 'media':
-				return handle === MEDIA
-			case 'webapi':
-				return handle === WEBAPI
-			case 'block':
-				return handle !== MEDIA && handle !== WEBAPI
-			default:
-				return true
-		}
-	}
 
 	return useMemo(() => {
 		const mainStore = useInternalStore.getState().mainStore
-		return Object.entries(mainStore)
-			.filter(([handle, _]) => filterByCategory(handle))
-			.flatMap(([handle, slice]) => {
-				let sources = Object.entries(slice).filter(([_, field]) => field.status !== 'unavailable')
-				if (contentTypeFilter) {
-					const filterByContentType = typeof contentTypeFilter === 'string' ? (ct: string) => ct.includes(contentTypeFilter) : contentTypeFilter
-					sources = sources.filter(([_, field]) => filterByContentType(field.contentType))
-				}
+		return Object.entries(mainStore).flatMap(([handle, slice]) => {
+			let sources = Object.entries(slice).filter(([_, field]) => field.status !== 'unavailable')
+			if (contentTypeFilter) {
+				const filterByContentType = typeof contentTypeFilter === 'string' ? (ct: string) => ct.includes(contentTypeFilter) : contentTypeFilter
+				sources = sources.filter(([_, field]) => filterByContentType(field.contentType))
+			}
 
-				return sources.map(([key, { status, value, ...rest }]) => ({ ...rest, key, slice: handle }))
-			})
-	}, [totalFields, contentTypeFilter, category])
+			return sources.map(([key, { status, value, ...rest }]) => ({ ...rest, key, slice: handle }))
+		})
+	}, [totalFields, contentTypeFilter])
 }
 
 const createDispatch = (blockHandle: string, fieldKey: string) => (updateField: Partial<Omit<Field, 'isContentTypeDynamic'>>) => {
@@ -188,8 +131,8 @@ function removeFieldsCallback(blockHandle: string, fields: string[], state: Draf
 	state.totalFields -= fields.length
 }
 
-function addBlock(blockName: string, fields: FieldWithKey[]): string {
-	const blockHandle = generateToken()
+function addBlock(blockName: string, handle: string, fields: FieldWithKey[]): string {
+	const blockHandle = handle ?? generateToken()
 	useInternalStore.setState((state) => {
 		state.blockTypeByHandle[blockHandle] = blockName
 		addFieldsCallback(blockHandle, fields, state)
