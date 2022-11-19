@@ -1,10 +1,10 @@
 import { useEffect, useMemo } from '@wordpress/element'
 import type { Draft } from 'immer'
+import { setAutoFreeze } from 'immer'
 import { nanoid } from 'nanoid/non-secure'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
-import { callMediaFile, callWebApi } from '../ApiServer'
 
 interface Field {
 	contentType: string
@@ -18,98 +18,86 @@ type FieldWithKey = Omit<Field, 'status' | 'value' | 'error'> & {
 	key: string
 }
 
-type SourceDTO = FieldWithKey & {
+interface SourceDTO extends FieldWithKey {
 	slice: string
+	instanceName: string
+}
+
+interface Meta {
+	blockType: string
+	instanceName: string
 }
 
 interface StoreWrapper {
-	blockTypeByHandle: Record<string, string>
 	//             slice          key
 	mainStore: Record<string, Record<string, Field>>
+	metaByHandle: Record<string, Meta>
 	totalFields: number
 }
 
 const generateToken = () => nanoid()
 
-const MEDIA = 'media'
-const WEBAPI = 'webapi'
-
 let store: any = (_set: any) => ({
-	blockTypeByHandle: {},
-	mainStore: {
-		[MEDIA]: {},
-		[WEBAPI]: {},
-	},
+	mainStore: {},
+	metaByHandle: {},
 	totalFields: 0,
 })
 
 if (process.env.NODE_ENV !== 'production') {
 	store = devtools(store, { name: 'inseri-store' })
+	setAutoFreeze(true)
+} else {
+	setAutoFreeze(false)
 }
 
 const useInternalStore = create(immer<StoreWrapper>(store))
 
-async function initSource({ slice, key: id, contentType }: SourceDTO) {
-	const dispatch = createDispatch(slice, id)
-
-	dispatch({ status: 'loading' })
-	const [error, data] = slice === MEDIA ? await callMediaFile(id, contentType) : await callWebApi(id, contentType)
-
-	if (data) {
-		dispatch({ value: data, status: 'ready' })
-	}
-
-	if (error) {
-		dispatch({ error, status: 'error' })
-	}
-}
-
 function useInseriStore(source: SourceDTO): Field {
 	const { slice, key, contentType, description } = source
-
-	useEffect(() => {
-		useInternalStore.setState((state) => {
-			if (!state.mainStore[slice]) {
-				state.mainStore[slice] = {}
-			}
-			if (!state.mainStore[slice]?.[key]) {
-				state.mainStore[slice][key] = { contentType, status: 'initial', description }
-			}
-		})
-
-		if (slice === WEBAPI || slice === MEDIA) {
-			initSource(source)
-		}
-	}, [slice, key])
-
-	return useInternalStore((state) => state.mainStore[slice]?.[key] ?? { contentType: '', status: 'initial', description: '' })
+	return useInternalStore((state) => state.mainStore[slice]?.[key] ?? { contentType, status: 'initial', description })
 }
 
-function useAvailableSources(contentTypeFilter?: string | ((contentType: string) => boolean)) {
+function useAvailableSources(contentTypeFilter?: string | ((contentType: string) => boolean)): Record<string, SourceDTO> {
 	const totalFields = useInternalStore((state) => state.totalFields)
 
 	return useMemo(() => {
-		const mainStore = useInternalStore.getState().mainStore
-		return Object.entries(mainStore).flatMap(([handle, slice]) => {
-			let sources = Object.entries(slice).filter(([_, field]) => field.status !== 'unavailable')
-			if (contentTypeFilter) {
-				const filterByContentType = typeof contentTypeFilter === 'string' ? (ct: string) => ct.includes(contentTypeFilter) : contentTypeFilter
-				sources = sources.filter(([_, field]) => filterByContentType(field.contentType))
-			}
+		const { mainStore, metaByHandle } = useInternalStore.getState()
+		return Object.entries(mainStore)
+			.flatMap(([handle, slice]) => {
+				let sources = Object.entries(slice).filter(([_, field]) => field.status !== 'unavailable')
+				if (contentTypeFilter) {
+					const filterByContentType = typeof contentTypeFilter === 'string' ? (ct: string) => ct.includes(contentTypeFilter) : contentTypeFilter
+					sources = sources.filter(([_, field]) => filterByContentType(field.contentType))
+				}
 
-			return sources.map(([key, { status, value, ...rest }]) => ({ ...rest, key, slice: handle }))
-		})
+				const { instanceName } = metaByHandle[handle]
+				return sources.map(([key, { status, value, ...rest }]) => ({ ...rest, key, slice: handle, instanceName }))
+			})
+			.reduce((accumulator, source) => ({ ...accumulator, [`${source.slice}-${source.key}`]: source }), {})
 	}, [totalFields, contentTypeFilter])
 }
 
-const createDispatch = (blockHandle: string, fieldKey: string) => (updateField: Partial<Omit<Field, 'isContentTypeDynamic'>>) => {
-	useInternalStore.setState((state: any) =>
-		Object.entries(updateField)
-			.filter(([_, itemVal]) => !!itemVal)
-			.forEach(([itemKey, itemVal]) => {
-				state.mainStore[blockHandle][fieldKey][itemKey] = itemVal
-			})
-	)
+function createDispatch(blockHandle: string, fieldKey: string) {
+	useEffect(() => {
+		useInternalStore.setState((state) => {
+			if (!state.mainStore[blockHandle]) {
+				state.mainStore[blockHandle] = {}
+			}
+			if (!state.mainStore[blockHandle]?.[fieldKey]) {
+				state.mainStore[blockHandle][fieldKey] = { contentType: '', status: 'initial', description: '' }
+			}
+		})
+	}, [blockHandle, fieldKey])
+
+	return (updateField: Partial<Omit<Field, 'isContentTypeDynamic'>>) => {
+		useInternalStore.setState((state: any) =>
+			Object.entries(updateField)
+				.filter(([_, itemVal]) => !!itemVal)
+				.forEach(([itemKey, itemVal]) => {
+					state.mainStore[blockHandle][fieldKey][itemKey] = itemVal
+				})
+		)
+	}
 }
 
 function addFieldsCallback(blockHandle: string, fields: FieldWithKey[], state: Draft<StoreWrapper>) {
@@ -132,9 +120,12 @@ function removeFieldsCallback(blockHandle: string, fields: string[], state: Draf
 }
 
 function addBlock(blockName: string, handle: string, fields: FieldWithKey[]): string {
-	const blockHandle = handle ?? generateToken()
+	const blockHandle = handle ? handle : generateToken()
 	useInternalStore.setState((state) => {
-		state.blockTypeByHandle[blockHandle] = blockName
+		state.metaByHandle[blockHandle] = {
+			blockType: blockName,
+			instanceName: blockName,
+		}
 		addFieldsCallback(blockHandle, fields, state)
 	})
 
@@ -157,10 +148,19 @@ function removeField(blockHandle: string, key: string) {
 	useInternalStore.setState((state) => removeFieldsCallback(blockHandle, [key], state))
 }
 
+function setInstanceName(blockHandle: string, instanceName: string) {
+	useInternalStore.setState((state) => {
+		if (state.metaByHandle[blockHandle]) {
+			state.metaByHandle[blockHandle].instanceName = instanceName
+		}
+	})
+}
+
 export default {
 	useAvailableSources,
 	useInseriStore,
 	createDispatch,
+	setInstanceName,
 	addBlock,
 	addField,
 	removeBlock,
