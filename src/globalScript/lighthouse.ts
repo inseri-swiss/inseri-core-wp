@@ -63,38 +63,15 @@ const useInternalStore = create(immer<StoreWrapper>(store))
 
 const compoundKey = (blockId: string, key: string) => `${blockId}/${key}`
 
-const createBeacon =
-	(blockId: string) =>
-	(config: InitBeaconConfig): ProducerBeacon => {
-		return useMemo(() => {
-			const { key, ...rest } = config
-			useInternalStore.setState((state) => {
-				state.beacons[compoundKey(blockId, key)] = { ...rest, status: 'initial', value: rest.default }
-			})
-
-			return { key: compoundKey(blockId, key), default: rest.default, contentType: rest.contentType }
-		}, [])
-	}
-
-const revokeBeacon =
-	(_blockId: string) =>
-	({ key }: ProducerBeacon) => {
-		useInternalStore.setState((state) => {
-			if (state.beacons[key]) {
-				state.beacons[key].status = 'unavailable'
-			}
-		})
-	}
-
-function useLighthouse(config: InitBlockConfig): [(config: InitBeaconConfig) => ProducerBeacon, (config: ProducerBeacon) => void] {
-	const { blockId, ...rest } = config
+function useLighthouse(blockConfig: InitBlockConfig, beaconConfigs: InitBeaconConfig[]) {
+	const { blockId, ...blockRest } = blockConfig
 
 	useEffect(() => {
 		// do clean up on unmount
 		return () => {
 			useInternalStore.setState((state) => {
 				Object.entries(state.beacons)
-					.filter(([compoundKey, _]) => compoundKey.startsWith(blockId + '/'))
+					.filter(([key, _]) => key.startsWith(blockId + '/'))
 					.forEach(([_, beacon]) => {
 						beacon.status = 'unavailable'
 					})
@@ -104,14 +81,42 @@ function useLighthouse(config: InitBlockConfig): [(config: InitBeaconConfig) => 
 
 	useEffect(() => {
 		useInternalStore.setState((state) => {
-			state.blocks[blockId] = rest
+			state.blocks[blockId] = blockRest
 		})
-	}, [rest.instanceName])
+	}, [blockRest.instanceName])
 
-	return [createBeacon(blockId), revokeBeacon(blockId)]
+	const joinedKeys = beaconConfigs.reduce((acc, c) => acc + c.key, '')
+
+	return useMemo(() => {
+		const beacons = useInternalStore.getState().beacons
+		const existingKeys = Object.entries(beacons)
+			.filter(([key, _]) => key.startsWith(blockId + '/'))
+			.filter(([_, val]) => val.status !== 'unavailable')
+			.map(([key, _]) => key)
+
+		const incomingKeys = beaconConfigs.map((config) => compoundKey(blockId, config.key))
+		const missingKeys = existingKeys.filter((key) => !incomingKeys.includes(key))
+		const newBeaconConfigs = beaconConfigs.filter((config) => !existingKeys.includes(compoundKey(blockId, config.key)))
+
+		useInternalStore.setState((state) => {
+			missingKeys.forEach((k) => {
+				state.beacons[k].status = 'unavailable'
+			})
+		})
+
+		useInternalStore.setState((state) => {
+			newBeaconConfigs.forEach(({ key, ...rest }) => {
+				state.beacons[compoundKey(blockId, key)] = { ...rest, status: 'initial', value: rest.default }
+			})
+		})
+
+		return beaconConfigs.map((config) => {
+			return { key: compoundKey(blockId, config.key), default: config.default, contentType: config.contentType }
+		})
+	}, [joinedKeys])
 }
 
-function createDispatch(config: ProducerBeacon) {
+function useDispatch(config: ProducerBeacon) {
 	const { key, contentType } = config
 	useEffect(() => {
 		useInternalStore.setState((state) => {
@@ -153,7 +158,7 @@ function useAvailableBeacons(contentTypeFilter?: string | ((contentType: string)
 				const instanceName = blocks[blockId]?.instanceName ?? ''
 				beacon.description = `${instanceName}: ${beacon.description}`
 
-				beacon['key'] = key
+				beacon.key = key
 				delete beacon.error
 				delete beacon.value
 				delete beacon.status
@@ -164,18 +169,18 @@ function useAvailableBeacons(contentTypeFilter?: string | ((contentType: string)
 
 function useBeacon(config?: ConsumerBeacon): BaseBeaconState {
 	const { key, contentType, default: defaultVal } = config ?? { key: '', contentType: '' }
-	const state = useInternalStore((state) => state.beacons[key])
+	const beaconState = useInternalStore((state) => state.beacons[key])
 
-	if (!state) {
+	if (!beaconState) {
 		return { contentType, value: defaultVal, status: 'initial' }
 	}
 
-	return state
+	return beaconState
 }
 
 export default {
 	useLighthouse,
-	createDispatch,
+	useDispatch,
 	useAvailableBeacons,
 	useBeacon,
 } as const
