@@ -39,7 +39,7 @@ interface BlockConfig {
 }
 
 interface InitBlockConfig extends BlockConfig {
-	blockId: string
+	blockId?: string
 }
 
 interface StoreWrapper {
@@ -77,17 +77,25 @@ function useControlTower(blockConfig: InitBlockConfig, beaconConfigs: InitBeacon
 					})
 			})
 		}
-	}, [])
+	}, [blockId])
 
 	useEffect(() => {
+		if (!blockId) {
+			return
+		}
+
 		useInternalStore.setState((state) => {
 			state.blocks[blockId] = blockRest
 		})
-	}, [blockRest.instanceName])
+	}, [blockRest.instanceName, blockId])
 
 	const joinedKeys = beaconConfigs.reduce((acc, c) => acc + c.key, '')
 
 	return useMemo(() => {
+		if (!blockId) {
+			return []
+		}
+
 		const beacons = useInternalStore.getState().beacons
 		const existingKeys = Object.entries(beacons)
 			.filter(([key, _]) => key.startsWith(blockId + '/'))
@@ -113,27 +121,29 @@ function useControlTower(blockConfig: InitBlockConfig, beaconConfigs: InitBeacon
 		return beaconConfigs.map((config) => {
 			return { key: compoundKey(blockId, config.key), default: config.default, contentType: config.contentType }
 		})
-	}, [joinedKeys])
+	}, [joinedKeys, blockId])
 }
 
-function useDispatch(config: ProducerBeacon) {
-	const { key, contentType } = config
+function useDispatch(config?: ProducerBeacon) {
 	useEffect(() => {
 		useInternalStore.setState((state) => {
-			if (!state.beacons[key]) {
+			if (config && !state.beacons[config.key]) {
+				const { key, contentType } = config
 				state.beacons[key] = { default: config.default, contentType, value: config.default, status: 'initial' }
 			}
 		})
-	}, [key])
+	}, [config?.key])
 
 	return (update: Partial<BaseBeaconState>) => {
-		useInternalStore.setState((state) =>
-			Object.entries(update)
-				.filter(([_, itemVal]) => !!itemVal)
-				.forEach(([itemKey, itemVal]) => {
-					state.beacons[key][itemKey as keyof BaseBeaconState] = itemVal
-				})
-		)
+		if (config) {
+			useInternalStore.setState((state) => {
+				Object.entries(update)
+					.filter(([_, itemVal]) => !!itemVal)
+					.forEach(([itemKey, itemVal]) => {
+						state.beacons[config.key][itemKey as keyof BaseBeaconState] = itemVal
+					})
+			})
+		}
 	}
 }
 
