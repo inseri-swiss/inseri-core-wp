@@ -63,7 +63,7 @@ const useInternalStore = create(immer<StoreWrapper>(store))
 
 const compoundKey = (blockId: string, key: string) => `${blockId}/${key}`
 
-function useLighthouse(blockConfig: InitBlockConfig, beaconConfigs: InitBeaconConfig[]) {
+function useControlTower(blockConfig: InitBlockConfig, beaconConfigs: InitBeaconConfig[]) {
 	const { blockId, ...blockRest } = blockConfig
 
 	useEffect(() => {
@@ -167,7 +167,7 @@ function useAvailableBeacons(contentTypeFilter?: string | ((contentType: string)
 	}) as any
 }
 
-function useBeacon(config?: ConsumerBeacon): BaseBeaconState {
+function useWatch(config?: ConsumerBeacon): BaseBeaconState {
 	const { key, contentType, default: defaultVal } = config ?? { key: '', contentType: '' }
 	const beaconState = useInternalStore((state) => state.beacons[key])
 
@@ -178,9 +178,4 @@ function useBeacon(config?: ConsumerBeacon): BaseBeaconState {
 	return beaconState
 }
 
-export default {
-	useLighthouse,
-	useDispatch,
-	useAvailableBeacons,
-	useBeacon,
-} as const
+export { useControlTower, useDispatch, useAvailableBeacons, useWatch }

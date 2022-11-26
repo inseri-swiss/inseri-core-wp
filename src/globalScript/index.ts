@@ -1,3 +1,4 @@
-import lighthouse from './lighthouse'
+import * as lighthouse from './lighthouse'
+import * as utils from './utils'
 
-export { lighthouse }
+export { lighthouse, utils }
