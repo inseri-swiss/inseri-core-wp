@@ -1,6 +1,7 @@
 {
 	"extends": ["plugin:@wordpress/eslint-plugin/recommended"],
 	"rules": {
-		"no-nested-ternary": "off"
+		"no-nested-ternary": "off",
+		"import/no-unresolved": [2, { "ignore": ["^@inseri/"] }]
 	}
 }

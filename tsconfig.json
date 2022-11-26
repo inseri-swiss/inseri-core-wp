@@ -14,7 +14,8 @@
 		"allowSyntheticDefaultImports": true,
 		"baseUrl": "./src",
 		"paths": {
-			"@inseri/lighthouse": ["./globalScript/lighthouse"]
+			"@inseri/lighthouse": ["./globalScript/lighthouse"],
+			"@inseri/utils": ["./globalScript/utils"]
 		}
 	},
 	"include": ["./src"],

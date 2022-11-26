@@ -35,6 +35,7 @@ const blockEntrypoints = fs.readdirSync('./src/blocks').reduce(
 	(accumulator, item) => ({
 		...accumulator,
 		[`blocks/${item}/index`]: `./src/blocks/${item}`,
+		[`blocks/${item}/hydration`]: `./src/blocks/${item}/hydration`,
 	}),
 	initialEntrypoints
 )
@@ -48,5 +49,6 @@ module.exports = {
 	],
 	externals: [
 		{ '@inseri/lighthouse': 'window.inseri.lighthouse' },
+		{ '@inseri/utils': 'window.inseri.utils' },
 	],
 }
