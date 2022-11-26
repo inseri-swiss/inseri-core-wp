@@ -4,26 +4,46 @@ import { Button, Select, TextInput } from '../../components'
 import { useEffect, useState } from '@wordpress/element'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { useAvailableBeacons, useDispatch, useControlTower, useWatch } from '@inseri/lighthouse'
+import { initJsonValidator, generateId } from '@inseri/utils'
 
-export default function Edit({ setAttributes, clientId }: BlockEditProps<{ handle: string; input: any; output: any }>) {
+const schema = {
+	type: 'object',
+	properties: {
+		foo: { type: 'number' },
+	},
+	required: ['foo'],
+	additionalProperties: true,
+}
+
+interface Foo {
+	foo: number
+}
+
+const jsonValidator = initJsonValidator<Foo>(schema)
+
+export default function Edit({ attributes, setAttributes }: BlockEditProps<{ handle: string; input: any; output: any }>) {
 	const [name, setName] = useState('')
 	const [beaconKey, setBeaconKey] = useState('')
 
 	const [isToggled, toggle] = useState(true)
 	const [myBeacons, setMyBeacons] = useState([{ contentType: 'json', description: 'foo', key: 'foo' }])
 
-	const producersBeacons = useControlTower({ blockId: clientId, blockType: 'inseri/core', instanceName: name }, myBeacons)
+	const producersBeacons = useControlTower({ blockId: attributes.handle, blockType: 'inseri/core', instanceName: name }, myBeacons)
 
 	const fooBeacon = producersBeacons[0]
 	const fooDispatch = useDispatch(fooBeacon)
 
 	useEffect(() => {
-		setAttributes({ handle: clientId })
+		if (!attributes.handle) {
+			setAttributes({ handle: generateId() })
+		}
 	}, [])
 
 	useEffect(() => {
-		setAttributes({ output: fooBeacon })
-	}, [fooBeacon.key])
+		if (fooBeacon?.key !== attributes.output.key) {
+			setAttributes({ output: fooBeacon })
+		}
+	}, [fooBeacon?.key])
 
 	const availableBeacons = useAvailableBeacons()
 
@@ -36,10 +56,18 @@ export default function Edit({ setAttributes, clientId }: BlockEditProps<{ handl
 	const selectData = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
 	const receivingValue = useWatch(availableBeacons?.[beaconKey])
 
+	useEffect(() => {
+		if (jsonValidator(receivingValue.value)) {
+			console.log(receivingValue.value) // eslint-disable-line
+		} else {
+			console.log(jsonValidator.errors) // eslint-disable-line
+		}
+	}, [receivingValue.value])
+
 	return (
 		<div {...useBlockProps()}>
 			<TextInput value={name} placeholder="Instance Name" onChange={(e) => setName(e.currentTarget.value)} />
-			<Button onClick={() => fooDispatch({ value: Math.random() })}>Set new value</Button>
+			<Button onClick={() => fooDispatch({ value: { foo: Math.random(), bar: 'meow' } })}>Set new value</Button>
 			<br />
 			<Button
 				onClick={() => {
@@ -54,7 +82,7 @@ export default function Edit({ setAttributes, clientId }: BlockEditProps<{ handl
 				{isToggled ? 'Add' : 'Remove'} beacon
 			</Button>
 			<Select data={selectData} onChange={(k) => setBeaconKey(k!)} />
-			<span>Value: {receivingValue.value}</span>
+			<span>Value: {receivingValue.value?.foo}</span>
 		</div>
 	)
 }
