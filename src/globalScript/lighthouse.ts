@@ -4,6 +4,8 @@ import type { Draft } from 'immer'
 import create from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
+import { Schema } from 'ajv'
+import { initJsonValidator } from './utils'
 
 interface BeaconState extends BaseBeaconState {
 	description?: string
@@ -177,6 +179,33 @@ function useAvailableBeacons(contentTypeFilter?: string | ((contentType: string)
 	}) as any
 }
 
+function useJsonBeacons(schema: Schema) {
+	const blocks = useInternalStore((state) => state.blocks)
+	const beacons = useInternalStore((state) => state.beacons)
+
+	const jsonValidator = useMemo(() => initJsonValidator(schema), [schema])
+
+	return produce(beacons, (dictDraft: Draft<Record<string, BeaconState & ConsumerBeacon>>) => {
+		Object.keys(beacons).forEach((key) => {
+			const beacon: any = dictDraft[key]
+			const isValid = jsonValidator(beacon.value)
+
+			if (beacon.status === 'unavailable' || !isValid) {
+				delete dictDraft[key]
+			} else {
+				const blockId = key.split('/')[0]
+				const instanceName = blocks[blockId]?.instanceName ?? ''
+				beacon.description = `${instanceName}: ${beacon.description}`
+
+				beacon.key = key
+				delete beacon.error
+				delete beacon.value
+				delete beacon.status
+			}
+		})
+	}) as any
+}
+
 function useWatch(config?: ConsumerBeacon): BaseBeaconState {
 	const { key, contentType, default: defaultVal } = config ?? { key: '', contentType: '' }
 	const beaconState = useInternalStore((state) => state.beacons[key])
@@ -188,4 +217,4 @@ function useWatch(config?: ConsumerBeacon): BaseBeaconState {
 	return beaconState
 }
 
-export { useControlTower, useDispatch, useAvailableBeacons, useWatch }
+export { useControlTower, useDispatch, useAvailableBeacons, useJsonBeacons, useWatch }
