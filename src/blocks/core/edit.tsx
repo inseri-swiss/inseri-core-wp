@@ -3,7 +3,7 @@ import './editor.scss'
 import { Button, Select, TextInput } from '../../components'
 import { useEffect, useState } from '@wordpress/element'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { useAvailableBeacons, useDispatch, useControlTower, useWatch } from '@inseri/lighthouse'
+import { useJsonBeacons, useDispatch, useControlTower, useWatch } from '@inseri/lighthouse'
 import { initJsonValidator, generateId } from '@inseri/utils'
 
 const schema = {
@@ -26,7 +26,7 @@ export default function Edit({ attributes, setAttributes }: BlockEditProps<{ han
 	const [beaconKey, setBeaconKey] = useState('')
 
 	const [isToggled, toggle] = useState(true)
-	const [myBeacons, setMyBeacons] = useState([{ contentType: 'json', description: 'foo', key: 'foo' }])
+	const [myBeacons, setMyBeacons] = useState<any[]>([{ contentType: 'json', description: 'foo', key: 'foo' }])
 
 	const producersBeacons = useControlTower({ blockId: attributes.handle, blockType: 'inseri/core', instanceName: name }, myBeacons)
 
@@ -45,7 +45,7 @@ export default function Edit({ attributes, setAttributes }: BlockEditProps<{ han
 		}
 	}, [fooBeacon?.key])
 
-	const availableBeacons = useAvailableBeacons()
+	const availableBeacons = useJsonBeacons(schema) //useAvailableBeacons()
 
 	useEffect(() => {
 		if (beaconKey) {
@@ -73,7 +73,7 @@ export default function Edit({ attributes, setAttributes }: BlockEditProps<{ han
 				onClick={() => {
 					toggle(!isToggled)
 					if (isToggled) {
-						setMyBeacons([...myBeacons, { contentType: 'text', description: 'bar bar bar', key: 'fooBar' }])
+						setMyBeacons([...myBeacons, { contentType: 'text', description: 'bar bar bar', key: 'fooBar', default: { foo: 33 } }])
 					} else {
 						setMyBeacons(myBeacons.filter((b) => b.key !== 'fooBar'))
 					}
