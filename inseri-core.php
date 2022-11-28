@@ -59,6 +59,20 @@ add_action('init', function () {
 /**
  * Blocks
  */
+add_filter('block_categories_all', 'inseri_core_add_block_category');
+
+function inseri_core_add_block_category($block_categories) {
+	return array_merge(
+		[
+			[
+				'slug' => 'inseri',
+				'title' => 'inseri',
+			],
+		],
+		$block_categories
+	);
+}
+
 add_action('init', 'inseri_core_block_init');
 
 function inseri_core_block_init() {
