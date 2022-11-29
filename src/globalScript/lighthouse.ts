@@ -26,12 +26,12 @@ interface InitBeaconConfig {
 	description: string
 }
 
-interface ProducerBeacon {
+export interface ProducerBeacon {
 	key: string
 	contentType: string
 	default?: any
 }
-interface ConsumerBeacon extends ProducerBeacon {
+export interface ConsumerBeacon extends ProducerBeacon {
 	description: string
 }
 
@@ -179,16 +179,16 @@ function useAvailableBeacons(contentTypeFilter?: string | ((contentType: string)
 	}) as any
 }
 
-function useJsonBeacons(schema: Schema) {
+function useJsonBeacons(...schemas: Schema[]): Record<string, ConsumerBeacon> {
 	const blocks = useInternalStore((state) => state.blocks)
 	const beacons = useInternalStore((state) => state.beacons)
 
-	const jsonValidator = useMemo(() => initJsonValidator(schema), [schema])
+	const jsonValidators = useMemo(() => schemas.map((s) => initJsonValidator(s)), [schemas.length])
 
 	return produce(beacons, (dictDraft: Draft<Record<string, BeaconState & ConsumerBeacon>>) => {
 		Object.keys(beacons).forEach((key) => {
 			const beacon: any = dictDraft[key]
-			const isValid = jsonValidator(beacon.value)
+			const isValid = jsonValidators.some((v) => v(beacon.value))
 
 			if (beacon.status === 'unavailable' || !isValid) {
 				delete dictDraft[key]

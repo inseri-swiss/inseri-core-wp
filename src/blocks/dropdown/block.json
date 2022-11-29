@@ -1,0 +1,30 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "inseri-core/dropdown",
+	"version": "0.1.0",
+	"title": "Dropdown",
+	"category": "inseri",
+	"description": "",
+	"attributes": {
+		"blockId": {
+			"type": "string",
+			"default": ""
+		},
+		"input": {
+			"type": "object"
+		},
+		"output": {
+			"type": "object"
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"textdomain": "inseri-core",
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"viewScript": ["file:./hydration.js"],
+	"style": ["file:./style-index.css"],
+	"script": "inseri-core"
+}
