@@ -2,7 +2,7 @@ import Ajv, { Schema } from 'ajv'
 import produce from 'immer'
 import { nanoid } from 'nanoid/non-secure'
 
-const generateId = () => nanoid()
+const generateId = (size?: number) => nanoid(size)
 
 const ajv = new Ajv({ allErrors: true })
 
