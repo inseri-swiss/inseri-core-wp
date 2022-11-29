@@ -1,46 +1,8 @@
-import { render } from '@wordpress/element'
 import domReady from '@wordpress/dom-ready'
-import { MantineProvider, Global, createStyles, MantineThemeOverride } from '../components'
+import { render } from '@wordpress/element'
+import { Global, InseriThemeProvider } from '../components'
 import { AdminPanel } from './AdminPanel'
 import './editor.scss'
-
-const useStyles = createStyles((theme, _params, getRef) => ({
-	input: {
-		ref: getRef('input'),
-	},
-	inputWrapper: {
-		[`& > .${getRef('input')}`]: {
-			backgroundColor: '#fff',
-			borderRadius: '3px',
-		},
-		[`& > .${getRef('input')}:focus`]: {
-			boxShadow: 'none',
-			borderColor: theme.colors.blue[8],
-		},
-	},
-	buttonRoot: {
-		fontWeight: 'normal',
-		fontSize: '14px',
-	},
-	checkboxInner: {
-		[`& > input[type="checkbox"]`]: {
-			border: '1px solid' + theme.colors.gray[4],
-			margin: 0,
-			width: '20px',
-			height: '20px',
-			borderRadius: '3px',
-			verticalAlign: 'unset',
-		},
-
-		[`& > input[type="checkbox"]:checked::before`]: {
-			content: 'unset',
-		},
-
-		[`& > input[type="checkbox"]:focus`]: {
-			boxShadow: 'unset',
-		},
-	},
-}))
 
 const AdminGlobalStyles = () => (
 	<Global
@@ -61,33 +23,11 @@ const AdminGlobalStyles = () => (
 )
 
 function Root() {
-	const { classes } = useStyles()
-	const { inputWrapper, input, buttonRoot, checkboxInner } = classes
-
-	const themeOverride: MantineThemeOverride = {
-		defaultRadius: 3,
-		primaryShade: 8,
-		components: {
-			Select: {
-				classNames: { input, wrapper: inputWrapper },
-			},
-			TextInput: {
-				classNames: { input, wrapper: inputWrapper },
-			},
-			Button: {
-				classNames: { root: buttonRoot },
-			},
-			Checkbox: {
-				classNames: { inner: checkboxInner },
-			},
-		},
-	}
-
 	return (
-		<MantineProvider withNormalizeCSS withGlobalStyles theme={themeOverride}>
+		<InseriThemeProvider>
 			<AdminGlobalStyles />
 			<AdminPanel />
-		</MantineProvider>
+		</InseriThemeProvider>
 	)
 }
 
