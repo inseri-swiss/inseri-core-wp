@@ -19,10 +19,10 @@
 	},
 	"dependencies": {
 		"@emotion/react": "^11.10.4",
-		"@mantine/core": "^5.5.0",
-		"@mantine/hooks": "^5.5.0",
+		"@mantine/core": "^5.8.4",
+		"@mantine/hooks": "^5.8.4",
 		"@prettier/plugin-php": "^0.18.9",
-		"@tabler/icons": "^1.100.0",
+		"@tabler/icons": "^1.114.0",
 		"@types/prismjs": "^1.26.0",
 		"@types/wordpress__block-editor": "^7.0.0",
 		"@types/wordpress__blocks": "^11.0.9",

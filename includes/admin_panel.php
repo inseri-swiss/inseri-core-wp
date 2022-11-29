@@ -29,6 +29,7 @@ abstract class Inseri_Core_Admin {
 			'nonce' => wp_create_nonce('wp_rest'),
 		]);
 
+		wp_enqueue_script('inseri-core');
 		wp_enqueue_script(self::$script_name);
 		wp_enqueue_style(self::$style_name);
 	}
