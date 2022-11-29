@@ -13,6 +13,7 @@ export interface Attributes {
 	blockId?: string
 	input?: ConsumerBeacon
 	output?: ProducerBeacon
+	name?: string
 }
 
 function Edit(props: BlockEditProps<Attributes>) {

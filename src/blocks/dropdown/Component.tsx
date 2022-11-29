@@ -4,7 +4,10 @@ import { Attributes } from './index'
 import { __ } from '@wordpress/i18n'
 import { IconCaretDown } from '@tabler/icons'
 import { useJsonBeacons, useDispatch, useControlTower, useWatch } from '@inseri/lighthouse'
+import { generateId } from '@inseri/utils'
 import { useState, useEffect } from '@wordpress/element'
+import { InspectorControls } from '@wordpress/block-editor'
+import { PanelBody, PanelRow, TextControl } from '@wordpress/components'
 
 const objectSchema = {
 	type: 'array',
@@ -32,7 +35,9 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 	const availableBeacons = useJsonBeacons(objectSchema, stringSchema)
 	const selectData = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
 
-	const producersBeacons = useControlTower({ blockId: attributes.blockId, blockType: 'inseri-core/dropdown', instanceName: 'dropdown' }, dropdownBeacon)
+	const [instanceName, setInstanceName] = useState(attributes.name ?? 'dropdown' + generateId(3))
+
+	const producersBeacons = useControlTower({ blockId: attributes.blockId, blockType: 'inseri-core/dropdown', instanceName }, dropdownBeacon)
 
 	useEffect(() => {
 		if (producersBeacons.length > 0) {
@@ -40,26 +45,41 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 		}
 	}, [producersBeacons.length])
 
-	return inputKey ? (
-		<DropdownInternalView {...props} />
-	) : (
-		<Box p="md" style={{ border: '1px solid #000' }}>
-			<Group mb="lg" spacing={0}>
-				<IconCaretDown size={28} />
-				<Text ml="xs" fz={24}>
-					{__('Dropdown', 'inseri-core')}
-				</Text>
-			</Group>
-			<Select
-				label={__('Choose a block source', 'inseri-core')}
-				data={selectData}
-				value={inputKey}
-				onChange={(key) => {
-					setInputkey(key!)
-					setAttributes({ input: availableBeacons[key!] })
-				}}
-			></Select>
-		</Box>
+	useEffect(() => {
+		setAttributes({ name: instanceName })
+	}, [instanceName])
+
+	return (
+		<>
+			<InspectorControls key="setting">
+				<PanelBody>
+					<PanelRow>
+						<TextControl label="Block Name" value={instanceName} onChange={(value) => setInstanceName(value)} />
+					</PanelRow>
+				</PanelBody>
+			</InspectorControls>
+			{inputKey ? (
+				<DropdownInternalView {...props} />
+			) : (
+				<Box p="md" style={{ border: '1px solid #000' }}>
+					<Group mb="lg" spacing={0}>
+						<IconCaretDown size={28} />
+						<Text ml="xs" fz={24}>
+							{__('Dropdown', 'inseri-core')}
+						</Text>
+					</Group>
+					<Select
+						label={__('Choose a block source', 'inseri-core')}
+						data={selectData}
+						value={inputKey}
+						onChange={(key) => {
+							setInputkey(key!)
+							setAttributes({ input: availableBeacons[key!] })
+						}}
+					></Select>
+				</Box>
+			)}
+		</>
 	)
 }
 

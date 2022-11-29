@@ -16,6 +16,9 @@
 		},
 		"output": {
 			"type": "object"
+		},
+		"name": {
+			"type": "string"
 		}
 	},
 	"supports": {
