@@ -1,13 +1,14 @@
-import { Select, Box, Text, Group, InseriThemeProvider } from '../../components'
-import type { BlockEditProps } from '@wordpress/blocks'
-import { Attributes } from './index'
-import { __ } from '@wordpress/i18n'
-import { IconCaretDown } from '@tabler/icons'
-import { useJsonBeacons, useDispatch, useControlTower, useWatch } from '@inseri/lighthouse'
+import { useControlTower, useDispatch, useJsonBeacons, useWatch } from '@inseri/lighthouse'
 import { generateId } from '@inseri/utils'
-import { useState, useEffect } from '@wordpress/element'
-import { InspectorControls } from '@wordpress/block-editor'
-import { PanelBody, PanelRow, TextControl } from '@wordpress/components'
+import { IconCaretDown } from '@tabler/icons'
+import { BlockControls, InspectorControls } from '@wordpress/block-editor'
+import type { BlockEditProps } from '@wordpress/blocks'
+import { PanelBody, PanelRow, TextControl, ToolbarGroup } from '@wordpress/components'
+import { useEffect, useState } from '@wordpress/element'
+import { __ } from '@wordpress/i18n'
+import { edit } from '@wordpress/icons'
+import { Box, Group, InseriThemeProvider, Select, Text } from '../../components'
+import { Attributes } from './index'
 
 const objectSchema = {
 	type: 'array',
@@ -30,12 +31,14 @@ const stringSchema = {
 const dropdownBeacon = [{ contentType: 'application/json', description: __('chosen value', 'inseri-core'), key: 'selected' }]
 
 export function DropdownEdit(props: BlockEditProps<Attributes>) {
-	const { setAttributes, attributes } = props
-	const [inputKey, setInputkey] = useState('')
+	const { setAttributes, attributes, isSelected } = props
+
+	const [isWizardMode, setWizardMode] = useState(!attributes.input)
+	const [inputBeaconKey, setInputBeaconKey] = useState(attributes.input?.key ?? '')
+	const [blockName, setBlockName] = useState(attributes.blockName ?? 'dropdown' + generateId(3))
+
 	const availableBeacons = useJsonBeacons(objectSchema, stringSchema)
 	const selectData = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
-
-	const [blockName, setBlockName] = useState(attributes.blockName ?? 'dropdown' + generateId(3))
 
 	const producersBeacons = useControlTower({ blockId: attributes.blockId, blockType: 'inseri-core/dropdown', instanceName: blockName }, dropdownBeacon)
 
@@ -49,8 +52,24 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 		setAttributes({ blockName: blockName })
 	}, [blockName])
 
+	useEffect(() => {
+		if (attributes.input && !isSelected && isWizardMode) {
+			setWizardMode(false)
+		}
+	}, [isSelected])
+
+	const toolbarControls = [
+		{
+			icon: edit,
+			isActive: isWizardMode,
+			onClick: () => setWizardMode(!isWizardMode),
+			title: __('Edit', 'inseri-core'),
+		},
+	]
+
 	return (
 		<>
+			<BlockControls>{attributes.input && <ToolbarGroup controls={toolbarControls} />}</BlockControls>
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
@@ -61,9 +80,7 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
-			{inputKey ? (
-				<DropdownInternalView {...props} />
-			) : (
+			{isWizardMode ? (
 				<Box p="md" style={{ border: '1px solid #000' }}>
 					<Group mb="lg" spacing={0}>
 						<IconCaretDown size={28} />
@@ -74,13 +91,16 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 					<Select
 						label={__('Choose a block source', 'inseri-core')}
 						data={selectData}
-						value={inputKey}
+						value={inputBeaconKey}
 						onChange={(key) => {
-							setInputkey(key!)
+							setInputBeaconKey(key!)
 							setAttributes({ input: availableBeacons[key!] })
+							setWizardMode(false)
 						}}
 					></Select>
 				</Box>
+			) : (
+				<DropdownInternalView {...props} />
 			)}
 		</>
 	)
