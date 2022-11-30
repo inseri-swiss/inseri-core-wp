@@ -15,6 +15,8 @@ export interface Attributes {
 	output?: ProducerBeacon
 	blockName?: string
 	label: string
+	searchable: boolean
+	clearable: boolean
 }
 
 function Edit(props: BlockEditProps<Attributes>) {

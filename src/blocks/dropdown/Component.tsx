@@ -3,7 +3,7 @@ import { generateId } from '@inseri/utils'
 import { IconCaretDown } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { PanelBody, PanelRow, TextControl, ToolbarGroup } from '@wordpress/components'
+import { PanelBody, PanelRow, TextControl, ToolbarGroup, ToggleControl } from '@wordpress/components'
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
@@ -32,16 +32,22 @@ const dropdownBeacon = [{ contentType: 'application/json', description: __('chos
 
 export function DropdownEdit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes, isSelected } = props
+	const { input, blockId, label, searchable, clearable, blockName = '' } = attributes
 
-	const [isWizardMode, setWizardMode] = useState(!attributes.input)
-	const [inputBeaconKey, setInputBeaconKey] = useState(attributes.input?.key ?? '')
-	const [blockName, setBlockName] = useState(attributes.blockName ?? 'dropdown' + generateId(3))
+	const [isWizardMode, setWizardMode] = useState(!input)
+	const [inputBeaconKey, setInputBeaconKey] = useState(input?.key ?? '')
 
 	const availableBeacons = useJsonBeacons(objectSchema, stringSchema)
 	const selectData = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
 
-	const producersBeacons = useControlTower({ blockId: attributes.blockId, blockType: 'inseri-core/dropdown', instanceName: blockName }, dropdownBeacon)
-	const { status } = useWatch(attributes.input)
+	const producersBeacons = useControlTower({ blockId: blockId, blockType: 'inseri-core/dropdown', instanceName: blockName }, dropdownBeacon)
+	const { status } = useWatch(input)
+
+	useEffect(() => {
+		if (!blockName) {
+			setAttributes({ blockName: 'dropdown' + generateId(3) })
+		}
+	}, [])
 
 	useEffect(() => {
 		if (status === 'unavailable') {
@@ -58,11 +64,7 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 	}, [producersBeacons.length])
 
 	useEffect(() => {
-		setAttributes({ blockName: blockName })
-	}, [blockName])
-
-	useEffect(() => {
-		if (attributes.input && !isSelected && isWizardMode) {
+		if (input && !isSelected && isWizardMode) {
 			setWizardMode(false)
 		}
 	}, [isSelected])
@@ -78,14 +80,20 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 
 	return (
 		<>
-			<BlockControls>{attributes.input && <ToolbarGroup controls={toolbarControls} />}</BlockControls>
+			<BlockControls>{input && <ToolbarGroup controls={toolbarControls} />}</BlockControls>
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
-						<TextControl label="Block Name" value={blockName} onChange={(value) => setBlockName(value)} />
+						<TextControl label="Block Name" value={blockName} onChange={(value) => setAttributes({ blockName: value })} />
 					</PanelRow>
 					<PanelRow>
-						<TextControl label="Label" value={attributes.label} onChange={(value) => setAttributes({ label: value })} />
+						<TextControl label="Label" value={label} onChange={(value) => setAttributes({ label: value })} />
+					</PanelRow>
+					<PanelRow>
+						<ToggleControl label="Searchable" checked={searchable} onChange={() => setAttributes({ searchable: !searchable })} />
+					</PanelRow>
+					<PanelRow>
+						<ToggleControl label="Clearable" checked={clearable} onChange={() => setAttributes({ clearable: !clearable })} />
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
@@ -122,7 +130,13 @@ function DropdownInternalView(props: { attributes: Readonly<Attributes> }) {
 
 	return (
 		<Box p="md">
-			<Select label={attributes.label} data={value ?? []} onChange={(item) => dispatch({ status: 'ready', value: item })} />
+			<Select
+				label={attributes.label}
+				data={value ?? []}
+				onChange={(item) => dispatch({ status: 'ready', value: item })}
+				searchable={attributes.searchable}
+				clearable={attributes.clearable}
+			/>
 		</Box>
 	)
 }

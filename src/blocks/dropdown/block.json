@@ -5,7 +5,7 @@
 	"version": "0.1.0",
 	"title": "Dropdown",
 	"category": "inseri",
-	"description": "",
+	"description": "Provide options to choose from",
 	"attributes": {
 		"blockId": {
 			"type": "string",
@@ -23,6 +23,14 @@
 		"label": {
 			"type": "string",
 			"default": "Choose an item"
+		},
+		"searchable": {
+			"type": "boolean",
+			"default": false
+		},
+		"clearable": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
