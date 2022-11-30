@@ -41,6 +41,15 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 	const selectData = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
 
 	const producersBeacons = useControlTower({ blockId: attributes.blockId, blockType: 'inseri-core/dropdown', instanceName: blockName }, dropdownBeacon)
+	const { status } = useWatch(attributes.input)
+
+	useEffect(() => {
+		if (status === 'unavailable') {
+			setAttributes({ input: undefined })
+			setInputBeaconKey('')
+			setWizardMode(true)
+		}
+	}, [status])
 
 	useEffect(() => {
 		if (producersBeacons.length > 0) {
@@ -89,7 +98,7 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 						</Text>
 					</Group>
 					<Select
-						label={__('Choose a block source', 'inseri-core')}
+						label={__('Provide options by selecting a block source', 'inseri-core')}
 						data={selectData}
 						value={inputBeaconKey}
 						onChange={(key) => {
