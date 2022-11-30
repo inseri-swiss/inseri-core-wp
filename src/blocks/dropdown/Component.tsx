@@ -35,9 +35,9 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 	const availableBeacons = useJsonBeacons(objectSchema, stringSchema)
 	const selectData = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
 
-	const [instanceName, setInstanceName] = useState(attributes.name ?? 'dropdown' + generateId(3))
+	const [blockName, setBlockName] = useState(attributes.blockName ?? 'dropdown' + generateId(3))
 
-	const producersBeacons = useControlTower({ blockId: attributes.blockId, blockType: 'inseri-core/dropdown', instanceName }, dropdownBeacon)
+	const producersBeacons = useControlTower({ blockId: attributes.blockId, blockType: 'inseri-core/dropdown', instanceName: blockName }, dropdownBeacon)
 
 	useEffect(() => {
 		if (producersBeacons.length > 0) {
@@ -46,15 +46,18 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 	}, [producersBeacons.length])
 
 	useEffect(() => {
-		setAttributes({ name: instanceName })
-	}, [instanceName])
+		setAttributes({ blockName: blockName })
+	}, [blockName])
 
 	return (
 		<>
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
-						<TextControl label="Block Name" value={instanceName} onChange={(value) => setInstanceName(value)} />
+						<TextControl label="Block Name" value={blockName} onChange={(value) => setBlockName(value)} />
+					</PanelRow>
+					<PanelRow>
+						<TextControl label="Label" value={attributes.label} onChange={(value) => setAttributes({ label: value })} />
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
@@ -90,7 +93,7 @@ function DropdownInternalView(props: { attributes: Readonly<Attributes> }) {
 
 	return (
 		<Box p="md">
-			<Select label={__('Choose an item', 'inseri-core')} data={value ?? []} onChange={(item) => dispatch({ status: 'ready', value: item })} />
+			<Select label={attributes.label} data={value ?? []} onChange={(item) => dispatch({ status: 'ready', value: item })} />
 		</Box>
 	)
 }

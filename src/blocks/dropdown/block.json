@@ -17,8 +17,12 @@
 		"output": {
 			"type": "object"
 		},
-		"name": {
+		"blockName": {
 			"type": "string"
+		},
+		"label": {
+			"type": "string",
+			"default": "Choose an item"
 		}
 	},
 	"supports": {
