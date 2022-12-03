@@ -39,7 +39,7 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 	const availableBeacons = useJsonBeacons(objectSchema, stringSchema)
 	const selectData = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
 
-	const producersBeacons = useControlTower({ blockId: blockId, blockType: 'inseri-core/dropdown', instanceName: blockName }, dropdownBeacon)
+	const producersBeacons = useControlTower({ blockId, blockType: 'inseri-core/dropdown', instanceName: blockName }, dropdownBeacon)
 	const { status } = useWatch(input)
 
 	useEffect(() => {

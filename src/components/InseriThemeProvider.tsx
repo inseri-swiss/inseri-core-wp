@@ -1,4 +1,5 @@
-import { createStyles, MantineProvider, MantineThemeOverride } from '@mantine/core'
+import { createStyles, MantineProvider } from '@mantine/core'
+import type { MantineThemeOverride } from '@mantine/core'
 import type { PropsWithChildren } from 'react'
 
 const useStyles = createStyles((theme, _params, getRef) => ({

@@ -1,5 +1,5 @@
 import { useBlockProps } from '@wordpress/block-editor'
-import { BlockEditProps } from '@wordpress/blocks'
+import type { BlockEditProps } from '@wordpress/blocks'
 import { useEffect } from '@wordpress/element'
 import type { PropsWithChildren } from 'react'
 import { generateId } from '@inseri/utils'
