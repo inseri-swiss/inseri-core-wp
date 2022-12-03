@@ -18,7 +18,8 @@
 			"type": "object"
 		},
 		"blockName": {
-			"type": "string"
+			"type": "string",
+			"default": ""
 		},
 		"label": {
 			"type": "string",

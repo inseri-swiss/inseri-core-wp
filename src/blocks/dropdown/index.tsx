@@ -13,7 +13,7 @@ export interface Attributes {
 	blockId?: string
 	input?: ConsumerBeacon
 	output?: ProducerBeacon
-	blockName?: string
+	blockName: string
 	label: string
 	searchable: boolean
 	clearable: boolean
@@ -21,7 +21,7 @@ export interface Attributes {
 
 function Edit(props: BlockEditProps<Attributes>) {
 	return (
-		<SetupEditorEnv {...props}>
+		<SetupEditorEnv {...props} baseBlockName={'dropdown'}>
 			<DropdownEdit {...props} />
 		</SetupEditorEnv>
 	)

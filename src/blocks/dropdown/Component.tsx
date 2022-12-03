@@ -1,5 +1,4 @@
 import { useControlTower, useDispatch, useJsonBeacons, useWatch } from '@inseri/lighthouse'
-import { generateId } from '@inseri/utils'
 import { IconCaretDown } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -7,7 +6,7 @@ import { PanelBody, PanelRow, TextControl, ToolbarGroup, ToggleControl } from '@
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Group, InseriThemeProvider, Select, Text } from '../../components'
+import { Box, Group, Select, Text } from '../../components'
 import { Attributes } from './index'
 
 const objectSchema = {
@@ -32,7 +31,7 @@ const dropdownBeacon = [{ contentType: 'application/json', description: __('chos
 
 export function DropdownEdit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes, isSelected } = props
-	const { input, blockId, label, searchable, clearable, blockName = '' } = attributes
+	const { input, blockId, label, searchable, clearable, blockName } = attributes
 
 	const [isWizardMode, setWizardMode] = useState(!input)
 	const [inputBeaconKey, setInputBeaconKey] = useState(input?.key ?? '')
@@ -42,12 +41,6 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 
 	const producersBeacons = useControlTower({ blockId: blockId, blockType: 'inseri-core/dropdown', instanceName: blockName }, dropdownBeacon)
 	const { status } = useWatch(input)
-
-	useEffect(() => {
-		if (!blockName) {
-			setAttributes({ blockName: 'dropdown' + generateId(3) })
-		}
-	}, [])
 
 	useEffect(() => {
 		if (status === 'unavailable') {
@@ -77,7 +70,6 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 			title: __('Edit', 'inseri-core'),
 		},
 	]
-
 	return (
 		<>
 			<BlockControls>{input && <ToolbarGroup controls={toolbarControls} />}</BlockControls>
@@ -117,13 +109,13 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 					></Select>
 				</Box>
 			) : (
-				<DropdownInternalView {...props} />
+				<DropdownView {...props} />
 			)}
 		</>
 	)
 }
 
-function DropdownInternalView(props: { attributes: Readonly<Attributes> }) {
+export function DropdownView(props: { attributes: Readonly<Attributes> }) {
 	const { attributes } = props
 	const { value } = useWatch(attributes.input)
 	const dispatch = useDispatch(attributes.output)
@@ -138,13 +130,5 @@ function DropdownInternalView(props: { attributes: Readonly<Attributes> }) {
 				clearable={attributes.clearable}
 			/>
 		</Box>
-	)
-}
-
-export function DropdownView(props: { attributes: Readonly<Attributes> }) {
-	return (
-		<InseriThemeProvider>
-			<DropdownInternalView {...props} />
-		</InseriThemeProvider>
 	)
 }
