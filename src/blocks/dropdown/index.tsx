@@ -39,5 +39,5 @@ registerBlockType<Attributes>(name, {
 	...settings,
 	edit: Edit,
 	save: Save,
-	icon: IconCaretDown,
+	icon: <IconCaretDown style={{ fill: 'none' }} />,
 })
