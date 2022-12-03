@@ -101,3 +101,32 @@ export const getBodyTypeByContenType = (contentType?: string): string | undefine
 	const found = Object.keys(contentTypeMap).find((k) => contentType?.includes(k))
 	return found ? contentTypeMap[found] : undefined
 }
+
+export const getCSSVariables = (prefix: string = '--wp--preset') => {
+	const isSameDomain = (styleSheet: StyleSheet) => {
+		if (!styleSheet.href) {
+			return true
+		}
+
+		return styleSheet.href.indexOf(window.location.origin) === 0
+	}
+
+	const isStyleRule = (rule: CSSRule) => rule.type === 1
+
+	return (
+		[...document.styleSheets]
+			.filter(isSameDomain)
+			.reduce((sheetAcc, sheet) => {
+				const cssVariables = [...sheet.cssRules].filter(isStyleRule).reduce((ruleAcc, rule) => {
+					const style = (rule as CSSStyleRule).style
+					const props = [...style].map((propName) => propName.trim()).filter((propName) => propName.startsWith(prefix))
+
+					return [...ruleAcc, ...props]
+				}, [] as string[])
+
+				return sheetAcc.concat(cssVariables)
+			}, [] as string[])
+			// make unique
+			.filter((v, i, a) => a.indexOf(v) === i)
+	)
+}
