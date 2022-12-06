@@ -1,18 +1,15 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
-	"name": "inseri-core/dropdown",
+	"name": "inseri-core/text-editor",
 	"version": "0.1.0",
-	"title": "Dropdown",
+	"title": "Text Editor",
 	"category": "inseri",
-	"description": "Provide options to choose from",
+	"description": "Write JSON, XML, HTML, ...",
 	"attributes": {
 		"blockId": {
 			"type": "string",
 			"default": ""
-		},
-		"input": {
-			"type": "object"
 		},
 		"output": {
 			"type": "object"
@@ -21,17 +18,9 @@
 			"type": "string",
 			"default": ""
 		},
-		"label": {
-			"type": "string",
-			"default": "Choose an item"
-		},
-		"searchable": {
+		"editable": {
 			"type": "boolean",
-			"default": true
-		},
-		"clearable": {
-			"type": "boolean",
-			"default": true
+			"default": false
 		}
 	},
 	"supports": {
@@ -40,5 +29,6 @@
 	"textdomain": "inseri-core",
 	"editorScript": "file:./index.js",
 	"viewScript": ["file:./hydration.js"],
+	"style": ["file:./index.css"],
 	"script": "inseri-core"
 }

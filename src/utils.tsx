@@ -57,12 +57,16 @@ export const getPropertyCaseInsensitive = (object: any, key: string) => {
 	return object[index]
 }
 
-export const COMMON_CONTENT_TYPES = [
+export const TEXTUAL_CONTENT_TYPES = [
 	{ label: 'Text', value: 'text/plain' },
 	{ label: 'HTML', value: 'text/html' },
 	{ label: 'JSON', value: 'application/json' },
 	{ label: 'XML', value: 'application/xml' },
 	{ label: 'SVG', value: 'image/svg+xml' },
+]
+
+export const COMMON_CONTENT_TYPES = [
+	...TEXTUAL_CONTENT_TYPES,
 	{ label: 'GIF', value: 'image/gif' },
 	{ label: 'JPEG', value: 'image/jpeg' },
 	{ label: 'PNG', value: 'image/png' },
@@ -92,6 +96,7 @@ export const getBodyTypeByContenType = (contentType?: string): string | undefine
 	const contentTypeMap: Record<string, string> = {
 		'application/x-www-form-urlencoded': 'form-urlencoded',
 		'multipart/form-data': 'form-data',
+		'text/html': 'html',
 		xml: 'xml',
 		json: 'json',
 		'text/': 'text',
