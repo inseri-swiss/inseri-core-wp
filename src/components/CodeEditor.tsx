@@ -8,10 +8,13 @@ import 'prismjs/components/prism-markup'
 import { escapeHtml } from '../utils'
 
 const useStyles = createStyles((theme) => ({
+	wrapper: {
+		border: '1px solid #ced4da',
+		overflow: 'auto',
+	},
 	editor: {
 		fontSize: theme.fontSizes.sm,
 		counterReset: 'line',
-		border: '1px solid #ced4da',
 
 		[`&> textarea`]: {
 			outline: 'none',
@@ -35,10 +38,12 @@ interface Props {
 	onChange?: (code: string) => void
 	type: string
 	textareaId?: string
+	height?: number
+	maxHeight?: number
 }
 
-export function CodeEditor({ value, onChange = () => {}, type, textareaId }: Props) {
-	const { editor, editorLineNumber } = useStyles().classes
+export function CodeEditor({ value, onChange = () => {}, type, textareaId, height, maxHeight }: Props) {
+	const { editor, editorLineNumber, wrapper } = useStyles().classes
 
 	const processCode = (code: string) => {
 		let processedCode = code
@@ -59,17 +64,19 @@ export function CodeEditor({ value, onChange = () => {}, type, textareaId }: Pro
 	}
 
 	return (
-		<Editor
-			className={editor}
-			value={value}
-			onValueChange={onChange}
-			highlight={processCode}
-			padding={{ top: 16, bottom: 16, right: 16, left: 54 }}
-			style={{
-				fontFamily: 'monospace',
-				minHeight: '128px',
-			}}
-			textareaId={textareaId}
-		/>
+		<div className={wrapper} style={{ maxHeight, height }}>
+			<Editor
+				className={editor}
+				value={value}
+				onValueChange={onChange}
+				highlight={processCode}
+				padding={{ top: 16, bottom: 16, right: 16, left: 54 }}
+				style={{
+					fontFamily: 'monospace',
+					minHeight: '128px',
+				}}
+				textareaId={textareaId}
+			/>
+		</div>
 	)
 }

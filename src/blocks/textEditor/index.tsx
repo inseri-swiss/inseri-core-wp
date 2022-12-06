@@ -14,6 +14,8 @@ export interface Attributes {
 	blockId?: string
 	output?: ProducerBeacon
 	blockName: string
+	height: number
+	editable: boolean
 }
 
 function Edit(props: BlockEditProps<Attributes>) {
