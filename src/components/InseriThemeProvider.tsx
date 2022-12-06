@@ -62,9 +62,5 @@ export function InseriThemeProvider({ children }: PropsWithChildren<{}>) {
 		},
 	}
 
-	return (
-		<MantineProvider withNormalizeCSS withGlobalStyles theme={themeOverride}>
-			{children}
-		</MantineProvider>
-	)
+	return <MantineProvider theme={themeOverride}>{children}</MantineProvider>
 }
