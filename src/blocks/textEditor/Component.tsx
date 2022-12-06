@@ -1,7 +1,7 @@
 import { useControlTower, useDispatch } from '@inseri/lighthouse'
 import { InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { PanelBody, PanelRow, TextControl, ResizableBox } from '@wordpress/components'
+import { PanelBody, PanelRow, TextControl, ResizableBox, ToggleControl } from '@wordpress/components'
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Box, CodeEditor, Select } from '../../components'
@@ -14,7 +14,7 @@ const textEditorBeacon = { contentType: 'text/plain', description: __('content',
 
 export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes } = props
-	const { blockId, blockName } = attributes
+	const { blockId, blockName, editable } = attributes
 
 	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, [textEditorBeacon])
 
@@ -43,6 +43,9 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 					<PanelRow>
 						<TextControl label="Block Name" value={blockName} onChange={(value) => setAttributes({ blockName: value })} />
 					</PanelRow>
+					<PanelRow>
+						<ToggleControl label="Editable to public" checked={editable} onChange={() => setAttributes({ editable: !editable })} />
+					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
 			<TextEditorView {...props} setAttributes={setAttributes} renderResizable={renderResizable} />
@@ -58,39 +61,58 @@ interface ViewProps {
 
 export function TextEditorView(props: ViewProps) {
 	const { attributes, setAttributes, renderResizable } = props
+	const { height, editable } = attributes
 	const dispatch = useDispatch(attributes.output)
 
+	const isEditingMode = !!setAttributes
+	const isReadonly = !editable && !isEditingMode
 	const [contentType, setContentType] = useState('')
 	const [codeType, setCodeType] = useState('')
 
-	const [code, setCode] = useState('')
+	const [code, setCode] = useState(attributes.content)
 	const [debouncedCode] = useDebouncedValue(code, 500)
 
 	useEffect(() => {
 		const initContentType = attributes.output?.contentType ?? textEditorBeacon.contentType
 		setContentType(initContentType)
 		setCodeType(getBodyTypeByContenType(initContentType) ?? 'text')
+		dispatch({ value: attributes.content, status: 'ready' })
 	}, [])
 
 	useEffect(() => {
 		dispatch({ value: debouncedCode, status: 'ready' })
+
+		if (isEditingMode) {
+			setAttributes({ content: debouncedCode })
+		}
 	}, [debouncedCode])
 
 	useEffect(() => {
 		dispatch({ contentType })
 		setCodeType(getBodyTypeByContenType(contentType) ?? 'text')
 
-		if (setAttributes) {
+		if (isEditingMode) {
 			const newOutput = { ...textEditorBeacon, contentType }
 			setAttributes({ output: newOutput })
 		}
 	}, [contentType])
 
-	const editorElement = <CodeEditor height={attributes.height} type={codeType} value={code} onChange={(val) => setCode(val)} />
+	const editorElement = (
+		<CodeEditor
+			height={height}
+			type={codeType}
+			value={code}
+			onChange={(val) => {
+				if (!isReadonly) {
+					setCode(val)
+				}
+			}}
+		/>
+	)
 
 	return (
 		<Box p="md">
-			<Select mb="md" data={TEXTUAL_CONTENT_TYPES} value={contentType} onChange={(v) => setContentType(v!)} />
+			<Select label="Content Type" mb="md" data={TEXTUAL_CONTENT_TYPES} value={contentType} onChange={(v) => setContentType(v!)} readOnly={isReadonly} />
 			{renderResizable ? renderResizable(editorElement) : editorElement}
 		</Box>
 	)

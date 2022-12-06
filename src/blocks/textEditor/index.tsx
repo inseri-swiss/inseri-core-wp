@@ -16,6 +16,7 @@ export interface Attributes {
 	blockName: string
 	height: number
 	editable: boolean
+	content: string
 }
 
 function Edit(props: BlockEditProps<Attributes>) {

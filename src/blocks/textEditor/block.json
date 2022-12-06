@@ -25,6 +25,10 @@
 		"editable": {
 			"type": "boolean",
 			"default": false
+		},
+		"content": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {
