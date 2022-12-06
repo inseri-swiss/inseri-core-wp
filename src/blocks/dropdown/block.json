@@ -27,11 +27,11 @@
 		},
 		"searchable": {
 			"type": "boolean",
-			"default": false
+			"default": true
 		},
 		"clearable": {
 			"type": "boolean",
-			"default": false
+			"default": true
 		}
 	},
 	"supports": {
