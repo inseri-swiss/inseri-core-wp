@@ -234,7 +234,7 @@ export function EmptyTableBody({ title, description, children }: EmptyProps) {
 	return (
 		<tbody>
 			<tr>
-				<td colSpan={5}>
+				<td colSpan={6}>
 					<Stack align="center" spacing={1}>
 						<Title order={2} size="h4">
 							{title}

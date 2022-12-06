@@ -88,7 +88,6 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 		background: '#fff',
 		height: '36px',
 		border: '1px solid #8c8f94',
-		borderLeft: '0',
 		borderTopLeftRadius: '0',
 		borderBottomLeftRadius: '0',
 		color: '#868E96',
