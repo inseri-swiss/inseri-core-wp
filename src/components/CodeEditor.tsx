@@ -5,7 +5,27 @@ import { createStyles } from '../components'
 // before a language can be highlighted, it must be imported as follows
 import 'prismjs/components/prism-json'
 import 'prismjs/components/prism-markup'
+import 'prismjs/components/prism-markdown'
+import 'prismjs/components/prism-r'
+import 'prismjs/components/prism-python'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-typescript'
+import 'prismjs/components/prism-sql'
+import 'prismjs/components/prism-yaml'
 import { escapeHtml } from '../utils'
+
+const supported_highlighted = [
+	'html',
+	'markdown',
+	'r',
+	'python',
+	'javascript',
+	'typescript',
+	'sql',
+	'yaml',
+	'xml',
+	'json',
+]
 
 const useStyles = createStyles((theme) => ({
 	wrapper: {
@@ -48,7 +68,7 @@ export function CodeEditor({ value, onChange = () => {}, type, textareaId, heigh
 	const processCode = (code: string) => {
 		let processedCode = code
 
-		if (type === 'json' || type === 'xml' || type === 'html') {
+		if (supported_highlighted.includes(type)) {
 			processedCode = highlight(code, languages[type], type)
 		}
 		if (type === 'text') {

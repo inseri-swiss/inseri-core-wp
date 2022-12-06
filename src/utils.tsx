@@ -58,11 +58,18 @@ export const getPropertyCaseInsensitive = (object: any, key: string) => {
 }
 
 export const TEXTUAL_CONTENT_TYPES = [
-	{ label: 'Text', value: 'text/plain' },
-	{ label: 'HTML', value: 'text/html' },
 	{ label: 'JSON', value: 'application/json' },
 	{ label: 'XML', value: 'application/xml' },
+	{ label: 'Text', value: 'text/plain' },
+	{ label: 'HTML', value: 'text/html' },
+	{ label: 'Markdown', value: 'text/markdown' },
 	{ label: 'SVG', value: 'image/svg+xml' },
+	{ label: 'Python', value: 'application/x-python' },
+	{ label: 'R', value: 'application/x-r' },
+	{ label: 'JavaScript', value: 'application/javascript' },
+	{ label: 'TypeScript', value: 'application/x-typescript' },
+	{ label: 'SQL', value: 'application/sql' },
+	{ label: 'YAML', value: 'application/x-yaml' },
 ]
 
 export const COMMON_CONTENT_TYPES = [
@@ -97,6 +104,13 @@ export const getBodyTypeByContenType = (contentType?: string): string | undefine
 		'application/x-www-form-urlencoded': 'form-urlencoded',
 		'multipart/form-data': 'form-data',
 		'text/html': 'html',
+		'text/markdown': 'markdown',
+		'application/x-r': 'r',
+		python: 'python',
+		javascript: 'javascript',
+		typescript: 'typescript',
+		sql: 'sql',
+		yaml: 'yaml',
 		xml: 'xml',
 		json: 'json',
 		'text/': 'text',
