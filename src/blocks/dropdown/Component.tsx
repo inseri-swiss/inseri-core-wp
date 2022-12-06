@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import { Box, Group, Select, Text } from '../../components'
 import { Attributes } from './index'
+import config from './block.json'
 
 const objectSchema = {
 	type: 'array',
@@ -39,7 +40,7 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 	const availableBeacons = useJsonBeacons(objectSchema, stringSchema)
 	const selectData = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
 
-	const producersBeacons = useControlTower({ blockId, blockType: 'inseri-core/dropdown', instanceName: blockName }, dropdownBeacon)
+	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, dropdownBeacon)
 	const { status } = useWatch(input)
 
 	useEffect(() => {
