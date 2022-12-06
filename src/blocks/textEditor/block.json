@@ -18,6 +18,10 @@
 			"type": "string",
 			"default": ""
 		},
+		"height": {
+			"type": "integer",
+			"default": 150
+		},
 		"editable": {
 			"type": "boolean",
 			"default": false

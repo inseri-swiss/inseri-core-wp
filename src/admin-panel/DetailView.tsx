@@ -520,6 +520,7 @@ export function DetailView(props: Props) {
 												</Text>
 											)}
 											<CodeEditor
+												maxHeight={500}
 												type={requestBodyType}
 												value={requestTextBody}
 												onChange={(val) => {
@@ -567,7 +568,7 @@ export function DetailView(props: Props) {
 											{__('Download File', 'inseri-core')}
 										</Button>
 									) : (
-										<CodeEditor type={responseBodyType} value={responseBody} textareaId={RESPONSE_AREA_ID} />
+										<CodeEditor maxHeight={500} type={responseBodyType} value={responseBody} textareaId={RESPONSE_AREA_ID} />
 									)}
 								</Tabs.Panel>
 							</Tabs>
