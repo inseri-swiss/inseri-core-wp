@@ -61,8 +61,8 @@ interface ViewProps {
 
 export function TextEditorView(props: ViewProps) {
 	const { attributes, setAttributes, renderResizable } = props
-	const { height, editable } = attributes
-	const dispatch = useDispatch(attributes.output)
+	const { height, editable, output } = attributes
+	const dispatch = useDispatch(output)
 
 	const isEditingMode = !!setAttributes
 	const isReadonly = !editable && !isEditingMode
@@ -73,7 +73,7 @@ export function TextEditorView(props: ViewProps) {
 	const [debouncedCode] = useDebouncedValue(code, 500)
 
 	useEffect(() => {
-		const initContentType = attributes.output?.contentType ?? textEditorBeacon.contentType
+		const initContentType = output?.contentType ?? textEditorBeacon.contentType
 		setContentType(initContentType)
 		setCodeType(getBodyTypeByContenType(initContentType) ?? 'text')
 		dispatch({ value: attributes.content, status: 'ready' })
@@ -91,8 +91,8 @@ export function TextEditorView(props: ViewProps) {
 		dispatch({ contentType })
 		setCodeType(getBodyTypeByContenType(contentType) ?? 'text')
 
-		if (isEditingMode) {
-			const newOutput = { ...textEditorBeacon, contentType }
+		if (isEditingMode && output) {
+			const newOutput = { ...output, contentType }
 			setAttributes({ output: newOutput })
 		}
 	}, [contentType])
