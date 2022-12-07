@@ -72,15 +72,27 @@ export function TextEditorView(props: ViewProps) {
 	const [code, setCode] = useState(attributes.content)
 	const [debouncedCode] = useDebouncedValue(code, 500)
 
+	const dispatchValue = (value: string) => {
+		if (contentType.match('application/json')) {
+			try {
+				dispatch({ value: JSON.parse(value), status: 'ready' })
+			} catch (error) {
+				dispatch({ status: 'error' })
+			}
+		} else {
+			dispatch({ value, status: 'ready' })
+		}
+	}
+
 	useEffect(() => {
 		const initContentType = output?.contentType ?? textEditorBeacon.contentType
 		setContentType(initContentType)
 		setCodeType(getBodyTypeByContenType(initContentType) ?? 'text')
-		dispatch({ value: attributes.content, status: 'ready' })
+		dispatchValue(attributes.content)
 	}, [])
 
 	useEffect(() => {
-		dispatch({ value: debouncedCode, status: 'ready' })
+		dispatchValue(debouncedCode)
 
 		if (isEditingMode) {
 			setAttributes({ content: debouncedCode })
