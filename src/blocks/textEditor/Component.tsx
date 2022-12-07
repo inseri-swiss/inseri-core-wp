@@ -64,10 +64,12 @@ export function TextEditorView(props: ViewProps) {
 	const { height, editable, output } = attributes
 	const dispatch = useDispatch(output)
 
+	const initContentType = output?.contentType ?? textEditorBeacon.contentType
+
 	const isEditingMode = !!setAttributes
 	const isReadonly = !editable && !isEditingMode
-	const [contentType, setContentType] = useState('')
-	const [codeType, setCodeType] = useState('')
+	const [contentType, setContentType] = useState(initContentType)
+	const [codeType, setCodeType] = useState(getBodyTypeByContenType(initContentType) ?? 'text')
 
 	const [code, setCode] = useState(attributes.content)
 	const [debouncedCode] = useDebouncedValue(code, 500)
@@ -85,9 +87,6 @@ export function TextEditorView(props: ViewProps) {
 	}
 
 	useEffect(() => {
-		const initContentType = output?.contentType ?? textEditorBeacon.contentType
-		setContentType(initContentType)
-		setCodeType(getBodyTypeByContenType(initContentType) ?? 'text')
 		dispatchValue(attributes.content)
 	}, [])
 
