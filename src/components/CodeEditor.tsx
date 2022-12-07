@@ -14,7 +14,7 @@ import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-yaml'
 import { escapeHtml } from '../utils'
 
-const supported_highlighted = [
+const supportedHighlighted = [
 	'html',
 	'markdown',
 	'r',
@@ -68,10 +68,9 @@ export function CodeEditor({ value, onChange = () => {}, type, textareaId, heigh
 	const processCode = (code: string) => {
 		let processedCode = code
 
-		if (supported_highlighted.includes(type)) {
+		if (supportedHighlighted.includes(type)) {
 			processedCode = highlight(code, languages[type], type)
-		}
-		if (type === 'text') {
+		} else {
 			processedCode = escapeHtml(processedCode)
 		}
 
