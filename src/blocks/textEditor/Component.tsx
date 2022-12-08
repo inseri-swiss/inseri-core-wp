@@ -32,7 +32,7 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 	}, [producersBeacons.length])
 
 	useEffect(() => {
-		dispatch({ contentType })
+		dispatch({ contentType, status: 'initial' })
 
 		if (output) {
 			const newOutput = { ...output, contentType }
@@ -101,6 +101,10 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 						onChange={(v) => {
 							setContentType(v!)
 							setWizardMode(false)
+
+							if (v !== contentType) {
+								dispatch({ status: 'unavailable' })
+							}
 						}}
 					/>
 				</Box>
@@ -160,6 +164,10 @@ export function TextEditorView(props: ViewProps) {
 			setAttributes({ content: debouncedCode })
 		}
 	}, [debouncedCode])
+
+	useEffect(() => {
+		dispatchValue(code)
+	}, [output?.contentType])
 
 	const editorElement = (
 		<CodeEditor
