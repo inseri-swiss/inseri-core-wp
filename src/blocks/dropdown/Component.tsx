@@ -118,10 +118,13 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 
 export function DropdownView(props: { attributes: Readonly<Attributes> }) {
 	const { attributes } = props
-	const { value, contentType } = useWatch(attributes.input)
+	const { value, contentType, status } = useWatch(attributes.input)
 	const dispatch = useDispatch(attributes.output)
 
-	const data = contentType.match('application/json') && !!value ? value : []
+	let data = []
+	if (contentType.match('/json') && status === 'ready') {
+		data = value
+	}
 
 	return (
 		<Box p="md">

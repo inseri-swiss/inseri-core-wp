@@ -17,6 +17,7 @@ export interface Attributes {
 	height: number
 	editable: boolean
 	content: string
+	label: string
 }
 
 function Edit(props: BlockEditProps<Attributes>) {
