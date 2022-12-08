@@ -43,7 +43,7 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 	const renderResizable = (children: JSX.Element) => (
 		<ResizableBox
 			enable={{ bottom: true }}
-			minHeight={150}
+			minHeight={60}
 			onResize={(_event, _direction, element) => {
 				setAttributes({ height: element.offsetHeight })
 			}}
