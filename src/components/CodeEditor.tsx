@@ -91,8 +91,9 @@ export function CodeEditor({ value, onChange = () => {}, type, textareaId, heigh
 				highlight={processCode}
 				padding={{ top: 16, bottom: 16, right: 16, left: 54 }}
 				style={{
+					background: '#fff',
 					fontFamily: 'monospace',
-					minHeight: '128px',
+					minHeight: '60px',
 				}}
 				textareaId={textareaId}
 			/>
