@@ -7,11 +7,11 @@ import { PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarG
 import { useEffect, useMemo, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, CodeEditor, Group, Select, Text } from '../../components'
+import { Box, Button, CodeEditor, Group, Select, Text } from '../../components'
 import config from './block.json'
 import { Attributes } from './index'
 
-import { getBodyTypeByContenType, TEXTUAL_CONTENT_TYPES } from '../../utils'
+import { formatCode, getBodyTypeByContenType, isBeautifyType, TEXTUAL_CONTENT_TYPES } from '../../utils'
 
 const textEditorBeacon = { contentType: '', description: __('content', 'inseri-core'), key: 'content', default: '' }
 
@@ -80,7 +80,7 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 						<TextControl label="Label" value={label} onChange={(value) => setAttributes({ label: value })} />
 					</PanelRow>
 					<PanelRow>
-						<ToggleControl label="Editable to public" checked={editable} onChange={() => setAttributes({ editable: !editable })} />
+						<ToggleControl label="publicly editable" checked={editable} onChange={() => setAttributes({ editable: !editable })} />
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
@@ -92,7 +92,17 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 							{__('Text Editor', 'inseri-core')}
 						</Text>
 					</Group>
-					<Select label="Choose a format" mb="md" searchable data={TEXTUAL_CONTENT_TYPES} value={contentType} onChange={(v) => setContentType(v!)} />
+					<Select
+						label="Choose a format"
+						mb="md"
+						searchable
+						data={TEXTUAL_CONTENT_TYPES}
+						value={contentType}
+						onChange={(v) => {
+							setContentType(v!)
+							setWizardMode(false)
+						}}
+					/>
 				</Box>
 			) : (
 				<TextEditorView {...props} setAttributes={setAttributes} renderResizable={renderResizable} />
@@ -121,13 +131,17 @@ export function TextEditorView(props: ViewProps) {
 	}, [output?.contentType])
 
 	const [code, setCode] = useState(attributes.content)
+	const [hasSyntaxError, setSyntaxError] = useState(false)
 	const [debouncedCode] = useDebouncedValue(code, 500)
 
 	const dispatchValue = (value: string) => {
+		setSyntaxError(false)
+
 		if (output?.contentType.match('/json')) {
 			try {
 				dispatch({ value: JSON.parse(value), status: 'ready' })
 			} catch (error) {
+				setSyntaxError(true)
 				dispatch({ status: 'error' })
 			}
 		} else {
@@ -160,10 +174,33 @@ export function TextEditorView(props: ViewProps) {
 		/>
 	)
 
+	const beautify = () => {
+		const [errorMsg, formattedCode] = formatCode(codeType, code)
+
+		setSyntaxError(!!errorMsg)
+
+		if (formattedCode) {
+			setCode(formattedCode)
+		}
+	}
+
 	return (
 		<Box p="md">
-			{label.trim() && <Text fz={14}>{label}</Text>}
+			<Group position="apart" mb={4}>
+				{label.trim() && <Text fz={14}>{label}</Text>}
+				<div />
+				{isBeautifyType(codeType) && isEditable && (
+					<Button variant="subtle" onClick={beautify}>
+						{__('Beautify', 'inseri-core')}
+					</Button>
+				)}
+			</Group>
 			{renderResizable ? renderResizable(editorElement) : editorElement}
+			{hasSyntaxError && (
+				<Text fz={14} color="red">
+					{__('It has syntax error!', 'inseri-core')}
+				</Text>
+			)}
 		</Box>
 	)
 }

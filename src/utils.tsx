@@ -120,3 +120,5 @@ export const getBodyTypeByContenType = (contentType?: string): string | undefine
 	const found = Object.keys(contentTypeMap).find((k) => contentType?.includes(k))
 	return found ? contentTypeMap[found] : undefined
 }
+
+export const isBeautifyType = (bodyType: string) => ['xml', 'json'].some((i) => i === bodyType)
