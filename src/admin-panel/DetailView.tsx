@@ -24,6 +24,7 @@ import {
 	formatCode,
 	getBodyTypeByContenType,
 	getPropertyCaseInsensitive,
+	isBeautifyType,
 	mapObjectToParams,
 	mapParamsToObject,
 } from '../utils'
@@ -120,7 +121,6 @@ const CONTENT_TYPE = 'Content-Type'
 
 const isFormType = (bodyType: string) => ['form-urlencoded', 'form-data'].some((i) => i === bodyType)
 const isTextType = (bodyType: string) => ['xml', 'json', 'text'].some((i) => i === bodyType)
-const isBeautifyType = (bodyType: string) => ['xml', 'json'].some((i) => i === bodyType)
 const createParamItem = () => ({ isChecked: true, key: '', value: '' })
 
 export function DetailView(props: Props) {
