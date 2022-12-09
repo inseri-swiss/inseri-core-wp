@@ -3,7 +3,7 @@ import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockEditProps, BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import { SetupEditorEnv } from '../../components'
-import { ProducerBeacon } from '../../globalScript'
+import { ConsumerBeacon, ProducerBeacon } from '../../globalScript'
 import json from './block.json'
 import { TextEditorEdit } from './Component'
 import './style.scss'
@@ -12,12 +12,14 @@ const { name, ...settings } = json as any
 
 export interface Attributes {
 	blockId?: string
+	input?: ConsumerBeacon
 	output?: ProducerBeacon
 	blockName: string
 	height: number
 	editable: boolean
 	content: string
 	label: string
+	isViewer: boolean
 }
 
 function Edit(props: BlockEditProps<Attributes>) {

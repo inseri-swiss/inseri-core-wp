@@ -5,11 +5,18 @@
 	"version": "0.1.0",
 	"title": "Text Editor",
 	"category": "inseri",
-	"description": "Write JSON, XML, HTML, ...",
+	"description": "Write or view JSON, XML, HTML, ...",
 	"attributes": {
 		"blockId": {
 			"type": "string",
 			"default": ""
+		},
+		"isViewer": {
+			"type": "boolean",
+			"default": false
+		},
+		"input": {
+			"type": "object"
 		},
 		"output": {
 			"type": "object"

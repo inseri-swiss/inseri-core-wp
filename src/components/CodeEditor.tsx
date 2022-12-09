@@ -12,6 +12,7 @@ import 'prismjs/components/prism-javascript'
 import 'prismjs/components/prism-typescript'
 import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-yaml'
+import 'prismjs/components/prism-csv'
 import { escapeHtml } from '../utils'
 
 const supportedHighlighted = [
@@ -25,6 +26,7 @@ const supportedHighlighted = [
 	'yaml',
 	'xml',
 	'json',
+	'csv',
 ]
 
 const useStyles = createStyles((theme) => ({
