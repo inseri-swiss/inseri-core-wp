@@ -1,4 +1,4 @@
-import { useControlTower, useDispatch } from '@inseri/lighthouse'
+import { useAvailableBeacons, useControlTower, useDispatch, useWatch } from '@inseri/lighthouse'
 import { useDebouncedValue } from '@mantine/hooks'
 import { IconCode } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
@@ -7,7 +7,7 @@ import { PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarG
 import { useEffect, useMemo, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Button, CodeEditor, Group, Select, Text } from '../../components'
+import { Box, Button, CodeEditor, Group, SegmentedControl, Select, Text } from '../../components'
 import config from './block.json'
 import { Attributes } from './index'
 
@@ -17,13 +17,25 @@ const textEditorBeacon = { contentType: '', description: __('content', 'inseri-c
 
 export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes, isSelected } = props
-	const { blockId, blockName, editable, output, label } = attributes
+	const { blockId, blockName, editable, input, output, label, isViewer } = attributes
 
 	const [contentType, setContentType] = useState(output?.contentType ?? '')
-	const [isWizardMode, setWizardMode] = useState(!contentType)
-	const dispatch = useDispatch(output)
+	const [isWizardMode, setWizardMode] = useState(!contentType && !output)
 
-	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, [textEditorBeacon])
+	const [isInternalViewer, setInternalViewer] = useState(isViewer)
+	const [inputBeaconKey, setInputBeaconKey] = useState(input?.key ?? '')
+
+	const textualContentTypes = TEXTUAL_CONTENT_TYPES.map((t) => t.value)
+	const availableBeacons = useAvailableBeacons((c) => textualContentTypes.includes(c))
+	const selectData = Object.keys(availableBeacons)
+		.filter((k) => !k.startsWith(blockId + '/'))
+		.map((k) => ({ label: availableBeacons[k].description, value: k }))
+
+	const beaconConfigs = isViewer ? [] : [textEditorBeacon]
+	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, beaconConfigs)
+
+	const dispatch = useDispatch(output)
+	const isValueSet = !!contentType || !!input
 
 	useEffect(() => {
 		if (producersBeacons.length > 0) {
@@ -40,6 +52,15 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 		}
 	}, [contentType])
 
+	const { status } = useWatch(input)
+	useEffect(() => {
+		if (status === 'unavailable') {
+			setAttributes({ input: undefined })
+			setInputBeaconKey('')
+			setWizardMode(true)
+		}
+	}, [status])
+
 	const renderResizable = (children: JSX.Element) => (
 		<ResizableBox
 			enable={{ bottom: true }}
@@ -53,7 +74,8 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 	)
 
 	useEffect(() => {
-		if (contentType && !isSelected && isWizardMode) {
+		if (isValueSet && !isSelected && isWizardMode) {
+			setInternalViewer(isViewer)
 			setWizardMode(false)
 		}
 	}, [isSelected])
@@ -69,8 +91,7 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 
 	return (
 		<>
-			<BlockControls>{contentType && <ToolbarGroup controls={toolbarControls} />}</BlockControls>
-
+			<BlockControls>{isValueSet && <ToolbarGroup controls={toolbarControls} />}</BlockControls>
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
@@ -79,34 +100,63 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 					<PanelRow>
 						<TextControl label="Label" value={label} onChange={(value) => setAttributes({ label: value })} />
 					</PanelRow>
-					<PanelRow>
-						<ToggleControl label="publicly editable" checked={editable} onChange={() => setAttributes({ editable: !editable })} />
-					</PanelRow>
+					{!isViewer && (
+						<PanelRow>
+							<ToggleControl label="publicly editable" checked={editable} onChange={() => setAttributes({ editable: !editable })} />
+						</PanelRow>
+					)}
 				</PanelBody>
 			</InspectorControls>
 			{isWizardMode ? (
 				<Box p="md" style={{ border: '1px solid #000' }}>
-					<Group mb="lg" spacing={0}>
+					<Group mb="md" spacing={0}>
 						<IconCode size={28} />
 						<Text ml="xs" fz={24}>
 							{__('Text Editor', 'inseri-core')}
 						</Text>
 					</Group>
-					<Select
-						label="Choose a format"
-						mb="md"
-						searchable
-						data={TEXTUAL_CONTENT_TYPES}
-						value={contentType}
-						onChange={(v) => {
-							setContentType(v!)
-							setWizardMode(false)
-
-							if (v !== contentType) {
-								dispatch({ status: 'unavailable' })
-							}
-						}}
+					<SegmentedControl
+						my="md"
+						value={isInternalViewer ? 'Viewer' : 'Editor'}
+						onChange={(v) => setInternalViewer(v === 'Viewer')}
+						data={['Editor', 'Viewer']}
 					/>
+					{!isInternalViewer && (
+						<Select
+							label="Choose a format"
+							mb="md"
+							searchable
+							data={TEXTUAL_CONTENT_TYPES}
+							value={contentType}
+							onChange={(v) => {
+								setContentType(v!)
+								setWizardMode(false)
+
+								if (v !== contentType) {
+									dispatch({ status: 'unavailable' })
+								}
+
+								setAttributes({ isViewer: isInternalViewer })
+								setInputBeaconKey('')
+								setAttributes({ input: undefined })
+							}}
+						/>
+					)}
+					{isInternalViewer && (
+						<Select
+							label={__('Display code by selecting a block source', 'inseri-core')}
+							data={selectData}
+							value={inputBeaconKey}
+							onChange={(key) => {
+								setInputBeaconKey(key!)
+								setAttributes({ input: availableBeacons[key!] })
+								setWizardMode(false)
+
+								setAttributes({ isViewer: isInternalViewer })
+								setContentType('')
+							}}
+						/>
+					)}
 				</Box>
 			) : (
 				<TextEditorView {...props} setAttributes={setAttributes} renderResizable={renderResizable} />
@@ -123,16 +173,21 @@ interface ViewProps {
 
 export function TextEditorView(props: ViewProps) {
 	const { attributes, setAttributes, renderResizable } = props
-	const { height, editable, output, label } = attributes
+	const { height, editable, output, label, isViewer, input } = attributes
 
 	const dispatch = useDispatch(output)
+	const { contentType: incomingContentType, value, status } = useWatch(input)
 
-	const isEditorMode = !!setAttributes
-	const isEditable = editable || isEditorMode
+	const isGutenbergEditor = !!setAttributes
+	const isEditable = editable || isGutenbergEditor
 
 	const codeType = useMemo(() => {
+		if (isViewer) {
+			return getBodyTypeByContenType(incomingContentType) ?? 'text'
+		}
+
 		return getBodyTypeByContenType(output?.contentType) ?? 'text'
-	}, [output?.contentType])
+	}, [output?.contentType, isViewer, incomingContentType])
 
 	const [code, setCode] = useState(attributes.content)
 	const [hasSyntaxError, setSyntaxError] = useState(false)
@@ -160,7 +215,7 @@ export function TextEditorView(props: ViewProps) {
 	useEffect(() => {
 		dispatchValue(debouncedCode)
 
-		if (isEditorMode) {
+		if (isGutenbergEditor) {
 			setAttributes({ content: debouncedCode })
 		}
 	}, [debouncedCode])
@@ -169,7 +224,9 @@ export function TextEditorView(props: ViewProps) {
 		dispatchValue(code)
 	}, [output?.contentType])
 
-	const editorElement = (
+	const editorElement = isViewer ? (
+		<CodeEditor height={height} type={codeType} value={status === 'ready' ? value : ''} />
+	) : (
 		<CodeEditor
 			height={height}
 			type={codeType}
@@ -184,7 +241,6 @@ export function TextEditorView(props: ViewProps) {
 
 	const beautify = () => {
 		const [errorMsg, formattedCode] = formatCode(codeType, code)
-
 		setSyntaxError(!!errorMsg)
 
 		if (formattedCode) {
@@ -197,7 +253,7 @@ export function TextEditorView(props: ViewProps) {
 			<Group position="apart" mb={4}>
 				{label.trim() && <Text fz={14}>{label}</Text>}
 				<div />
-				{isBeautifyType(codeType) && isEditable && (
+				{isBeautifyType(codeType) && isEditable && !isViewer && (
 					<Button variant="subtle" onClick={beautify}>
 						{__('Beautify', 'inseri-core')}
 					</Button>
