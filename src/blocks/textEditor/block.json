@@ -11,9 +11,9 @@
 			"type": "string",
 			"default": ""
 		},
-		"isViewer": {
-			"type": "boolean",
-			"default": false
+		"mode": {
+			"type": "string",
+			"default": "editor"
 		},
 		"input": {
 			"type": "object"
