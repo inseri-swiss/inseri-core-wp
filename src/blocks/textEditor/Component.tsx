@@ -33,12 +33,12 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 		.filter((k) => !k.startsWith(blockId + '/'))
 		.map((k) => ({ label: availableBeacons[k].description, value: k }))
 
-	const beaconConfigs = mode === 'editor' ? [textEditorBeacon] : []
+	const beaconConfigs = mode === 'editor' ? [{ ...textEditorBeacon, contentType }] : []
 	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, beaconConfigs)
 	const dispatch = useDispatch(output)
 
 	useEffect(() => {
-		if (producersBeacons.length > 0) {
+		if (producersBeacons.length > 0 && !output) {
 			setAttributes({ output: producersBeacons[0] })
 		}
 	}, [producersBeacons.length])
