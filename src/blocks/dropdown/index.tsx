@@ -1,11 +1,12 @@
+import { IconCaretDown } from '@tabler/icons'
 import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockEditProps, BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
+import stringify from 'json-stable-stringify'
 import { SetupEditorEnv } from '../../components'
 import { ConsumerBeacon, ProducerBeacon } from '../../globalScript'
 import json from './block.json'
 import { DropdownEdit } from './Component'
-import { IconCaretDown } from '@tabler/icons'
 
 const { name, ...settings } = json as any
 
@@ -29,7 +30,7 @@ function Edit(props: BlockEditProps<Attributes>) {
 
 function Save({ attributes }: BlockSaveProps<Attributes>) {
 	return (
-		<div {...useBlockProps.save()} data-attributes={JSON.stringify(attributes)}>
+		<div {...useBlockProps.save()} data-attributes={stringify(attributes)}>
 			is loading ...
 		</div>
 	)
