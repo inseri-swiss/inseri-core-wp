@@ -1,7 +1,9 @@
 import Ajv, { Schema } from 'ajv'
 import produce from 'immer'
-import { nanoid } from 'nanoid/non-secure'
+import { customAlphabet } from 'nanoid/non-secure'
 
+const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+const nanoid = customAlphabet(alphabet, 21)
 const generateId = (size?: number) => nanoid(size)
 
 const ajv = new Ajv({ allErrors: true })

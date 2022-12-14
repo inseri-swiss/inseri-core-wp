@@ -123,7 +123,13 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 					</PanelRow>
 					{mode === 'editor' && (
 						<PanelRow>
-							<ToggleControl label="publicly editable" checked={editable} onChange={() => setAttributes({ editable: !editable })} />
+							<ToggleControl
+								label={__('publicly editable', 'inseri-core')}
+								checked={editable}
+								onChange={() => {
+									setAttributes({ editable: !editable })
+								}}
+							/>
 						</PanelRow>
 					)}
 				</PanelBody>
