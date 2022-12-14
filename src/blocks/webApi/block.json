@@ -1,0 +1,32 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "inseri-core/web-api",
+	"version": "0.1.0",
+	"title": "Web API",
+	"category": "inseri",
+	"description": "Load data from a Web API",
+	"attributes": {
+		"blockId": {
+			"type": "string",
+			"default": ""
+		},
+		"output": {
+			"type": "object"
+		},
+		"blockName": {
+			"type": "string",
+			"default": ""
+		},
+		"baseWebApi": {
+			"type": "number"
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"textdomain": "inseri-core",
+	"editorScript": "file:./index.js",
+	"viewScript": ["file:./hydration.js"],
+	"script": "inseri-core"
+}
