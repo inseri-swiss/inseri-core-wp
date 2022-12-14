@@ -11,6 +11,7 @@ import { Box, Button, CodeEditor, Group, SegmentedControl, Select, Text } from '
 import { formatCode, getBodyTypeByContenType, isBeautifyType, TEXTUAL_CONTENT_TYPES } from '../../utils'
 import config from './block.json'
 import { Attributes } from './index'
+import stringify from 'json-stable-stringify'
 
 const textEditorBeacon = { contentType: '', description: __('content', 'inseri-core'), key: 'content', default: '' }
 
@@ -44,11 +45,11 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 	}, [producersBeacons.length])
 
 	useEffect(() => {
-		if (prevContentType !== contentType) {
+		if (prevContentType && prevContentType !== contentType) {
 			dispatch({ status: 'unavailable' })
-		}
 
-		setTimeout(() => dispatch({ contentType, status: 'initial' }), 100)
+			setTimeout(() => dispatch({ contentType, status: 'initial' }), 100)
+		}
 	}, [contentType])
 
 	const { status } = useWatch(input)
@@ -222,9 +223,19 @@ export function TextEditorView(props: ViewProps) {
 		}
 	}, [debouncedCode])
 
+	let preparedValue = value
+
+	if (incomingContentType.match('/json')) {
+		preparedValue = stringify(value)
+	}
+
+	if (status !== 'ready' && status !== 'initial') {
+		preparedValue = ''
+	}
+
 	const editorElement =
 		mode === 'viewer' ? (
-			<CodeEditor height={height} type={codeType} value={status === 'ready' ? value : ''} />
+			<CodeEditor height={height} type={codeType} value={preparedValue} />
 		) : (
 			<CodeEditor
 				height={height}
