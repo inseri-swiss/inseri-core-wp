@@ -231,11 +231,11 @@ export function TextEditorView(props: ViewProps) {
 
 	let preparedValue = value
 
-	if (incomingContentType.match('/json')) {
+	if (incomingContentType.match('/json') && preparedValue) {
 		preparedValue = stringify(value)
 	}
 
-	if (status !== 'ready' && status !== 'initial') {
+	if ((status !== 'ready' && status !== 'initial') || !preparedValue) {
 		preparedValue = ''
 	}
 

@@ -32,7 +32,7 @@ const dropdownBeacon = [{ contentType: 'application/json', description: __('chos
 
 export function DropdownEdit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes, isSelected } = props
-	const { input, blockId, label, searchable, clearable, blockName } = attributes
+	const { input, blockId, label, searchable, clearable, blockName, output } = attributes
 
 	const [isWizardMode, setWizardMode] = useState(!input)
 	const [inputBeaconKey, setInputBeaconKey] = useState(input?.key ?? '')
@@ -52,7 +52,7 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 	}, [status])
 
 	useEffect(() => {
-		if (producersBeacons.length > 0) {
+		if (producersBeacons.length > 0 && !output) {
 			setAttributes({ output: producersBeacons[0] })
 		}
 	}, [producersBeacons.length])

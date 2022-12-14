@@ -140,7 +140,7 @@ function useDispatch(config?: ProducerBeacon) {
 		if (config) {
 			useInternalStore.setState((state) => {
 				Object.entries(update)
-					.filter(([_, itemVal]) => !!itemVal)
+					.filter(([_, itemVal]) => itemVal !== undefined)
 					.forEach(([itemKey, itemVal]) => {
 						state.beacons[config.key][itemKey as keyof BaseBeaconState] = itemVal
 					})
