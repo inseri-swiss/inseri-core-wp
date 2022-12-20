@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n'
 import xmlFormatter from 'xml-formatter'
+import { StateCreator } from 'zustand'
 import { ParamItem } from './admin-panel/ParamsTable'
 
 const htmlEscapesMap: Record<string, string> = {
@@ -123,3 +124,37 @@ export const getBodyTypeByContenType = (contentType?: string): string | undefine
 }
 
 export const isBeautifyType = (bodyType: string) => ['xml', 'json'].some((i) => i === bodyType)
+
+type PersistToAttributesImpl = (
+	initialState: StateCreator<Record<string, any>, [], []>,
+	wpAttributes: {
+		setAttributes: (attrs: Partial<Record<string, any>>) => void
+		attributes: Readonly<Record<string, any>>
+		keysToSave: string[]
+	}
+) => StateCreator<Record<string, any>, [], []>
+
+export const persistToAttributes: PersistToAttributesImpl =
+	(config, { keysToSave, setAttributes, attributes }) =>
+	(set, get, store) => {
+		// TODO load values from attributes
+
+		return config(
+			(args) => {
+				const oldVal = get()
+				set(args)
+				const newVal = get()
+
+				const modifiedKeys = Object.keys(oldVal)
+					.filter((k) => keysToSave.includes(k))
+					.filter((k) => oldVal[k] !== newVal[k])
+
+				const updateObj = modifiedKeys.reduce((acc, k) => ({ ...acc, [k]: newVal[k] }), {})
+				if (Object.keys(updateObj).length > 0) {
+					setAttributes(updateObj)
+				}
+			},
+			get,
+			store
+		)
+	}
