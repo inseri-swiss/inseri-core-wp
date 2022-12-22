@@ -6,21 +6,25 @@ import create, { useStore, StateCreator, StoreApi } from 'zustand'
 const StateContext = createContext<StoreApi<any> | undefined>(undefined)
 
 interface StateProviderProps<T> extends PropsWithChildren<any> {
-	storeCreator: StateCreator<T, [], []>
+	stateCreator: (initialState?: Partial<T>) => StateCreator<T, [], []>
 
 	setAttributes?: (attrs: Partial<Record<string, any>>) => void
 	attributes?: Readonly<Record<string, any>>
-	keysToSave?: string[]
+	keysInSync?: string[]
 }
 
-export function StateProvider<T>({ children, storeCreator, setAttributes, attributes, keysToSave }: StateProviderProps<T>) {
+export function StateProvider<T>({ children, stateCreator, setAttributes, attributes, keysInSync }: StateProviderProps<T>) {
 	const storeRef = useRef<StoreApi<any>>()
 
 	if (!storeRef.current) {
-		if (setAttributes && attributes && keysToSave) {
-			storeRef.current = create(persistToAttributes(storeCreator as any, { setAttributes, attributes, keysToSave }))
+		if (setAttributes && attributes && keysInSync) {
+			const initialStateFromAttributes = Object.entries(attributes)
+				.filter(([k, _]) => keysInSync.includes(k))
+				.reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {})
+
+			storeRef.current = create(persistToAttributes(stateCreator(initialStateFromAttributes) as any, { setAttributes, keysToSave: keysInSync }))
 		} else {
-			storeRef.current = create(storeCreator)
+			storeRef.current = create(stateCreator())
 		}
 	}
 
