@@ -129,15 +129,15 @@ type PersistToAttributesImpl = (
 	initialState: StateCreator<Record<string, any>, [], []>,
 	wpAttributes: {
 		setAttributes: (attrs: Partial<Record<string, any>>) => void
-		initialAttributes: Readonly<Record<string, any>>
+		attributes: Readonly<Record<string, any>>
 		keysToSave: string[]
 	}
 ) => StateCreator<Record<string, any>, [], []>
 
 export const persistToAttributes: PersistToAttributesImpl =
-	(config, { keysToSave, setAttributes, initialAttributes }) =>
+	(config, { keysToSave, setAttributes, attributes }) =>
 	(set, get, store) => {
-		set((state) => Object.keys(initialAttributes).reduce((acc, k) => ({ ...acc, [k]: initialAttributes[k] }), state))
+		set((state) => Object.keys(attributes).reduce((acc, k) => ({ ...acc, [k]: attributes[k] }), state))
 
 		return config(
 			(args) => {
