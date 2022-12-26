@@ -29,7 +29,7 @@ export function StateProvider<T>({ initialState, children, stateCreator, setAttr
 
 		if (setAttributes && attributes && keysToSave) {
 			store = persistToAttributes(stateCreator(attributes) as any, { setAttributes, keysToSave })
-			blockId = (attributes as any)['blockId']
+			blockId = attributes.blockId
 		} else {
 			store = stateCreator(initialState)
 		}
