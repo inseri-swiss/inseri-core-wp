@@ -19,13 +19,15 @@ const textEditorBeacon = { contentType: '', description: 'content', key: 'conten
 export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { input, output, label, mode, blockId, blockName, editable, isWizardMode, prevContentType, selectedTab } = useGlobalState((state: GlobalState) => state)
+	const { input, output, label, mode, blockId, blockName, editable, isWizardMode, prevContentType, selectedTab, actions } = useGlobalState(
+		(state: GlobalState) => state
+	)
 	const isValueSet = !!output.contentType || !!input.key
 	const contentType = output.contentType
 	const inputBeaconKey = input.key
 	const outputBeacon = output.key ? output : undefined
 
-	const { updateState, setContentType, chooseInputBeacon } = useGlobalState((s: GlobalState) => s.actions)
+	const { updateState, setContentType, chooseInputBeacon } = actions
 
 	const textualContentTypes = TEXTUAL_CONTENT_TYPES.map((t) => t.value)
 	const availableBeacons = useAvailableBeacons((c) => textualContentTypes.includes(c))
@@ -47,7 +49,7 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 		if (prevContentType !== contentType) {
 			dispatch({ status: 'unavailable' })
 
-			setTimeout(() => dispatch({ contentType, status: 'initial' }), 200)
+			setTimeout(() => dispatch({ contentType, status: 'initial' }), 100)
 		}
 	}, [contentType])
 
