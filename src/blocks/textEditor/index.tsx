@@ -3,18 +3,19 @@ import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockEditProps, BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
-import { SetupEditorEnv } from '../../components'
+import { SetupEditorEnv, StateProvider } from '../../components'
 import { ConsumerBeacon, ProducerBeacon } from '../../globalScript'
 import json from './block.json'
 import { TextEditorEdit } from './Component'
+import { storeCreator } from './state'
 import './style.scss'
 
 const { name, ...settings } = json as any
 
 export interface Attributes {
 	blockId?: string
-	input?: ConsumerBeacon
-	output?: ProducerBeacon
+	input: ConsumerBeacon
+	output: ProducerBeacon
 	blockName: string
 	height: number
 	editable: boolean
@@ -24,9 +25,12 @@ export interface Attributes {
 }
 
 function Edit(props: BlockEditProps<Attributes>) {
+	const { setAttributes, attributes } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'textEditor'}>
-			<TextEditorEdit {...props} />
+			<StateProvider stateCreator={storeCreator} keysInSync={Object.keys(json.attributes)} setAttributes={setAttributes} attributes={attributes}>
+				<TextEditorEdit {...props} />
+			</StateProvider>
 		</SetupEditorEnv>
 	)
 }
