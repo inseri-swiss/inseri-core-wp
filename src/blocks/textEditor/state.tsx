@@ -23,7 +23,7 @@ export const storeCreator = (initalState: GlobalState) => {
 	return immer<GlobalState>((set) => ({
 		...initalState,
 		isWizardMode: !isValueSet,
-		prevContentType: initalState.output?.contentType ?? '',
+		prevContentType: initalState.output.contentType,
 		selectedTab: initalState.mode,
 
 		actions: {
