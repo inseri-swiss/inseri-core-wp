@@ -8,36 +8,34 @@ import { setAutoFreeze } from 'immer'
 const StateContext = createContext<StoreApi<any> | undefined>(undefined)
 
 interface SimpleProps<T> extends PropsWithChildren<any> {
-	stateCreator: (initialState: T) => StateCreator<T, [], []>
+	stateCreator: (initialState: T) => StateCreator<T, any, any>
 	initialState: T
 }
 interface AttributesProps<T> extends PropsWithChildren<any> {
 	stateCreator: (initialState: T) => StateCreator<T, any, any>
 	setAttributes: (attrs: Partial<Record<string, any>>) => void
 	attributes: Readonly<Record<string, any>>
-	keysInSync: string[]
+	keysToSave: string[]
 }
 
 type StateProviderProps<T> = SimpleProps<T> | AttributesProps<T>
 
-export function StateProvider<T>({ initialState, children, stateCreator, setAttributes, attributes, keysInSync }: StateProviderProps<T>) {
+export function StateProvider<T>({ initialState, children, stateCreator, setAttributes, attributes, keysToSave }: StateProviderProps<T>) {
 	const storeRef = useRef<StoreApi<any>>()
 
 	if (!storeRef.current) {
 		let store: any
+		let blockId: string | undefined
 
-		if (setAttributes && attributes && keysInSync) {
-			const initialStateFromAttributes = Object.entries(attributes)
-				.filter(([k, _]) => keysInSync.includes(k))
-				.reduce((acc, [k, v]) => ({ ...acc, [k]: v }), {}) as T
-
-			store = persistToAttributes(stateCreator(initialStateFromAttributes) as any, { setAttributes, keysToSave: keysInSync })
+		if (setAttributes && attributes && keysToSave) {
+			store = persistToAttributes(stateCreator(attributes) as any, { setAttributes, keysToSave })
+			blockId = (attributes as any)['blockId']
 		} else {
 			store = stateCreator(initialState)
 		}
 
 		if (process.env.NODE_ENV !== 'production') {
-			store = devtools(store, { name: attributes.blockId ?? 'component' })
+			store = devtools(store, { name: blockId ?? 'component' })
 			setAutoFreeze(true)
 		} else {
 			setAutoFreeze(false)

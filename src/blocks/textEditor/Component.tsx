@@ -17,7 +17,7 @@ import { GlobalState } from './state'
 const textEditorBeacon = { contentType: '', description: 'content', key: 'content', default: '' }
 
 export function TextEditorEdit(props: BlockEditProps<Attributes>) {
-	const { setAttributes, isSelected } = props
+	const { isSelected } = props
 
 	const { input, output, label, mode, blockId, blockName, editable, isWizardMode, prevContentType, selectedTab } = useGlobalState((state: GlobalState) => state)
 	const isValueSet = !!output.contentType || !!input.key
@@ -143,7 +143,7 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 					)}
 				</Box>
 			) : (
-				<TextEditorView {...props} setAttributes={setAttributes} renderResizable={renderResizable} />
+				<TextEditorView {...props} isGutenbergEditor renderResizable={renderResizable} />
 			)}
 		</>
 	)
@@ -151,18 +151,17 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 
 interface ViewProps {
 	attributes: Readonly<Attributes>
-	setAttributes?: (attrs: Partial<Attributes>) => void
+	isGutenbergEditor?: boolean
 	renderResizable?: (EditorComponent: JSX.Element) => JSX.Element
 }
 
 export function TextEditorView(props: ViewProps) {
-	const { attributes, setAttributes, renderResizable } = props
-	const { height, editable, output, label, mode, input } = attributes
+	const { isGutenbergEditor, renderResizable } = props
+	const { height, editable, output, label, mode, input, content } = useGlobalState((state: GlobalState) => state)
+	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 
 	const dispatch = useDispatch(output)
 	const { contentType: incomingContentType, value, status } = useWatch(input)
-
-	const isGutenbergEditor = !!setAttributes
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
 
 	const codeType = useMemo(() => {
@@ -170,10 +169,10 @@ export function TextEditorView(props: ViewProps) {
 			return getBodyTypeByContenType(incomingContentType) ?? 'text'
 		}
 
-		return getBodyTypeByContenType(output?.contentType) ?? 'text'
-	}, [output?.contentType, mode, incomingContentType])
+		return getBodyTypeByContenType(output.contentType) ?? 'text'
+	}, [output.contentType, mode, incomingContentType])
 
-	const [code, setCode] = useState(attributes.content)
+	const [code, setCode] = useState(content)
 	const [hasSyntaxError, setSyntaxError] = useState(false)
 	const [debouncedCode] = useDebouncedValue(code, 500)
 
@@ -193,14 +192,14 @@ export function TextEditorView(props: ViewProps) {
 	}
 
 	useEffect(() => {
-		dispatchValue(attributes.content)
+		dispatchValue(content)
 	}, [])
 
 	useEffect(() => {
 		dispatchValue(debouncedCode)
 
 		if (isGutenbergEditor) {
-			setAttributes({ content: debouncedCode })
+			updateState({ content: debouncedCode })
 		}
 	}, [debouncedCode])
 

@@ -1,7 +1,8 @@
 import domReady from '@wordpress/dom-ready'
 import { render } from '@wordpress/element'
 import { TextEditorView } from './Component'
-import { InseriThemeProvider } from '../../components'
+import { InseriThemeProvider, StateProvider } from '../../components'
+import { storeCreator } from './state'
 
 function initReactComponents() {
 	const items = document.querySelectorAll('.wp-block-inseri-core-text-editor')
@@ -10,7 +11,9 @@ function initReactComponents() {
 			const attributes = JSON.parse(item.dataset.attributes)
 			render(
 				<InseriThemeProvider>
-					<TextEditorView attributes={attributes} />
+					<StateProvider stateCreator={storeCreator} initialState={attributes}>
+						<TextEditorView attributes={attributes} />
+					</StateProvider>
 				</InseriThemeProvider>,
 				item
 			)

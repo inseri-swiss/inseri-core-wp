@@ -28,7 +28,7 @@ function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'textEditor'}>
-			<StateProvider stateCreator={storeCreator} keysInSync={Object.keys(json.attributes)} setAttributes={setAttributes} attributes={attributes}>
+			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} attributes={attributes}>
 				<TextEditorEdit {...props} />
 			</StateProvider>
 		</SetupEditorEnv>
