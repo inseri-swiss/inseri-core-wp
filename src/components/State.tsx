@@ -3,7 +3,6 @@ import type { PropsWithChildren } from 'react'
 import { persistToAttributes } from '../utils'
 import create, { useStore, StateCreator, StoreApi } from 'zustand'
 import { devtools } from 'zustand/middleware'
-import { immer } from 'zustand/middleware/immer'
 import { setAutoFreeze } from 'immer'
 
 const StateContext = createContext<StoreApi<any> | undefined>(undefined)
@@ -13,7 +12,7 @@ interface SimpleProps<T> extends PropsWithChildren<any> {
 	initialState: T
 }
 interface AttributesProps<T> extends PropsWithChildren<any> {
-	stateCreator: (initialState: T) => StateCreator<T, [], []>
+	stateCreator: (initialState: T) => StateCreator<T, any, any>
 	setAttributes: (attrs: Partial<Record<string, any>>) => void
 	attributes: Readonly<Record<string, any>>
 	keysInSync: string[]
@@ -44,7 +43,7 @@ export function StateProvider<T>({ initialState, children, stateCreator, setAttr
 			setAutoFreeze(false)
 		}
 
-		storeRef.current = create(immer(store))
+		storeRef.current = create(store)
 	}
 
 	return <StateContext.Provider value={storeRef.current}>{children}</StateContext.Provider>

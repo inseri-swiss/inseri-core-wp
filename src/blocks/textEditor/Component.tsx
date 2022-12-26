@@ -1,5 +1,5 @@
 import { useAvailableBeacons, useControlTower, useDispatch, useWatch } from '@inseri/lighthouse'
-import { useDebouncedValue, usePrevious } from '@mantine/hooks'
+import { useDebouncedValue } from '@mantine/hooks'
 import { IconCode } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -7,26 +7,25 @@ import { PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarG
 import { useEffect, useMemo, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Button, CodeEditor, Group, SegmentedControl, Select, Text } from '../../components'
+import stringify from 'json-stable-stringify'
+import { Box, Button, CodeEditor, Group, SegmentedControl, Select, Text, useGlobalState } from '../../components'
 import { formatCode, getBodyTypeByContenType, isBeautifyType, TEXTUAL_CONTENT_TYPES } from '../../utils'
 import config from './block.json'
 import { Attributes } from './index'
-import stringify from 'json-stable-stringify'
+import { GlobalState } from './state'
 
-const textEditorBeacon = { contentType: '', description: __('content', 'inseri-core'), key: 'content', default: '' }
+const textEditorBeacon = { contentType: '', description: 'content', key: 'content', default: '' }
 
 export function TextEditorEdit(props: BlockEditProps<Attributes>) {
-	const { setAttributes, attributes, isSelected } = props
-	const { blockId, blockName, editable, input, output, label, mode } = attributes
+	const { setAttributes, isSelected } = props
 
-	const isValueSet = !!output?.contentType || !!input
+	const { input, output, label, mode, blockId, blockName, editable, isWizardMode, prevContentType, selectedTab } = useGlobalState((state: GlobalState) => state)
+	const isValueSet = !!output.contentType || !!input.key
+	const contentType = output.contentType
+	const inputBeaconKey = input.key
+	const outputBeacon = output.key ? output : undefined
 
-	const [contentType, setContentType] = useState(output?.contentType ?? '')
-	const prevContentType = usePrevious(contentType)
-	const [isWizardMode, setWizardMode] = useState(!isValueSet)
-
-	const [selectedTab, setSelectedTab] = useState<'editor' | 'viewer'>(mode)
-	const [inputBeaconKey, setInputBeaconKey] = useState(input?.key ?? '')
+	const { updateState, setContentType, chooseInputBeacon } = useGlobalState((s: GlobalState) => s.actions)
 
 	const textualContentTypes = TEXTUAL_CONTENT_TYPES.map((t) => t.value)
 	const availableBeacons = useAvailableBeacons((c) => textualContentTypes.includes(c))
@@ -36,65 +35,41 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 
 	const beaconConfigs = mode === 'editor' ? [{ ...textEditorBeacon, contentType }] : []
 	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, beaconConfigs)
-	const dispatch = useDispatch(output)
+	const dispatch = useDispatch(outputBeacon)
 
 	useEffect(() => {
-		if (producersBeacons.length > 0 && !output) {
-			setAttributes({ output: producersBeacons[0] })
+		if (producersBeacons.length > 0 && !output.key) {
+			updateState({ output: producersBeacons[0] })
 		}
 	}, [producersBeacons.length])
 
 	useEffect(() => {
-		if (prevContentType && prevContentType !== contentType) {
+		if (prevContentType !== contentType) {
 			dispatch({ status: 'unavailable' })
 
-			setTimeout(() => dispatch({ contentType, status: 'initial' }), 100)
+			setTimeout(() => dispatch({ contentType, status: 'initial' }), 200)
 		}
 	}, [contentType])
 
 	const { status } = useWatch(input)
 	useEffect(() => {
 		if (status === 'unavailable') {
-			setAttributes({ input: undefined })
-			setInputBeaconKey('')
-			setWizardMode(true)
+			updateState({ input: { ...input, key: '' }, isWizardMode: true })
 		}
 	}, [status])
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
-			setSelectedTab(mode)
-			setWizardMode(false)
+			updateState({ selectedTab: mode, isWizardMode: false })
 		}
 	}, [isSelected])
-
-	const setContenTypeAction = (newContentType: string) => {
-		setWizardMode(false)
-		setContentType(newContentType)
-
-		if (output) {
-			const newOutput = { ...output, contentType: newContentType }
-			setAttributes({ output: newOutput })
-		}
-
-		setAttributes({ mode: 'editor', input: undefined })
-		setInputBeaconKey('')
-	}
-
-	const chooseInputBeacon = (key: string) => {
-		setWizardMode(false)
-		setInputBeaconKey(key!)
-
-		setAttributes({ input: availableBeacons[key!], mode: 'viewer' })
-		setContentType('')
-	}
 
 	const renderResizable = (children: JSX.Element) => (
 		<ResizableBox
 			enable={{ bottom: true }}
 			minHeight={60}
 			onResize={(_event, _direction, element) => {
-				setAttributes({ height: element.offsetHeight })
+				updateState({ height: element.offsetHeight })
 			}}
 		>
 			{children}
@@ -105,7 +80,7 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 		{
 			icon: edit,
 			isActive: isWizardMode,
-			onClick: () => setWizardMode(!isWizardMode),
+			onClick: () => updateState({ isWizardMode: !isWizardMode }),
 			title: __('Edit', 'inseri-core'),
 		},
 	]
@@ -116,10 +91,10 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
-						<TextControl label="Block Name" value={blockName} onChange={(value) => setAttributes({ blockName: value })} />
+						<TextControl label="Block Name" value={blockName} onChange={(value) => updateState({ blockName: value })} />
 					</PanelRow>
 					<PanelRow>
-						<TextControl label="Label" value={label} onChange={(value) => setAttributes({ label: value })} />
+						<TextControl label="Label" value={label} onChange={(value) => updateState({ label: value })} />
 					</PanelRow>
 					{mode === 'editor' && (
 						<PanelRow>
@@ -127,7 +102,7 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 								label={__('publicly editable', 'inseri-core')}
 								checked={editable}
 								onChange={() => {
-									setAttributes({ editable: !editable })
+									updateState({ editable: !editable })
 								}}
 							/>
 						</PanelRow>
@@ -145,7 +120,7 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 					<SegmentedControl
 						my="md"
 						value={selectedTab}
-						onChange={(v: any) => setSelectedTab(v)}
+						onChange={(v: any) => updateState({ selectedTab: v })}
 						data={['Editor', 'Viewer'].map((s) => ({ label: s, value: s.toLowerCase() }))}
 					/>
 					{selectedTab === 'editor' && (
@@ -155,7 +130,7 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 							searchable
 							data={TEXTUAL_CONTENT_TYPES}
 							value={contentType}
-							onChange={setContenTypeAction}
+							onChange={setContentType}
 						/>
 					)}
 					{selectedTab === 'viewer' && (
@@ -163,7 +138,7 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 							label={__('Display code by selecting a block source', 'inseri-core')}
 							data={selectData}
 							value={inputBeaconKey}
-							onChange={chooseInputBeacon}
+							onChange={(key) => chooseInputBeacon(availableBeacons[key!])}
 						/>
 					)}
 				</Box>

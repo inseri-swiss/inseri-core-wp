@@ -16,10 +16,19 @@
 			"default": "editor"
 		},
 		"input": {
-			"type": "object"
+			"type": "object",
+			"default": {
+				"key": "",
+				"contentType": "",
+				"description": ""
+			}
 		},
 		"output": {
-			"type": "object"
+			"type": "object",
+			"default": {
+				"key": "",
+				"contentType": ""
+			}
 		},
 		"blockName": {
 			"type": "string",
