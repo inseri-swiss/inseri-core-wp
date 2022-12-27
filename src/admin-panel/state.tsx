@@ -5,9 +5,9 @@ import { createParamItem } from './DetailView'
 import { updatePartially } from '../utils'
 
 interface AdminAttributes {
-	mode: 'create' | 'edit' | 'read'
+	mode: 'create' | 'edit' | 'read' | 'none'
 	openAccordionItems: string[]
-
+	webApiId: number | null
 	item: Datasource | null
 
 	heading: {
@@ -48,9 +48,9 @@ export interface AdminState extends AdminAttributes {
 }
 
 export const initialState: AdminAttributes = {
-	mode: 'create',
+	mode: 'none',
 	openAccordionItems: ['request'],
-
+	webApiId: null,
 	item: null,
 
 	heading: {
