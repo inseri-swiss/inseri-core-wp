@@ -1,7 +1,9 @@
 import { useDebouncedValue } from '@mantine/hooks'
 import { IconCircleOff, IconLock, IconLockOpen } from '@tabler/icons'
-import { useEffect, useState } from '@wordpress/element'
+import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
+import { addNewItem, Datasource, DatasourceWithoutId, getItem, handleTryRequest, updateNewItem } from '../ApiServer'
+import logo from '../assets/inseri_logo.png'
 import {
 	Accordion,
 	ActionIcon,
@@ -17,6 +19,7 @@ import {
 	Text,
 	TextInput,
 	Title,
+	useGlobalState,
 } from '../components'
 import {
 	BODY_TYPE_TO_CONTENT_TYPE,
@@ -28,11 +31,10 @@ import {
 	mapObjectToParams,
 	mapParamsToObject,
 } from '../utils'
-import { addNewItem, Datasource, DatasourceWithoutId, handleTryRequest, getItem, updateNewItem } from '../ApiServer'
 import { PAGES } from './config'
 import { ParamItem, ParamsTable } from './ParamsTable'
+import { AdminState } from './state'
 import { UrlBar } from './UrlBar'
-import logo from '../assets/inseri_logo.png'
 
 const useStyles = createStyles((theme, _params, getRef) => ({
 	primaryBtn: {
@@ -121,7 +123,7 @@ const CONTENT_TYPE = 'Content-Type'
 
 const isFormType = (bodyType: string) => ['form-urlencoded', 'form-data'].some((i) => i === bodyType)
 const isTextType = (bodyType: string) => ['xml', 'json', 'text'].some((i) => i === bodyType)
-const createParamItem = () => ({ isChecked: true, key: '', value: '' })
+export const createParamItem = () => ({ isChecked: true, key: '', value: '' })
 
 export function DetailView(props: Props) {
 	const {
@@ -141,72 +143,59 @@ export function DetailView(props: Props) {
 	const { mode } = props
 	const isEdit = mode === 'edit'
 
-	const [datasourceName, setDatasourceName] = useState('')
-	const [datasourceType, setDatasourceType] = useState<string | null>(DATASOURCE_TYPES[0].value)
+	const openAccordionItems = useGlobalState((state: AdminState) => state.openAccordionItems)
+	const item = useGlobalState((state: AdminState) => state.item)
 
-	const [method, setMethod] = useState('GET')
-	const [url, setUrl] = useState('')
+	const { name, contentType, isContentTypeLock, webApiType, pageError, isLoading } = useGlobalState((state: AdminState) => state.heading)
+	const {
+		method,
+		url,
+		urlError,
+		queryParams,
+		headerParams,
+		bodyType: requestBodyType,
+		textBody,
+		paramsBody,
+		bodyError,
+	} = useGlobalState((state: AdminState) => state.parameters)
+	const {
+		status: responseStatus,
+		headerParams: responseHeaders,
+		body: responseBody,
+		bodyType: responseBodyType,
+	} = useGlobalState((state: AdminState) => state.response)
+
 	const [debouncedUrl] = useDebouncedValue(url, 500)
-	const [urlError, setUrlError] = useState('')
-
-	const [queryParams, setQueryParams] = useState<ParamItem[]>([createParamItem()])
-	const [headerParams, setHeaderParams] = useState<ParamItem[]>([createParamItem()])
-
-	const [requestBodyType, setRequestBodyType] = useState<string>(BODY_TYPES[0].value)
-	const [requestTextBody, setRequestTextBody] = useState<string>('')
-	const [requestParamsBody, setRequestParamsBody] = useState<ParamItem[]>([createParamItem()])
-	const [bodyError, setBodyError] = useState<string>('')
-
-	const [openAccordionItems, setOpenAccordionItems] = useState<string[]>(['request'])
-	const [isLoadingRequest, setLoadingRequest] = useState(false)
-
-	const [responseStatus, setResponseStatus] = useState<string>('')
-	const [responseHeaders, setResponseHeaders] = useState<ParamItem[]>([createParamItem()])
-	const [responseBody, setResponseBody] = useState<any>('')
-	const [responseBodyType, setResponseBodyType] = useState<string>('')
-
-	const [responseContentType, setResponseContentType] = useState<string | undefined>(undefined)
-	const [isContentTypeLock, setContentTypeLock] = useState(false)
-
-	const [pageError, setPageError] = useState<string>('')
-	const [item, setItem] = useState<Datasource | null>(null)
-
-	const isNotReadyForSubmit = !!urlError || !url || !datasourceName || !responseContentType
+	const { updateState } = useGlobalState((state: AdminState) => state.actions)
+	const isNotReadyForSubmit = !!urlError || !url || !name || !contentType
 
 	const tryRequest = async () => {
-		setLoadingRequest(true)
-		setPageError('')
+		updateState({ heading: { isLoading: true, pageError: '' } })
 
 		let body: any = null
 		if (requestBodyType === 'form-urlencoded') {
-			body = new URLSearchParams(mapParamsToObject(requestParamsBody))
+			body = new URLSearchParams(mapParamsToObject(paramsBody))
 		}
 		if (requestBodyType === 'form-data') {
 			const bodyFormData = new FormData()
-			const paramsObject = mapParamsToObject(requestParamsBody)
+			const paramsObject = mapParamsToObject(paramsBody)
 			Object.keys(paramsObject).forEach((k) => bodyFormData.append(k, paramsObject[k]))
 
 			body = bodyFormData
 		}
 		if (isTextType(requestBodyType)) {
-			body = requestTextBody
+			body = textBody
 		}
 
 		const [status, headers, data] = await handleTryRequest(method, url, mapParamsToObject(queryParams), mapParamsToObject(headerParams), body)
 
 		if (!status || status === 'ERR_NETWORK') {
-			setPageError(__('The request failed (maybe the request was blocked by CORS). Open the browser dev tools for more information.', 'inseri-core'))
+			// eslint-disable-next-line
+			const pageErrorText = __('The request failed (maybe the request was blocked by CORS). Open the browser dev tools for more information.', 'inseri-core')
+			updateState({ heading: { pageError: pageErrorText } })
 		} else {
-			const isResponsePanelOpen = openAccordionItems.some((i) => i === 'response')
-			if (!isResponsePanelOpen) {
-				setOpenAccordionItems([...openAccordionItems, 'response'])
-			}
-
-			setResponseStatus(status)
-			setResponseHeaders(mapObjectToParams(headers))
-
-			const contentType: string | undefined = getPropertyCaseInsensitive(headers, CONTENT_TYPE)
-			const bodyType = getBodyTypeByContenType(contentType) ?? 'raw'
+			const responseContentType: string | undefined = getPropertyCaseInsensitive(headers, CONTENT_TYPE)
+			const bodyType = getBodyTypeByContenType(responseContentType) ?? 'raw'
 			let preparedBody: string | { url: string; filename: string } = ''
 
 			if (bodyType === 'image') {
@@ -227,33 +216,41 @@ export function DetailView(props: Props) {
 			}
 
 			if (!isContentTypeLock) {
-				setResponseContentType(contentType)
+				updateState({ heading: { contentType: responseContentType } })
 			}
-			setResponseBodyType(bodyType)
-			setResponseBody(preparedBody)
+
+			updateState({
+				openAccordionItems: Array.from(new Set([...openAccordionItems, 'response'])),
+				response: {
+					status,
+					headerParams: mapObjectToParams(headers),
+					bodyType,
+					body: preparedBody,
+				},
+			})
 		}
 
-		setLoadingRequest(false)
+		updateState({ heading: { isLoading: false } })
 	}
 
 	const createOrUpdateDatasource = async () => {
 		let body: string | undefined
 
 		if (isFormType(requestBodyType)) {
-			body = JSON.stringify(mapParamsToObject(requestParamsBody))
+			body = JSON.stringify(mapParamsToObject(paramsBody))
 		} else if (requestBodyType !== 'none') {
-			body = requestTextBody
+			body = textBody
 		}
 
 		const payload: DatasourceWithoutId = {
 			method,
 			url,
-			description: datasourceName,
+			description: name,
 			headers: JSON.stringify(mapParamsToObject(headerParams)),
 			query_params: JSON.stringify(mapParamsToObject(queryParams)),
-			type: datasourceType ?? DATASOURCE_TYPES[0].value,
+			type: webApiType ?? DATASOURCE_TYPES[0].value,
 			body,
-			content_type: responseContentType ?? '',
+			content_type: contentType ?? '',
 		}
 
 		let result: [string?, Datasource?]
@@ -270,7 +267,7 @@ export function DetailView(props: Props) {
 
 		const errorMsg = result[0]
 		if (errorMsg) {
-			setPageError(errorMsg)
+			updateState({ heading: { pageError: errorMsg } })
 		} else {
 			const currentUrl = new URL(window.location.href)
 			currentUrl.searchParams.set('page', PAGES.home)
@@ -279,13 +276,13 @@ export function DetailView(props: Props) {
 	}
 
 	const beautify = () => {
-		const [errorMsg, formattedCode] = formatCode(requestBodyType, requestTextBody)
+		const [errorMsg, formattedCode] = formatCode(requestBodyType, textBody)
 
 		const error = errorMsg ?? ''
-		setBodyError(error)
+		updateState({ parameters: { bodyError: error } })
 
 		if (formattedCode) {
-			setRequestTextBody(formattedCode)
+			updateState({ parameters: { textBody: formattedCode } })
 		}
 	}
 
@@ -299,7 +296,7 @@ export function DetailView(props: Props) {
 		const beginIndex = foundIndex >= 0 ? foundIndex + 1 : -1
 		const updatedHeaders = [...headerParams.slice(0, foundIndex), ...itemsToInsert, ...headerParams.slice(beginIndex)]
 
-		setHeaderParams(updatedHeaders)
+		updateState({ parameters: { headerParams: updatedHeaders } })
 	}, [requestBodyType])
 
 	useEffect(() => {
@@ -309,35 +306,31 @@ export function DetailView(props: Props) {
 		if (mode === 'edit') {
 			getItem(props.itemId).then(([errorMsg, data]) => {
 				if (errorMsg) {
-					setPageError(errorMsg)
+					updateState({ heading: { pageError: errorMsg } })
 				}
 				if (data) {
 					// eslint-disable-next-line
 					const { description, url, method, headers, query_params, type, body, content_type } = data
-					setItem(data)
-					setResponseContentType(content_type)
-					setDatasourceName(description)
-					setUrl(url)
-					setMethod(method)
-					setDatasourceType(type)
-					const queryParamItems = [...mapObjectToParams(JSON.parse(query_params)), createParamItem()]
-					setQueryParams(queryParamItems)
 
+					const queryParamItems = [...mapObjectToParams(JSON.parse(query_params)), createParamItem()]
 					const headerParamItems: ParamItem[] = [...mapObjectToParams(JSON.parse(headers)), createParamItem()]
 					const contentTypeItem = headerParamItems.find((i) => i.key.toLowerCase() === CONTENT_TYPE.toLowerCase())
 					const bodyType = getBodyTypeByContenType(contentTypeItem?.value) ?? 'none'
 
 					if (isFormType(bodyType) && body) {
-						setRequestParamsBody([...mapObjectToParams(JSON.parse(body)), createParamItem()])
+						updateState({ parameters: { paramsBody: [...mapObjectToParams(JSON.parse(body)), createParamItem()] } })
 					}
 
 					if (!isFormType(bodyType) && body) {
-						setRequestTextBody(body)
+						updateState({ parameters: { textBody: body } })
 					}
 
-					setRequestBodyType(bodyType)
-					setHeaderParams(headerParamItems)
-					setContentTypeLock(true)
+					updateState({
+						item: data,
+						// eslint-disable-next-line
+						heading: { name: description, webApiType: type, contentType: content_type, isContentTypeLock: true },
+						parameters: { method, url, queryParams: queryParamItems, headerParams: headerParamItems, bodyType },
+					})
 				}
 			})
 		}
@@ -349,16 +342,19 @@ export function DetailView(props: Props) {
 				new URL(debouncedUrl)
 			}
 		} catch (exception) {
-			setUrlError(__('invalid URL', 'inseri-core'))
+			updateState({ parameters: { urlError: __('invalid URL', 'inseri-core') } })
 		}
 	}, [debouncedUrl])
 
 	const title = isEdit ? __('Edit Web API', 'inseri-core') : __('Add New Web API', 'inseri-core')
 	const primaryBtnText = isEdit ? __('Save', 'inseri-core') : __('Create', 'inseri-core')
 
-	const foundContentType = COMMON_CONTENT_TYPES.find((c) => c.value === responseContentType)
-	const contentTypesSelection =
-		!foundContentType && responseContentType ? [{ label: responseContentType, value: responseContentType }, ...COMMON_CONTENT_TYPES] : COMMON_CONTENT_TYPES
+	const foundContentType = COMMON_CONTENT_TYPES.find((c) => c.value === contentType)
+	let contentTypesSelection = COMMON_CONTENT_TYPES
+
+	if (!foundContentType && contentType) {
+		contentTypesSelection = [{ label: contentType, value: contentType }, ...COMMON_CONTENT_TYPES]
+	}
 
 	return (
 		<>
@@ -384,7 +380,7 @@ export function DetailView(props: Props) {
 						variant="outline"
 						color="red"
 						classNames={{ root: alertRoot }}
-						onClose={() => setPageError('')}
+						onClose={() => updateState({ heading: { pageError: '' } })}
 						withCloseButton
 					>
 						{pageError}
@@ -407,8 +403,8 @@ export function DetailView(props: Props) {
 					<Select
 						label={__('Web API Type', 'inseri-core')}
 						data={DATASOURCE_TYPES}
-						value={datasourceType}
-						onChange={setDatasourceType}
+						value={webApiType}
+						onChange={(type) => updateState({ heading: { webApiType: type! } })}
 						classNames={{ wrapper: isEdit ? readonlyWrapper : undefined }}
 						readOnly={isEdit}
 						withAsterisk={!isEdit}
@@ -418,8 +414,8 @@ export function DetailView(props: Props) {
 						label={__('Name', 'inseri-core')}
 						className={midSizeField}
 						style={{ flex: 1 }}
-						value={datasourceName}
-						onChange={(e) => setDatasourceName(e.currentTarget.value)}
+						value={name}
+						onChange={(e) => updateState({ heading: { name: e.currentTarget.value } })}
 						withAsterisk
 					/>
 
@@ -430,12 +426,12 @@ export function DetailView(props: Props) {
 							classNames={{ root: midSizeField, wrapper: ctInputWrapper }}
 							searchable
 							data={contentTypesSelection}
-							value={responseContentType}
+							value={contentType}
 							readOnly={isContentTypeLock}
-							onChange={(val) => setResponseContentType(val!)}
+							onChange={(val) => updateState({ heading: { contentType: val! } })}
 							withAsterisk
 						/>
-						<ActionIcon onClick={() => setContentTypeLock(!isContentTypeLock)} className={lockWrapper}>
+						<ActionIcon onClick={() => updateState({ heading: { isContentTypeLock: !isContentTypeLock } })} className={lockWrapper}>
 							{isContentTypeLock ? <IconLock size={18} /> : <IconLockOpen size={18} />}
 						</ActionIcon>
 					</Group>
@@ -457,13 +453,13 @@ export function DetailView(props: Props) {
 			<Box mt="lg" mx={36} className={whiteBox}>
 				<UrlBar
 					method={method}
-					onMethodChange={setMethod}
+					onMethodChange={(val) => updateState({ parameters: { method: val } })}
 					url={url}
-					onUrlChange={setUrl}
+					onUrlChange={(val) => updateState({ parameters: { url: val } })}
 					urlError={urlError}
-					setUrlError={setUrlError}
+					setUrlError={(err) => updateState({ parameters: { urlError: err } })}
 					onTryClick={tryRequest}
-					isLoadingRequest={isLoadingRequest}
+					isLoadingRequest={isLoading}
 				/>
 
 				<Accordion
@@ -474,7 +470,7 @@ export function DetailView(props: Props) {
 						content: accordionContent,
 					}}
 					value={openAccordionItems}
-					onChange={setOpenAccordionItems}
+					onChange={(items) => updateState({ openAccordionItems: items })}
 				>
 					<Accordion.Item value="request" defaultChecked={true}>
 						<Accordion.Control>{__('Parameters', 'inseri-core')}</Accordion.Control>
@@ -487,16 +483,22 @@ export function DetailView(props: Props) {
 								</Tabs.List>
 
 								<Tabs.Panel value="query-params" pt="xs">
-									<ParamsTable items={queryParams} onItemsChange={setQueryParams} />
+									<ParamsTable items={queryParams} onItemsChange={(qs) => updateState({ parameters: { queryParams: qs } })} />
 								</Tabs.Panel>
 
 								<Tabs.Panel value="headers" pt="xs">
-									<ParamsTable items={headerParams} onItemsChange={setHeaderParams} />
+									<ParamsTable items={headerParams} onItemsChange={(hs) => updateState({ parameters: { headerParams: hs } })} />
 								</Tabs.Panel>
 
 								<Tabs.Panel value="body" py="sm" px="md">
 									<Group position="apart">
-										<SegmentedControl value={requestBodyType} onChange={setRequestBodyType} data={BODY_TYPES} />
+										<SegmentedControl
+											value={requestBodyType}
+											onChange={(bodyType) => {
+												updateState({ parameters: { bodyType } })
+											}}
+											data={BODY_TYPES}
+										/>
 										{isBeautifyType(requestBodyType) && (
 											<Button variant="subtle" onClick={beautify}>
 												{__('Beautify', 'inseri-core')}
@@ -511,7 +513,7 @@ export function DetailView(props: Props) {
 											</Text>
 										</Group>
 									) : isFormType(requestBodyType) ? (
-										<ParamsTable items={requestParamsBody} onItemsChange={setRequestParamsBody} />
+										<ParamsTable items={paramsBody} onItemsChange={(val) => updateState({ parameters: { paramsBody: val } })} />
 									) : (
 										<Box mt="sm">
 											{bodyError && (
@@ -522,11 +524,8 @@ export function DetailView(props: Props) {
 											<CodeEditor
 												maxHeight={500}
 												type={requestBodyType}
-												value={requestTextBody}
-												onChange={(val) => {
-													setBodyError('')
-													setRequestTextBody(val)
-												}}
+												value={textBody}
+												onChange={(val) => updateState({ parameters: { textBody: val, bodyError: '' } })}
 											/>
 										</Box>
 									)}

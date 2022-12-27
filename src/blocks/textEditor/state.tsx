@@ -17,7 +17,7 @@ export interface GlobalState extends Attributes {
 	}
 }
 
-export const storeCreator = (initalState: GlobalState) => {
+export const storeCreator = (initalState: Attributes) => {
 	const isValueSet = !!initalState.output.contentType || !!initalState.input.key
 
 	return immer<GlobalState>((set) => ({
