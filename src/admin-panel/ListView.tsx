@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n'
 import logo from '../assets/inseri_logo.png'
 import { ActionIcon, Alert, Box, Button, createStyles, Group, MediaQuery, Select, Table, TextInput, Title, useGlobalState } from '../components'
 import { Datasource, getAllItems, removeItem } from '../ApiServer'
-import { HTTP_METHODS, PAGES } from './config'
+import { HTTP_METHODS, PAGES } from './utils'
 import { ContentTableBody, EmptyTableBody, SortableColumns, TableHeader } from './TableComponents'
 import { AdminState } from './state'
 

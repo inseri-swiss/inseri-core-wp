@@ -2,7 +2,6 @@ import { useDebouncedValue } from '@mantine/hooks'
 import { IconCircleOff, IconLock, IconLockOpen } from '@tabler/icons'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { addNewItem, Datasource, DatasourceWithoutId, getItem, handleTryRequest, updateNewItem } from '../ApiServer'
 import logo from '../assets/inseri_logo.png'
 import {
 	Accordion,
@@ -21,20 +20,11 @@ import {
 	Title,
 	useGlobalState,
 } from '../components'
-import {
-	BODY_TYPE_TO_CONTENT_TYPE,
-	COMMON_CONTENT_TYPES,
-	formatCode,
-	getBodyTypeByContenType,
-	getPropertyCaseInsensitive,
-	isBeautifyType,
-	mapObjectToParams,
-	mapParamsToObject,
-} from '../utils'
-import { PAGES } from './config'
-import { ParamItem, ParamsTable } from './ParamsTable'
+import { COMMON_CONTENT_TYPES, formatCode, isBeautifyType } from '../utils'
+import { ParamsTable } from './ParamsTable'
 import { AdminState } from './state'
 import { UrlBar } from './UrlBar'
+import { isFormType } from './utils'
 
 const useStyles = createStyles((theme, _params, getRef) => ({
 	primaryBtn: {
@@ -108,11 +98,6 @@ const BODY_TYPES = [
 ]
 
 const RESPONSE_AREA_ID = 'response-textarea'
-const CONTENT_TYPE = 'Content-Type'
-
-const isFormType = (bodyType: string) => ['form-urlencoded', 'form-data'].some((i) => i === bodyType)
-const isTextType = (bodyType: string) => ['xml', 'json', 'text'].some((i) => i === bodyType)
-export const createParamItem = () => ({ isChecked: true, key: '', value: '' })
 
 export function DetailView() {
 	const {
@@ -132,7 +117,6 @@ export function DetailView() {
 
 	const openAccordionItems = useGlobalState((state: AdminState) => state.openAccordionItems)
 	const item = useGlobalState((state: AdminState) => state.item)
-	const webApiId = useGlobalState((state: AdminState) => state.webApiId)
 	const mode = useGlobalState((state: AdminState) => state.mode)
 	const isEdit = mode === 'edit'
 
@@ -156,114 +140,8 @@ export function DetailView() {
 	} = useGlobalState((state: AdminState) => state.response)
 
 	const [debouncedUrl] = useDebouncedValue(url, 500)
-	const { updateState } = useGlobalState((state: AdminState) => state.actions)
+	const { updateState, createOrUpdateWebApi, tryRequest, loadData, updateRequestBodyType } = useGlobalState((state: AdminState) => state.actions)
 	const isNotReadyForSubmit = !!urlError || !url || !name || !contentType
-
-	const tryRequest = async () => {
-		updateState({ heading: { isLoading: true, pageError: '' } })
-
-		let body: any = null
-		if (requestBodyType === 'form-urlencoded') {
-			body = new URLSearchParams(mapParamsToObject(paramsBody))
-		}
-		if (requestBodyType === 'form-data') {
-			const bodyFormData = new FormData()
-			const paramsObject = mapParamsToObject(paramsBody)
-			Object.keys(paramsObject).forEach((k) => bodyFormData.append(k, paramsObject[k]))
-
-			body = bodyFormData
-		}
-		if (isTextType(requestBodyType)) {
-			body = textBody
-		}
-
-		const [status, headers, data] = await handleTryRequest(method, url, mapParamsToObject(queryParams), mapParamsToObject(headerParams), body)
-
-		if (!status || status === 'ERR_NETWORK') {
-			// eslint-disable-next-line
-			const pageErrorText = __('The request failed (maybe the request was blocked by CORS). Open the browser dev tools for more information.', 'inseri-core')
-			updateState({ heading: { pageError: pageErrorText } })
-		} else {
-			const responseContentType: string | undefined = getPropertyCaseInsensitive(headers, CONTENT_TYPE)
-			const bodyType = getBodyTypeByContenType(responseContentType) ?? 'raw'
-			let preparedBody: string | { url: string; filename: string } = ''
-
-			if (bodyType === 'image') {
-				preparedBody = url
-			} else if (bodyType === 'raw') {
-				const urlObject = URL.createObjectURL(new Blob([data]))
-				const parts = url.split('/')
-				const lastPart = parts[parts.length - 1]
-				preparedBody = { url: urlObject, filename: lastPart }
-			} else {
-				const textBlob = new Blob([data])
-				preparedBody = await textBlob.text()
-			}
-
-			if (isBeautifyType(bodyType) && typeof preparedBody === 'string') {
-				const formattedCode = formatCode(bodyType, preparedBody)[1]
-				preparedBody = formattedCode ?? preparedBody
-			}
-
-			if (!isContentTypeLock) {
-				updateState({ heading: { contentType: responseContentType } })
-			}
-
-			updateState({
-				openAccordionItems: Array.from(new Set([...openAccordionItems, 'response'])),
-				response: {
-					status,
-					headerParams: mapObjectToParams(headers),
-					bodyType,
-					body: preparedBody,
-				},
-			})
-		}
-
-		updateState({ heading: { isLoading: false } })
-	}
-
-	const createOrUpdateDatasource = async () => {
-		let body: string | undefined
-
-		if (isFormType(requestBodyType)) {
-			body = JSON.stringify(mapParamsToObject(paramsBody))
-		} else if (requestBodyType !== 'none') {
-			body = textBody
-		}
-
-		const payload: DatasourceWithoutId = {
-			method,
-			url,
-			description: name,
-			headers: JSON.stringify(mapParamsToObject(headerParams)),
-			query_params: JSON.stringify(mapParamsToObject(queryParams)),
-			type: webApiType ?? DATASOURCE_TYPES[0].value,
-			body,
-			content_type: contentType ?? '',
-		}
-
-		let result: [string?, Datasource?]
-
-		if (isEdit && item) {
-			const updatePayload: Datasource = {
-				...item,
-				...payload,
-			}
-			result = await updateNewItem(updatePayload)
-		} else {
-			result = await addNewItem(payload)
-		}
-
-		const errorMsg = result[0]
-		if (errorMsg) {
-			updateState({ heading: { pageError: errorMsg } })
-		} else {
-			const currentUrl = new URL(window.location.href)
-			currentUrl.searchParams.set('page', PAGES.home)
-			window.location.href = currentUrl.toString()
-		}
-	}
 
 	const beautify = () => {
 		const [errorMsg, formattedCode] = formatCode(requestBodyType, textBody)
@@ -277,53 +155,9 @@ export function DetailView() {
 	}
 
 	useEffect(() => {
-		const foundIndex = headerParams.findIndex((i) => i.key.toLowerCase() === CONTENT_TYPE.toLowerCase())
-		const newContentType = { isChecked: true, key: CONTENT_TYPE, value: BODY_TYPE_TO_CONTENT_TYPE[requestBodyType] }
-		const itemsToInsert = [requestBodyType === 'none' ? null : newContentType].filter(Boolean) as ParamItem[]
-
-		// if found then replace
-		// otherwise insert at 2nd last place (because last item is an empty item)
-		const beginIndex = foundIndex >= 0 ? foundIndex + 1 : -1
-		const updatedHeaders = [...headerParams.slice(0, foundIndex), ...itemsToInsert, ...headerParams.slice(beginIndex)]
-
-		updateState({ parameters: { headerParams: updatedHeaders } })
-	}, [requestBodyType])
-
-	useEffect(() => {
 		const responseTextarea = document.getElementById(RESPONSE_AREA_ID)
 		responseTextarea?.setAttribute('readonly', 'true')
-
-		if (isEdit && webApiId) {
-			getItem(webApiId).then(([errorMsg, data]) => {
-				if (errorMsg) {
-					updateState({ heading: { pageError: errorMsg } })
-				}
-				if (data) {
-					// eslint-disable-next-line
-					const { description, url, method, headers, query_params, type, body, content_type } = data
-
-					const queryParamItems = [...mapObjectToParams(JSON.parse(query_params)), createParamItem()]
-					const headerParamItems: ParamItem[] = [...mapObjectToParams(JSON.parse(headers)), createParamItem()]
-					const contentTypeItem = headerParamItems.find((i) => i.key.toLowerCase() === CONTENT_TYPE.toLowerCase())
-					const bodyType = getBodyTypeByContenType(contentTypeItem?.value) ?? 'none'
-
-					if (isFormType(bodyType) && body) {
-						updateState({ parameters: { paramsBody: [...mapObjectToParams(JSON.parse(body)), createParamItem()] } })
-					}
-
-					if (!isFormType(bodyType) && body) {
-						updateState({ parameters: { textBody: body } })
-					}
-
-					updateState({
-						item: data,
-						// eslint-disable-next-line
-						heading: { name: description, webApiType: type, contentType: content_type, isContentTypeLock: true },
-						parameters: { method, url, queryParams: queryParamItems, headerParams: headerParamItems, bodyType },
-					})
-				}
-			})
-		}
+		loadData()
 	}, [])
 
 	useEffect(() => {
@@ -357,7 +191,7 @@ export function DetailView() {
 						{title}
 					</Title>
 
-					<Button classNames={{ root: primaryBtn }} size="sm" disabled={isNotReadyForSubmit} onClick={createOrUpdateDatasource}>
+					<Button classNames={{ root: primaryBtn }} size="sm" disabled={isNotReadyForSubmit} onClick={createOrUpdateWebApi}>
 						{primaryBtnText}
 					</Button>
 				</Group>
@@ -485,7 +319,7 @@ export function DetailView() {
 										<SegmentedControl
 											value={requestBodyType}
 											onChange={(bodyType) => {
-												updateState({ parameters: { bodyType } })
+												updateRequestBodyType(bodyType)
 											}}
 											data={BODY_TYPES}
 										/>
