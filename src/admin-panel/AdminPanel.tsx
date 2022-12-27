@@ -1,21 +1,26 @@
-import { useState } from '@wordpress/element'
+import { useEffect } from '@wordpress/element'
+import { useGlobalState } from '../components'
 import { PAGES } from './config'
 import { DetailView } from './DetailView'
 import { ListView } from './ListView'
+import { AdminState } from './state'
 
 export function AdminPanel() {
 	const queryParams = new URLSearchParams(document.location.search)
 	const showAddNew = queryParams.get('page') === PAGES['add-new']
 
-	const [itemId, setItemId] = useState<number | null>(null)
+	const mode = useGlobalState((state: AdminState) => state.mode)
+	const { updateState } = useGlobalState((state: AdminState) => state.actions)
 
-	if (showAddNew) {
-		return <DetailView mode="create" />
+	useEffect(() => {
+		if (showAddNew) {
+			updateState({ mode: 'create' })
+		}
+	}, [showAddNew])
+
+	if (mode !== 'none') {
+		return <DetailView />
 	}
 
-	if (itemId) {
-		return <DetailView mode="edit" itemId={itemId} />
-	}
-
-	return <ListView onItemClick={setItemId} />
+	return <ListView />
 }

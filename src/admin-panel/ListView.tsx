@@ -3,14 +3,11 @@ import { IconX } from '@tabler/icons'
 import { useEffect, useRef, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import logo from '../assets/inseri_logo.png'
-import { ActionIcon, Alert, Box, Button, createStyles, Group, MediaQuery, Select, Table, TextInput, Title } from '../components'
+import { ActionIcon, Alert, Box, Button, createStyles, Group, MediaQuery, Select, Table, TextInput, Title, useGlobalState } from '../components'
 import { Datasource, getAllItems, removeItem } from '../ApiServer'
 import { HTTP_METHODS, PAGES } from './config'
 import { ContentTableBody, EmptyTableBody, SortableColumns, TableHeader } from './TableComponents'
-
-interface Props {
-	onItemClick: (id: number) => void
-}
+import { AdminState } from './state'
 
 const useStyles = createStyles((theme) => ({
 	titleBar: {
@@ -42,8 +39,10 @@ const ALL_METHODS = __('All Methods', 'inseri-core')
 const methods = [ALL_METHODS, ...HTTP_METHODS]
 const ADD_NEW_PATH = 'admin.php?page=' + PAGES['add-new']
 
-export function ListView({ onItemClick }: Props) {
+export function ListView() {
 	const { secondaryBtn, table: tableClass, titleBar, primaryBtn, alertRoot } = useStyles().classes
+
+	const { updateState } = useGlobalState((state: AdminState) => state.actions)
 
 	const [rawDatasources, setRawDatasources] = useState<Datasource[]>([])
 	const [datasources, setDatasources] = useState<Datasource[]>([])
@@ -222,7 +221,12 @@ export function ListView({ onItemClick }: Props) {
 				<Table striped className={tableClass} verticalSpacing="md">
 					<TableHeader sortBy={sortDataBy} isReversed={isReversed} sortData={sortData} />
 					{datasources.length > 0 ? (
-						<ContentTableBody datasources={datasources} onDelete={deleteDatasource} onNameClick={onItemClick} onSelectClick={setFilterByString} />
+						<ContentTableBody
+							datasources={datasources}
+							onDelete={deleteDatasource}
+							onNameClick={(id) => updateState({ webApiId: id, mode: 'edit' })}
+							onSelectClick={setFilterByString}
+						/>
 					) : rawDatasources.length > 0 ? (
 						<EmptyTableBody
 							title={__('No Web APIs found', 'inseri-core')}

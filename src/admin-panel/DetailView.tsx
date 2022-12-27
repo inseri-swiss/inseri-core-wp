@@ -97,17 +97,6 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 	},
 }))
 
-interface EditProps {
-	mode: 'edit'
-	itemId: number
-}
-
-interface CreateProps {
-	mode: 'create'
-}
-
-type Props = CreateProps | EditProps
-
 const DATASOURCE_TYPES = [{ label: __('General', 'inseri-core'), value: 'general' }]
 const BODY_TYPES = [
 	{ label: __('None', 'inseri-core'), value: 'none' },
@@ -125,7 +114,7 @@ const isFormType = (bodyType: string) => ['form-urlencoded', 'form-data'].some((
 const isTextType = (bodyType: string) => ['xml', 'json', 'text'].some((i) => i === bodyType)
 export const createParamItem = () => ({ isChecked: true, key: '', value: '' })
 
-export function DetailView(props: Props) {
+export function DetailView() {
 	const {
 		primaryBtn,
 		titleBar,
@@ -140,11 +129,12 @@ export function DetailView(props: Props) {
 		ctInputWrapper,
 		lockWrapper,
 	} = useStyles().classes
-	const { mode } = props
-	const isEdit = mode === 'edit'
 
 	const openAccordionItems = useGlobalState((state: AdminState) => state.openAccordionItems)
 	const item = useGlobalState((state: AdminState) => state.item)
+	const webApiId = useGlobalState((state: AdminState) => state.webApiId)
+	const mode = useGlobalState((state: AdminState) => state.mode)
+	const isEdit = mode === 'edit'
 
 	const { name, contentType, isContentTypeLock, webApiType, pageError, isLoading } = useGlobalState((state: AdminState) => state.heading)
 	const {
@@ -303,8 +293,8 @@ export function DetailView(props: Props) {
 		const responseTextarea = document.getElementById(RESPONSE_AREA_ID)
 		responseTextarea?.setAttribute('readonly', 'true')
 
-		if (mode === 'edit') {
-			getItem(props.itemId).then(([errorMsg, data]) => {
+		if (isEdit && webApiId) {
+			getItem(webApiId).then(([errorMsg, data]) => {
 				if (errorMsg) {
 					updateState({ heading: { pageError: errorMsg } })
 				}
