@@ -7,21 +7,28 @@ import { setAutoFreeze } from 'immer'
 
 const StateContext = createContext<StoreApi<any> | undefined>(undefined)
 
-interface SimpleProps<T> extends PropsWithChildren<any> {
-	stateCreator: (initialState: T) => StateCreator<T, any, any>
-	initialState: T
+interface SimpleProps<I, T extends I> extends PropsWithChildren<any> {
+	stateCreator: (initialState: I) => StateCreator<T, any, any>
+	initialState: I
 }
-interface AttributesProps<T> extends PropsWithChildren<any> {
-	stateCreator: (initialState: T) => StateCreator<T, any, any>
+interface AttributesProps<I, T extends I> extends PropsWithChildren<any> {
+	stateCreator: (initialState: I) => StateCreator<T, any, any>
 	setAttributes: (attrs: Partial<Record<string, any>>) => void
 	attributes: Readonly<Record<string, any>>
 	keysToSave: string[]
 }
 
-type StateProviderProps<T> = SimpleProps<T> | AttributesProps<T>
+type StateProviderProps<I, T extends I> = SimpleProps<I, T> | AttributesProps<I, T>
 
-export function StateProvider<T>({ initialState, children, stateCreator, setAttributes, attributes, keysToSave }: StateProviderProps<T>) {
-	const storeRef = useRef<StoreApi<any>>()
+export function StateProvider<INIT, STATE extends INIT>({
+	initialState,
+	children,
+	stateCreator,
+	setAttributes,
+	attributes,
+	keysToSave,
+}: StateProviderProps<INIT, STATE>) {
+	const storeRef = useRef<StoreApi<STATE>>()
 
 	if (!storeRef.current) {
 		let store: any

@@ -155,3 +155,17 @@ export const persistToAttributes: PersistToAttributesImpl =
 			store
 		)
 	}
+
+export function updatePartially(state: any, modifier: any) {
+	Object.entries(modifier).forEach(([key, value]) => {
+		if (typeof value === 'object' && !Array.isArray(value) && value) {
+			if (!state[key]) {
+				state[key] = {}
+			}
+
+			updatePartially(state[key], value)
+		} else {
+			state[key] = value
+		}
+	})
+}
