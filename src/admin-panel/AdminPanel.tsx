@@ -1,6 +1,6 @@
 import { useEffect } from '@wordpress/element'
 import { useGlobalState } from '../components'
-import { PAGES } from './config'
+import { PAGES } from './utils'
 import { DetailView } from './DetailView'
 import { ListView } from './ListView'
 import { AdminState } from './state'
