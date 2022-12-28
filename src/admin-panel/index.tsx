@@ -3,7 +3,7 @@ import { render } from '@wordpress/element'
 import { Global, InseriThemeProvider, StateProvider } from '../components'
 import { AdminPanel } from './AdminPanel'
 import './editor.scss'
-import { storeCreator, initialState } from './state'
+import { storeCreator, initialState } from '../components/AdminState'
 
 const AdminGlobalStyles = () => (
 	<Global

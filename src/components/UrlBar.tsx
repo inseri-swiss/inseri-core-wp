@@ -1,6 +1,6 @@
 import { __ } from '@wordpress/i18n'
-import { Button, createStyles, Group, Select, TextInput } from '../components'
-import { HTTP_METHODS } from './utils'
+import { Button, createStyles, Group, Select, TextInput } from './index'
+import { HTTP_METHODS } from '../utils'
 
 const useStyles = createStyles((theme, _params, getRef) => ({
 	sendBtn: {

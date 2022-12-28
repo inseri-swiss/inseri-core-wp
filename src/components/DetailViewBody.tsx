@@ -2,12 +2,11 @@ import { useDebouncedValue } from '@mantine/hooks'
 import { IconCircleOff } from '@tabler/icons'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Accordion, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Tabs, Text, useGlobalState } from '../components'
-import { formatCode, isBeautifyType } from '../utils'
+import { Accordion, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Tabs, Text, useGlobalState } from '.'
+import { formatCode, isBeautifyType, isFormType } from '../utils'
 import { ParamsTable } from './ParamsTable'
-import { AdminState } from './state'
+import { AdminState } from './AdminState'
 import { UrlBar } from './UrlBar'
-import { isFormType } from './utils'
 
 const useStyles = createStyles((theme) => ({
 	primaryBtn: {

@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n'
 import { COMMON_CONTENT_TYPES } from '../utils'
 import logo from '../assets/inseri_logo.png'
 import { ActionIcon, Alert, Box, Button, createStyles, Group, Select, TextInput, Title, useGlobalState } from '../components'
-import { AdminState } from './state'
+import { AdminState } from '../components/AdminState'
 
 const useStyles = createStyles((theme, _params, getRef) => ({
 	primaryBtn: {
