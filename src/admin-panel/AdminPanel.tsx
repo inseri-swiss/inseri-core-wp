@@ -1,9 +1,10 @@
 import { useEffect } from '@wordpress/element'
-import { useGlobalState } from '../components'
+import { Box, useGlobalState } from '../components'
 import { PAGES } from './utils'
-import { DetailView } from './DetailView'
+import { DetailViewBody } from './DetailViewBody'
 import { ListView } from './ListView'
 import { AdminState } from './state'
+import { DetailViewHeading } from './DetailViewHeading'
 
 export function AdminPanel() {
 	const queryParams = new URLSearchParams(document.location.search)
@@ -19,7 +20,14 @@ export function AdminPanel() {
 	}, [showAddNew])
 
 	if (mode !== 'none') {
-		return <DetailView />
+		return (
+			<>
+				<DetailViewHeading />
+				<Box mt="lg" mx={36}>
+					<DetailViewBody />
+				</Box>
+			</>
+		)
 	}
 
 	return <ListView />

@@ -1,7 +1,7 @@
 import { addNewItem, Datasource, DatasourceWithoutId, getItem, handleTryRequest, updateNewItem } from '../ApiServer'
 import { immer } from 'zustand/middleware/immer'
 import { ParamItem } from './ParamsTable'
-import {} from './DetailView'
+import {} from './DetailViewBody'
 import {
 	BODY_TYPE_TO_CONTENT_TYPE,
 	formatCode,
@@ -23,18 +23,21 @@ interface AdminAttributes {
 
 	heading: {
 		pageError: string
-		isLoading: boolean
+		isSaveLoading: boolean
 
 		name: string
+		id: number
 		webApiType: string
 		contentType: string
 		isContentTypeLock: boolean
+		author: string
 	}
 
 	parameters: {
 		method: string
 		url: string
 		urlError: string
+		isTryLoading: boolean
 
 		queryParams: ParamItem[]
 		headerParams: ParamItem[]
@@ -70,18 +73,21 @@ export const initialState: AdminAttributes = {
 
 	heading: {
 		pageError: '',
-		isLoading: false,
+		isSaveLoading: false,
 
 		name: '',
+		id: -1,
 		webApiType: 'general',
 		contentType: '',
 		isContentTypeLock: false,
+		author: '',
 	},
 
 	parameters: {
 		method: 'GET',
 		url: '',
 		urlError: '',
+		isTryLoading: false,
 
 		queryParams: [createParamItem()],
 		headerParams: [createParamItem()],
@@ -109,8 +115,11 @@ export const storeCreator = (initalState: AdminAttributes) => {
 				}),
 
 			createOrUpdateWebApi: async () => {
-				let body: string | undefined
+				set((state) => {
+					state.heading.isSaveLoading = true
+				})
 
+				let body: string | undefined
 				const { mode, item, parameters, heading } = get()
 				const { bodyType, headerParams, queryParams, paramsBody, textBody, method, url } = parameters
 				const { name, webApiType, contentType } = heading
@@ -148,6 +157,7 @@ export const storeCreator = (initalState: AdminAttributes) => {
 				if (errorMsg) {
 					set((state) => {
 						state.heading.pageError = errorMsg
+						state.heading.isSaveLoading = false
 					})
 				} else {
 					const currentUrl = new URL(window.location.href)
@@ -158,7 +168,7 @@ export const storeCreator = (initalState: AdminAttributes) => {
 
 			tryRequest: async () => {
 				set((state) => {
-					state.heading.isLoading = true
+					state.parameters.isTryLoading = true
 					state.heading.pageError = ''
 				})
 
@@ -229,7 +239,7 @@ export const storeCreator = (initalState: AdminAttributes) => {
 				}
 
 				set((state) => {
-					state.heading.isLoading = false
+					state.parameters.isTryLoading = false
 				})
 			},
 
@@ -246,7 +256,7 @@ export const storeCreator = (initalState: AdminAttributes) => {
 
 						if (data) {
 							// eslint-disable-next-line
-							const { description, url, method, headers, query_params, type, body, content_type } = data
+							const { description, url, method, headers, query_params, type, body, content_type, id, author_name } = data
 
 							const queryParamItems = [...mapObjectToParams(JSON.parse(query_params)), createParamItem()]
 							const headerParamItems: ParamItem[] = [...mapObjectToParams(JSON.parse(headers)), createParamItem()]
@@ -265,9 +275,11 @@ export const storeCreator = (initalState: AdminAttributes) => {
 							state.heading = {
 								...state.heading,
 								name: description,
+								id,
 								webApiType: type,
 								contentType: content_type,
 								isContentTypeLock: true,
+								author: author_name,
 							}
 
 							state.parameters = {
