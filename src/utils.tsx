@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n'
 import xmlFormatter from 'xml-formatter'
 import { StateCreator } from 'zustand'
-import { ParamItem } from './admin-panel/ParamsTable'
+import { ParamItem } from './components/ParamsTable'
 
 const htmlEscapesMap: Record<string, string> = {
 	'&': '&amp;',
@@ -169,3 +169,24 @@ export function updatePartially(state: any, modifier: any) {
 		}
 	})
 }
+
+export const HTTP_METHODS = [
+	'GET',
+	'HEAD',
+	'POST',
+	'PUT',
+	'DELETE',
+	'OPTIONS',
+	'PATCH',
+]
+
+export const PAGES = {
+	home: 'inseri-core-page',
+	'add-new': 'inseri-core-add-new-page',
+}
+
+export const CONTENT_TYPE = 'Content-Type'
+
+export const isFormType = (bodyType: string) => ['form-urlencoded', 'form-data'].some((i) => i === bodyType)
+export const isTextType = (bodyType: string) => ['xml', 'json', 'text'].some((i) => i === bodyType)
+export const createParamItem = () => ({ isChecked: true, key: '', value: '' })

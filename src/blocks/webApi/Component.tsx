@@ -2,11 +2,13 @@ import { useControlTower, useDispatch, useJsonBeacons } from '@inseri/lighthouse
 import { IconApi } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { PanelBody, PanelRow, TextControl, ToolbarGroup } from '@wordpress/components'
+import { Button as WPButton, PanelBody, PanelRow, TextControl, ToolbarGroup } from '@wordpress/components'
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Group, Select, Text } from '../../components'
+import { DetailViewBody } from '../../components/DetailViewBody'
+import { Datasource, getAllItems } from '../../ApiServer'
+import { Box, Group, Modal, Select, Text } from '../../components'
 import config from './block.json'
 import { Attributes } from './index'
 
@@ -17,16 +19,27 @@ const stringSchema = {
 
 const dropdownBeacon = [{ contentType: 'application/json', description: 'data', key: 'data' }]
 
-export function DropdownEdit(props: BlockEditProps<Attributes>) {
+export function WebApiEdit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes, isSelected } = props
-	const { blockId, blockName, output } = attributes
+	const { blockId, blockName, output, webApiId } = attributes
 
-	const [isWizardMode, setWizardMode] = useState(false)
+	const [isModalOpen, setModalOpen] = useState(false)
+	const [isWizardMode, setWizardMode] = useState(true)
+	const [datasources, setDatasources] = useState<Datasource[]>([])
 
 	const availableBeacons = useJsonBeacons(stringSchema)
-	const selectData = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
+	availableBeacons
+	const selectData = datasources.map((d) => ({ label: d.description, value: String(d.id) }))
 
 	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, dropdownBeacon)
+
+	useEffect(() => {
+		getAllItems().then(([_, data]) => {
+			if (data) {
+				setDatasources(data)
+			}
+		})
+	}, [])
 
 	useEffect(() => {
 		if (producersBeacons.length > 0 && !output) {
@@ -50,9 +63,23 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 	]
 	return (
 		<>
+			{webApiId && (
+				<Modal size="90%" overlayOpacity={0.7} overlayBlur={3} opened={isModalOpen} onClose={() => setModalOpen(false)}>
+					<Group spacing={0}>
+						<DetailViewBody />
+					</Group>
+				</Modal>
+			)}
 			<BlockControls>{<ToolbarGroup controls={toolbarControls} />}</BlockControls>
 			<InspectorControls key="setting">
 				<PanelBody>
+					<PanelRow>
+						<Box mb="sm">
+							<WPButton variant="primary" onClick={() => setModalOpen(true)}>
+								{__('Customize the settings', 'inseri-core')}
+							</WPButton>
+						</Box>
+					</PanelRow>
 					<PanelRow>
 						<TextControl label="Block Name" value={blockName} onChange={(value) => setAttributes({ blockName: value })} />
 					</PanelRow>
@@ -66,7 +93,12 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 							{__('Web API', 'inseri-core')}
 						</Text>
 					</Group>
-					<Select label={__('Choose a base Web API', 'inseri-core')} data={selectData} value={''} onChange={(key) => {}}></Select>
+					<Select
+						label={__('Choose a base Web API', 'inseri-core')}
+						data={selectData}
+						value={String(webApiId)}
+						onChange={(key) => setAttributes({ webApiId: parseInt(key!) })}
+					/>
 				</Box>
 			) : (
 				<WebApiView {...props} />
@@ -77,7 +109,7 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 
 export function WebApiView(props: { attributes: Readonly<Attributes> }) {
 	const { attributes } = props
-	const dispatch = useDispatch(attributes.output)
+	useDispatch(attributes.output)
 
 	return <Box p="md">PlaceHolder</Box>
 }

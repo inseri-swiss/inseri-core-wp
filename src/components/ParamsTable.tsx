@@ -1,6 +1,6 @@
 import { IconX } from '@tabler/icons'
 import { __ } from '@wordpress/i18n'
-import { ActionIcon, Checkbox, createStyles, Table, TextInput } from '../components'
+import { ActionIcon, Checkbox, createStyles, Table, TextInput } from './index'
 
 const useStyles = createStyles((theme, _params, getRef) => ({
 	table: {

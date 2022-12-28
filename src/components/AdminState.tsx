@@ -11,8 +11,12 @@ import {
 	mapObjectToParams,
 	mapParamsToObject,
 	updatePartially,
+	CONTENT_TYPE,
+	createParamItem,
+	isFormType,
+	isTextType,
+	PAGES,
 } from '../utils'
-import { CONTENT_TYPE, createParamItem, isFormType, isTextType, PAGES } from './utils'
 import { __ } from '@wordpress/i18n'
 
 interface AdminAttributes {

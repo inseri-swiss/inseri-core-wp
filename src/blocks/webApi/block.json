@@ -18,7 +18,7 @@
 			"type": "string",
 			"default": ""
 		},
-		"baseWebApi": {
+		"webApiId": {
 			"type": "number"
 		}
 	},

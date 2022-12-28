@@ -1,9 +1,7 @@
 import { useEffect } from '@wordpress/element'
-import { Box, useGlobalState } from '../components'
-import { PAGES } from './utils'
-import { DetailViewBody } from './DetailViewBody'
+import { Box, useGlobalState, DetailViewBody, AdminState } from '../components'
+import { PAGES } from '../utils'
 import { ListView } from './ListView'
-import { AdminState } from './state'
 import { DetailViewHeading } from './DetailViewHeading'
 
 export function AdminPanel() {

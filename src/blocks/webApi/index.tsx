@@ -6,7 +6,7 @@ import stringify from 'json-stable-stringify'
 import { SetupEditorEnv } from '../../components'
 import { ProducerBeacon } from '../../globalScript'
 import json from './block.json'
-import { DropdownEdit } from './Component'
+import { WebApiEdit } from './Component'
 
 const { name, ...settings } = json as any
 
@@ -14,13 +14,13 @@ export interface Attributes {
 	blockId?: string
 	output?: ProducerBeacon
 	blockName: string
-	baseWebApi?: number
+	webApiId?: number
 }
 
 function Edit(props: BlockEditProps<Attributes>) {
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'webApi'}>
-			<DropdownEdit {...props} />
+			<WebApiEdit {...props} />
 		</SetupEditorEnv>
 	)
 }
