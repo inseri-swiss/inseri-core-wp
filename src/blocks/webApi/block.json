@@ -18,6 +18,38 @@
 				"contentType": ""
 			}
 		},
+		"inputMethodUrl": {
+			"type": "object",
+			"default": {
+				"key": "",
+				"contentType": "",
+				"description": ""
+			}
+		},
+		"inputQueryParams": {
+			"type": "object",
+			"default": {
+				"key": "",
+				"contentType": "",
+				"description": ""
+			}
+		},
+		"inputHeadersParams": {
+			"type": "object",
+			"default": {
+				"key": "",
+				"contentType": "",
+				"description": ""
+			}
+		},
+		"inputBody": {
+			"type": "object",
+			"default": {
+				"key": "",
+				"contentType": "",
+				"description": ""
+			}
+		},
 		"blockName": {
 			"type": "string",
 			"default": ""
