@@ -291,13 +291,22 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 							// eslint-disable-next-line
 							const { description, url, method, headers, query_params, type, body, content_type, id, author_name } = data
 
-							const queryParamItems = [...mapObjectToParams(JSON.parse(query_params)), createParamItem()]
-							const headerParamItems: ParamItem[] = [...mapObjectToParams(JSON.parse(headers)), createParamItem()]
+							const queryParamItems = mapObjectToParams(JSON.parse(query_params))
+							const headerParamItems: ParamItem[] = mapObjectToParams(JSON.parse(headers))
 							const contentTypeItem = headerParamItems.find((i) => i.key.toLowerCase() === CONTENT_TYPE.toLowerCase())
 							const bodyType = getBodyTypeByContenType(contentTypeItem?.value) ?? 'none'
 
+							if (mode !== 'read') {
+								queryParamItems.push(createParamItem())
+								headerParamItems.push(createParamItem())
+							}
+
 							if (isFormType(bodyType) && body) {
-								state.parameters.paramsBody = [...mapObjectToParams(JSON.parse(body)), createParamItem()]
+								state.parameters.paramsBody = mapObjectToParams(JSON.parse(body))
+
+								if (mode !== 'read') {
+									state.parameters.paramsBody.push(createParamItem())
+								}
 							}
 
 							if (!isFormType(bodyType) && body) {
