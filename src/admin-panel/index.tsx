@@ -1,9 +1,8 @@
 import domReady from '@wordpress/dom-ready'
 import { render } from '@wordpress/element'
-import { Global, InseriThemeProvider, StateProvider } from '../components'
+import { Global, InseriThemeProvider, StateProvider, datasourceStoreCreator, datasourceInitialState } from '../components'
 import { AdminPanel } from './AdminPanel'
 import './editor.scss'
-import { storeCreator, initialState } from '../components/AdminState'
 
 const AdminGlobalStyles = () => (
 	<Global
@@ -27,7 +26,7 @@ function Root() {
 	return (
 		<InseriThemeProvider>
 			<AdminGlobalStyles />
-			<StateProvider stateCreator={storeCreator} initialState={initialState}>
+			<StateProvider stateCreator={datasourceStoreCreator} initialState={datasourceInitialState}>
 				<AdminPanel />
 			</StateProvider>
 		</InseriThemeProvider>

@@ -1,4 +1,4 @@
-import { addNewItem, Datasource, DatasourceWithoutId, getItem, handleTryRequest, updateNewItem } from '../ApiServer'
+import { addNewItem, Datasource, DatasourceWithoutId, getAllItems, getItem, handleTryRequest, updateNewItem } from '../ApiServer'
 import { immer } from 'zustand/middleware/immer'
 import { ParamItem } from './ParamsTable'
 import {} from './DetailViewBody'
@@ -18,11 +18,11 @@ import {
 	PAGES,
 } from '../utils'
 import { __ } from '@wordpress/i18n'
+import { Attributes as BlockAttributes } from '../blocks/webApi'
 
-interface AdminAttributes {
+interface DatasourceAttributes extends BlockAttributes {
 	mode: 'create' | 'edit' | 'read' | 'none'
 	openAccordionItems: string[]
-	webApiId: number | null
 	item: Datasource | null
 
 	heading: {
@@ -59,20 +59,34 @@ interface AdminAttributes {
 	}
 }
 
-export interface AdminState extends AdminAttributes {
+export interface DatasourceState extends DatasourceAttributes {
+	block: {
+		isWizardMode: boolean
+		isModalOpen: boolean
+		datasources: Datasource[]
+	}
+
 	actions: {
-		updateState: (modifier: RecursivePartial<AdminState>) => void
+		updateState: (modifier: RecursivePartial<DatasourceState>) => void
 		createOrUpdateWebApi: () => void
 		tryRequest: () => void
-		loadData: () => void
+		loadDatasourceById: () => void
+		loadDatasources: () => void
 		updateRequestBodyType: (bodyType: string) => void
 	}
 }
 
-export const initialState: AdminAttributes = {
+export const datasourceInitialState: DatasourceAttributes = {
+	blockId: '',
+	blockName: '',
+	output: {
+		key: '',
+		contentType: '',
+	},
+	webApiId: -1,
+
 	mode: 'none',
 	openAccordionItems: ['request'],
-	webApiId: null,
 	item: null,
 
 	heading: {
@@ -108,15 +122,30 @@ export const initialState: AdminAttributes = {
 	},
 }
 
-export const storeCreator = (initalState: AdminAttributes) => {
-	return immer<AdminState>((set, get) => ({
+export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
+	return immer<DatasourceState>((set, get) => ({
 		...initalState,
+		block: {
+			isWizardMode: initalState.webApiId === -1,
+			isModalOpen: false,
+			datasources: [],
+		},
 
 		actions: {
-			updateState: (modifier: RecursivePartial<AdminAttributes>) =>
+			updateState: (modifier: RecursivePartial<DatasourceAttributes>) =>
 				set((state) => {
 					updatePartially(state, modifier)
 				}),
+
+			loadDatasources: async () => {
+				const [_, data] = await getAllItems()
+				if (data) {
+					set((state) => {
+						state.block.datasources = data
+						state.mode = 'read'
+					})
+				}
+			},
 
 			createOrUpdateWebApi: async () => {
 				set((state) => {
@@ -247,10 +276,10 @@ export const storeCreator = (initalState: AdminAttributes) => {
 				})
 			},
 
-			loadData: async () => {
-				const { webApiId, mode } = get()
+			loadDatasourceById: async () => {
+				const { webApiId, mode, item } = get()
 
-				if ((mode === 'edit' || mode === 'read') && webApiId) {
+				if ((mode === 'edit' || mode === 'read') && webApiId && !item) {
 					const [errorMsg, data] = await getItem(webApiId)
 
 					set((state) => {

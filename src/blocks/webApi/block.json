@@ -12,14 +12,19 @@
 			"default": ""
 		},
 		"output": {
-			"type": "object"
+			"type": "object",
+			"default": {
+				"key": "",
+				"contentType": ""
+			}
 		},
 		"blockName": {
 			"type": "string",
 			"default": ""
 		},
 		"webApiId": {
-			"type": "number"
+			"type": "number",
+			"default": -1
 		}
 	},
 	"supports": {

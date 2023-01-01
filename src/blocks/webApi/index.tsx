@@ -3,7 +3,7 @@ import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockEditProps, BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
-import { SetupEditorEnv } from '../../components'
+import { datasourceStoreCreator, datasourceInitialState, SetupEditorEnv, StateProvider } from '../../components'
 import { ProducerBeacon } from '../../globalScript'
 import json from './block.json'
 import { WebApiEdit } from './Component'
@@ -11,16 +11,23 @@ import { WebApiEdit } from './Component'
 const { name, ...settings } = json as any
 
 export interface Attributes {
-	blockId?: string
-	output?: ProducerBeacon
+	blockId: string
+	output: ProducerBeacon
 	blockName: string
-	webApiId?: number
+	webApiId: number
 }
 
 function Edit(props: BlockEditProps<Attributes>) {
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'webApi'}>
-			<WebApiEdit {...props} />
+			<StateProvider
+				stateCreator={datasourceStoreCreator}
+				initialState={{ ...datasourceInitialState, ...props.attributes }}
+				keysToSave={Object.keys(json.attributes)}
+				setAttributes={props.setAttributes}
+			>
+				<WebApiEdit {...props} />
+			</StateProvider>
 		</SetupEditorEnv>
 	)
 }
