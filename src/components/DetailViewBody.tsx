@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n'
 import { Accordion, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Tabs, Text, useGlobalState } from '.'
 import { formatCode, isBeautifyType, isFormType } from '../utils'
 import { ParamsTable } from './ParamsTable'
-import { AdminState } from './AdminState'
+import { DatasourceState } from './AdminState'
 import { UrlBar } from './UrlBar'
 
 const useStyles = createStyles((theme) => ({
@@ -42,7 +42,7 @@ const RESPONSE_AREA_ID = 'response-textarea'
 export function DetailViewBody() {
 	const { primaryBtn, whiteBox, accordionContent, accordionLabel, tab } = useStyles().classes
 
-	const openAccordionItems = useGlobalState((state: AdminState) => state.openAccordionItems)
+	const openAccordionItems = useGlobalState((state: DatasourceState) => state.openAccordionItems)
 	const {
 		method,
 		url,
@@ -54,11 +54,11 @@ export function DetailViewBody() {
 		paramsBody,
 		bodyError,
 		isTryLoading,
-	} = useGlobalState((state: AdminState) => state.parameters)
-	const { status, headerParams: responseHeaders, body: responseBody, bodyType: responseBodyType } = useGlobalState((state: AdminState) => state.response)
+	} = useGlobalState((state: DatasourceState) => state.parameters)
+	const { status, headerParams: responseHeaders, body: responseBody, bodyType: responseBodyType } = useGlobalState((state: DatasourceState) => state.response)
 
 	const [debouncedUrl] = useDebouncedValue(url, 500)
-	const { updateState, tryRequest, loadData, updateRequestBodyType } = useGlobalState((state: AdminState) => state.actions)
+	const { updateState, tryRequest, loadDatasourceById, updateRequestBodyType } = useGlobalState((state: DatasourceState) => state.actions)
 
 	const beautify = () => {
 		const [errorMsg, formattedCode] = formatCode(requestBodyType, textBody)
@@ -74,7 +74,7 @@ export function DetailViewBody() {
 	useEffect(() => {
 		const responseTextarea = document.getElementById(RESPONSE_AREA_ID)
 		responseTextarea?.setAttribute('readonly', 'true')
-		loadData()
+		loadDatasourceById()
 	}, [])
 
 	useEffect(() => {

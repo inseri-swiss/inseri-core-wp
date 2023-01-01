@@ -7,7 +7,7 @@ import { ActionIcon, Alert, Box, Button, createStyles, Group, MediaQuery, Select
 import { Datasource, getAllItems, removeItem } from '../ApiServer'
 import { HTTP_METHODS, PAGES } from '../utils'
 import { ContentTableBody, EmptyTableBody, SortableColumns, TableHeader } from './TableComponents'
-import { AdminState } from '../components/AdminState'
+import { DatasourceState } from '../components/AdminState'
 
 const useStyles = createStyles((theme) => ({
 	titleBar: {
@@ -42,7 +42,7 @@ const ADD_NEW_PATH = 'admin.php?page=' + PAGES['add-new']
 export function ListView() {
 	const { secondaryBtn, table: tableClass, titleBar, primaryBtn, alertRoot } = useStyles().classes
 
-	const { updateState } = useGlobalState((state: AdminState) => state.actions)
+	const { updateState } = useGlobalState((state: DatasourceState) => state.actions)
 
 	const [rawDatasources, setRawDatasources] = useState<Datasource[]>([])
 	const [datasources, setDatasources] = useState<Datasource[]>([])

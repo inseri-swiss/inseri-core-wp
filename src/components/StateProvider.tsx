@@ -13,30 +13,23 @@ interface SimpleProps<I, T extends I> extends PropsWithChildren<any> {
 }
 interface AttributesProps<I, T extends I> extends PropsWithChildren<any> {
 	stateCreator: (initialState: I) => StateCreator<T, any, any>
+	initialState: I
 	setAttributes: (attrs: Partial<Record<string, any>>) => void
-	attributes: Readonly<Record<string, any>>
 	keysToSave: string[]
 }
 
 type StateProviderProps<I, T extends I> = SimpleProps<I, T> | AttributesProps<I, T>
 
-export function StateProvider<INIT, STATE extends INIT>({
-	initialState,
-	children,
-	stateCreator,
-	setAttributes,
-	attributes,
-	keysToSave,
-}: StateProviderProps<INIT, STATE>) {
+export function StateProvider<INIT, STATE extends INIT>({ initialState, children, stateCreator, setAttributes, keysToSave }: StateProviderProps<INIT, STATE>) {
 	const storeRef = useRef<StoreApi<STATE>>()
 
 	if (!storeRef.current) {
 		let store: any
 		let blockId: string | undefined
 
-		if (setAttributes && attributes && keysToSave) {
-			store = persistToAttributes(stateCreator(attributes) as any, { setAttributes, keysToSave })
-			blockId = attributes.blockId
+		if (setAttributes && keysToSave) {
+			store = persistToAttributes(stateCreator(initialState) as any, { setAttributes, keysToSave })
+			blockId = (initialState as any).blockId
 		} else {
 			store = stateCreator(initialState)
 		}

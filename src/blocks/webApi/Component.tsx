@@ -3,12 +3,11 @@ import { IconApi } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { Button as WPButton, PanelBody, PanelRow, TextControl, ToolbarGroup } from '@wordpress/components'
-import { useEffect, useState } from '@wordpress/element'
+import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import { DetailViewBody } from '../../components/DetailViewBody'
-import { Datasource, getAllItems } from '../../ApiServer'
-import { Box, Group, Modal, Select, Text } from '../../components'
+import { Box, DatasourceState, Group, Modal, Select, Text, useGlobalState } from '../../components'
 import config from './block.json'
 import { Attributes } from './index'
 
@@ -20,36 +19,32 @@ const stringSchema = {
 const dropdownBeacon = [{ contentType: 'application/json', description: 'data', key: 'data' }]
 
 export function WebApiEdit(props: BlockEditProps<Attributes>) {
-	const { setAttributes, attributes, isSelected } = props
-	const { blockId, blockName, output, webApiId } = attributes
-
-	const [isModalOpen, setModalOpen] = useState(false)
-	const [isWizardMode, setWizardMode] = useState(true)
-	const [datasources, setDatasources] = useState<Datasource[]>([])
+	const { isSelected } = props
+	const { blockId, blockName, output, webApiId } = useGlobalState((state: DatasourceState) => state)
+	const { name, author } = useGlobalState((state: DatasourceState) => state.heading)
+	const { isModalOpen, isWizardMode, datasources } = useGlobalState((state: DatasourceState) => state.block)
+	const { updateState, loadDatasources } = useGlobalState((state: DatasourceState) => state.actions)
+	const isWebAPIChosen = webApiId !== -1
 
 	const availableBeacons = useJsonBeacons(stringSchema)
 	availableBeacons
-	const selectData = datasources.map((d) => ({ label: d.description, value: String(d.id) }))
+	const selectData = datasources.map((d) => ({ label: `${d.description} (${d.author_name})`, value: String(d.id) }))
 
 	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, dropdownBeacon)
 
 	useEffect(() => {
-		getAllItems().then(([_, data]) => {
-			if (data) {
-				setDatasources(data)
-			}
-		})
+		loadDatasources()
 	}, [])
 
 	useEffect(() => {
-		if (producersBeacons.length > 0 && !output) {
-			setAttributes({ output: producersBeacons[0] })
+		if (producersBeacons.length > 0 && !output.key) {
+			updateState({ output: producersBeacons[0] })
 		}
 	}, [producersBeacons.length])
 
 	useEffect(() => {
-		if (!isSelected && isWizardMode) {
-			setWizardMode(false)
+		if (isWebAPIChosen && !isSelected && isWizardMode) {
+			updateState({ block: { isWizardMode: false } })
 		}
 	}, [isSelected])
 
@@ -57,31 +52,45 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 		{
 			icon: edit,
 			isActive: isWizardMode,
-			onClick: () => setWizardMode(!isWizardMode),
+			onClick: () => updateState({ block: { isWizardMode: !isWizardMode } }),
 			title: __('Edit', 'inseri-core'),
 		},
 	]
 	return (
 		<>
-			{webApiId && (
-				<Modal size="90%" overlayOpacity={0.7} overlayBlur={3} opened={isModalOpen} onClose={() => setModalOpen(false)}>
-					<Group spacing={0}>
-						<DetailViewBody />
+			<Modal
+				size="90%"
+				overlayOpacity={0.7}
+				overlayBlur={3}
+				opened={isModalOpen}
+				onClose={() => updateState({ block: { isModalOpen: false } })}
+				styles={{ modal: { background: '#f0f0f1' } }}
+				overflow="inside"
+				title={
+					<Group>
+						<Text fz="md" fw="bold">
+							{name}
+						</Text>{' '}
+						<Text fz={14}>({author})</Text>
 					</Group>
-				</Modal>
-			)}
-			<BlockControls>{<ToolbarGroup controls={toolbarControls} />}</BlockControls>
+				}
+			>
+				<Group spacing={0} grow>
+					<DetailViewBody />
+				</Group>
+			</Modal>
+			<BlockControls>{isWebAPIChosen && <ToolbarGroup controls={toolbarControls} />}</BlockControls>
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
 						<Box mb="sm">
-							<WPButton variant="primary" onClick={() => setModalOpen(true)}>
+							<WPButton variant="primary" onClick={() => updateState({ block: { isModalOpen: true } })} disabled={!isWebAPIChosen}>
 								{__('Customize the settings', 'inseri-core')}
 							</WPButton>
 						</Box>
 					</PanelRow>
 					<PanelRow>
-						<TextControl label="Block Name" value={blockName} onChange={(value) => setAttributes({ blockName: value })} />
+						<TextControl label="Block Name" value={blockName} onChange={(value) => updateState({ blockName: value })} />
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
@@ -97,7 +106,8 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 						label={__('Choose a base Web API', 'inseri-core')}
 						data={selectData}
 						value={String(webApiId)}
-						onChange={(key) => setAttributes({ webApiId: parseInt(key!) })}
+						searchable
+						onChange={(key) => updateState({ webApiId: parseInt(key!), block: { isWizardMode: false } })}
 					/>
 				</Box>
 			) : (

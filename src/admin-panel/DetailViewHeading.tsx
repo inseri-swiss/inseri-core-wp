@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n'
 import { COMMON_CONTENT_TYPES } from '../utils'
 import logo from '../assets/inseri_logo.png'
 import { ActionIcon, Alert, Box, Button, createStyles, Group, Select, TextInput, Title, useGlobalState } from '../components'
-import { AdminState } from '../components/AdminState'
+import { DatasourceState } from '../components/AdminState'
 
 const useStyles = createStyles((theme, _params, getRef) => ({
 	primaryBtn: {
@@ -59,16 +59,16 @@ const DATASOURCE_TYPES = [{ label: __('General', 'inseri-core'), value: 'general
 
 export function DetailViewHeading() {
 	const { primaryBtn, titleBar, alertRoot, midSizeField, idField, readonlyWrapper, ctInputWrapper, lockWrapper } = useStyles().classes
-	const { name, id, author, contentType, isContentTypeLock, webApiType, pageError, isSaveLoading } = useGlobalState((state: AdminState) => state.heading)
+	const { name, id, author, contentType, isContentTypeLock, webApiType, pageError, isSaveLoading } = useGlobalState((state: DatasourceState) => state.heading)
 
-	const mode = useGlobalState((state: AdminState) => state.mode)
+	const mode = useGlobalState((state: DatasourceState) => state.mode)
 	const isEdit = mode === 'edit'
 
-	const isNotReadyForSubmit = useGlobalState(({ heading, parameters }: AdminState) => {
+	const isNotReadyForSubmit = useGlobalState(({ heading, parameters }: DatasourceState) => {
 		return !!parameters.urlError || !parameters.url || !heading.name || !heading.contentType
 	})
 
-	const { updateState, createOrUpdateWebApi } = useGlobalState((state: AdminState) => state.actions)
+	const { updateState, createOrUpdateWebApi } = useGlobalState((state: DatasourceState) => state.actions)
 
 	const title = isEdit ? __('Edit Web API', 'inseri-core') : __('Add New Web API', 'inseri-core')
 	const primaryBtnText = isEdit ? __('Save', 'inseri-core') : __('Create', 'inseri-core')
