@@ -4,7 +4,7 @@ import type { BlockEditProps, BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
 import { datasourceStoreCreator, datasourceInitialState, SetupEditorEnv, StateProvider } from '../../components'
-import { ProducerBeacon } from '../../globalScript'
+import { ConsumerBeacon, ProducerBeacon } from '../../globalScript'
 import json from './block.json'
 import { WebApiEdit } from './Component'
 
@@ -13,6 +13,10 @@ const { name, ...settings } = json as any
 export interface Attributes {
 	blockId: string
 	output: ProducerBeacon
+	inputMethodUrl: ConsumerBeacon
+	inputQueryParams: ConsumerBeacon
+	inputHeadersParams: ConsumerBeacon
+	inputBody: ConsumerBeacon
 	blockName: string
 	webApiId: number
 }

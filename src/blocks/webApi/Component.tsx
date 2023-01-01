@@ -7,28 +7,56 @@ import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import { DetailViewBody } from '../../components/DetailViewBody'
-import { Box, DatasourceState, Group, Modal, Select, Text, useGlobalState } from '../../components'
+import { Box, DatasourceState, Group, Modal, Select, Stack, Text, useGlobalState } from '../../components'
 import config from './block.json'
 import { Attributes } from './index'
 
 const stringSchema = {
-	type: 'array',
-	items: [{ type: 'string' }],
+	type: 'string',
+}
+
+const methodUrlSchema = {
+	properties: {
+		method: { type: 'string' },
+		url: { type: 'string' },
+	},
+	required: ['method', 'url'],
+	additionalProperties: true,
+}
+
+const recordSchema = {
+	type: 'object',
+	additionalProperties: {
+		type: 'string',
+	},
+}
+
+const defaultInput = {
+	key: '',
+	contentType: '',
+	description: '',
 }
 
 const dropdownBeacon = [{ contentType: 'application/json', description: 'data', key: 'data' }]
 
 export function WebApiEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { blockId, blockName, output, webApiId } = useGlobalState((state: DatasourceState) => state)
+	const { blockId, blockName, output, webApiId, inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody } = useGlobalState(
+		(state: DatasourceState) => state
+	)
 	const { name, author } = useGlobalState((state: DatasourceState) => state.heading)
 	const { isModalOpen, isWizardMode, datasources } = useGlobalState((state: DatasourceState) => state.block)
 	const { updateState, loadDatasources } = useGlobalState((state: DatasourceState) => state.actions)
 	const isWebAPIChosen = webApiId !== -1
 
-	const availableBeacons = useJsonBeacons(stringSchema)
-	availableBeacons
-	const selectData = datasources.map((d) => ({ label: `${d.description} (${d.author_name})`, value: String(d.id) }))
+	const availableUrlBeacons = useJsonBeacons(stringSchema, methodUrlSchema)
+	const availableRecordBeacons = useJsonBeacons(recordSchema)
+	const availableStringBeacons = useJsonBeacons(stringSchema)
+
+	const webApiOptions = datasources.map((d) => ({ label: `${d.description} (${d.author_name})`, value: String(d.id) }))
+	const methodUrlOptions = Object.entries(availableUrlBeacons).map(([k, { description }]) => ({ label: description, value: k }))
+	const recordOptions = Object.entries(availableRecordBeacons).map(([k, { description }]) => ({ label: description, value: k }))
+	const bodyOptions = Object.entries(availableStringBeacons).map(([k, { description }]) => ({ label: description, value: k }))
 
 	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, dropdownBeacon)
 
@@ -67,16 +95,52 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 				styles={{ modal: { background: '#f0f0f1' } }}
 				overflow="inside"
 				title={
-					<Group>
+					<Group pl="md" spacing="xs">
 						<Text fz="md" fw="bold">
 							{name}
-						</Text>{' '}
+						</Text>
 						<Text fz={14}>({author})</Text>
 					</Group>
 				}
 			>
-				<Group spacing={0} grow>
-					<DetailViewBody />
+				<Group px={1} align="stretch" spacing="lg">
+					<Box style={{ flex: 1 }}>
+						<DetailViewBody />
+					</Box>
+					<Stack p="md" style={{ background: '#fff', width: '300px', border: '1px solid #ced4da' }}>
+						<Select
+							styles={{ label: { fontWeight: 'normal' } }}
+							label={__('Override method and URL', 'inseri-core')}
+							clearable
+							data={methodUrlOptions}
+							value={inputMethodUrl.key}
+							onChange={(key) => updateState({ inputMethodUrl: key ? availableUrlBeacons[key!] : { ...defaultInput } })}
+						/>
+						<Select
+							styles={{ label: { fontWeight: 'normal' } }}
+							label={__('Extend query params', 'inseri-core')}
+							clearable
+							data={recordOptions}
+							value={inputQueryParams.key}
+							onChange={(key) => updateState({ inputQueryParams: key ? availableRecordBeacons[key!] : { ...defaultInput } })}
+						/>
+						<Select
+							styles={{ label: { fontWeight: 'normal' } }}
+							label={__('Extend headers', 'inseri-core')}
+							clearable
+							data={recordOptions}
+							value={inputHeadersParams.key}
+							onChange={(key) => updateState({ inputHeadersParams: key ? availableRecordBeacons[key!] : { ...defaultInput } })}
+						/>
+						<Select
+							styles={{ label: { fontWeight: 'normal' } }}
+							label={__('Override body', 'inseri-core')}
+							clearable
+							data={bodyOptions}
+							value={inputBody.key}
+							onChange={(key) => updateState({ inputBody: key ? availableStringBeacons[key!] : { ...defaultInput } })}
+						/>
+					</Stack>
 				</Group>
 			</Modal>
 			<BlockControls>{isWebAPIChosen && <ToolbarGroup controls={toolbarControls} />}</BlockControls>
@@ -104,7 +168,7 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 					</Group>
 					<Select
 						label={__('Choose a base Web API', 'inseri-core')}
-						data={selectData}
+						data={webApiOptions}
 						value={String(webApiId)}
 						searchable
 						onChange={(key) => updateState({ webApiId: parseInt(key!), block: { isWizardMode: false } })}

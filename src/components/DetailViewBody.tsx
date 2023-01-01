@@ -123,11 +123,23 @@ export function DetailViewBody() {
 							</Tabs.List>
 
 							<Tabs.Panel value="query-params" pt="xs">
-								<ParamsTable items={queryParams} onItemsChange={(qs) => updateState({ parameters: { queryParams: qs } })} readonly={isReading} />
+								<ParamsTable
+									items={queryParams}
+									onItemsChange={(qs) => {
+										updateState({ parameters: { queryParams: qs } })
+									}}
+									readonly={isReading}
+								/>
 							</Tabs.Panel>
 
 							<Tabs.Panel value="headers" pt="xs">
-								<ParamsTable items={headerParams} onItemsChange={(hs) => updateState({ parameters: { headerParams: hs } })} readonly={isReading} />
+								<ParamsTable
+									items={headerParams}
+									onItemsChange={(hs) => {
+										updateState({ parameters: { headerParams: hs } })
+									}}
+									readonly={isReading}
+								/>
 							</Tabs.Panel>
 
 							<Tabs.Panel value="body" py="sm" px="md">
@@ -155,7 +167,13 @@ export function DetailViewBody() {
 										</Text>
 									</Group>
 								) : isFormType(requestBodyType) ? (
-									<ParamsTable items={paramsBody} onItemsChange={(val) => updateState({ parameters: { paramsBody: val } })} readonly={isReading} />
+									<ParamsTable
+										items={paramsBody}
+										onItemsChange={(val) => {
+											updateState({ parameters: { paramsBody: val } })
+										}}
+										readonly={isReading}
+									/>
 								) : (
 									<Box mt="sm">
 										{bodyError && (

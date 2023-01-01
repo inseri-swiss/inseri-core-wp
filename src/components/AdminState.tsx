@@ -83,6 +83,26 @@ export const datasourceInitialState: DatasourceAttributes = {
 		key: '',
 		contentType: '',
 	},
+	inputMethodUrl: {
+		key: '',
+		contentType: '',
+		description: '',
+	},
+	inputQueryParams: {
+		key: '',
+		contentType: '',
+		description: '',
+	},
+	inputHeadersParams: {
+		key: '',
+		contentType: '',
+		description: '',
+	},
+	inputBody: {
+		key: '',
+		contentType: '',
+		description: '',
+	},
 	webApiId: -1,
 
 	mode: 'none',
@@ -235,12 +255,12 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 					})
 				} else {
 					const responseContentType: string = getPropertyCaseInsensitive(headers, CONTENT_TYPE) ?? ''
-					const bodyType = getBodyTypeByContenType(responseContentType) ?? 'raw'
+					const incomingBodyType = getBodyTypeByContenType(responseContentType) ?? 'raw'
 					let preparedBody: string | { url: string; filename: string } = ''
 
-					if (bodyType === 'image') {
+					if (incomingBodyType === 'image') {
 						preparedBody = url
-					} else if (bodyType === 'raw') {
+					} else if (incomingBodyType === 'raw') {
 						const urlObject = URL.createObjectURL(new Blob([data]))
 						const parts = url.split('/')
 						const lastPart = parts[parts.length - 1]
@@ -250,8 +270,8 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 						preparedBody = await textBlob.text()
 					}
 
-					if (isBeautifyType(bodyType) && typeof preparedBody === 'string') {
-						const formattedCode = formatCode(bodyType, preparedBody)[1]
+					if (isBeautifyType(incomingBodyType) && typeof preparedBody === 'string') {
+						const formattedCode = formatCode(incomingBodyType, preparedBody)[1]
 						preparedBody = formattedCode ?? preparedBody
 					}
 
@@ -264,7 +284,7 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 						state.response = {
 							...state.response,
 							status,
-							bodyType,
+							bodyType: incomingBodyType,
 							body: preparedBody,
 							headerParams: mapObjectToParams(headers),
 						}
@@ -289,7 +309,7 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 
 						if (data) {
 							// eslint-disable-next-line
-							const { description, url, method, headers, query_params, type, body, content_type, id, author_name } = data
+							const { description, url, method, headers, query_params, type, body, content_type: incomingContentType, id, author_name: authorName } = data
 
 							const queryParamItems = mapObjectToParams(JSON.parse(query_params))
 							const headerParamItems: ParamItem[] = mapObjectToParams(JSON.parse(headers))
@@ -319,9 +339,9 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 								name: description,
 								id,
 								webApiType: type,
-								contentType: content_type,
+								contentType: incomingContentType,
 								isContentTypeLock: true,
-								author: author_name,
+								author: authorName,
 							}
 
 							state.parameters = {
