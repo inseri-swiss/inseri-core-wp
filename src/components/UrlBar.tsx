@@ -44,9 +44,10 @@ interface Props {
 	setUrlError: (error: string) => void
 	onTryClick: () => void
 	isLoadingRequest: boolean
+	readonly?: boolean
 }
 
-export function UrlBar({ method, onMethodChange, url, onUrlChange, onTryClick, isLoadingRequest, urlError, setUrlError }: Props) {
+export function UrlBar({ method, onMethodChange, url, onUrlChange, onTryClick, isLoadingRequest, urlError, setUrlError, readonly }: Props) {
 	const { sendBtn, methodRoot, methodInput, methodWrapper, urlInput, urlWrapper, urlRoot } = useStyles().classes
 	const isNotReady = !url || !!urlError
 
@@ -59,6 +60,7 @@ export function UrlBar({ method, onMethodChange, url, onUrlChange, onTryClick, i
 					data={HTTP_METHODS}
 					value={method}
 					onChange={onMethodChange}
+					readOnly={readonly}
 				/>
 				<TextInput
 					classNames={{ root: urlRoot, wrapper: urlWrapper, input: urlInput }}
@@ -70,6 +72,7 @@ export function UrlBar({ method, onMethodChange, url, onUrlChange, onTryClick, i
 						setUrlError('')
 					}}
 					error={urlError}
+					readOnly={readonly}
 				/>
 			</Group>
 			<Button classNames={{ root: sendBtn }} variant="light" onClick={onTryClick} uppercase disabled={isNotReady} loading={isLoadingRequest}>

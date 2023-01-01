@@ -56,6 +56,7 @@ export function DetailViewBody() {
 		isTryLoading,
 	} = useGlobalState((state: DatasourceState) => state.parameters)
 	const { status, headerParams: responseHeaders, body: responseBody, bodyType: responseBodyType } = useGlobalState((state: DatasourceState) => state.response)
+	const isReading = useGlobalState((state: DatasourceState) => state.mode === 'read')
 
 	const [debouncedUrl] = useDebouncedValue(url, 500)
 	const { updateState, tryRequest, loadDatasourceById, updateRequestBodyType } = useGlobalState((state: DatasourceState) => state.actions)
@@ -98,6 +99,7 @@ export function DetailViewBody() {
 				setUrlError={(err) => updateState({ parameters: { urlError: err } })}
 				onTryClick={tryRequest}
 				isLoadingRequest={isTryLoading}
+				readonly={isReading}
 			/>
 
 			<Accordion
@@ -121,11 +123,11 @@ export function DetailViewBody() {
 							</Tabs.List>
 
 							<Tabs.Panel value="query-params" pt="xs">
-								<ParamsTable items={queryParams} onItemsChange={(qs) => updateState({ parameters: { queryParams: qs } })} />
+								<ParamsTable items={queryParams} onItemsChange={(qs) => updateState({ parameters: { queryParams: qs } })} readonly={isReading} />
 							</Tabs.Panel>
 
 							<Tabs.Panel value="headers" pt="xs">
-								<ParamsTable items={headerParams} onItemsChange={(hs) => updateState({ parameters: { headerParams: hs } })} />
+								<ParamsTable items={headerParams} onItemsChange={(hs) => updateState({ parameters: { headerParams: hs } })} readonly={isReading} />
 							</Tabs.Panel>
 
 							<Tabs.Panel value="body" py="sm" px="md">
@@ -133,11 +135,13 @@ export function DetailViewBody() {
 									<SegmentedControl
 										value={requestBodyType}
 										onChange={(bodyType) => {
-											updateRequestBodyType(bodyType)
+											if (!isReading) {
+												updateRequestBodyType(bodyType)
+											}
 										}}
 										data={BODY_TYPES}
 									/>
-									{isBeautifyType(requestBodyType) && (
+									{isBeautifyType(requestBodyType) && !isReading && (
 										<Button variant="subtle" onClick={beautify}>
 											{__('Beautify', 'inseri-core')}
 										</Button>
@@ -151,7 +155,7 @@ export function DetailViewBody() {
 										</Text>
 									</Group>
 								) : isFormType(requestBodyType) ? (
-									<ParamsTable items={paramsBody} onItemsChange={(val) => updateState({ parameters: { paramsBody: val } })} />
+									<ParamsTable items={paramsBody} onItemsChange={(val) => updateState({ parameters: { paramsBody: val } })} readonly={isReading} />
 								) : (
 									<Box mt="sm">
 										{bodyError && (
@@ -163,7 +167,11 @@ export function DetailViewBody() {
 											maxHeight={500}
 											type={requestBodyType}
 											value={textBody}
-											onChange={(val) => updateState({ parameters: { textBody: val, bodyError: '' } })}
+											onChange={(val) => {
+												if (!isReading) {
+													updateState({ parameters: { textBody: val, bodyError: '' } })
+												}
+											}}
 										/>
 									</Box>
 								)}
