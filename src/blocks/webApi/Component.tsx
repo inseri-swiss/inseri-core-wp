@@ -1,4 +1,4 @@
-import { useControlTower, useDispatch, useJsonBeacons } from '@inseri/lighthouse'
+import { useControlTower, useDispatch, useJsonBeacons, useWatch } from '@inseri/lighthouse'
 import { IconApi } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -184,6 +184,60 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 export function WebApiView(props: { attributes: Readonly<Attributes> }) {
 	const { attributes } = props
 	useDispatch(attributes.output)
+
+	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, item } = useGlobalState((state: DatasourceState) => state)
+	const { overrideMethodUrl, overrideQueryParams, overrideHeaderParams, overrideBody } = useGlobalState((state: DatasourceState) => state.actions)
+
+	const isLoaded = !!item
+
+	const watchMethodUrl = useWatch(inputMethodUrl)
+	const watchQueryParams = useWatch(inputQueryParams)
+	const watchHeadersParams = useWatch(inputHeadersParams)
+	const watchBody = useWatch(inputBody)
+
+	useEffect(() => {
+		if (watchMethodUrl.status === 'ready') {
+			if (typeof watchMethodUrl.value === 'object') {
+				overrideMethodUrl(watchMethodUrl.value.method, watchMethodUrl.value.url)
+			} else {
+				overrideMethodUrl(undefined, watchMethodUrl.value)
+			}
+		}
+
+		if (!inputMethodUrl.key) {
+			overrideMethodUrl(undefined, undefined)
+		}
+	}, [watchMethodUrl.status, watchMethodUrl.value, inputMethodUrl.key, isLoaded])
+
+	useEffect(() => {
+		if (watchQueryParams.status === 'ready') {
+			overrideQueryParams(watchQueryParams.value)
+		}
+
+		if (!inputQueryParams.key) {
+			overrideQueryParams(undefined)
+		}
+	}, [watchQueryParams.status, watchQueryParams.value, inputQueryParams.key, isLoaded])
+
+	useEffect(() => {
+		if (watchHeadersParams.status === 'ready') {
+			overrideHeaderParams(watchHeadersParams.value)
+		}
+
+		if (!inputHeadersParams.key) {
+			overrideHeaderParams(undefined)
+		}
+	}, [watchHeadersParams.status, watchHeadersParams.value, inputHeadersParams.key, isLoaded])
+
+	useEffect(() => {
+		if (watchBody.status === 'ready') {
+			overrideBody(watchBody.value)
+		}
+
+		if (!inputBody.key) {
+			overrideBody(undefined)
+		}
+	}, [watchBody.status, watchBody.value, inputBody.key, isLoaded])
 
 	return <Box p="md">PlaceHolder</Box>
 }

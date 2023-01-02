@@ -73,6 +73,11 @@ export interface DatasourceState extends DatasourceAttributes {
 		loadDatasourceById: () => void
 		loadDatasources: () => void
 		updateRequestBodyType: (bodyType: string) => void
+
+		overrideMethodUrl: (method?: string, url?: string) => void
+		overrideQueryParams: (record?: Record<string, string>) => void
+		overrideHeaderParams: (record?: Record<string, string>) => void
+		overrideBody: (newBody?: string) => void
 	}
 }
 
@@ -299,7 +304,7 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 			loadDatasourceById: async () => {
 				const { webApiId, mode, item } = get()
 
-				if ((mode === 'edit' || mode === 'read') && webApiId && !item) {
+				if ((mode === 'edit' || mode === 'read') && webApiId !== -1 && !item) {
 					const [errorMsg, data] = await getItem(webApiId)
 
 					set((state) => {
@@ -372,6 +377,60 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 				set((state) => {
 					state.parameters.headerParams = updatedHeaders
 					state.parameters.bodyType = bodyType
+				})
+			},
+
+			overrideMethodUrl: (method?: string, url?: string) => {
+				set((state) => {
+					if (method) {
+						state.parameters.method = method
+					}
+					if (url) {
+						state.parameters.url = url
+					}
+
+					if (!method && !url && state.item) {
+						state.parameters.method = state.item.method
+						state.parameters.url = state.item.url
+					}
+				})
+			},
+			overrideQueryParams: (record?: Record<string, string>) => {
+				set((state) => {
+					if (record) {
+						state.parameters.queryParams.push(...mapObjectToParams(record))
+					} else if (state.item) {
+						state.parameters.queryParams = mapObjectToParams(JSON.parse(state.item.query_params))
+					}
+				})
+			},
+			overrideHeaderParams: (record?: Record<string, string>) => {
+				set((state) => {
+					if (record) {
+						state.parameters.headerParams.push(...mapObjectToParams(record))
+					} else if (state.item) {
+						state.parameters.headerParams = mapObjectToParams(JSON.parse(state.item.headers))
+					}
+				})
+			},
+			overrideBody: (newBody?: string) => {
+				set((state) => {
+					if (newBody) {
+						state.parameters.bodyType = 'text'
+						state.parameters.textBody = newBody
+					} else if (state.item && state.item.body) {
+						const contentTypeValue = getPropertyCaseInsensitive(JSON.parse(state.item.headers), CONTENT_TYPE)
+						const bodyType = getBodyTypeByContenType(contentTypeValue) ?? 'none'
+						state.parameters.bodyType = bodyType
+
+						if (isFormType(bodyType)) {
+							state.parameters.paramsBody = mapObjectToParams(JSON.parse(state.item.body))
+						}
+
+						if (!isFormType(bodyType)) {
+							state.parameters.textBody = state.item.body
+						}
+					}
 				})
 			},
 		},
