@@ -31,7 +31,7 @@ const handleBody = async (blob: Blob, contentType: string) => {
 		responseBody = JSON.parse(await textBlob.text())
 	}
 
-	if (contentType.includes('text/') || contentType.includes('application/xml')) {
+	if (contentType.includes('text/') || contentType.includes('xml')) {
 		const textBlob = new Blob([responseBody])
 		responseBody = await textBlob.text()
 	}
@@ -83,6 +83,39 @@ export const callWebApi = async (datasourceId: string, responseContentType: stri
 			url: urlObject.toString(),
 			headers: headersObj,
 			data: requestBody,
+			responseType: 'blob',
+		})
+
+		const responseBody = await handleBody(response.data, responseContentType)
+
+		return [undefined, responseBody]
+	} catch (exception) {
+		if (exception instanceof axios.AxiosError) {
+			return [exception.message, undefined]
+		}
+
+		return ['Unknown error occurred', undefined]
+	}
+}
+
+export const fireWebApi = async (
+	method: string,
+	url: string,
+	queryParams: Record<string, string>,
+	headers: Record<string, string>,
+	body: any,
+	responseContentType: string
+): Promise<[string?, any?]> => {
+	try {
+		const urlObject = new URL(url)
+		const queries = new URLSearchParams(queryParams)
+		urlObject.search = queries.toString()
+
+		const response = await axios({
+			method,
+			url: urlObject.toString(),
+			headers,
+			data: body,
 			responseType: 'blob',
 		})
 

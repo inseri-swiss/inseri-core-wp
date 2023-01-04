@@ -12,7 +12,7 @@ interface BeaconState extends BaseBeaconState {
 	default?: string
 }
 
-interface BaseBeaconState {
+export interface BaseBeaconState {
 	contentType: string
 	status: 'initial' | 'loading' | 'ready' | 'error' | 'unavailable'
 	error?: string

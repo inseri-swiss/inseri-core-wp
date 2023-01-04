@@ -1,4 +1,4 @@
-import { useControlTower, useDispatch, useJsonBeacons, useWatch } from '@inseri/lighthouse'
+import { BaseBeaconState, ConsumerBeacon, useControlTower, useDispatch, useJsonBeacons, useWatch } from '@inseri/lighthouse'
 import { IconApi } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -7,7 +7,7 @@ import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import { DetailViewBody } from '../../components/DetailViewBody'
-import { Box, DatasourceState, Group, Modal, Select, Stack, Text, useGlobalState } from '../../components'
+import { Box, Button, DatasourceState, Group, Modal, Select, Stack, Text, useGlobalState } from '../../components'
 import config from './block.json'
 import { Attributes } from './index'
 
@@ -175,18 +175,32 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 					/>
 				</Box>
 			) : (
-				<WebApiView {...props} />
+				<WebApiView />
 			)}
 		</>
 	)
 }
 
-export function WebApiView(props: { attributes: Readonly<Attributes> }) {
-	const { attributes } = props
-	useDispatch(attributes.output)
+const isBeaconReady = (beacon: ConsumerBeacon, val: BaseBeaconState) => (beacon.key && val.status === 'ready') || !beacon.key
 
-	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, item } = useGlobalState((state: DatasourceState) => state)
-	const { overrideMethodUrl, overrideQueryParams, overrideHeaderParams, overrideBody } = useGlobalState((state: DatasourceState) => state.actions)
+export function WebApiView() {
+	const { contentType } = useGlobalState((state: DatasourceState) => state.heading)
+	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, item, output } = useGlobalState((state: DatasourceState) => state)
+	const { overrideMethodUrl, overrideQueryParams, overrideHeaderParams, overrideBody, fireRequest } = useGlobalState((state: DatasourceState) => state.actions)
+
+	const dispatch = useDispatch(output)
+
+	const initDownload = async () => {
+		dispatch({ status: 'loading', contentType })
+
+		const [errorMsg, data] = await fireRequest()
+
+		if (errorMsg) {
+			dispatch({ status: 'error' })
+		} else {
+			dispatch({ status: 'ready', value: data })
+		}
+	}
 
 	const isLoaded = !!item
 
@@ -194,6 +208,12 @@ export function WebApiView(props: { attributes: Readonly<Attributes> }) {
 	const watchQueryParams = useWatch(inputQueryParams)
 	const watchHeadersParams = useWatch(inputHeadersParams)
 	const watchBody = useWatch(inputBody)
+
+	const isDownloadReady =
+		isBeaconReady(inputMethodUrl, watchMethodUrl) &&
+		isBeaconReady(inputQueryParams, watchQueryParams) &&
+		isBeaconReady(inputHeadersParams, watchHeadersParams) &&
+		isBeaconReady(inputBody, watchBody)
 
 	useEffect(() => {
 		if (watchMethodUrl.status === 'ready') {
@@ -239,5 +259,11 @@ export function WebApiView(props: { attributes: Readonly<Attributes> }) {
 		}
 	}, [watchBody.status, watchBody.value, inputBody.key, isLoaded])
 
-	return <Box p="md">PlaceHolder</Box>
+	return (
+		<Box p="md">
+			<Button variant="filled" disabled={!isDownloadReady} onClick={initDownload}>
+				Download
+			</Button>
+		</Box>
+	)
 }

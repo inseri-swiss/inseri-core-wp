@@ -1,4 +1,4 @@
-import { addNewItem, Datasource, DatasourceWithoutId, getAllItems, getItem, handleTryRequest, updateNewItem } from '../ApiServer'
+import { addNewItem, Datasource, DatasourceWithoutId, fireWebApi, getAllItems, getItem, handleTryRequest, updateNewItem } from '../ApiServer'
 import { immer } from 'zustand/middleware/immer'
 import { ParamItem } from './ParamsTable'
 import {} from './DetailViewBody'
@@ -70,6 +70,7 @@ export interface DatasourceState extends DatasourceAttributes {
 		updateState: (modifier: RecursivePartial<DatasourceState>) => void
 		createOrUpdateWebApi: () => void
 		tryRequest: () => void
+		fireRequest: () => Promise<[string?, any?]>
 		loadDatasourceById: () => void
 		loadDatasources: () => void
 		updateRequestBodyType: (bodyType: string) => void
@@ -299,6 +300,28 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 				set((state) => {
 					state.parameters.isTryLoading = false
 				})
+			},
+
+			fireRequest: async () => {
+				const { contentType } = get().heading
+				const { bodyType, headerParams, queryParams, paramsBody, textBody, method, url } = get().parameters
+
+				let body: any = null
+				if (bodyType === 'form-urlencoded') {
+					body = new URLSearchParams(mapParamsToObject(paramsBody))
+				}
+				if (bodyType === 'form-data') {
+					const bodyFormData = new FormData()
+					const paramsObject = mapParamsToObject(paramsBody)
+					Object.keys(paramsObject).forEach((k) => bodyFormData.append(k, paramsObject[k]))
+
+					body = bodyFormData
+				}
+				if (isTextType(bodyType)) {
+					body = textBody
+				}
+
+				return await fireWebApi(method, url, mapParamsToObject(queryParams), mapParamsToObject(headerParams), body, contentType)
 			},
 
 			loadDatasourceById: async () => {
