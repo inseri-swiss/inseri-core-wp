@@ -19,6 +19,8 @@ export interface Attributes {
 	inputBody: ConsumerBeacon
 	blockName: string
 	webApiId: number
+	label: string
+	isVisible: boolean
 }
 
 function Edit(props: BlockEditProps<Attributes>) {

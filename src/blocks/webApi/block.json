@@ -61,6 +61,14 @@
 		"mode": {
 			"type": "string",
 			"default": "read"
+		},
+		"label": {
+			"type": "string",
+			"default": "Download"
+		},
+		"isVisible": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {

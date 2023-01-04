@@ -109,6 +109,8 @@ export const datasourceInitialState: DatasourceAttributes = {
 		description: '',
 	},
 	webApiId: -1,
+	label: '',
+	isVisible: false,
 
 	mode: 'none',
 	openAccordionItems: ['request'],
