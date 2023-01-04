@@ -41,13 +41,15 @@ const DATASOURCE_TYPES = [{ label: __('General', 'inseri-core'), value: 'general
 
 export function DetailViewHeading() {
 	const { primaryBtn, titleBar, alertRoot, midSizeField, idField, readonlyWrapper } = useStyles().classes
-	const { name, id, author, contentType, isContentTypeLock, webApiType, pageError, isSaveLoading } = useGlobalState((state: DatasourceState) => state.heading)
+	const { name, id, author, webApiType, pageError, isSaveLoading } = useGlobalState((state: DatasourceState) => state.heading)
 
 	const mode = useGlobalState((state: DatasourceState) => state.mode)
+	const isContentTypeLock = useGlobalState((state: DatasourceState) => state.isContentTypeLock)
+	const contentType = useGlobalState((state: DatasourceState) => state.output.contentType)
 	const isEdit = mode === 'edit'
 
-	const isNotReadyForSubmit = useGlobalState(({ heading, parameters }: DatasourceState) => {
-		return !!parameters.urlError || !parameters.url || !heading.name || !heading.contentType
+	const isNotReadyForSubmit = useGlobalState(({ heading, parameters, output }: DatasourceState) => {
+		return !!parameters.urlError || !parameters.url || !heading.name || !output.contentType
 	})
 
 	const { updateState, createOrUpdateWebApi, loadDatasourceById } = useGlobalState((state: DatasourceState) => state.actions)
@@ -124,8 +126,8 @@ export function DetailViewHeading() {
 				<ContentTypeSelect
 					value={contentType}
 					isLocked={isContentTypeLock}
-					update={(val) => updateState({ heading: { contentType: val! } })}
-					setLocked={(isLocked) => updateState({ heading: { isContentTypeLock: isLocked } })}
+					update={(val) => updateState({ output: { contentType: val! } })}
+					setLocked={(isLocked) => updateState({ isContentTypeLock: isLocked })}
 					withAsterisk
 				/>
 

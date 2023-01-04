@@ -37,14 +37,14 @@ const defaultInput = {
 	description: '',
 }
 
-const dropdownBeacon = [{ contentType: 'application/json', description: 'data', key: 'data' }]
+const baseOutputBeacon = [{ contentType: '', description: 'data', key: 'data' }]
 
 export function WebApiEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { blockId, blockName, output, webApiId, inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody } = useGlobalState(
+	const { blockId, blockName, output, webApiId, inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, isContentTypeLock } = useGlobalState(
 		(state: DatasourceState) => state
 	)
-	const { name, author, contentType, isContentTypeLock } = useGlobalState((state: DatasourceState) => state.heading)
+	const { name, author } = useGlobalState((state: DatasourceState) => state.heading)
 	const { isModalOpen, isWizardMode, datasources } = useGlobalState((state: DatasourceState) => state.block)
 	const { updateState, loadDatasources } = useGlobalState((state: DatasourceState) => state.actions)
 	const isWebAPIChosen = webApiId !== -1
@@ -58,7 +58,7 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 	const recordOptions = Object.entries(availableRecordBeacons).map(([k, { description }]) => ({ label: description, value: k }))
 	const bodyOptions = Object.entries(availableStringBeacons).map(([k, { description }]) => ({ label: description, value: k }))
 
-	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, dropdownBeacon)
+	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, baseOutputBeacon)
 
 	useEffect(() => {
 		loadDatasources()
@@ -109,10 +109,10 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 					</Box>
 					<Stack p="md" style={{ background: '#fff', width: '300px', border: '1px solid #ced4da' }}>
 						<ContentTypeSelect
-							value={contentType}
+							value={output.contentType}
 							isLocked={isContentTypeLock}
-							update={(val) => updateState({ heading: { contentType: val! } })}
-							setLocked={(isLocked) => updateState({ heading: { isContentTypeLock: isLocked } })}
+							update={(val) => updateState({ output: { contentType: val } })}
+							setLocked={(isLocked) => updateState({ isContentTypeLock: isLocked })}
 						/>
 
 						<Select
@@ -191,7 +191,6 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 const isBeaconReady = (beacon: ConsumerBeacon, val: BaseBeaconState) => (beacon.key && val.status === 'ready') || !beacon.key
 
 export function WebApiView() {
-	const { contentType } = useGlobalState((state: DatasourceState) => state.heading)
 	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, item, output } = useGlobalState((state: DatasourceState) => state)
 	const { overrideMethodUrl, overrideQueryParams, overrideHeaderParams, overrideBody, fireRequest, loadDatasourceById } = useGlobalState(
 		(state: DatasourceState) => state.actions
@@ -200,7 +199,7 @@ export function WebApiView() {
 	const dispatch = useDispatch(output)
 
 	const initDownload = async () => {
-		dispatch({ status: 'loading', contentType })
+		dispatch({ status: 'loading' })
 
 		const [errorMsg, data] = await fireRequest()
 
@@ -227,6 +226,10 @@ export function WebApiView() {
 	useEffect(() => {
 		loadDatasourceById()
 	}, [])
+
+	useEffect(() => {
+		dispatch({ contentType: output.contentType })
+	}, [output.contentType])
 
 	useEffect(() => {
 		if (watchMethodUrl.status === 'ready') {
