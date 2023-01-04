@@ -6,8 +6,8 @@ import { Button as WPButton, PanelBody, PanelRow, TextControl, ToolbarGroup } fr
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { DetailViewBody } from '../../components/DetailViewBody'
 import { Box, Button, ContentTypeSelect, DatasourceState, Group, Modal, Select, Stack, Text, useGlobalState } from '../../components'
+import { DetailViewBody } from '../../components/DetailViewBody'
 import config from './block.json'
 import { Attributes } from './index'
 
@@ -191,7 +191,7 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 const isBeaconReady = (beacon: ConsumerBeacon, val: BaseBeaconState) => (beacon.key && val.status === 'ready') || !beacon.key
 
 export function WebApiView() {
-	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, item, output } = useGlobalState((state: DatasourceState) => state)
+	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, item, output, webApiId } = useGlobalState((state: DatasourceState) => state)
 	const { overrideMethodUrl, overrideQueryParams, overrideHeaderParams, overrideBody, fireRequest, loadDatasourceById } = useGlobalState(
 		(state: DatasourceState) => state.actions
 	)
@@ -225,7 +225,7 @@ export function WebApiView() {
 
 	useEffect(() => {
 		loadDatasourceById()
-	}, [])
+	}, [webApiId])
 
 	useEffect(() => {
 		dispatch({ contentType: output.contentType })
