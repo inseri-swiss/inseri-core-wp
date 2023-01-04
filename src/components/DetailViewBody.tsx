@@ -37,8 +37,6 @@ const BODY_TYPES = [
 	{ label: 'Form-Data', value: 'form-data' },
 ]
 
-const RESPONSE_AREA_ID = 'response-textarea'
-
 export function DetailViewBody() {
 	const { primaryBtn, whiteBox, accordionContent, accordionLabel, tab } = useStyles().classes
 
@@ -59,7 +57,7 @@ export function DetailViewBody() {
 	const isReading = useGlobalState((state: DatasourceState) => state.mode === 'read')
 
 	const [debouncedUrl] = useDebouncedValue(url, 500)
-	const { updateState, tryRequest, loadDatasourceById, updateRequestBodyType } = useGlobalState((state: DatasourceState) => state.actions)
+	const { updateState, tryRequest, updateRequestBodyType } = useGlobalState((state: DatasourceState) => state.actions)
 
 	const beautify = () => {
 		const [errorMsg, formattedCode] = formatCode(requestBodyType, textBody)
@@ -71,12 +69,6 @@ export function DetailViewBody() {
 			updateState({ parameters: { textBody: formattedCode } })
 		}
 	}
-
-	useEffect(() => {
-		const responseTextarea = document.getElementById(RESPONSE_AREA_ID)
-		responseTextarea?.setAttribute('readonly', 'true')
-		loadDatasourceById()
-	}, [])
 
 	useEffect(() => {
 		try {
@@ -231,7 +223,7 @@ export function DetailViewBody() {
 										{__('Download File', 'inseri-core')}
 									</Button>
 								) : (
-									<CodeEditor maxHeight={500} type={responseBodyType} value={responseBody} textareaId={RESPONSE_AREA_ID} />
+									<CodeEditor maxHeight={500} type={responseBodyType} value={responseBody} />
 								)}
 							</Tabs.Panel>
 						</Tabs>
