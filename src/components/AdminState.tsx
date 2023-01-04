@@ -24,6 +24,7 @@ interface DatasourceAttributes extends BlockAttributes {
 	mode: 'create' | 'edit' | 'read' | 'none'
 	openAccordionItems: string[]
 	item: Datasource | null
+	isContentTypeLock: boolean
 
 	heading: {
 		pageError: string
@@ -32,8 +33,6 @@ interface DatasourceAttributes extends BlockAttributes {
 		name: string
 		id: number
 		webApiType: string
-		contentType: string
-		isContentTypeLock: boolean
 		author: string
 	}
 
@@ -114,6 +113,7 @@ export const datasourceInitialState: DatasourceAttributes = {
 	mode: 'none',
 	openAccordionItems: ['request'],
 	item: null,
+	isContentTypeLock: false,
 
 	heading: {
 		pageError: '',
@@ -122,8 +122,6 @@ export const datasourceInitialState: DatasourceAttributes = {
 		name: '',
 		id: -1,
 		webApiType: 'general',
-		contentType: '',
-		isContentTypeLock: false,
 		author: '',
 	},
 
@@ -178,9 +176,9 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 				})
 
 				let body: string | undefined
-				const { mode, item, parameters, heading } = get()
+				const { mode, item, parameters, heading, output } = get()
 				const { bodyType, headerParams, queryParams, paramsBody, textBody, method, url } = parameters
-				const { name, webApiType, contentType } = heading
+				const { name, webApiType } = heading
 
 				if (isFormType(bodyType)) {
 					body = JSON.stringify(mapParamsToObject(paramsBody))
@@ -196,7 +194,7 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 					query_params: JSON.stringify(mapParamsToObject(queryParams)),
 					type: webApiType,
 					body,
-					content_type: contentType,
+					content_type: output.contentType,
 				}
 
 				let result: [string?, Datasource?]
@@ -281,8 +279,8 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 					}
 
 					set((state) => {
-						if (!state.heading.isContentTypeLock) {
-							state.heading.contentType = responseContentType
+						if (!state.isContentTypeLock) {
+							state.output.contentType = responseContentType
 						}
 
 						state.openAccordionItems = Array.from(new Set([...state.openAccordionItems, 'response']))
@@ -302,7 +300,7 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 			},
 
 			fireRequest: async () => {
-				const { contentType } = get().heading
+				const { contentType } = get().output
 				const { bodyType, headerParams, queryParams, paramsBody, textBody, method, url } = get().parameters
 
 				let body: any = null
@@ -361,13 +359,12 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 							}
 
 							state.item = data
+							state.isContentTypeLock = true
 							state.heading = {
 								...state.heading,
 								name: description,
 								id,
 								webApiType: type,
-								contentType: incomingContentType,
-								isContentTypeLock: true,
 								author: authorName,
 							}
 
@@ -378,6 +375,10 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 								queryParams: queryParamItems,
 								headerParams: headerParamItems,
 								bodyType,
+							}
+
+							if (!state.output.contentType) {
+								state.output.contentType = incomingContentType
 							}
 						}
 					})
