@@ -11,7 +11,7 @@ function initReactComponents() {
 			render(
 				<InseriThemeProvider>
 					<StateProvider stateCreator={datasourceStoreCreator} initialState={{ ...datasourceInitialState, ...attributes }}>
-						<WebApiView attributes={attributes} />
+						<WebApiView />
 					</StateProvider>
 				</InseriThemeProvider>,
 				item
