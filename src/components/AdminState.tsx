@@ -322,9 +322,9 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 			},
 
 			loadDatasourceById: async () => {
-				const { webApiId, mode, item } = get()
+				const { webApiId, mode } = get()
 
-				if ((mode === 'edit' || mode === 'read') && webApiId !== -1 && !item) {
+				if ((mode === 'edit' || mode === 'read') && webApiId !== -1) {
 					const [errorMsg, data] = await getItem(webApiId)
 
 					set((state) => {
