@@ -2,7 +2,7 @@ import { BaseBeaconState, ConsumerBeacon, useControlTower, useDispatch, useJsonB
 import { IconApi } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { Button as WPButton, PanelBody, PanelRow, TextControl, ToolbarGroup } from '@wordpress/components'
+import { Button as WPButton, PanelBody, PanelRow, TextControl, ToolbarGroup, ToggleControl } from '@wordpress/components'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
@@ -41,9 +41,8 @@ const baseOutputBeacon = [{ contentType: '', description: 'data', key: 'data' }]
 
 export function WebApiEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { blockId, blockName, output, webApiId, inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, isContentTypeLock } = useGlobalState(
-		(state: DatasourceState) => state
-	)
+	const { blockId, blockName, output, webApiId, inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, isContentTypeLock, label, isVisible } =
+		useGlobalState((state: DatasourceState) => state)
 	const { name, author } = useGlobalState((state: DatasourceState) => state.heading)
 	const { isModalOpen, isWizardMode, datasources } = useGlobalState((state: DatasourceState) => state.block)
 	const { updateState, loadDatasources } = useGlobalState((state: DatasourceState) => state.actions)
@@ -163,6 +162,18 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 					<PanelRow>
 						<TextControl label="Block Name" value={blockName} onChange={(value) => updateState({ blockName: value })} />
 					</PanelRow>
+					<PanelRow>
+						<TextControl label="Label" value={label} onChange={(value) => updateState({ label: value })} />
+					</PanelRow>
+					<PanelRow>
+						<ToggleControl
+							label={__('block is visible', 'inseri-core')}
+							checked={isVisible}
+							onChange={() => {
+								updateState({ isVisible: !isVisible })
+							}}
+						/>
+					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
 			{isWizardMode ? (
@@ -182,7 +193,7 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 					/>
 				</Box>
 			) : (
-				<WebApiView />
+				<WebApiView isSelected={isSelected} isGutenbergEditor />
 			)}
 		</>
 	)
@@ -190,8 +201,15 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 
 const isBeaconReady = (beacon: ConsumerBeacon, val: BaseBeaconState) => (beacon.key && val.status === 'ready') || !beacon.key
 
-export function WebApiView() {
-	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, item, output, webApiId } = useGlobalState((state: DatasourceState) => state)
+interface ViewProps {
+	isSelected?: boolean
+	isGutenbergEditor?: boolean
+}
+
+export function WebApiView({ isSelected, isGutenbergEditor }: ViewProps) {
+	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, item, output, webApiId, label, isVisible } = useGlobalState(
+		(state: DatasourceState) => state
+	)
 	const { overrideMethodUrl, overrideQueryParams, overrideHeaderParams, overrideBody, fireRequest, loadDatasourceById } = useGlobalState(
 		(state: DatasourceState) => state.actions
 	)
@@ -275,11 +293,26 @@ export function WebApiView() {
 		}
 	}, [watchBody.status, watchBody.value, inputBody.key, isLoaded])
 
-	return (
+	return isVisible || isSelected ? (
 		<Box p="md">
 			<Button variant="filled" disabled={!isDownloadReady} onClick={initDownload}>
-				Download
+				{label}
 			</Button>
 		</Box>
+	) : isGutenbergEditor ? (
+		<Box
+			style={{
+				height: '68px',
+				border: '1px dashed currentcolor',
+				borderRadius: '2px',
+			}}
+		>
+			<Box />
+			<svg width="100%" height="100%">
+				<line stroke-dasharray="3" x1="0" y1="0" x2="100%" y2="100%" style={{ stroke: 'currentColor' }} />
+			</svg>
+		</Box>
+	) : (
+		<div />
 	)
 }
