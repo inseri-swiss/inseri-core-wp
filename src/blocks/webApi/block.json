@@ -57,6 +57,10 @@
 		"webApiId": {
 			"type": "number",
 			"default": -1
+		},
+		"mode": {
+			"type": "string",
+			"default": "read"
 		}
 	},
 	"supports": {

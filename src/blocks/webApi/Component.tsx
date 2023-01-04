@@ -7,7 +7,7 @@ import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import { DetailViewBody } from '../../components/DetailViewBody'
-import { Box, Button, DatasourceState, Group, Modal, Select, Stack, Text, useGlobalState } from '../../components'
+import { Box, Button, ContentTypeSelect, DatasourceState, Group, Modal, Select, Stack, Text, useGlobalState } from '../../components'
 import config from './block.json'
 import { Attributes } from './index'
 
@@ -44,7 +44,7 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 	const { blockId, blockName, output, webApiId, inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody } = useGlobalState(
 		(state: DatasourceState) => state
 	)
-	const { name, author } = useGlobalState((state: DatasourceState) => state.heading)
+	const { name, author, contentType, isContentTypeLock } = useGlobalState((state: DatasourceState) => state.heading)
 	const { isModalOpen, isWizardMode, datasources } = useGlobalState((state: DatasourceState) => state.block)
 	const { updateState, loadDatasources } = useGlobalState((state: DatasourceState) => state.actions)
 	const isWebAPIChosen = webApiId !== -1
@@ -108,6 +108,13 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 						<DetailViewBody />
 					</Box>
 					<Stack p="md" style={{ background: '#fff', width: '300px', border: '1px solid #ced4da' }}>
+						<ContentTypeSelect
+							value={contentType}
+							isLocked={isContentTypeLock}
+							update={(val) => updateState({ heading: { contentType: val! } })}
+							setLocked={(isLocked) => updateState({ heading: { isContentTypeLock: isLocked } })}
+						/>
+
 						<Select
 							styles={{ label: { fontWeight: 'normal' } }}
 							label={__('Override method and URL', 'inseri-core')}
@@ -186,7 +193,9 @@ const isBeaconReady = (beacon: ConsumerBeacon, val: BaseBeaconState) => (beacon.
 export function WebApiView() {
 	const { contentType } = useGlobalState((state: DatasourceState) => state.heading)
 	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, item, output } = useGlobalState((state: DatasourceState) => state)
-	const { overrideMethodUrl, overrideQueryParams, overrideHeaderParams, overrideBody, fireRequest } = useGlobalState((state: DatasourceState) => state.actions)
+	const { overrideMethodUrl, overrideQueryParams, overrideHeaderParams, overrideBody, fireRequest, loadDatasourceById } = useGlobalState(
+		(state: DatasourceState) => state.actions
+	)
 
 	const dispatch = useDispatch(output)
 
@@ -214,6 +223,10 @@ export function WebApiView() {
 		isBeaconReady(inputQueryParams, watchQueryParams) &&
 		isBeaconReady(inputHeadersParams, watchHeadersParams) &&
 		isBeaconReady(inputBody, watchBody)
+
+	useEffect(() => {
+		loadDatasourceById()
+	}, [])
 
 	useEffect(() => {
 		if (watchMethodUrl.status === 'ready') {

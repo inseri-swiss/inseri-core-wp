@@ -168,7 +168,6 @@ export const datasourceStoreCreator = (initalState: DatasourceAttributes) => {
 				if (data) {
 					set((state) => {
 						state.block.datasources = data
-						state.mode = 'read'
 					})
 				}
 			},

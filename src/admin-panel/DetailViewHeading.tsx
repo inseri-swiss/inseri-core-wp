@@ -1,8 +1,7 @@
-import { IconLock, IconLockOpen } from '@tabler/icons'
+import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { COMMON_CONTENT_TYPES } from '../utils'
 import logo from '../assets/inseri_logo.png'
-import { ActionIcon, Alert, Box, Button, createStyles, Group, Select, TextInput, Title, useGlobalState } from '../components'
+import { Alert, Box, Button, ContentTypeSelect, createStyles, Group, Select, TextInput, Title, useGlobalState } from '../components'
 import { DatasourceState } from '../components/AdminState'
 
 const useStyles = createStyles((theme, _params, getRef) => ({
@@ -36,29 +35,12 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 			},
 		},
 	},
-	ctInputWrapper: {
-		[`& > .${getRef('input')}`]: {
-			borderTopRightRadius: '0',
-			borderBottomRightRadius: '0',
-		},
-		[`& > .${getRef('input')}:read-only`]: {
-			cursor: 'not-allowed',
-		},
-	},
-	lockWrapper: {
-		background: '#fff',
-		height: '36px',
-		border: '1px solid #8c8f94',
-		borderTopLeftRadius: '0',
-		borderBottomLeftRadius: '0',
-		color: '#868E96',
-	},
 }))
 
 const DATASOURCE_TYPES = [{ label: __('General', 'inseri-core'), value: 'general' }]
 
 export function DetailViewHeading() {
-	const { primaryBtn, titleBar, alertRoot, midSizeField, idField, readonlyWrapper, ctInputWrapper, lockWrapper } = useStyles().classes
+	const { primaryBtn, titleBar, alertRoot, midSizeField, idField, readonlyWrapper } = useStyles().classes
 	const { name, id, author, contentType, isContentTypeLock, webApiType, pageError, isSaveLoading } = useGlobalState((state: DatasourceState) => state.heading)
 
 	const mode = useGlobalState((state: DatasourceState) => state.mode)
@@ -68,17 +50,14 @@ export function DetailViewHeading() {
 		return !!parameters.urlError || !parameters.url || !heading.name || !heading.contentType
 	})
 
-	const { updateState, createOrUpdateWebApi } = useGlobalState((state: DatasourceState) => state.actions)
+	const { updateState, createOrUpdateWebApi, loadDatasourceById } = useGlobalState((state: DatasourceState) => state.actions)
 
 	const title = isEdit ? __('Edit Web API', 'inseri-core') : __('Add New Web API', 'inseri-core')
 	const primaryBtnText = isEdit ? __('Save', 'inseri-core') : __('Create', 'inseri-core')
 
-	const foundContentType = COMMON_CONTENT_TYPES.find((c) => c.value === contentType)
-	let contentTypesSelection = COMMON_CONTENT_TYPES
-
-	if (!foundContentType && contentType) {
-		contentTypesSelection = [{ label: contentType, value: contentType }, ...COMMON_CONTENT_TYPES]
-	}
+	useEffect(() => {
+		loadDatasourceById()
+	}, [])
 
 	return (
 		<Box>
@@ -142,22 +121,13 @@ export function DetailViewHeading() {
 					withAsterisk
 				/>
 
-				<Group spacing={0} align={'flex-end'}>
-					<Select
-						label={__('Content Type', 'inseri-core')}
-						placeholder={isContentTypeLock ? '' : __('generate with Try Request', 'inseri-core')}
-						classNames={{ root: midSizeField, wrapper: ctInputWrapper }}
-						searchable
-						data={contentTypesSelection}
-						value={contentType}
-						readOnly={isContentTypeLock}
-						onChange={(val) => updateState({ heading: { contentType: val! } })}
-						withAsterisk
-					/>
-					<ActionIcon onClick={() => updateState({ heading: { isContentTypeLock: !isContentTypeLock } })} className={lockWrapper}>
-						{isContentTypeLock ? <IconLock size={18} /> : <IconLockOpen size={18} />}
-					</ActionIcon>
-				</Group>
+				<ContentTypeSelect
+					value={contentType}
+					isLocked={isContentTypeLock}
+					update={(val) => updateState({ heading: { contentType: val! } })}
+					setLocked={(isLocked) => updateState({ heading: { isContentTypeLock: isLocked } })}
+					withAsterisk
+				/>
 
 				{isEdit && (
 					<TextInput
