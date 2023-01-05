@@ -21,6 +21,7 @@ export interface Attributes {
 	webApiId: number
 	label: string
 	isVisible: boolean
+	autoTrigger: boolean
 }
 
 function Edit(props: BlockEditProps<Attributes>) {
