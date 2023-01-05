@@ -64,9 +64,13 @@
 		},
 		"label": {
 			"type": "string",
-			"default": "Download"
+			"default": "Call Web API"
 		},
 		"isVisible": {
+			"type": "boolean",
+			"default": true
+		},
+		"autoTrigger": {
 			"type": "boolean",
 			"default": true
 		}

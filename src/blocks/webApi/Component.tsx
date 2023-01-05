@@ -41,8 +41,20 @@ const baseOutputBeacon = [{ contentType: '', description: 'data', key: 'data' }]
 
 export function WebApiEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { blockId, blockName, output, webApiId, inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, isContentTypeLock, label, isVisible } =
-		useGlobalState((state: DatasourceState) => state)
+	const {
+		blockId,
+		blockName,
+		output,
+		webApiId,
+		inputMethodUrl,
+		inputQueryParams,
+		inputHeadersParams,
+		inputBody,
+		isContentTypeLock,
+		label,
+		isVisible,
+		autoTrigger,
+	} = useGlobalState((state: DatasourceState) => state)
 	const { name, author } = useGlobalState((state: DatasourceState) => state.heading)
 	const { isModalOpen, isWizardMode, datasources } = useGlobalState((state: DatasourceState) => state.block)
 	const { updateState, loadDatasources } = useGlobalState((state: DatasourceState) => state.actions)
@@ -169,8 +181,20 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 						<ToggleControl
 							label={__('block is visible', 'inseri-core')}
 							checked={isVisible}
-							onChange={() => {
-								updateState({ isVisible: !isVisible })
+							onChange={(newVisibility) => {
+								updateState({ isVisible: newVisibility })
+								if (!newVisibility) {
+									updateState({ autoTrigger: true })
+								}
+							}}
+						/>
+					</PanelRow>
+					<PanelRow>
+						<ToggleControl
+							label={__('call automatically on changes', 'inseri-core')}
+							checked={autoTrigger}
+							onChange={(newTriggerState) => {
+								updateState({ autoTrigger: newTriggerState })
 							}}
 						/>
 					</PanelRow>
@@ -207,7 +231,7 @@ interface ViewProps {
 }
 
 export function WebApiView({ isSelected, isGutenbergEditor }: ViewProps) {
-	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, item, output, webApiId, label, isVisible } = useGlobalState(
+	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, item, output, webApiId, label, isVisible, autoTrigger } = useGlobalState(
 		(state: DatasourceState) => state
 	)
 	const { overrideMethodUrl, overrideQueryParams, overrideHeaderParams, overrideBody, fireRequest, loadDatasourceById } = useGlobalState(
@@ -216,7 +240,7 @@ export function WebApiView({ isSelected, isGutenbergEditor }: ViewProps) {
 
 	const dispatch = useDispatch(output)
 
-	const initDownload = async () => {
+	const triggerRequest = async () => {
 		dispatch({ status: 'loading' })
 
 		const [errorMsg, data] = await fireRequest()
@@ -235,7 +259,8 @@ export function WebApiView({ isSelected, isGutenbergEditor }: ViewProps) {
 	const watchHeadersParams = useWatch(inputHeadersParams)
 	const watchBody = useWatch(inputBody)
 
-	const isDownloadReady =
+	const isCallReady =
+		isLoaded &&
 		isBeaconReady(inputMethodUrl, watchMethodUrl) &&
 		isBeaconReady(inputQueryParams, watchQueryParams) &&
 		isBeaconReady(inputHeadersParams, watchHeadersParams) &&
@@ -293,9 +318,22 @@ export function WebApiView({ isSelected, isGutenbergEditor }: ViewProps) {
 		}
 	}, [watchBody.status, watchBody.value, inputBody.key, isLoaded])
 
+	// must be the last useEffect
+	useEffect(() => {
+		if (autoTrigger && isCallReady) {
+			triggerRequest()
+		}
+	}, [
+		watchMethodUrl.value,
+		watchQueryParams.value,
+		watchHeadersParams.value,
+		watchBody.value,
+		isCallReady,
+	])
+
 	return isVisible || isSelected ? (
 		<Box p="md">
-			<Button variant="filled" disabled={!isDownloadReady} onClick={initDownload}>
+			<Button variant="filled" disabled={!isCallReady} onClick={triggerRequest}>
 				{label}
 			</Button>
 		</Box>
@@ -309,7 +347,7 @@ export function WebApiView({ isSelected, isGutenbergEditor }: ViewProps) {
 		>
 			<Box />
 			<svg width="100%" height="100%">
-				<line stroke-dasharray="3" x1="0" y1="0" x2="100%" y2="100%" style={{ stroke: 'currentColor' }} />
+				<line strokeDasharray="3" x1="0" y1="0" x2="100%" y2="100%" style={{ stroke: 'currentColor' }} />
 			</svg>
 		</Box>
 	) : (
