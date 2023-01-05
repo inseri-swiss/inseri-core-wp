@@ -175,11 +175,12 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 						<TextControl label="Block Name" value={blockName} onChange={(value) => updateState({ blockName: value })} />
 					</PanelRow>
 					<PanelRow>
-						<TextControl label="Label" value={label} onChange={(value) => updateState({ label: value })} />
+						<TextControl label="Action Text" value={label} onChange={(value) => updateState({ label: value })} />
 					</PanelRow>
 					<PanelRow>
 						<ToggleControl
-							label={__('block is visible', 'inseri-core')}
+							label={__('Show block', 'inseri-core')}
+							help={isVisible ? __('Block is visible.', 'inseri-core') : __('Block is invisible.', 'inseri-core')}
 							checked={isVisible}
 							onChange={(newVisibility) => {
 								updateState({ isVisible: newVisibility })
@@ -191,10 +192,17 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 					</PanelRow>
 					<PanelRow>
 						<ToggleControl
-							label={__('call automatically on changes', 'inseri-core')}
+							label={__('Call automatically', 'inseri-core')}
+							help={
+								autoTrigger
+									? __('Web API is called initially and on changes of inputs.', 'inseri-core')
+									: __('Web API needs to be called manually.', 'inseri-core')
+							}
 							checked={autoTrigger}
 							onChange={(newTriggerState) => {
-								updateState({ autoTrigger: newTriggerState })
+								if (isVisible) {
+									updateState({ autoTrigger: newTriggerState })
+								}
 							}}
 						/>
 					</PanelRow>
