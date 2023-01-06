@@ -231,7 +231,7 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 	)
 }
 
-const isBeaconReady = (beacon: ConsumerBeacon, val: BaseBeaconState) => (beacon.key && val.status === 'ready') || !beacon.key
+const isBeaconReady = (beacon: ConsumerBeacon, val: BaseBeaconState) => !beacon.key || val.status === 'ready'
 
 interface ViewProps {
 	isSelected?: boolean
