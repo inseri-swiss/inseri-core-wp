@@ -1,0 +1,38 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "inseri-core/media-library",
+	"version": "0.1.0",
+	"title": "Media Library",
+	"category": "inseri",
+	"description": "Load files from media library",
+	"attributes": {
+		"blockId": {
+			"type": "string",
+			"default": ""
+		},
+		"blockName": {
+			"type": "string",
+			"default": ""
+		},
+		"output": {
+			"type": "object",
+			"default": {
+				"key": "",
+				"contentType": ""
+			}
+		},
+		"fileIds": {
+			"type": "array",
+			"default": []
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"textdomain": "inseri-core",
+	"editorScript": "file:./index.js",
+	"viewScript": ["file:./hydration.js"],
+	"style": ["file:./index.css"],
+	"script": "inseri-core"
+}
