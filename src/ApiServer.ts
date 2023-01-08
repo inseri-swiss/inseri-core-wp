@@ -215,7 +215,7 @@ export const updateNewItem = async (newItem: Datasource): Promise<[string?, Data
 
 // it contains more properties
 // but only properties of interest are added here
-interface Media {
+export interface Media {
 	id: number
 	mime_type: string
 	author: number
@@ -223,9 +223,16 @@ interface Media {
 	modified: string
 	source_url: string
 	title: { rendered: string }
+	media_details: {
+		sizes: {
+			full?: { source_url: string }
+			medium?: { source_url: string }
+			thumbnail?: { source_url: string }
+		}
+	}
 }
 
-export const getAllMedia = async (): Promise<[string?, Media[]?]> => {
-	const action = () => axios.get<Media[]>(inseriApiSettings.root + MEDIA_ROUTE)
+export const getAllMedia = async (ids: number[]): Promise<[string?, Media[]?]> => {
+	const action = () => axios.get<Media[]>(inseriApiSettings.root + MEDIA_ROUTE + `&include=${ids.join(',')}`)
 	return handleRequest(action)
 }
