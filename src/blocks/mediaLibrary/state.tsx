@@ -111,6 +111,7 @@ export const storeCreator = (initalState: Attributes) => {
 			chooseFile: async (id: string | null) => {
 				set((state) => {
 					state.selectedFileId = id
+					state.hasError = false
 				})
 
 				if (!id) {
