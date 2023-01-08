@@ -8,8 +8,6 @@ import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import { Box, Group, Image, Select, Text, useGlobalState } from '../../components'
 import config from './block.json'
-
-import { useSelect } from '@wordpress/data'
 import { Attributes } from './index'
 import { GlobalState } from './state'
 
@@ -79,62 +77,25 @@ export function MediaLibraryEdit(props: BlockEditProps<Attributes>) {
 interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
 	thumbnail: string
 	label: string
-	description: string
 }
 
-const SelectItem = forwardRef<HTMLDivElement, ItemProps>(({ thumbnail, label, description, ...others }: ItemProps, ref) => (
+const SelectItem = forwardRef<HTMLDivElement, ItemProps>(({ thumbnail, label, ...others }: ItemProps, ref) => (
 	<div ref={ref} {...others}>
 		<Group noWrap>
 			<Image src={thumbnail} width={38} height={38} fit="contain" />
 
-			<div>
-				<Text size="sm">{label}</Text>
-				<Text size="xs" opacity={0.65}>
-					{description}
-				</Text>
-			</div>
+			<Text size="sm">{label}</Text>
 		</Group>
 	</div>
 ))
 
-interface WpFile {
-	id: number
-	source_url: string
-	mime_type: string
-	title: { raw: string }
-	description: { raw: string }
-	media_details: {
-		sizes: {
-			full?: { source_url: string }
-			medium?: { source_url: string }
-			thumbnail?: { source_url: string }
-		}
-	}
-}
-
-const transformToOption = (file: WpFile) => {
-	const sizes = file.media_details.sizes
-	let thumbnail = '/wp-includes/images/media/default.png'
-
-	if (sizes.thumbnail?.source_url) {
-		thumbnail = sizes.thumbnail.source_url
-	} else if (sizes.medium?.source_url) {
-		thumbnail = sizes.medium.source_url
-	} else if (sizes.full?.source_url) {
-		thumbnail = sizes.full.source_url
-	} else if (file.mime_type.startsWith('image')) {
-		thumbnail = file.source_url
-	}
-
-	return { value: String(file.id), label: file.title.raw, description: file.description.raw, url: file.source_url, mime: file.mime_type, thumbnail }
-}
-
 export function MediaLibraryView() {
-	const { label, selectedFileId, fileIds } = useGlobalState((state: GlobalState) => state)
-	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
+	const { label, selectedFileId, files } = useGlobalState((state: GlobalState) => state)
+	const { updateState, loadMedias } = useGlobalState((state: GlobalState) => state.actions)
 
-	const rawData = useSelect((select: any) => select('core').getMediaItems({ include: fileIds }), []) ?? []
-	const data = rawData.map(transformToOption)
+	useEffect(() => {
+		loadMedias()
+	}, [])
 
 	return (
 		<Box p="md">
@@ -142,7 +103,7 @@ export function MediaLibraryView() {
 				itemComponent={SelectItem}
 				label={label}
 				value={selectedFileId}
-				data={data}
+				data={files}
 				onChange={(val) => {
 					updateState({ selectedFileId: val })
 				}}
