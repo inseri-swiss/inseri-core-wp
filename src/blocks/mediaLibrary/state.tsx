@@ -91,34 +91,36 @@ export const storeCreator = (initalState: Attributes) => {
 				const { fileIds, selectedFileId } = get()
 				const [err, medias] = await getAllMedia(fileIds)
 
-				set((state) => {
-					if (medias) {
-						state.files = medias.map(transformToFile)
+				if (medias) {
+					const newFiles = medias.map(transformToFile)
+					set((state) => {
+						state.files = newFiles
+					})
 
-						const file = state.files.find((f) => f.value === selectedFileId)
-						if (file) {
-							loadFile(set, file)
-						}
+					const file = newFiles.find((f) => f.value === selectedFileId)
+					if (file) {
+						loadFile(set, file)
 					}
-					if (err) {
+				}
+				if (err) {
+					set((state) => {
 						state.hasError = true
-					}
-				})
+					})
+				}
 			},
 			chooseFile: async (id: string | null) => {
+				set((state) => {
+					state.selectedFileId = id
+				})
+
 				if (!id) {
 					set((state) => {
-						state.selectedFileId = id
 						state.fileContent = null
 					})
 				}
 
 				const file = get().files.find((f) => f.value === id)
-				if (id && file) {
-					set((state) => {
-						state.selectedFileId = id
-					})
-
+				if (file) {
 					loadFile(set, file)
 				}
 			},
