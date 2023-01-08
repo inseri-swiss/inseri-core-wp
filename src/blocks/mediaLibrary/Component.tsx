@@ -1,4 +1,5 @@
 import { useControlTower, useDispatch } from '@inseri/lighthouse'
+import { usePrevious } from '@mantine/hooks'
 import { IconFiles } from '@tabler/icons'
 import { BlockControls, InspectorControls, MediaPlaceholder } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -93,6 +94,7 @@ export function MediaLibraryView() {
 	const { label, selectedFileId, files, output, isLoading, hasError, fileContent, mime } = useGlobalState((state: GlobalState) => state)
 	const { loadMedias, chooseFile } = useGlobalState((state: GlobalState) => state.actions)
 	const dispatch = useDispatch(output)
+	const prevMime = usePrevious(mime)
 
 	useEffect(() => {
 		loadMedias()
@@ -106,9 +108,13 @@ export function MediaLibraryView() {
 			dispatch({ status: 'error' })
 		}
 		if (fileContent) {
-			dispatch({ status: 'ready', value: fileContent, contentType: mime })
+			if (prevMime && prevMime !== mime) {
+				dispatch({ status: 'unavailable' })
+			}
+
+			setTimeout(() => dispatch({ status: 'ready', value: fileContent, contentType: mime }), 100)
 		}
-	}, [isLoading, hasError, fileContent])
+	}, [isLoading, hasError, fileContent, mime])
 
 	return (
 		<Box p="md">
