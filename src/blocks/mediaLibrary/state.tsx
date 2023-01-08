@@ -1,7 +1,8 @@
-import { updatePartially } from '../../utils'
+import type { Draft } from 'immer'
 import { immer } from 'zustand/middleware/immer'
+import { callMediaFile, getAllMedia, Media } from '../../ApiServer'
+import { updatePartially } from '../../utils'
 import { Attributes } from './index'
-import { getAllMedia, Media } from '../../ApiServer'
 
 interface File {
 	value: string
@@ -18,9 +19,15 @@ export interface GlobalState extends Attributes {
 	files: File[]
 	selectedFileId: string | null
 
+	fileContent: any
+	isLoading: boolean
+	hasError: boolean
+	mime: string
+
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
-		loadMedias: () => void
+		loadMedias: () => Promise<void>
+		chooseFile: (id: string | null) => Promise<void>
 	}
 }
 
@@ -41,12 +48,38 @@ const transformToFile = (file: Media): File => {
 	return { value: String(file.id), label: file.title.rendered, url: file.source_url, mime: file.mime_type, thumbnail }
 }
 
+type Set = (nextStateOrUpdater: (state: Draft<GlobalState>) => void, shouldReplace?: boolean | undefined) => void
+
 export const storeCreator = (initalState: Attributes) => {
+	const loadFile = async (set: Set, file: File) => {
+		set((state) => {
+			state.isLoading = true
+			state.mime = file.mime
+		})
+
+		const [err, data] = await callMediaFile(file.value, file.mime)
+
+		set((state) => {
+			if (data) {
+				state.fileContent = data
+			}
+
+			if (err) {
+				state.hasError = true
+			}
+
+			state.isLoading = false
+		})
+	}
+
 	return immer<GlobalState>((set, get) => ({
 		...initalState,
 		isWizardMode: initalState.fileIds.length === 0,
 		files: [],
-		selectedFileId: null,
+		fileContent: null,
+		isLoading: false,
+		hasError: false,
+		mime: '',
 
 		actions: {
 			updateState: (modifier: RecursivePartial<GlobalState>) =>
@@ -55,13 +88,38 @@ export const storeCreator = (initalState: Attributes) => {
 				}),
 
 			loadMedias: async () => {
-				const ids = get().fileIds
-				const [_, medias] = await getAllMedia(ids)
+				const { fileIds, selectedFileId } = get()
+				const [err, medias] = await getAllMedia(fileIds)
 
-				if (medias) {
-					set((state) => {
+				set((state) => {
+					if (medias) {
 						state.files = medias.map(transformToFile)
+
+						const file = state.files.find((f) => f.value === selectedFileId)
+						if (file) {
+							loadFile(set, file)
+						}
+					}
+					if (err) {
+						state.hasError = true
+					}
+				})
+			},
+			chooseFile: async (id: string | null) => {
+				if (!id) {
+					set((state) => {
+						state.selectedFileId = id
+						state.fileContent = null
 					})
+				}
+
+				const file = get().files.find((f) => f.value === id)
+				if (id && file) {
+					set((state) => {
+						state.selectedFileId = id
+					})
+
+					loadFile(set, file)
 				}
 			},
 		},
