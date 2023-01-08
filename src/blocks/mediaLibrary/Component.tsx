@@ -4,10 +4,11 @@ import { IconFiles } from '@tabler/icons'
 import { BlockControls, InspectorControls, MediaPlaceholder } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, TextControl, ToolbarGroup } from '@wordpress/components'
+import { useDispatch as useWpDispatch } from '@wordpress/data'
 import { forwardRef, useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Group, Image, Select, Text, useGlobalState } from '../../components'
+import { Box, Group, Image, Loader, Select, Text, useGlobalState } from '../../components'
 import config from './block.json'
 import { Attributes } from './index'
 import { GlobalState } from './state'
@@ -15,6 +16,7 @@ import { GlobalState } from './state'
 const baseBeacon = { contentType: '', description: 'file', key: 'file', default: '' }
 
 export function MediaLibraryEdit(props: BlockEditProps<Attributes>) {
+	const { createErrorNotice } = useWpDispatch('core/notices')
 	const { isSelected } = props
 	const { output, blockId, blockName, label, isWizardMode, actions, fileIds } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
@@ -67,6 +69,7 @@ export function MediaLibraryEdit(props: BlockEditProps<Attributes>) {
 					multiple={true}
 					labels={{ title: 'Media Libray' }}
 					icon={<IconFiles style={{ fill: 'none' }} />}
+					onError={(err) => createErrorNotice(err, { type: 'snackbar' })}
 				></MediaPlaceholder>
 			) : (
 				<MediaLibraryView />
@@ -84,7 +87,6 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(({ thumbnail, label, ..
 	<div ref={ref} {...others}>
 		<Group noWrap>
 			<Image src={thumbnail} width={38} height={38} fit="contain" />
-
 			<Text size="sm">{label}</Text>
 		</Group>
 	</div>
@@ -124,9 +126,9 @@ export function MediaLibraryView() {
 				label={label}
 				value={selectedFileId}
 				data={files}
-				onChange={(val) => {
-					chooseFile(val)
-				}}
+				onChange={(val) => chooseFile(val)}
+				rightSection={isLoading && <Loader p="xs" />}
+				error={hasError ? __('An error has occurred.', 'inseri-core') : null}
 			/>
 		</Box>
 	)
