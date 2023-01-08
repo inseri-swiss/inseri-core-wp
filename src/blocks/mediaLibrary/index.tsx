@@ -14,6 +14,7 @@ const { name, ...settings } = json as any
 export interface Attributes {
 	blockId: string
 	blockName: string
+	label: string
 	output: ProducerBeacon
 	fileIds: number[]
 }
