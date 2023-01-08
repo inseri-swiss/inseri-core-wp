@@ -1,4 +1,4 @@
-import { useControlTower } from '@inseri/lighthouse'
+import { useControlTower, useDispatch } from '@inseri/lighthouse'
 import { IconFiles } from '@tabler/icons'
 import { BlockControls, InspectorControls, MediaPlaceholder } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -90,22 +90,36 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(({ thumbnail, label, ..
 ))
 
 export function MediaLibraryView() {
-	const { label, selectedFileId, files } = useGlobalState((state: GlobalState) => state)
-	const { updateState, loadMedias } = useGlobalState((state: GlobalState) => state.actions)
+	const { label, selectedFileId, files, output, isLoading, hasError, fileContent, mime } = useGlobalState((state: GlobalState) => state)
+	const { loadMedias, chooseFile } = useGlobalState((state: GlobalState) => state.actions)
+	const dispatch = useDispatch(output)
 
 	useEffect(() => {
 		loadMedias()
 	}, [])
 
+	useEffect(() => {
+		if (isLoading) {
+			dispatch({ status: 'loading' })
+		}
+		if (hasError) {
+			dispatch({ status: 'error' })
+		}
+		if (fileContent) {
+			dispatch({ status: 'ready', value: fileContent, contentType: mime })
+		}
+	}, [isLoading, hasError, fileContent])
+
 	return (
 		<Box p="md">
 			<Select
+				clearable
 				itemComponent={SelectItem}
 				label={label}
 				value={selectedFileId}
 				data={files}
 				onChange={(val) => {
-					updateState({ selectedFileId: val })
+					chooseFile(val)
 				}}
 			/>
 		</Box>

@@ -29,6 +29,10 @@
 		"fileIds": {
 			"type": "array",
 			"default": []
+		},
+		"selectedFileId": {
+			"type": "string",
+			"default": null
 		}
 	},
 	"supports": {

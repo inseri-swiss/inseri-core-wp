@@ -39,7 +39,7 @@ const handleBody = async (blob: Blob, contentType: string) => {
 	return responseBody
 }
 
-export const callMediaFile = async (mediaId: string, responseContentType: string): Promise<[string?, Blob?]> => {
+export const callMediaFile = async (mediaId: string, responseContentType: string): Promise<[string?, any?]> => {
 	try {
 		const metaResponse = await axios.get<Media>(inseriApiSettings.root + MEDIA_ROUTE + mediaId)
 		const mediaResponse = await axios.get<Blob>(metaResponse.data.source_url, { responseType: 'blob' })
