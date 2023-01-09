@@ -90,3 +90,9 @@ function inseri_core_block_init() {
 add_action('init', 'Inseri_Core_Admin::register_ui_script');
 add_action('admin_enqueue_scripts', 'Inseri_Core_Admin::load_script');
 add_action('admin_menu', 'Inseri_Core_Admin::add_menu');
+
+/**
+ * Enable additional file MIMEs
+ */
+add_filter('upload_mimes', 'inseri_core\extend_upload_mimes');
+add_filter('wp_check_filetype_and_ext', 'inseri_core\wp_check_filetype_and_ext', 10, 4);
