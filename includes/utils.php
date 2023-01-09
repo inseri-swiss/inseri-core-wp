@@ -1,6 +1,27 @@
 <?php
 namespace inseri_core;
 
+function extend_upload_mimes($mimes) {
+	$mimes['py'] = 'text/x-python';
+	$mimes['r'] = 'text/x-r';
+	$mimes['json'] = 'application/json';
+	$mimes['yml|yaml'] = 'application/x-yaml';
+	$mimes['sql'] = 'application/sql';
+	$mimes['md'] = 'text/markdown';
+	$mimes['svg|svgz'] = 'image/svg+xml';
+
+	return $mimes;
+}
+
+function wp_check_filetype_and_ext($data, $file, $filename, $mimes) {
+	$filetype = wp_check_filetype($filename, $mimes);
+	return [
+		'ext' => $filetype['ext'],
+		'type' => $filetype['type'],
+		'proper_filename' => $data['proper_filename'],
+	];
+}
+
 abstract class Either {
 	/**
 	 * Transforms Right value and flatten the nested Either
