@@ -57,7 +57,7 @@ export const storeCreator = (initalState: Attributes) => {
 			state.mime = file.mime
 		})
 
-		const [err, data] = await callMediaFile(file.value, file.mime)
+		const [err, data] = await callMediaFile(file.url, file.mime)
 
 		set((state) => {
 			if (data) {

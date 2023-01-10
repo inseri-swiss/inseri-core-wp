@@ -18,6 +18,7 @@ export interface Attributes {
 	output: ProducerBeacon
 	fileIds: number[]
 	selectedFileId: string | null
+	isVisible: boolean
 }
 
 function Edit(props: BlockEditProps<Attributes>) {
