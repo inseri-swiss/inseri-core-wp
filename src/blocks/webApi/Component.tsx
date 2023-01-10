@@ -71,6 +71,11 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 
 	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, baseOutputBeacon)
 
+	const watchMethodUrl = useWatch(inputMethodUrl)
+	const watchQueryParams = useWatch(inputQueryParams)
+	const watchHeadersParams = useWatch(inputHeadersParams)
+	const watchBody = useWatch(inputBody)
+
 	useEffect(() => {
 		loadDatasources()
 	}, [])
@@ -86,6 +91,30 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 			updateState({ block: { isWizardMode: false } })
 		}
 	}, [isSelected])
+
+	useEffect(() => {
+		if (watchMethodUrl.status === 'unavailable') {
+			updateState({ inputMethodUrl: { ...defaultInput } })
+		}
+	}, [watchMethodUrl.status])
+
+	useEffect(() => {
+		if (watchQueryParams.status === 'unavailable') {
+			updateState({ inputQueryParams: { ...defaultInput } })
+		}
+	}, [watchQueryParams.status])
+
+	useEffect(() => {
+		if (watchHeadersParams.status === 'unavailable') {
+			updateState({ inputHeadersParams: { ...defaultInput } })
+		}
+	}, [watchHeadersParams.status])
+
+	useEffect(() => {
+		if (watchBody.status === 'unavailable') {
+			updateState({ inputBody: { ...defaultInput } })
+		}
+	}, [watchBody.status])
 
 	const toolbarControls = [
 		{
