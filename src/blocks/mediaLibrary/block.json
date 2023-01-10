@@ -33,6 +33,10 @@
 		"selectedFileId": {
 			"type": "string",
 			"default": null
+		},
+		"isVisible": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {

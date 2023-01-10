@@ -3,7 +3,7 @@ import { usePrevious } from '@mantine/hooks'
 import { IconFiles } from '@tabler/icons'
 import { BlockControls, InspectorControls, MediaPlaceholder } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { PanelBody, PanelRow, TextControl, ToolbarGroup } from '@wordpress/components'
+import { PanelBody, PanelRow, TextControl, ToolbarGroup, ToggleControl } from '@wordpress/components'
 import { useDispatch as useWpDispatch } from '@wordpress/data'
 import { forwardRef, useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
@@ -18,7 +18,7 @@ const baseBeacon = { contentType: '', description: 'file', key: 'file', default:
 export function MediaLibraryEdit(props: BlockEditProps<Attributes>) {
 	const { createErrorNotice } = useWpDispatch('core/notices')
 	const { isSelected } = props
-	const { output, blockId, blockName, label, isWizardMode, actions, fileIds } = useGlobalState((state: GlobalState) => state)
+	const { output, blockId, blockName, label, isWizardMode, actions, fileIds, files, isVisible } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
 
 	const isValueSet = fileIds.length > 0
@@ -56,14 +56,30 @@ export function MediaLibraryEdit(props: BlockEditProps<Attributes>) {
 					<PanelRow>
 						<TextControl label="Label" value={label} onChange={(value) => updateState({ label: value })} />
 					</PanelRow>
+					{files.length === 1 && (
+						<PanelRow>
+							<ToggleControl
+								label={__('Show block', 'inseri-core')}
+								help={isVisible ? __('Block is visible.', 'inseri-core') : __('Block is invisible.', 'inseri-core')}
+								checked={isVisible}
+								onChange={(newVisibility) => {
+									updateState({ isVisible: newVisibility })
+								}}
+							/>
+						</PanelRow>
+					)}
 				</PanelBody>
 			</InspectorControls>
 			{isWizardMode ? (
 				<MediaPlaceholder
 					onSelect={(elements) => {
+						const fileIds = elements.map((e) => e.id)
+
 						updateState({
-							fileIds: elements.map((e) => e.id),
+							fileIds,
+							selectedFileId: fileIds.length === 1 ? String(fileIds[0]) : null,
 							isWizardMode: false,
+							isVisible: true,
 						})
 					}}
 					multiple={true}
@@ -72,7 +88,7 @@ export function MediaLibraryEdit(props: BlockEditProps<Attributes>) {
 					onError={(err) => createErrorNotice(err, { type: 'snackbar' })}
 				></MediaPlaceholder>
 			) : (
-				<MediaLibraryView />
+				<MediaLibraryView isGutenbergEditor isSelected={isSelected} />
 			)}
 		</>
 	)
@@ -92,8 +108,13 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>(({ thumbnail, label, ..
 	</div>
 ))
 
-export function MediaLibraryView() {
-	const { label, selectedFileId, files, output, isLoading, hasError, fileContent, mime } = useGlobalState((state: GlobalState) => state)
+interface ViewProps {
+	isSelected?: boolean
+	isGutenbergEditor?: boolean
+}
+
+export function MediaLibraryView({ isGutenbergEditor, isSelected }: ViewProps) {
+	const { label, selectedFileId, files, output, isLoading, hasError, fileContent, mime, isVisible } = useGlobalState((state: GlobalState) => state)
 	const { loadMedias, chooseFile } = useGlobalState((state: GlobalState) => state.actions)
 	const dispatch = useDispatch(output)
 	const prevMime = usePrevious(mime)
@@ -113,21 +134,24 @@ export function MediaLibraryView() {
 	}, [mime])
 
 	useEffect(() => {
-		if (isLoading) {
-			dispatch({ status: 'loading' })
-		}
-		if (hasError) {
-			dispatch({ status: 'error' })
-		}
-		if (!isLoading && !hasError && fileContent) {
-			dispatch({ status: 'ready', value: fileContent })
-		}
+		setTimeout(() => {
+			if (isLoading) {
+				dispatch({ status: 'loading' })
+			}
+			if (hasError) {
+				dispatch({ status: 'error' })
+			}
+			if (!isLoading && !hasError && fileContent) {
+				dispatch({ status: 'ready', value: fileContent })
+			}
+		}, 100)
 	}, [isLoading, hasError, fileContent])
 
-	return (
+	return isVisible || isSelected ? (
 		<Box p="md">
 			<Select
 				clearable
+				readOnly={files.length === 1}
 				itemComponent={SelectItem}
 				label={label}
 				value={selectedFileId}
@@ -137,5 +161,20 @@ export function MediaLibraryView() {
 				error={hasError ? __('An error has occurred.', 'inseri-core') : null}
 			/>
 		</Box>
+	) : isGutenbergEditor ? (
+		<Box
+			style={{
+				height: '68px',
+				border: '1px dashed currentcolor',
+				borderRadius: '2px',
+			}}
+		>
+			<Box />
+			<svg width="100%" height="100%">
+				<line strokeDasharray="3" x1="0" y1="0" x2="100%" y2="100%" style={{ stroke: 'currentColor' }} />
+			</svg>
+		</Box>
+	) : (
+		<div />
 	)
 }
