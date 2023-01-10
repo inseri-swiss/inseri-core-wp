@@ -103,20 +103,26 @@ export function MediaLibraryView() {
 	}, [])
 
 	useEffect(() => {
+		if (prevMime && prevMime !== mime) {
+			dispatch({ status: 'unavailable' })
+		}
+	}, [mime])
+
+	useEffect(() => {
+		dispatch({ contentType: mime })
+	}, [mime])
+
+	useEffect(() => {
 		if (isLoading) {
 			dispatch({ status: 'loading' })
 		}
 		if (hasError) {
 			dispatch({ status: 'error' })
 		}
-		if (fileContent) {
-			if (prevMime && prevMime !== mime) {
-				dispatch({ status: 'unavailable' })
-			}
-
-			setTimeout(() => dispatch({ status: 'ready', value: fileContent, contentType: mime }), 100)
+		if (!isLoading && !hasError && fileContent) {
+			dispatch({ status: 'ready', value: fileContent })
 		}
-	}, [isLoading, hasError, fileContent, mime])
+	}, [isLoading, hasError, fileContent])
 
 	return (
 		<Box p="md">
