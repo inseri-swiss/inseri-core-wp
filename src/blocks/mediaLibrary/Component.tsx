@@ -73,11 +73,11 @@ export function MediaLibraryEdit(props: BlockEditProps<Attributes>) {
 			{isWizardMode ? (
 				<MediaPlaceholder
 					onSelect={(elements) => {
-						const fileIds = elements.map((e) => e.id)
+						const newFileIds = elements.map((e) => e.id)
 
 						updateState({
-							fileIds,
-							selectedFileId: fileIds.length === 1 ? String(fileIds[0]) : null,
+							fileIds: newFileIds,
+							selectedFileId: newFileIds.length === 1 ? String(newFileIds[0]) : null,
 							isWizardMode: false,
 							isVisible: true,
 						})
