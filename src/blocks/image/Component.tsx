@@ -1,3 +1,4 @@
+import { useAvailableBeacons, useJsonBeacons } from '@inseri/lighthouse'
 import { IconPhoto } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -8,6 +9,19 @@ import { edit } from '@wordpress/icons'
 import { Box, Group, Select, Text, useGlobalState } from '../../components'
 import { Attributes } from './index'
 import { GlobalState } from './state'
+
+const defaultInput = {
+	key: '',
+	contentType: '',
+	description: '',
+}
+
+const urlSchema = {
+	$ref: '#/definitions/URL',
+	definitions: {
+		URL: { format: 'uri', pattern: '^https?://' },
+	},
+}
 
 export function PhotoEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
@@ -21,6 +35,11 @@ export function PhotoEdit(props: BlockEditProps<Attributes>) {
 			updateState({ isWizardMode: false })
 		}
 	}, [isSelected])
+
+	const jsonBeacons = useJsonBeacons(urlSchema)
+	const contentTypeBeacons = useAvailableBeacons('image/')
+	const availableBeacons = { ...jsonBeacons, ...contentTypeBeacons }
+	const imageOptions = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
 
 	return (
 		<>
@@ -61,10 +80,10 @@ export function PhotoEdit(props: BlockEditProps<Attributes>) {
 					</Group>
 					<Select
 						label={__('Display image by selecting a block source', 'inseri-core')}
-						data={[]}
-						value={''}
+						data={imageOptions}
+						value={input.key}
 						searchable
-						onChange={(key) => updateState({ webApiId: parseInt(key!), block: { isWizardMode: false } })}
+						onChange={(key) => updateState({ input: key ? availableBeacons[key] : defaultInput, isWizardMode: false })}
 					/>
 				</Box>
 			) : (
