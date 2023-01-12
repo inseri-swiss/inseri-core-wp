@@ -2,11 +2,11 @@ import { useAvailableBeacons, useJsonBeacons, useWatch } from '@inseri/lighthous
 import { IconPhoto } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { PanelBody, PanelRow, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
+import { PanelBody, PanelRow, ResizableBox, SelectControl, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Group, Image, Select, Text, useGlobalState } from '../../components'
+import { Box, Group, Select, Text, useGlobalState } from '../../components'
 import { Attributes } from './index'
 import { GlobalState } from './state'
 
@@ -23,9 +23,24 @@ const urlSchema = {
 	},
 }
 
+const resizingOptions = [
+	{ label: __('Stay contained', 'inseri-core'), value: 'contain' },
+	{ label: __('Cover', 'inseri-core'), value: 'cover' },
+	{ label: __('Stretch', 'inseri-core'), value: 'fill' },
+	{ label: __('Scale down', 'inseri-core'), value: 'scale-down' },
+	{ label: __('Original size', 'inseri-core'), value: 'none' },
+]
+const resizingHelps = {
+	contain: __('Resize image to stay contained within its container', 'inseri-core'),
+	cover: __('Resize image to cover its container', 'inseri-core'),
+	fill: __('Stretch image to fit its container', 'inseri-core'),
+	'scale-down': __('Display image at its original size but scale it down to fit its container if necessary', 'inseri-core'),
+	none: __('Display image always at its original size', 'inseri-core'),
+}
+
 export function PhotoEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { blockName, input, isWizardMode, actions, altText, caption } = useGlobalState((state: GlobalState) => state)
+	const { blockName, input, isWizardMode, actions, altText, caption, height, fit } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
 
 	const isValueSet = !!input.key
@@ -40,6 +55,19 @@ export function PhotoEdit(props: BlockEditProps<Attributes>) {
 	const contentTypeBeacons = useAvailableBeacons('image/')
 	const availableBeacons = { ...jsonBeacons, ...contentTypeBeacons }
 	const imageOptions = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
+
+	const renderResizable = (children: JSX.Element) => (
+		<ResizableBox
+			size={{ height: height ?? 'auto', width: 'auto' }}
+			enable={{ bottom: true }}
+			showHandle={isSelected}
+			onResize={(_event, _direction, element) => {
+				updateState({ height: element.offsetHeight })
+			}}
+		>
+			{children}
+		</ResizableBox>
+	)
 
 	return (
 		<>
@@ -60,13 +88,38 @@ export function PhotoEdit(props: BlockEditProps<Attributes>) {
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
-						<TextControl label="Block Name" value={blockName} onChange={(value) => updateState({ blockName: value })} />
+						<TextControl label={__('Block Name', 'inseri-core')} value={blockName} onChange={(value) => updateState({ blockName: value })} />
 					</PanelRow>
 					<PanelRow>
-						<TextControl label="Caption" value={caption} onChange={(value) => updateState({ caption: value })} />
+						<TextControl label={__('Caption', 'inseri-core')} value={caption} onChange={(value) => updateState({ caption: value })} />
 					</PanelRow>
 					<PanelRow>
-						<TextControl label="Alt Text" value={altText} onChange={(value) => updateState({ altText: value })} />
+						<TextControl label={__('Alt Text', 'inseri-core')} value={altText} onChange={(value) => updateState({ altText: value })} />
+					</PanelRow>
+					<PanelRow>
+						<div style={{ width: '100%' }}>
+							<TextControl
+								label={__('height', 'inseri-core')}
+								type="number"
+								min={0}
+								value={height ?? '0'}
+								onChange={(value) => {
+									const newVal = parseInt(value)
+									updateState({ height: newVal > 0 ? newVal : null })
+								}}
+							/>
+						</div>
+					</PanelRow>
+					<PanelRow>
+						<div style={{ width: '100%' }}>
+							<SelectControl
+								label={__('Resizing behavior', 'inseri-core')}
+								value={fit}
+								onChange={(value) => updateState({ fit: value as any })}
+								options={resizingOptions}
+								help={resizingHelps[fit]}
+							/>
+						</div>
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
@@ -87,14 +140,18 @@ export function PhotoEdit(props: BlockEditProps<Attributes>) {
 					/>
 				</Box>
 			) : (
-				<PhotoView />
+				<PhotoView renderResizable={renderResizable} />
 			)}
 		</>
 	)
 }
 
-export function PhotoView() {
-	const { input, isBlob, isPrevBlob, imageUrl, prevImageUrl, caption, altText } = useGlobalState((state: GlobalState) => state)
+interface ViewProps {
+	renderResizable?: (Component: JSX.Element) => JSX.Element
+}
+
+export function PhotoView({ renderResizable }: ViewProps) {
+	const { input, isBlob, isPrevBlob, imageUrl, prevImageUrl, caption, altText, height, fit } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 	const { value, status, contentType } = useWatch(input)
 
@@ -128,5 +185,18 @@ export function PhotoView() {
 		}
 	}, [value])
 
-	return <Box>{imageUrl && <Image src={imageUrl} caption={caption} alt={altText} />}</Box>
+	const imageElement = <img src={imageUrl} alt={altText} style={{ height: height ?? 'auto', objectFit: fit }} />
+	return (
+		<Box>
+			<figure>
+				<div style={{ textAlign: 'center' }}>{renderResizable && imageUrl ? renderResizable(imageElement) : imageUrl && imageElement}</div>
+
+				{!!caption && (
+					<Text component="figcaption" size="sm" align="center" color="dimmed">
+						{caption}
+					</Text>
+				)}
+			</figure>
+		</Box>
+	)
 }

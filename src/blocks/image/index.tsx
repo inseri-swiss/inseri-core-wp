@@ -17,6 +17,8 @@ export interface Attributes {
 	input: ConsumerBeacon
 	caption: string
 	altText: string
+	height: number | null
+	fit: 'cover' | 'contain' | 'fill' | 'scale-down' | 'none'
 }
 
 function Edit(props: BlockEditProps<Attributes>) {

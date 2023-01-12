@@ -31,6 +31,14 @@
 		"altText": {
 			"type": "string",
 			"default": ""
+		},
+		"height": {
+			"type": "integer",
+			"default": null
+		},
+		"fit": {
+			"type": "string",
+			"default": "contain"
 		}
 	},
 	"supports": {
