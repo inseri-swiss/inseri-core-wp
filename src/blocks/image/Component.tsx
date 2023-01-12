@@ -1,4 +1,4 @@
-import { useAvailableBeacons, useJsonBeacons } from '@inseri/lighthouse'
+import { useAvailableBeacons, useJsonBeacons, useWatch } from '@inseri/lighthouse'
 import { IconPhoto } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -6,7 +6,7 @@ import { PanelBody, PanelRow, TextControl, ToolbarButton, ToolbarGroup } from '@
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Group, Select, Text, useGlobalState } from '../../components'
+import { Box, Group, Image, Select, Text, useGlobalState } from '../../components'
 import { Attributes } from './index'
 import { GlobalState } from './state'
 
@@ -94,5 +94,39 @@ export function PhotoEdit(props: BlockEditProps<Attributes>) {
 }
 
 export function PhotoView() {
-	return <Box p="md">Placeholder</Box>
+	const { input, isBlob, isPrevBlob, imageUrl, prevImageUrl, caption, altText } = useGlobalState((state: GlobalState) => state)
+	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
+	const { value, status, contentType } = useWatch(input)
+
+	const update = (url: string, blob: boolean) =>
+		updateState({
+			imageUrl: url,
+			prevImageUrl: imageUrl,
+			isBlob: blob,
+			isPrevBlob: isBlob,
+		})
+
+	useEffect(() => {
+		let processedValue = value
+
+		if (status === 'ready') {
+			if (typeof processedValue === 'string' && contentType.includes('image/svg+xml')) {
+				processedValue = new Blob([value], { type: 'image/svg+xml' })
+			}
+
+			if (typeof processedValue === 'string') {
+				update(processedValue, false)
+			}
+
+			if (typeof processedValue === 'object' && processedValue instanceof Blob) {
+				update(URL.createObjectURL(processedValue), true)
+			}
+
+			if (isPrevBlob) {
+				URL.revokeObjectURL(prevImageUrl)
+			}
+		}
+	}, [value])
+
+	return <Box>{imageUrl && <Image src={imageUrl} caption={caption} alt={altText} />}</Box>
 }
