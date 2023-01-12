@@ -1,0 +1,44 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "inseri-core/image",
+	"version": "0.1.0",
+	"title": "Image",
+	"category": "inseri",
+	"description": "Display image",
+	"attributes": {
+		"blockId": {
+			"type": "string",
+			"default": ""
+		},
+		"blockName": {
+			"type": "string",
+			"default": ""
+		},
+
+		"input": {
+			"type": "object",
+			"default": {
+				"key": "",
+				"contentType": "",
+				"description": ""
+			}
+		},
+		"caption": {
+			"type": "string",
+			"default": ""
+		},
+		"altText": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"textdomain": "inseri-core",
+	"editorScript": "file:./index.js",
+	"viewScript": ["file:./hydration.js"],
+	"style": ["file:./index.css"],
+	"script": "inseri-core"
+}
