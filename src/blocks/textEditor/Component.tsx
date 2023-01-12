@@ -30,7 +30,7 @@ export function TextEditorEdit(props: BlockEditProps<Attributes>) {
 	const { updateState, setContentType, chooseInputBeacon } = actions
 
 	const textualContentTypes = TEXTUAL_CONTENT_TYPES.map((t) => t.value)
-	const availableBeacons = useAvailableBeacons((c) => textualContentTypes.includes(c))
+	const availableBeacons = useAvailableBeacons((c) => textualContentTypes.includes(c) || c.startsWith('text/'))
 	const selectData = Object.keys(availableBeacons)
 		.filter((k) => !k.startsWith(blockId + '/'))
 		.map((k) => ({ label: availableBeacons[k].description, value: k }))
