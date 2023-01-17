@@ -1,5 +1,5 @@
 import { useAvailableBeacons, useJsonBeacons, useWatch } from '@inseri/lighthouse'
-import { IconPhoto } from '@tabler/icons'
+import { IconPhoto, IconPhotoOff, IconCircleOff } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, SelectControl, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
@@ -157,9 +157,11 @@ interface ViewProps {
 }
 
 export function PhotoView({ renderResizable, imageRef, isSelected }: ViewProps) {
-	const { input, isBlob, isPrevBlob, imageUrl, prevImageUrl, caption, altText, height, fit } = useGlobalState((state: GlobalState) => state)
+	const { input, isBlob, isPrevBlob, imageUrl, prevImageUrl, caption, altText, height, fit, hasError } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 	const { value, status, contentType } = useWatch(input)
+
+	const isUrlEmpty = !imageUrl
 
 	const update = (url: string, blob: boolean) =>
 		updateState({
@@ -185,24 +187,95 @@ export function PhotoView({ renderResizable, imageRef, isSelected }: ViewProps) 
 				update(URL.createObjectURL(processedValue), true)
 			}
 
+			if (!processedValue) {
+				update('', false)
+			}
+
 			if (isPrevBlob) {
 				URL.revokeObjectURL(prevImageUrl)
 			}
+
+			updateState({ hasError: false })
 		}
 	}, [value])
 
 	const highlightBg = isSelected
 		? {
-				opacity: 1,
-				background: 'repeating-linear-gradient( 45deg, #999, #999 3px, transparent 3px, transparent 15px )',
+				backgroundColor: '#fff',
+				backgroundImage: `repeating-linear-gradient(45deg, #808080 25%, transparent 25%, transparent 75%, #808080 75%, #808080),
+					 repeating-linear-gradient(45deg, #808080 25%, #ffffff 25%, #ffffff 75%, #808080 75%, #808080)`,
+				backgroundPosition: '0 0, 10px 10px',
+				backgroundSize: '20px 20px',
 		  }
 		: {}
 
-	const imageElement = <img ref={imageRef} src={imageUrl} alt={altText} style={{ height: height ?? 'auto', objectFit: fit }} />
+	let errorText = __('Failed to load', 'inser-core')
+	if (altText) {
+		errorText += ': ' + altText
+	}
+
+	const imageElement = (
+		<>
+			<img
+				ref={imageRef}
+				onError={() => updateState({ hasError: true })}
+				src={imageUrl}
+				alt={altText}
+				style={{
+					height: height ?? 'auto',
+					objectFit: fit,
+				}}
+			/>
+			{hasError && (
+				<Group
+					align="center"
+					position="center"
+					style={{
+						inset: '0px',
+						position: 'absolute',
+						background: '#F8F9FA',
+						color: '#868E96',
+					}}
+				>
+					<IconPhotoOff size={40} />
+					<Text size="xl" align="center">
+						{errorText}
+					</Text>
+				</Group>
+			)}
+		</>
+	)
+
+	const emptyElement = (
+		<Group
+			align="center"
+			position="center"
+			style={{
+				background: '#F8F9FA',
+				color: '#868E96',
+				height: height ?? 'auto',
+			}}
+		>
+			<IconCircleOff size={40} />
+			<Text size="xl" align="center">
+				{__('No image is set', 'inser-core')}
+			</Text>
+		</Group>
+	)
+
 	return (
 		<Box>
 			<figure>
-				<div style={{ textAlign: 'center', ...highlightBg }}>{renderResizable && imageUrl ? renderResizable(imageElement) : imageUrl && imageElement}</div>
+				<div
+					style={{
+						height: height ?? 'auto',
+						position: 'relative',
+						textAlign: 'center',
+						...highlightBg,
+					}}
+				>
+					{isUrlEmpty ? emptyElement : renderResizable ? renderResizable(imageElement) : imageElement}
+				</div>
 
 				{!!caption && (
 					<Text component="figcaption" size="sm" align="center" color="dimmed">

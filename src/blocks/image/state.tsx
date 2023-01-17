@@ -10,6 +10,7 @@ export interface GlobalState extends Attributes {
 	isPrevBlob: boolean
 	imageUrl: string
 	prevImageUrl: string
+	hasError: boolean
 
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
@@ -24,6 +25,7 @@ export const storeCreator = (initalState: Attributes) => {
 		isPrevBlob: false,
 		imageUrl: '',
 		prevImageUrl: '',
+		hasError: false,
 
 		actions: {
 			updateState: (modifier: RecursivePartial<GlobalState>) =>
