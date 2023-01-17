@@ -3,7 +3,7 @@ import { IconPhoto } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, SelectControl, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
-import { useEffect } from '@wordpress/element'
+import { useEffect, useRef } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import { Box, Group, Select, Text, useGlobalState } from '../../components'
@@ -44,6 +44,7 @@ export function PhotoEdit(props: BlockEditProps<Attributes>) {
 	const { updateState } = actions
 
 	const isValueSet = !!input.key
+	const imageRef = useRef<HTMLImageElement>(null)
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -56,9 +57,11 @@ export function PhotoEdit(props: BlockEditProps<Attributes>) {
 	const availableBeacons = { ...jsonBeacons, ...contentTypeBeacons }
 	const imageOptions = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
 
+	const resizerHeight = height ?? imageRef.current?.height ?? 'auto'
+
 	const renderResizable = (children: JSX.Element) => (
 		<ResizableBox
-			size={{ height: height ?? 'auto', width: 'auto' }}
+			size={{ height: resizerHeight, width: 'auto' }}
 			enable={{ bottom: true }}
 			showHandle={isSelected}
 			onResize={(_event, _direction, element) => {
@@ -107,6 +110,7 @@ export function PhotoEdit(props: BlockEditProps<Attributes>) {
 									const newVal = parseInt(value)
 									updateState({ height: newVal > 0 ? newVal : null })
 								}}
+								help={__('Set 0 for automatic height adjustment', 'inseri-core')}
 							/>
 						</div>
 					</PanelRow>
@@ -140,7 +144,7 @@ export function PhotoEdit(props: BlockEditProps<Attributes>) {
 					/>
 				</Box>
 			) : (
-				<PhotoView renderResizable={renderResizable} />
+				<PhotoView renderResizable={renderResizable} imageRef={imageRef} isSelected={isSelected} />
 			)}
 		</>
 	)
@@ -148,9 +152,11 @@ export function PhotoEdit(props: BlockEditProps<Attributes>) {
 
 interface ViewProps {
 	renderResizable?: (Component: JSX.Element) => JSX.Element
+	imageRef?: React.Ref<HTMLImageElement>
+	isSelected?: boolean
 }
 
-export function PhotoView({ renderResizable }: ViewProps) {
+export function PhotoView({ renderResizable, imageRef, isSelected }: ViewProps) {
 	const { input, isBlob, isPrevBlob, imageUrl, prevImageUrl, caption, altText, height, fit } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 	const { value, status, contentType } = useWatch(input)
@@ -185,11 +191,18 @@ export function PhotoView({ renderResizable }: ViewProps) {
 		}
 	}, [value])
 
-	const imageElement = <img src={imageUrl} alt={altText} style={{ height: height ?? 'auto', objectFit: fit }} />
+	const highlightBg = isSelected
+		? {
+				opacity: 1,
+				background: 'repeating-linear-gradient( 45deg, #999, #999 3px, transparent 3px, transparent 15px )',
+		  }
+		: {}
+
+	const imageElement = <img ref={imageRef} src={imageUrl} alt={altText} style={{ height: height ?? 'auto', objectFit: fit }} />
 	return (
 		<Box>
 			<figure>
-				<div style={{ textAlign: 'center' }}>{renderResizable && imageUrl ? renderResizable(imageElement) : imageUrl && imageElement}</div>
+				<div style={{ textAlign: 'center', ...highlightBg }}>{renderResizable && imageUrl ? renderResizable(imageElement) : imageUrl && imageElement}</div>
 
 				{!!caption && (
 					<Text component="figcaption" size="sm" align="center" color="dimmed">
