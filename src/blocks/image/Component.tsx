@@ -214,7 +214,26 @@ export function PhotoView({ renderResizable, imageRef, isSelected }: ViewProps) 
 		errorText += ': ' + altText
 	}
 
-	const imageElement = (
+	const emptyElement = (
+		<Group
+			align="center"
+			position="center"
+			style={{
+				background: '#F8F9FA',
+				color: '#868E96',
+				height: height ?? 'auto',
+			}}
+		>
+			<IconCircleOff size={40} />
+			<Text size="xl" align="center">
+				{__('No image is set', 'inser-core')}
+			</Text>
+		</Group>
+	)
+
+	const imageElement = isUrlEmpty ? (
+		emptyElement
+	) : (
 		<>
 			<img
 				ref={imageRef}
@@ -246,23 +265,6 @@ export function PhotoView({ renderResizable, imageRef, isSelected }: ViewProps) 
 		</>
 	)
 
-	const emptyElement = (
-		<Group
-			align="center"
-			position="center"
-			style={{
-				background: '#F8F9FA',
-				color: '#868E96',
-				height: height ?? 'auto',
-			}}
-		>
-			<IconCircleOff size={40} />
-			<Text size="xl" align="center">
-				{__('No image is set', 'inser-core')}
-			</Text>
-		</Group>
-	)
-
 	return (
 		<Box>
 			<figure>
@@ -274,7 +276,7 @@ export function PhotoView({ renderResizable, imageRef, isSelected }: ViewProps) 
 						...highlightBg,
 					}}
 				>
-					{isUrlEmpty ? emptyElement : renderResizable ? renderResizable(imageElement) : imageElement}
+					{renderResizable ? renderResizable(imageElement) : imageElement}
 				</div>
 
 				{!!caption && (
