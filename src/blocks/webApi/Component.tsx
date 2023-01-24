@@ -6,6 +6,7 @@ import { Button as WPButton, PanelBody, PanelRow, TextControl, ToolbarGroup, Tog
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
+import { Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import { Box, Button, ContentTypeSelect, DatasourceState, Group, Modal, Select, Stack, Text, useGlobalState } from '../../components'
 import { DetailViewBody } from '../../components/DetailViewBody'
 import config from './block.json'
@@ -127,6 +128,7 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 	return (
 		<>
 			<Modal
+				zIndex={Z_INDEX_ABOVE_ADMIN}
 				size="90%"
 				overlayOpacity={0.7}
 				overlayBlur={3}
