@@ -190,3 +190,7 @@ export const CONTENT_TYPE = 'Content-Type'
 export const isFormType = (bodyType: string) => ['form-urlencoded', 'form-data'].some((i) => i === bodyType)
 export const isTextType = (bodyType: string) => ['xml', 'json', 'text'].some((i) => i === bodyType)
 export const createParamItem = () => ({ isChecked: true, key: '', value: '' })
+
+// admin topbar has 99999
+// admin sidebar has 9990
+export const Z_INDEX_ABOVE_ADMIN = 100_000

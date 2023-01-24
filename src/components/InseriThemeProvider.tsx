@@ -10,6 +10,7 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 		[`& > .${getRef('input')}`]: {
 			backgroundColor: '#fff',
 			borderRadius: '3px',
+			minHeight: 'unset',
 		},
 		[`& > .${getRef('input')}:focus`]: {
 			borderColor: theme.colors.blue[8],
