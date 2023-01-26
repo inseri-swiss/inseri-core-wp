@@ -1,13 +1,15 @@
 import { ConsumerBeacon } from '../../globalScript'
 import { immer } from 'zustand/middleware/immer'
 import { Attributes } from './index'
+import * as Comlink from 'comlink'
+import { API } from './worker'
 
 type Tab = 'editor' | 'viewer'
 
 export interface GlobalState extends Attributes {
 	[i: string]: any
 
-	pyWorker: Worker
+	pyWorker: Comlink.Remote<API>
 
 	isWizardMode: boolean
 	prevContentType: string
@@ -25,7 +27,7 @@ export const storeCreator = (initalState: Attributes) => {
 	return immer<GlobalState>((set) => ({
 		...initalState,
 
-		pyWorker: new Worker(new URL(inseriApiSettings.worker, import.meta.url)),
+		pyWorker: Comlink.wrap(new Worker(new URL(inseriApiSettings.worker, import.meta.url))),
 
 		isWizardMode: !isValueSet,
 		prevContentType: initalState.output.contentType,

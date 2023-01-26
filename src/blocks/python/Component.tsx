@@ -19,7 +19,7 @@ const textEditorBeacon = { contentType: '', description: 'content', key: 'conten
 export function PythonEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { input, output, label, mode, blockId, blockName, editable, isWizardMode, prevContentType, selectedTab, actions } = useGlobalState(
+	const { input, output, label, mode, blockId, blockName, editable, isWizardMode, prevContentType, selectedTab, actions, pyWorker } = useGlobalState(
 		(state: GlobalState) => state
 	)
 	const isValueSet = !!output.contentType || !!input.key
@@ -88,6 +88,16 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 		},
 	]
 
+	const runCode = async () => {
+		const res = await pyWorker.runCode(
+			`
+1 + 3
+`
+		)
+		res
+		//console.log('--->', res)
+	}
+
 	return (
 		<>
 			<BlockControls>{isValueSet && <ToolbarGroup controls={toolbarControls} />}</BlockControls>
@@ -116,7 +126,7 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 				<Box p="md" style={{ border: '1px solid #000' }}>
 					<Group mb="md" spacing={0}>
 						<IconBrandPython size={28} />
-						<Text ml="xs" fz={24}>
+						<Text ml="xs" fz={24} onClick={runCode}>
 							{__('Python Code', 'inseri-core')}
 						</Text>
 					</Group>
