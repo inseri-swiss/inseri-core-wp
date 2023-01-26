@@ -1,0 +1,62 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "inseri-core/python",
+	"version": "0.1.0",
+	"title": "Python Code",
+	"category": "inseri",
+	"description": "Run Python code",
+	"attributes": {
+		"blockId": {
+			"type": "string",
+			"default": ""
+		},
+		"input": {
+			"type": "object",
+			"default": {
+				"key": "",
+				"contentType": "",
+				"description": ""
+			}
+		},
+		"output": {
+			"type": "object",
+			"default": {
+				"key": "",
+				"contentType": ""
+			}
+		},
+		"blockName": {
+			"type": "string",
+			"default": ""
+		},
+		"mode": {
+			"type": "string",
+			"default": "editor"
+		},
+		"height": {
+			"type": "integer",
+			"default": 150
+		},
+		"editable": {
+			"type": "boolean",
+			"default": false
+		},
+		"content": {
+			"type": "string",
+			"default": ""
+		},
+		"label": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"textdomain": "inseri-core",
+	"editorScript": "file:./index.js",
+	"viewScript": ["file:./hydration.js"],
+	"style": ["file:./index.css"],
+	"script": "inseri-core"
+}
