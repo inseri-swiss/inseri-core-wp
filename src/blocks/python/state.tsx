@@ -7,6 +7,8 @@ type Tab = 'editor' | 'viewer'
 export interface GlobalState extends Attributes {
 	[i: string]: any
 
+	pyWorker: Worker
+
 	isWizardMode: boolean
 	prevContentType: string
 	selectedTab: Tab
@@ -22,6 +24,9 @@ export const storeCreator = (initalState: Attributes) => {
 
 	return immer<GlobalState>((set) => ({
 		...initalState,
+
+		pyWorker: new Worker(new URL(inseriApiSettings.worker, import.meta.url)),
+
 		isWizardMode: !isValueSet,
 		prevContentType: initalState.output.contentType,
 		selectedTab: initalState.mode,
