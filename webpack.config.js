@@ -31,14 +31,16 @@ const initialEntrypoints = {
 	'admin-panel': './src/admin-panel',
 }
 
-const blockEntrypoints = fs.readdirSync('./src/blocks').reduce(
-	(accumulator, item) => ({
+const blockEntrypoints = fs.readdirSync('./src/blocks').reduce((accumulator, item) => {
+	const worker = fs.existsSync(`./src/blocks/${item}/worker.ts`) ? { [`blocks/${item}/worker`]: `./src/blocks/${item}/worker` } : {}
+
+	return {
 		...accumulator,
 		[`blocks/${item}/index`]: `./src/blocks/${item}`,
 		[`blocks/${item}/hydration`]: `./src/blocks/${item}/hydration`,
-	}),
-	initialEntrypoints
-)
+		...worker,
+	}
+}, initialEntrypoints)
 
 module.exports = {
 	...defaultConfig,

@@ -47,12 +47,23 @@ add_action('rest_api_init', [$inseri_core_rest, 'register_api_routes']);
  * main script
  */
 add_action('init', function () {
+	global $wp_scripts;
+
 	$asset_file_inseri = include plugin_dir_path(__FILE__) . 'build/inseri-core.asset.php';
 	wp_register_script('inseri-core', plugins_url('build/inseri-core.js', __FILE__), $asset_file_inseri['dependencies'], $asset_file_inseri['version']);
+
+	$asset_file_worker = include plugin_dir_path(__FILE__) . 'build/blocks/python/worker.asset.php';
+	wp_register_script(
+		'inseri-core-python-worker',
+		plugins_url('build/blocks/python/worker.js', __FILE__),
+		$asset_file_worker['dependencies'],
+		$asset_file_worker['version']
+	);
 
 	wp_localize_script('inseri-core', 'inseriApiSettings', [
 		'root' => esc_url_raw(rest_url()),
 		'nonce' => wp_create_nonce('wp_rest'),
+		'worker' => $wp_scripts->registered['inseri-core-python-worker']->src,
 	]);
 });
 
