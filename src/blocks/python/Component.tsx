@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import stringify from 'json-stable-stringify'
 import { Box, Button, CodeEditor, Group, SegmentedControl, Select, Text, useGlobalState } from '../../components'
-import { formatCode, getBodyTypeByContenType, isBeautifyType, TEXTUAL_CONTENT_TYPES } from '../../utils'
+import { getBodyTypeByContenType, TEXTUAL_CONTENT_TYPES } from '../../utils'
 import config from './block.json'
 import { Attributes } from './index'
 import { GlobalState } from './state'
@@ -19,7 +19,7 @@ const textEditorBeacon = { contentType: '', description: 'content', key: 'conten
 export function PythonEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { input, output, label, mode, blockId, blockName, editable, isWizardMode, prevContentType, selectedTab, actions, pyWorker } = useGlobalState(
+	const { input, output, label, mode, blockId, blockName, editable, isWizardMode, prevContentType, selectedTab, actions } = useGlobalState(
 		(state: GlobalState) => state
 	)
 	const isValueSet = !!output.contentType || !!input.key
@@ -88,16 +88,6 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 		},
 	]
 
-	const runCode = async () => {
-		const res = await pyWorker.runCode(
-			`
-1 + 3
-`
-		)
-		res
-		//console.log('--->', res)
-	}
-
 	return (
 		<>
 			<BlockControls>{isValueSet && <ToolbarGroup controls={toolbarControls} />}</BlockControls>
@@ -126,7 +116,7 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 				<Box p="md" style={{ border: '1px solid #000' }}>
 					<Group mb="md" spacing={0}>
 						<IconBrandPython size={28} />
-						<Text ml="xs" fz={24} onClick={runCode}>
+						<Text ml="xs" fz={24}>
 							{__('Python Code', 'inseri-core')}
 						</Text>
 					</Group>
@@ -170,12 +160,18 @@ interface ViewProps {
 
 export function PythonView(props: ViewProps) {
 	const { isGutenbergEditor, renderResizable } = props
-	const { height, editable, output, label, mode, input, content } = useGlobalState((state: GlobalState) => state)
+	const { height, editable, output, label, mode, input, content, pyWorker, isWorkerReady, stderr, stdout, result } = useGlobalState(
+		(state: GlobalState) => state
+	)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 
 	const dispatch = useDispatch(output)
 	const { contentType: incomingContentType, value, status } = useWatch(input)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
+
+	stderr && console.log('stderr', stderr)
+	stdout && console.log('stdout', stdout)
+	result && console.log('result', result)
 
 	const codeType = useMemo(() => {
 		if (mode === 'viewer') {
@@ -242,13 +238,9 @@ export function PythonView(props: ViewProps) {
 			/>
 		)
 
-	const beautify = () => {
-		const [errorMsg, formattedCode] = formatCode(codeType, code)
-		setSyntaxError(!!errorMsg)
-
-		if (formattedCode) {
-			setCode(formattedCode)
-		}
+	const runCode = () => {
+		updateState({ stderr: '', stdout: '' })
+		pyWorker.postMessage({ code })
 	}
 
 	return (
@@ -256,11 +248,10 @@ export function PythonView(props: ViewProps) {
 			<Group position="apart" mb={4}>
 				{label.trim() && <Text fz={14}>{label}</Text>}
 				<div />
-				{isBeautifyType(codeType) && isEditable && (
-					<Button variant="subtle" onClick={beautify}>
-						{__('Beautify', 'inseri-core')}
-					</Button>
-				)}
+
+				<Button variant="subtle" onClick={runCode} disabled={!isWorkerReady}>
+					{__('Run Code', 'inseri-core')}
+				</Button>
 			</Group>
 			{renderResizable ? renderResizable(editorElement) : editorElement}
 			{hasSyntaxError && (

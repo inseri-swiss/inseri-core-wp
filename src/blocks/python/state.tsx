@@ -1,15 +1,17 @@
 import { ConsumerBeacon } from '../../globalScript'
 import { immer } from 'zustand/middleware/immer'
 import { Attributes } from './index'
-import * as Comlink from 'comlink'
-import { API } from './worker'
 
 type Tab = 'editor' | 'viewer'
 
 export interface GlobalState extends Attributes {
 	[i: string]: any
 
-	pyWorker: Comlink.Remote<API>
+	pyWorker: Worker
+	isWorkerReady: boolean
+	stdout: string
+	stderr: string
+	result: any
 
 	isWizardMode: boolean
 	prevContentType: string
@@ -23,41 +25,56 @@ export interface GlobalState extends Attributes {
 
 export const storeCreator = (initalState: Attributes) => {
 	const isValueSet = !!initalState.output.contentType || !!initalState.input.key
+	const pyWorker = new Worker(new URL(inseriApiSettings.worker))
 
-	return immer<GlobalState>((set) => ({
-		...initalState,
+	return immer<GlobalState>((set) => {
+		pyWorker.onmessage = ({ data }) => {
+			set((state) => {
+				Object.entries(data).forEach(([k, v]) => {
+					state[k] = v
+				})
+			})
+		}
 
-		pyWorker: Comlink.wrap(new Worker(new URL(inseriApiSettings.worker, import.meta.url))),
+		return {
+			...initalState,
 
-		isWizardMode: !isValueSet,
-		prevContentType: initalState.output.contentType,
-		selectedTab: initalState.mode,
+			pyWorker,
+			isWorkerReady: false,
+			stderr: '',
+			stdout: '',
+			result: null,
 
-		actions: {
-			updateState: (modifier: Partial<GlobalState>) =>
-				set((state) => {
-					Object.keys(modifier).forEach((k) => {
-						state[k] = modifier[k]
-					})
-				}),
+			isWizardMode: !isValueSet,
+			prevContentType: initalState.output.contentType,
+			selectedTab: initalState.mode,
 
-			setContentType: (contentType: string) =>
-				set((state) => {
-					state.isWizardMode = false
-					state.mode = 'editor'
-					state.input.key = ''
-					state.prevContentType = state.output.contentType
-					state.output.contentType = contentType
-				}),
+			actions: {
+				updateState: (modifier: Partial<GlobalState>) =>
+					set((state) => {
+						Object.keys(modifier).forEach((k) => {
+							state[k] = modifier[k]
+						})
+					}),
 
-			chooseInputBeacon: (beacon: ConsumerBeacon) =>
-				set((state) => {
-					state.isWizardMode = false
-					state.input = beacon
-					state.mode = 'viewer'
-					state.prevContentType = state.output.contentType
-					state.output.contentType = ''
-				}),
-		},
-	}))
+				setContentType: (contentType: string) =>
+					set((state) => {
+						state.isWizardMode = false
+						state.mode = 'editor'
+						state.input.key = ''
+						state.prevContentType = state.output.contentType
+						state.output.contentType = contentType
+					}),
+
+				chooseInputBeacon: (beacon: ConsumerBeacon) =>
+					set((state) => {
+						state.isWizardMode = false
+						state.input = beacon
+						state.mode = 'viewer'
+						state.prevContentType = state.output.contentType
+						state.output.contentType = ''
+					}),
+			},
+		}
+	})
 }
