@@ -21,7 +21,7 @@ export interface Attributes {
 	editable: boolean
 	content: string
 	label: string
-	mode: 'editor' | 'viewer'
+	mode: 'editor' | 'viewer' | ''
 }
 
 function Edit(props: BlockEditProps<Attributes>) {
