@@ -32,7 +32,7 @@
 		},
 		"mode": {
 			"type": "string",
-			"default": "editor"
+			"default": ""
 		},
 		"height": {
 			"type": "integer",

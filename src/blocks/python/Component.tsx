@@ -1,15 +1,12 @@
-import { useAvailableBeacons, useControlTower, useDispatch, useWatch } from '@inseri/lighthouse'
-import { useDebouncedValue } from '@mantine/hooks'
-import { IconBrandPython } from '@tabler/icons'
+import { useAvailableBeacons, useControlTower, useWatch } from '@inseri/lighthouse'
+import { IconBrandPython, IconChevronLeft } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarGroup } from '@wordpress/components'
-import { useEffect, useMemo, useState } from '@wordpress/element'
+import { PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
+import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import stringify from 'json-stable-stringify'
-import { Box, Button, CodeEditor, Group, SegmentedControl, Select, Text, useGlobalState } from '../../components'
-import { getBodyTypeByContenType, TEXTUAL_CONTENT_TYPES } from '../../utils'
+import { Box, Button, CodeEditor, Group, Select, Text, useGlobalState } from '../../components'
 import config from './block.json'
 import { Attributes } from './index'
 import { GlobalState } from './state'
@@ -19,25 +16,22 @@ const textEditorBeacon = { contentType: '', description: 'content', key: 'conten
 export function PythonEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { input, output, label, mode, blockId, blockName, editable, isWizardMode, prevContentType, selectedTab, actions } = useGlobalState(
+	const { input, output, label, mode, blockId, blockName, editable, isWizardMode, selectedMode, wizardStep, actions } = useGlobalState(
 		(state: GlobalState) => state
 	)
-	const isValueSet = !!output.contentType || !!input.key
+	const isValueSet = mode === 'editor' || (!!mode && input.key)
 	const contentType = output.contentType
 	const inputBeaconKey = input.key
-	const outputBeacon = output.key ? output : undefined
 
-	const { updateState, setContentType, chooseInputBeacon } = actions
+	const { updateState } = actions
 
-	const textualContentTypes = TEXTUAL_CONTENT_TYPES.map((t) => t.value)
-	const availableBeacons = useAvailableBeacons((c) => textualContentTypes.includes(c) || c.startsWith('text/'))
+	const availableBeacons = useAvailableBeacons('python')
 	const selectData = Object.keys(availableBeacons)
 		.filter((k) => !k.startsWith(blockId + '/'))
 		.map((k) => ({ label: availableBeacons[k].description, value: k }))
 
 	const beaconConfigs = mode === 'editor' ? [{ ...textEditorBeacon, contentType }] : []
 	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, beaconConfigs)
-	const dispatch = useDispatch(outputBeacon)
 
 	useEffect(() => {
 		if (producersBeacons.length > 0 && !output.key) {
@@ -45,24 +39,16 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 		}
 	}, [producersBeacons.length])
 
-	useEffect(() => {
-		if (prevContentType !== contentType) {
-			dispatch({ status: 'unavailable' })
-
-			setTimeout(() => dispatch({ contentType, status: 'initial' }), 100)
-		}
-	}, [contentType])
-
 	const { status } = useWatch(input)
 	useEffect(() => {
 		if (status === 'unavailable') {
-			updateState({ input: { ...input, key: '' }, isWizardMode: true })
+			updateState({ input: { ...input, key: '' }, isWizardMode: true, wizardStep: 1, mode: '' })
 		}
 	}, [status])
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
-			updateState({ selectedTab: mode, isWizardMode: false })
+			updateState({ isWizardMode: false, wizardStep: 0 })
 		}
 	}, [isSelected])
 
@@ -79,18 +65,15 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 		</ResizableBox>
 	)
 
-	const toolbarControls = [
-		{
-			icon: edit,
-			isActive: isWizardMode,
-			onClick: () => updateState({ isWizardMode: !isWizardMode }),
-			title: __('Edit', 'inseri-core'),
-		},
-	]
-
 	return (
 		<>
-			<BlockControls>{isValueSet && <ToolbarGroup controls={toolbarControls} />}</BlockControls>
+			<BlockControls>
+				{isValueSet && (
+					<ToolbarGroup>
+						<ToolbarButton icon={edit} title={__('Edit', 'inseri-core')} onClick={() => updateState({ isWizardMode: !isWizardMode })} />
+					</ToolbarGroup>
+				)}
+			</BlockControls>
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
@@ -120,29 +103,40 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 							{__('Python Code', 'inseri-core')}
 						</Text>
 					</Group>
-					<SegmentedControl
-						my="md"
-						value={selectedTab}
-						onChange={(v: any) => updateState({ selectedTab: v })}
-						data={['Editor', 'Viewer'].map((s) => ({ label: s, value: s.toLowerCase() }))}
-					/>
-					{selectedTab === 'editor' && (
-						<Select
-							label={__('Choose a format', 'inseri-core')}
-							mb="md"
-							searchable
-							data={TEXTUAL_CONTENT_TYPES}
-							value={contentType}
-							onChange={setContentType}
-						/>
+					{wizardStep == 0 && (
+						<Group mb="md" spacing={0}>
+							<Button
+								onClick={() => updateState({ isWizardMode: false, mode: 'editor', selectedMode: 'editor' })}
+								variant="outline"
+								mr="sm"
+								style={{ flex: 1 }}
+							>
+								{__('Write Code', 'inseri-core')}
+							</Button>
+							<Button onClick={() => updateState({ wizardStep: 1, selectedMode: 'viewer' })} variant="outline" ml="sm" style={{ flex: 1 }}>
+								{__('Load Code', 'inseri-core')}
+							</Button>
+						</Group>
 					)}
-					{selectedTab === 'viewer' && (
-						<Select
-							label={__('Display code by selecting a block source', 'inseri-core')}
-							data={selectData}
-							value={inputBeaconKey}
-							onChange={(key) => chooseInputBeacon(availableBeacons[key!])}
-						/>
+					{selectedMode === 'viewer' && wizardStep === 1 && (
+						<>
+							<Select
+								label={__('Display code by selecting a block source', 'inseri-core')}
+								data={selectData}
+								value={inputBeaconKey}
+								onChange={(key) => updateState({ input: availableBeacons[key!], isWizardMode: false, mode: 'viewer' })}
+								mb="lg"
+							/>
+							<Button
+								color="gray"
+								variant="outline"
+								onClick={() => updateState({ wizardStep: 0 })}
+								leftIcon={<IconChevronLeft size={14} />}
+								styles={{ leftIcon: { marginRight: 0 } }}
+							>
+								{__('Back', 'inseri-core')}
+							</Button>
+						</>
 					)}
 				</Box>
 			) : (
@@ -160,63 +154,19 @@ interface ViewProps {
 
 export function PythonView(props: ViewProps) {
 	const { isGutenbergEditor, renderResizable } = props
-	const { height, editable, output, label, mode, input, content, pyWorker, isWorkerReady, stderr, stdout, result } = useGlobalState(
-		(state: GlobalState) => state
-	)
+	const { height, editable, label, mode, input, content, pyWorker, isWorkerReady, stderr, stdout, result } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 
-	const dispatch = useDispatch(output)
-	const { contentType: incomingContentType, value, status } = useWatch(input)
+	const { value, status } = useWatch(input)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
 
 	stderr && console.log('stderr', stderr)
 	stdout && console.log('stdout', stdout)
 	result && console.log('result', result)
 
-	const codeType = useMemo(() => {
-		if (mode === 'viewer') {
-			return getBodyTypeByContenType(incomingContentType) ?? 'text'
-		}
-
-		return getBodyTypeByContenType(output.contentType) ?? 'text'
-	}, [output.contentType, mode, incomingContentType])
-
 	const [code, setCode] = useState(content)
-	const [hasSyntaxError, setSyntaxError] = useState(false)
-	const [debouncedCode] = useDebouncedValue(code, 500)
-
-	const dispatchValue = (newValue: string) => {
-		setSyntaxError(false)
-
-		if (output?.contentType.match('/json')) {
-			try {
-				dispatch({ value: JSON.parse(newValue), status: 'ready' })
-			} catch (error) {
-				setSyntaxError(true)
-				dispatch({ status: 'error' })
-			}
-		} else {
-			dispatch({ value: newValue, status: 'ready' })
-		}
-	}
-
-	useEffect(() => {
-		dispatchValue(content)
-	}, [])
-
-	useEffect(() => {
-		dispatchValue(debouncedCode)
-
-		if (isGutenbergEditor) {
-			updateState({ content: debouncedCode })
-		}
-	}, [debouncedCode])
 
 	let preparedValue = value
-
-	if (incomingContentType.match('/json') && preparedValue) {
-		preparedValue = stringify(value)
-	}
 
 	if ((status !== 'ready' && status !== 'initial') || !preparedValue) {
 		preparedValue = ''
@@ -224,11 +174,11 @@ export function PythonView(props: ViewProps) {
 
 	const editorElement =
 		mode === 'viewer' ? (
-			<CodeEditor height={height} type={codeType} value={preparedValue} />
+			<CodeEditor height={height} type={'python'} value={preparedValue} />
 		) : (
 			<CodeEditor
 				height={height}
-				type={codeType}
+				type={'python'}
 				value={code}
 				onChange={(val) => {
 					if (isEditable) {
@@ -254,9 +204,9 @@ export function PythonView(props: ViewProps) {
 				</Button>
 			</Group>
 			{renderResizable ? renderResizable(editorElement) : editorElement}
-			{hasSyntaxError && (
+			{stderr && (
 				<Text fz={14} color="red">
-					{__('It has syntax error!', 'inseri-core')}
+					{stderr}
 				</Text>
 			)}
 		</Box>
