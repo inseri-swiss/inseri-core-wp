@@ -11,13 +11,17 @@
 			"type": "string",
 			"default": ""
 		},
-		"input": {
+		"inputCode": {
 			"type": "object",
 			"default": {
 				"key": "",
 				"contentType": "",
 				"description": ""
 			}
+		},
+		"inputs": {
+			"type": "object",
+			"default": {}
 		},
 		"output": {
 			"type": "object",

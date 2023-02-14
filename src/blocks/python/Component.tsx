@@ -1,14 +1,14 @@
 import { useAvailableBeacons, useControlTower, useWatch } from '@inseri/lighthouse'
-import { IconBrandPython, IconChevronLeft, IconPlus, IconX } from '@tabler/icons'
+import { IconBrandPython, IconChevronLeft } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit, external } from '@wordpress/icons'
-import { ActionIcon, Box, Button, CodeEditor, Group, Modal, Select, Stack, Tabs, Text, TextInput, useGlobalState, SelectWithAction } from '../../components'
-import { Z_INDEX_ABOVE_ADMIN } from '../../utils'
+import { Box, Button, CodeEditor, Group, Select, Text, useGlobalState } from '../../components'
 import config from './block.json'
+import { ExtendedView } from './ExtendedView'
 import { Attributes } from './index'
 import { GlobalState } from './state'
 
@@ -17,29 +17,14 @@ const textEditorBeacon = { contentType: '', description: 'content', key: 'conten
 export function PythonEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const {
-		input,
-		output,
-		label,
-		mode,
-		blockId,
-		blockName,
-		editable,
-		isWizardMode,
-		selectedMode,
-		wizardStep,
-		actions,
-		isModalOpen,
-		content,
-		stdout,
-		stderr,
-		isWorkerReady,
-	} = useGlobalState((state: GlobalState) => state)
-	const isValueSet = mode === 'editor' || (!!mode && input.key)
+	const { inputCode, output, label, mode, blockId, blockName, editable, isWizardMode, selectedMode, wizardStep, actions, isModalOpen } = useGlobalState(
+		(state: GlobalState) => state
+	)
+	const isValueSet = mode === 'editor' || (!!mode && inputCode.key)
 	const contentType = output.contentType
-	const inputBeaconKey = input.key
+	const inputBeaconKey = inputCode.key
 
-	const { updateState, runCode } = actions
+	const { updateState } = actions
 
 	const availableBeacons = useAvailableBeacons('python')
 	const selectData = Object.keys(availableBeacons)
@@ -55,12 +40,14 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 		}
 	}, [producersBeacons.length])
 
-	const { status } = useWatch(input)
+	const { status } = useWatch(inputCode)
 	useEffect(() => {
 		if (status === 'unavailable') {
-			updateState({ input: { ...input, key: '' }, isWizardMode: true, wizardStep: 1, mode: '' })
+			updateState({ input: { ...inputCode, key: '' }, isWizardMode: true, wizardStep: 1, mode: '' })
 		}
 	}, [status])
+
+	// TODO watch inputs for unavailables
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -83,86 +70,7 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 
 	return (
 		<>
-			<Modal
-				zIndex={Z_INDEX_ABOVE_ADMIN}
-				size="100%"
-				overlayOpacity={0.7}
-				overlayBlur={3}
-				opened={isModalOpen}
-				onClose={() => updateState({ isModalOpen: false })}
-				styles={{
-					modal: { background: '#f0f0f1', height: '100%' },
-					body: { height: '100%', display: 'flex', flexDirection: 'column' },
-				}}
-				overflow="inside"
-				title={
-					<Text fz="md" fw="bold">
-						{`Python Code${blockName ? ': ' + blockName : ''}`}
-					</Text>
-				}
-			>
-				<Group align="stretch" style={{ flex: 1 }}>
-					<Stack style={{ flex: 1 }}>
-						<Box bg={'#fff'} style={{ flex: 1 }}>
-							<Group position="apart" style={{ borderBottom: '2px solid #ced4da' }}>
-								{label.trim() && (
-									<Text fz={14} pl="sm">
-										{label}
-									</Text>
-								)}
-								<div />
-								<Button variant="subtle" onClick={runCode} disabled={!isWorkerReady}>
-									{__('Run Code', 'inseri-core')}
-								</Button>
-							</Group>
-							<CodeEditor
-								withBorder={false}
-								type={'python'}
-								value={content}
-								onChange={(val) => {
-									updateState({ content: val })
-								}}
-							/>
-						</Box>
-						<Tabs defaultValue="output" bg={'#fff'}>
-							<Tabs.List>
-								<Tabs.Tab value="output">{__('Output', 'inseri-core')}</Tabs.Tab>
-								<Tabs.Tab value="console">{__('Console', 'inseri-core')}</Tabs.Tab>
-							</Tabs.List>
-
-							<Tabs.Panel value="output">
-								<Box>
-									<CodeEditor type={'json'} value={content} showLineNo={false} withBorder={false} />
-								</Box>
-							</Tabs.Panel>
-
-							<Tabs.Panel value="console">
-								<Box>
-									<CodeEditor type={'text'} value={stderr ? `${stderr}\n${stdout}` : stdout} showLineNo={false} withBorder={false} />
-								</Box>
-							</Tabs.Panel>
-						</Tabs>
-					</Stack>
-					<Box p="sm" bg={'#fff'}>
-						<SelectWithAction
-							label="Foo"
-							placeholder="Choose a block source"
-							title="Remove variable"
-							onClick={() => {}}
-							icon={<IconX size={16} />}
-							data={['React', 'Angular', 'Svelte', 'Vue']}
-						/>
-						<TextInput
-							placeholder={__('Enter variable name', 'inseri-core')}
-							rightSection={
-								<ActionIcon title="Create">
-									<IconPlus size={16} />
-								</ActionIcon>
-							}
-						/>
-					</Box>
-				</Group>
-			</Modal>
+			<ExtendedView />
 			<BlockControls>
 				{isValueSet && (
 					<ToolbarGroup>
@@ -221,7 +129,7 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 								label={__('Display code by selecting a block source', 'inseri-core')}
 								data={selectData}
 								value={inputBeaconKey}
-								onChange={(key) => updateState({ input: availableBeacons[key!], isWizardMode: false, mode: 'viewer' })}
+								onChange={(key) => updateState({ inputCode: availableBeacons[key!], isWizardMode: false, mode: 'viewer' })}
 								mb="lg"
 							/>
 							<Button
@@ -251,10 +159,10 @@ interface ViewProps {
 
 export function PythonView(props: ViewProps) {
 	const { isGutenbergEditor, renderResizable } = props
-	const { height, editable, label, mode, input, content, isWorkerReady, stderr, stdout, result } = useGlobalState((state: GlobalState) => state)
+	const { height, editable, label, mode, inputCode, content, isWorkerReady, stderr, stdout, result } = useGlobalState((state: GlobalState) => state)
 	const { updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
 
-	const { value, status } = useWatch(input)
+	const { value, status } = useWatch(inputCode)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
 
 	stderr && console.log('stderr', stderr)

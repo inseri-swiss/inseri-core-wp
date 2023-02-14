@@ -14,7 +14,8 @@ const { name, ...settings } = json as any
 
 export interface Attributes {
 	blockId?: string
-	input: ConsumerBeacon
+	inputCode: ConsumerBeacon
+	inputs: Record<string, ConsumerBeacon>
 	output: ProducerBeacon
 	blockName: string
 	height: number

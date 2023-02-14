@@ -1,3 +1,4 @@
+import { ConsumerBeacon } from '@inseri/lighthouse'
 import { immer } from 'zustand/middleware/immer'
 import { Attributes } from './index'
 
@@ -14,14 +15,20 @@ export interface GlobalState extends Attributes {
 	isWizardMode: boolean
 	selectedMode: 'editor' | 'viewer'
 	wizardStep: number
+
+	newVarName: string
+
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
 		runCode: () => void
+		addNewInput: () => void
+		chooseInput: (variable: string, beacon: ConsumerBeacon) => void
+		removeInput: (variable: string) => void
 	}
 }
 
 export const storeCreator = (initalState: Attributes) => {
-	const isValueSet = initalState.mode === 'editor' || (!!initalState.mode && initalState.input.key)
+	const isValueSet = initalState.mode === 'editor' || (!!initalState.mode && initalState.inputCode.key)
 	const pyWorker = new Worker(new URL(inseriApiSettings.worker))
 
 	return immer<GlobalState>((set, get) => {
@@ -47,6 +54,8 @@ export const storeCreator = (initalState: Attributes) => {
 			selectedMode: initalState.mode ? initalState.mode : 'editor',
 			wizardStep: 0,
 
+			newVarName: '',
+
 			actions: {
 				updateState: (modifier: Partial<GlobalState>) =>
 					set((state) => {
@@ -63,6 +72,25 @@ export const storeCreator = (initalState: Attributes) => {
 
 					const code = get().content
 					pyWorker.postMessage({ code })
+				},
+
+				addNewInput: () => {
+					set((state) => {
+						state.inputs[state.newVarName!] = { key: '', contentType: '', description: '' }
+						state.newVarName = ''
+					})
+				},
+
+				chooseInput: (variable: string, beacon: ConsumerBeacon) => {
+					set((state) => {
+						state.inputs[variable] = beacon
+					})
+				},
+
+				removeInput: (variable: string) => {
+					set((state) => {
+						delete state.inputs[variable]
+					})
 				},
 			},
 		}
