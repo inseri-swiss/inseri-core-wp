@@ -1,4 +1,4 @@
-import { useAvailableBeacons, useControlTower, useWatch } from '@inseri/lighthouse'
+import { useAvailableBeacons, useControlTower, useWatch, useWatchMany } from '@inseri/lighthouse'
 import { IconBrandPython, IconChevronLeft } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -47,8 +47,6 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 		}
 	}, [status])
 
-	// TODO watch inputs for unavailables
-
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
 			updateState({ isWizardMode: false, wizardStep: 0 })
@@ -75,7 +73,13 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 				{isValueSet && (
 					<ToolbarGroup>
 						<ToolbarButton icon={edit} title={__('Edit', 'inseri-core')} onClick={() => updateState({ isWizardMode: !isWizardMode })} />
-						<ToolbarButton icon={external} title={__('Open extended view', 'inseri-core')} onClick={() => updateState({ isModalOpen: !isModalOpen })} />
+						<ToolbarButton
+							icon={external}
+							title={__('Open extended view', 'inseri-core')}
+							onClick={() => {
+								updateState({ isModalOpen: !isModalOpen })
+							}}
+						/>
 					</ToolbarGroup>
 				)}
 			</BlockControls>
@@ -108,7 +112,7 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 							{__('Python Code', 'inseri-core')}
 						</Text>
 					</Group>
-					{wizardStep == 0 && (
+					{wizardStep === 0 && (
 						<Group mb="md" spacing={0}>
 							<Button
 								onClick={() => updateState({ isWizardMode: false, mode: 'editor', selectedMode: 'editor' })}
@@ -159,15 +163,33 @@ interface ViewProps {
 
 export function PythonView(props: ViewProps) {
 	const { isGutenbergEditor, renderResizable } = props
-	const { height, editable, label, mode, inputCode, content, isWorkerReady, stderr, stdout, result } = useGlobalState((state: GlobalState) => state)
+	const { height, editable, label, mode, inputCode, content, isWorkerReady, stderr, inputs, blockerr, pyWorker } = useGlobalState((state: GlobalState) => {
+		return state
+	})
 	const { updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
-
-	const { value, status } = useWatch(inputCode)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
 
-	stderr && console.log('stderr', stderr)
-	stdout && console.log('stdout', stdout)
-	result && console.log('result', result)
+	const { value, status } = useWatch(inputCode)
+	const watchedValues = useWatchMany(inputs)
+	const watchedValuesIndicator = Object.values(watchedValues).reduce((acc, item) => acc + (item ? JSON.stringify(item).length : 0), 0)
+	const areWatchedValuesReady = Object.values(watchedValues).reduce((acc, item) => acc && item.status === 'ready', true)
+	const isReady = areWatchedValuesReady && isWorkerReady
+
+	useEffect(() => {
+		if (!areWatchedValuesReady) {
+			updateState({ blockerr: 'Inputs are not ready' })
+			return
+		}
+
+		updateState({ blockerr: '' })
+
+		const watchedInputs = Object.entries(watchedValues).reduce((acc, [variable, watched]) => {
+			acc[variable] = watched.value
+			return acc
+		}, {} as any)
+
+		pyWorker.postMessage({ inputs: watchedInputs })
+	}, [watchedValuesIndicator, areWatchedValuesReady])
 
 	let preparedValue = value
 
@@ -197,14 +219,14 @@ export function PythonView(props: ViewProps) {
 				{label.trim() && <Text fz={14}>{label}</Text>}
 				<div />
 
-				<Button variant="subtle" onClick={runCode} disabled={!isWorkerReady}>
+				<Button variant="subtle" onClick={runCode} disabled={!isReady}>
 					{__('Run Code', 'inseri-core')}
 				</Button>
 			</Group>
 			{renderResizable ? renderResizable(editorElement) : editorElement}
-			{stderr && (
+			{(blockerr || stderr) && (
 				<Text fz={14} color="red">
-					{stderr}
+					{blockerr || stderr}
 				</Text>
 			)}
 		</Box>
