@@ -10,11 +10,13 @@ export interface GlobalState extends Attributes {
 	stderr: string
 	result: any
 
+	isModalOpen: boolean
 	isWizardMode: boolean
 	selectedMode: 'editor' | 'viewer'
 	wizardStep: number
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
+		runCode: () => void
 	}
 }
 
@@ -22,7 +24,7 @@ export const storeCreator = (initalState: Attributes) => {
 	const isValueSet = initalState.mode === 'editor' || (!!initalState.mode && initalState.input.key)
 	const pyWorker = new Worker(new URL(inseriApiSettings.worker))
 
-	return immer<GlobalState>((set) => {
+	return immer<GlobalState>((set, get) => {
 		pyWorker.onmessage = ({ data }) => {
 			set((state) => {
 				Object.entries(data).forEach(([k, v]) => {
@@ -40,6 +42,7 @@ export const storeCreator = (initalState: Attributes) => {
 			stdout: '',
 			result: null,
 
+			isModalOpen: false,
 			isWizardMode: !isValueSet,
 			selectedMode: initalState.mode ? initalState.mode : 'editor',
 			wizardStep: 0,
@@ -51,6 +54,16 @@ export const storeCreator = (initalState: Attributes) => {
 							state[k] = modifier[k]
 						})
 					}),
+
+				runCode: () => {
+					set((state) => {
+						state.stderr = ''
+						state.stdout = ''
+					})
+
+					const code = get().content
+					pyWorker.postMessage({ code })
+				},
 			},
 		}
 	})

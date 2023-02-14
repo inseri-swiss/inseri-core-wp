@@ -31,7 +31,6 @@ const supportedHighlighted = [
 
 const useStyles = createStyles((theme) => ({
 	wrapper: {
-		border: '1px solid #ced4da',
 		overflow: 'auto',
 	},
 	editor: {
@@ -62,9 +61,11 @@ interface Props {
 	textareaId?: string
 	height?: number
 	maxHeight?: number
+	withBorder?: boolean
+	showLineNo?: boolean
 }
 
-export function CodeEditor({ value, onChange = () => {}, type, textareaId, height, maxHeight }: Props) {
+export function CodeEditor({ value, onChange = () => {}, type, textareaId, height, maxHeight, withBorder = true, showLineNo = true }: Props) {
 	const { editor, editorLineNumber, wrapper } = useStyles().classes
 
 	const processCode = (code: string) => {
@@ -76,22 +77,24 @@ export function CodeEditor({ value, onChange = () => {}, type, textareaId, heigh
 			processedCode = escapeHtml(processedCode)
 		}
 
-		processedCode = processedCode
-			.split('\n')
-			.map((line, i) => `<span class='${editorLineNumber}'>${i + 1}</span>${line}`)
-			.join('\n')
+		if (showLineNo) {
+			processedCode = processedCode
+				.split('\n')
+				.map((line, i) => `<span class='${editorLineNumber}'>${i + 1}</span>${line}`)
+				.join('\n')
+		}
 
 		return processedCode
 	}
 
 	return (
-		<div className={wrapper} style={{ maxHeight, height }}>
+		<div className={wrapper} style={{ maxHeight, height, border: withBorder ? '1px solid #ced4da' : undefined }}>
 			<Editor
 				className={editor}
 				value={value}
 				onValueChange={onChange}
 				highlight={processCode}
-				padding={{ top: 16, bottom: 16, right: 16, left: 54 }}
+				padding={{ top: 16, bottom: 16, right: 16, left: showLineNo ? 54 : 16 }}
 				style={{
 					background: '#fff',
 					fontFamily: 'monospace',

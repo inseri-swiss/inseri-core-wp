@@ -1,12 +1,13 @@
 import { useAvailableBeacons, useControlTower, useWatch } from '@inseri/lighthouse'
-import { IconBrandPython, IconChevronLeft } from '@tabler/icons'
+import { IconBrandPython, IconChevronLeft, IconPlus, IconX } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
-import { useEffect, useState } from '@wordpress/element'
+import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { edit } from '@wordpress/icons'
-import { Box, Button, CodeEditor, Group, Select, Text, useGlobalState } from '../../components'
+import { edit, external } from '@wordpress/icons'
+import { ActionIcon, Box, Button, CodeEditor, Group, Modal, Select, Stack, Tabs, Text, TextInput, useGlobalState, SelectWithAction } from '../../components'
+import { Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import config from './block.json'
 import { Attributes } from './index'
 import { GlobalState } from './state'
@@ -16,14 +17,29 @@ const textEditorBeacon = { contentType: '', description: 'content', key: 'conten
 export function PythonEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { input, output, label, mode, blockId, blockName, editable, isWizardMode, selectedMode, wizardStep, actions } = useGlobalState(
-		(state: GlobalState) => state
-	)
+	const {
+		input,
+		output,
+		label,
+		mode,
+		blockId,
+		blockName,
+		editable,
+		isWizardMode,
+		selectedMode,
+		wizardStep,
+		actions,
+		isModalOpen,
+		content,
+		stdout,
+		stderr,
+		isWorkerReady,
+	} = useGlobalState((state: GlobalState) => state)
 	const isValueSet = mode === 'editor' || (!!mode && input.key)
 	const contentType = output.contentType
 	const inputBeaconKey = input.key
 
-	const { updateState } = actions
+	const { updateState, runCode } = actions
 
 	const availableBeacons = useAvailableBeacons('python')
 	const selectData = Object.keys(availableBeacons)
@@ -67,10 +83,91 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 
 	return (
 		<>
+			<Modal
+				zIndex={Z_INDEX_ABOVE_ADMIN}
+				size="100%"
+				overlayOpacity={0.7}
+				overlayBlur={3}
+				opened={isModalOpen}
+				onClose={() => updateState({ isModalOpen: false })}
+				styles={{
+					modal: { background: '#f0f0f1', height: '100%' },
+					body: { height: '100%', display: 'flex', flexDirection: 'column' },
+				}}
+				overflow="inside"
+				title={
+					<Text fz="md" fw="bold">
+						{`Python Code${blockName ? ': ' + blockName : ''}`}
+					</Text>
+				}
+			>
+				<Group align="stretch" style={{ flex: 1 }}>
+					<Stack style={{ flex: 1 }}>
+						<Box bg={'#fff'} style={{ flex: 1 }}>
+							<Group position="apart" style={{ borderBottom: '2px solid #ced4da' }}>
+								{label.trim() && (
+									<Text fz={14} pl="sm">
+										{label}
+									</Text>
+								)}
+								<div />
+								<Button variant="subtle" onClick={runCode} disabled={!isWorkerReady}>
+									{__('Run Code', 'inseri-core')}
+								</Button>
+							</Group>
+							<CodeEditor
+								withBorder={false}
+								type={'python'}
+								value={content}
+								onChange={(val) => {
+									updateState({ content: val })
+								}}
+							/>
+						</Box>
+						<Tabs defaultValue="output" bg={'#fff'}>
+							<Tabs.List>
+								<Tabs.Tab value="output">{__('Output', 'inseri-core')}</Tabs.Tab>
+								<Tabs.Tab value="console">{__('Console', 'inseri-core')}</Tabs.Tab>
+							</Tabs.List>
+
+							<Tabs.Panel value="output">
+								<Box>
+									<CodeEditor type={'json'} value={content} showLineNo={false} withBorder={false} />
+								</Box>
+							</Tabs.Panel>
+
+							<Tabs.Panel value="console">
+								<Box>
+									<CodeEditor type={'text'} value={stderr ? `${stderr}\n${stdout}` : stdout} showLineNo={false} withBorder={false} />
+								</Box>
+							</Tabs.Panel>
+						</Tabs>
+					</Stack>
+					<Box p="sm" bg={'#fff'}>
+						<SelectWithAction
+							label="Foo"
+							placeholder="Choose a block source"
+							title="Remove variable"
+							onClick={() => {}}
+							icon={<IconX size={16} />}
+							data={['React', 'Angular', 'Svelte', 'Vue']}
+						/>
+						<TextInput
+							placeholder={__('Enter variable name', 'inseri-core')}
+							rightSection={
+								<ActionIcon title="Create">
+									<IconPlus size={16} />
+								</ActionIcon>
+							}
+						/>
+					</Box>
+				</Group>
+			</Modal>
 			<BlockControls>
 				{isValueSet && (
 					<ToolbarGroup>
 						<ToolbarButton icon={edit} title={__('Edit', 'inseri-core')} onClick={() => updateState({ isWizardMode: !isWizardMode })} />
+						<ToolbarButton icon={external} title={__('Open extended view', 'inseri-core')} onClick={() => updateState({ isModalOpen: !isModalOpen })} />
 					</ToolbarGroup>
 				)}
 			</BlockControls>
@@ -154,8 +251,8 @@ interface ViewProps {
 
 export function PythonView(props: ViewProps) {
 	const { isGutenbergEditor, renderResizable } = props
-	const { height, editable, label, mode, input, content, pyWorker, isWorkerReady, stderr, stdout, result } = useGlobalState((state: GlobalState) => state)
-	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
+	const { height, editable, label, mode, input, content, isWorkerReady, stderr, stdout, result } = useGlobalState((state: GlobalState) => state)
+	const { updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
 
 	const { value, status } = useWatch(input)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
@@ -163,8 +260,6 @@ export function PythonView(props: ViewProps) {
 	stderr && console.log('stderr', stderr)
 	stdout && console.log('stdout', stdout)
 	result && console.log('result', result)
-
-	const [code, setCode] = useState(content)
 
 	let preparedValue = value
 
@@ -179,19 +274,14 @@ export function PythonView(props: ViewProps) {
 			<CodeEditor
 				height={height}
 				type={'python'}
-				value={code}
+				value={content}
 				onChange={(val) => {
 					if (isEditable) {
-						setCode(val)
+						updateState({ content: val })
 					}
 				}}
 			/>
 		)
-
-	const runCode = () => {
-		updateState({ stderr: '', stdout: '' })
-		pyWorker.postMessage({ code })
-	}
 
 	return (
 		<Box p="md">
