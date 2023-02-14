@@ -10,6 +10,7 @@ export interface GlobalState extends Attributes {
 	stdout: string
 	stderr: string
 	result: any
+	blockerr: string
 
 	isModalOpen: boolean
 	isWizardMode: boolean
@@ -48,6 +49,7 @@ export const storeCreator = (initalState: Attributes) => {
 			stderr: '',
 			stdout: '',
 			result: null,
+			blockerr: '',
 
 			isModalOpen: false,
 			isWizardMode: !isValueSet,

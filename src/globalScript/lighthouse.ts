@@ -217,4 +217,20 @@ function useWatch(config?: ConsumerBeacon): BaseBeaconState {
 	return beaconState
 }
 
-export { useControlTower, useDispatch, useAvailableBeacons, useJsonBeacons, useWatch }
+function useWatchMany(configs: Record<string, ConsumerBeacon>): Record<string, BaseBeaconState> {
+	const beaconState = useInternalStore((state) =>
+		Object.entries(configs).reduce((acc, [variableName, config]) => {
+			let slice = state.beacons[config.key]
+			if (!slice) {
+				slice = { contentType: config.contentType, value: config.default, status: 'initial' }
+			}
+
+			acc[variableName] = slice
+			return acc
+		}, {} as Record<string, BaseBeaconState>)
+	)
+
+	return beaconState
+}
+
+export { useControlTower, useDispatch, useAvailableBeacons, useJsonBeacons, useWatch, useWatchMany }

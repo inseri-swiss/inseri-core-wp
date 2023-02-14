@@ -6,7 +6,7 @@ import { isVariableValid, Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import { GlobalState } from './state'
 
 export function ExtendedView() {
-	const { label, blockId, blockName, actions, isModalOpen, content, stdout, stderr, isWorkerReady, newVarName, inputs } = useGlobalState(
+	const { label, blockId, blockName, actions, isModalOpen, content, blockerr, stdout, stderr, isWorkerReady, newVarName, inputs } = useGlobalState(
 		(state: GlobalState) => state
 	)
 	const { updateState, runCode, addNewInput, chooseInput, removeInput } = actions
@@ -20,6 +20,7 @@ export function ExtendedView() {
 		.filter((k) => !k.startsWith(blockId + '/'))
 		.map((k) => ({ label: availableBeacons[k].description, value: k }))
 
+	const consoleOut = (blockerr ? blockerr + '\n' : '') + (stderr ? stderr + '\n' : '') + stdout
 	return (
 		<Modal
 			zIndex={Z_INDEX_ABOVE_ADMIN}
@@ -76,7 +77,7 @@ export function ExtendedView() {
 
 						<Tabs.Panel value="console">
 							<Box>
-								<CodeEditor type={'text'} value={stderr ? `${stderr}\n${stdout}` : stdout} showLineNo={false} withBorder={false} />
+								<CodeEditor type={'text'} value={consoleOut} showLineNo={false} withBorder={false} />
 							</Box>
 						</Tabs.Panel>
 					</Tabs>
