@@ -1,4 +1,4 @@
-import { useAvailableBeacons, useControlTower, useWatch, useWatchMany } from '@inseri/lighthouse'
+import { dispatch, useAvailableBeacons, useControlTower, useDispatchMany, useWatch, useWatchMany } from '@inseri/lighthouse'
 import { IconBrandPython, IconChevronLeft, IconPlayerPlay } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -12,33 +12,20 @@ import { ExtendedView } from './ExtendedView'
 import { Attributes } from './index'
 import { GlobalState } from './state'
 
-const textEditorBeacon = { contentType: '', description: 'content', key: 'content', default: '' }
-
 export function PythonEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { inputCode, output, label, mode, blockId, blockName, editable, isWizardMode, selectedMode, wizardStep, actions, isModalOpen } = useGlobalState(
+	const { inputCode, label, mode, blockId, blockName, editable, isWizardMode, selectedMode, wizardStep, actions, isModalOpen } = useGlobalState(
 		(state: GlobalState) => state
 	)
-	const isValueSet = mode === 'editor' || (!!mode && inputCode.key)
-	const contentType = output.contentType
-	const inputBeaconKey = inputCode.key
-
 	const { updateState } = actions
+	const isValueSet = mode === 'editor' || (!!mode && inputCode.key)
+	const inputBeaconKey = inputCode.key
 
 	const availableBeacons = useAvailableBeacons('python')
 	const selectData = Object.keys(availableBeacons)
 		.filter((k) => !k.startsWith(blockId + '/'))
 		.map((k) => ({ label: availableBeacons[k].description, value: k }))
-
-	const beaconConfigs = mode === 'editor' ? [{ ...textEditorBeacon, contentType }] : []
-	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, beaconConfigs)
-
-	useEffect(() => {
-		if (producersBeacons.length > 0 && !output.key) {
-			updateState({ output: producersBeacons[0] })
-		}
-	}, [producersBeacons.length])
 
 	const { status } = useWatch(inputCode)
 	useEffect(() => {
@@ -163,9 +150,9 @@ interface ViewProps {
 
 export function PythonView(props: ViewProps) {
 	const { isGutenbergEditor, renderResizable } = props
-	const { height, editable, label, mode, inputCode, content, isWorkerReady, stderr, inputs, blockerr, pyWorker } = useGlobalState((state: GlobalState) => {
-		return state
-	})
+	const { height, editable, label, mode, inputCode, content, isWorkerReady, stderr, inputs, blockerr, pyWorker, blockId, blockName, outputs } = useGlobalState(
+		(state: GlobalState) => state
+	)
 	const { updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
 
@@ -190,6 +177,27 @@ export function PythonView(props: ViewProps) {
 
 		pyWorker.postMessage({ inputs: watchedInputs })
 	}, [watchedValuesIndicator, areWatchedValuesReady])
+
+	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, outputs)
+	const joinedKeys = outputs.reduce((acc, b) => acc + b.key, '')
+
+	useEffect(() => {
+		updateState({ outputs: producersBeacons })
+	}, [producersBeacons.length, joinedKeys])
+
+	const dispatchRecord = useDispatchMany(producersBeacons)
+
+	pyWorker.addEventListener('message', ({ data }) => {
+		if (Object.hasOwn(data, 'output')) {
+			const key = Object.keys(data.output)[0]
+			if (dispatchRecord[key]) {
+				dispatchRecord[key]({ status: 'ready', value: data.output[key] })
+			} else {
+				dispatch(`${blockId}/${key}`, { status: 'ready', value: data.output[key] }, { contentType: 'application/json', description: '', key: '' })
+				updateState({ outputs: outputs.concat({ contentType: 'application/json', description: key, key }) })
+			}
+		}
+	})
 
 	let preparedValue = value
 

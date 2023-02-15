@@ -33,13 +33,15 @@ export const storeCreator = (initalState: Attributes) => {
 	const pyWorker = new Worker(new URL(inseriApiSettings.worker))
 
 	return immer<GlobalState>((set, get) => {
-		pyWorker.onmessage = ({ data }) => {
-			set((state) => {
-				Object.entries(data).forEach(([k, v]) => {
-					state[k] = v
+		pyWorker.addEventListener('message', ({ data }) => {
+			if (['isWorkerReady', 'stdout', 'stderr', 'result'].some((e) => Object.hasOwn(data, e))) {
+				set((state) => {
+					Object.entries(data).forEach(([k, v]) => {
+						state[k] = v
+					})
 				})
-			})
-		}
+			}
+		})
 
 		return {
 			...initalState,
