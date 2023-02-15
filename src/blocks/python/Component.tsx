@@ -1,5 +1,5 @@
 import { useAvailableBeacons, useControlTower, useWatch, useWatchMany } from '@inseri/lighthouse'
-import { IconBrandPython, IconChevronLeft } from '@tabler/icons'
+import { IconBrandPython, IconChevronLeft, IconPlayerPlay } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
@@ -218,9 +218,8 @@ export function PythonView(props: ViewProps) {
 			<Group position="apart" mb={4}>
 				{label.trim() && <Text fz={14}>{label}</Text>}
 				<div />
-
-				<Button variant="subtle" onClick={runCode} disabled={!isReady}>
-					{__('Run Code', 'inseri-core')}
+				<Button variant="filled" onClick={runCode} leftIcon={<IconPlayerPlay size={20} />} disabled={!isReady}>
+					{__('Run', 'inseri-core')}
 				</Button>
 			</Group>
 			{renderResizable ? renderResizable(editorElement) : editorElement}

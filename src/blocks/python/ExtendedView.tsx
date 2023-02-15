@@ -1,7 +1,23 @@
 import { useAvailableBeacons } from '@inseri/lighthouse'
-import { IconPlus, IconX } from '@tabler/icons'
+import { useDisclosure, useHotkeys } from '@mantine/hooks'
+import { IconPlus, IconX, IconPlayerPlay } from '@tabler/icons'
 import { __ } from '@wordpress/i18n'
-import { ActionIcon, Box, Button, CodeEditor, Group, Modal, SelectWithAction, Stack, Tabs, Text, TextInput, useGlobalState } from '../../components'
+import {
+	ActionIcon,
+	Box,
+	Button,
+	CodeEditor,
+	Group,
+	Kbd,
+	Modal,
+	Popover,
+	SelectWithAction,
+	Stack,
+	Tabs,
+	Text,
+	TextInput,
+	useGlobalState,
+} from '../../components'
 import { isVariableValid, Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import { GlobalState } from './state'
 
@@ -10,6 +26,7 @@ export function ExtendedView() {
 		(state: GlobalState) => state
 	)
 	const { updateState, runCode, addNewInput, chooseInput, removeInput } = actions
+	const [isPopoverOpen, { close: closePopover, open: openPopover }] = useDisclosure(false)
 
 	const nameIsNotUsed = !Object.keys(inputs).includes(newVarName)
 	const isVariableNameValid = isVariableValid(newVarName) && nameIsNotUsed
@@ -19,6 +36,11 @@ export function ExtendedView() {
 	const selectData = Object.keys(availableBeacons)
 		.filter((k) => !k.startsWith(blockId + '/'))
 		.map((k) => ({ label: availableBeacons[k].description, value: k }))
+
+	useHotkeys([
+		['Escape', () => updateState({ isModalOpen: false })],
+		['ctrl+Enter', runCode],
+	])
 
 	const consoleOut = (blockerr ? blockerr + '\n' : '') + (stderr ? stderr + '\n' : '') + stdout
 	return (
@@ -43,16 +65,34 @@ export function ExtendedView() {
 			<Group align="stretch" style={{ flex: 1 }}>
 				<Stack style={{ flex: 1 }}>
 					<Box bg={'#fff'} style={{ flex: 1 }}>
-						<Group position="apart" style={{ borderBottom: '2px solid #ced4da', height: '38px' }}>
+						<Group position="apart" style={{ borderBottom: '2px solid #ced4da', height: '54px' }}>
 							{label.trim() && (
 								<Text fz={14} pl="sm">
 									{label}
 								</Text>
 							)}
 							<div />
-							<Button variant="subtle" onClick={runCode} disabled={!isWorkerReady}>
-								{__('Run Code', 'inseri-core')}
-							</Button>
+
+							<Popover position="top" withArrow shadow="md" opened={isPopoverOpen}>
+								<Popover.Target>
+									<Button
+										m={8}
+										variant="filled"
+										leftIcon={<IconPlayerPlay size={18} />}
+										onMouseEnter={openPopover}
+										onMouseLeave={closePopover}
+										onClick={runCode}
+										disabled={!isWorkerReady}
+									>
+										{__('Run', 'inseri-core')}
+									</Button>
+								</Popover.Target>
+								<Popover.Dropdown sx={{ pointerEvents: 'none' }}>
+									<Text size="sm">
+										Run Code with <Kbd>Ctrl</Kbd> + <Kbd>Enter</Kbd>
+									</Text>
+								</Popover.Dropdown>
+							</Popover>
 						</Group>
 						<CodeEditor
 							withBorder={false}
@@ -83,7 +123,7 @@ export function ExtendedView() {
 					</Tabs>
 				</Stack>
 				<Box bg={'#fff'}>
-					<Group style={{ borderBottom: '2px solid #ced4da', height: '38px' }}>
+					<Group style={{ borderBottom: '2px solid #ced4da', height: '54px' }}>
 						<Text fz={14} pl="sm">
 							{__('Inputs from Blocks', 'inseri-core')}
 						</Text>
