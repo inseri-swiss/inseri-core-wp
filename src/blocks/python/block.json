@@ -23,12 +23,9 @@
 			"type": "object",
 			"default": {}
 		},
-		"output": {
-			"type": "object",
-			"default": {
-				"key": "",
-				"contentType": ""
-			}
+		"outputs": {
+			"type": "array",
+			"default": []
 		},
 		"blockName": {
 			"type": "string",

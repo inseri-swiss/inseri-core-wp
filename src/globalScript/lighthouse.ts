@@ -63,9 +63,9 @@ if (process.env.NODE_ENV !== 'production') {
 
 const useInternalStore = create(immer<StoreWrapper>(store))
 
-const compoundKey = (blockId: string, key: string) => `${blockId}/${key}`
+const compoundKey = (blockId: string, key: string) => (key.includes('/') ? key : `${blockId}/${key}`)
 
-function useControlTower(blockConfig: InitBlockConfig, beaconConfigs: InitBeaconConfig[]) {
+function useControlTower(blockConfig: InitBlockConfig, beaconConfigs: InitBeaconConfig[]): ConsumerBeacon[] {
 	const { blockId, ...blockRest } = blockConfig
 
 	useEffect(() => {
@@ -121,7 +121,7 @@ function useControlTower(blockConfig: InitBlockConfig, beaconConfigs: InitBeacon
 		})
 
 		return beaconConfigs.map((config) => {
-			return { key: compoundKey(blockId, config.key), default: config.default, contentType: config.contentType }
+			return { key: compoundKey(blockId, config.key), default: config.default, contentType: config.contentType, description: config.description }
 		})
 	}, [joinedKeys, blockId])
 }
@@ -147,6 +147,52 @@ function useDispatch(config?: ProducerBeacon) {
 			})
 		}
 	}
+}
+
+type RecordUpdater = Record<string, (update: Partial<BaseBeaconState>) => void>
+
+function useDispatchMany(configs: ConsumerBeacon[]): RecordUpdater {
+	const joinedKeys = configs.reduce((acc, c) => acc + c.key, '')
+	useEffect(() => {
+		useInternalStore.setState((state) => {
+			configs.forEach((config) => {
+				if (config && config.key.includes('/') && !state.beacons[config.key]) {
+					const { key, contentType } = config
+					state.beacons[key] = { default: config.default, contentType, value: config.default, status: 'initial' }
+				}
+			})
+		})
+	}, [joinedKeys])
+
+	const result: RecordUpdater = {}
+	configs.forEach((c) => {
+		result[c.description] = (update: Partial<BaseBeaconState>) => {
+			useInternalStore.setState((state) => {
+				Object.entries(update)
+					.filter(([_, itemVal]) => itemVal !== undefined)
+					.forEach(([itemKey, itemVal]) => {
+						state.beacons[c.key][itemKey as keyof BaseBeaconState] = itemVal
+					})
+			})
+		}
+	})
+
+	return result
+}
+
+function dispatch(key: string, update: Partial<BaseBeaconState>, config: InitBeaconConfig = { contentType: '', description: '', key: '' }) {
+	useInternalStore.setState((state) => {
+		if (!state.beacons[key]) {
+			const { contentType } = config
+			state.beacons[key] = { default: config.default, contentType, value: config.default, status: 'initial' }
+		}
+
+		Object.entries(update)
+			.filter(([_, itemVal]) => itemVal !== undefined)
+			.forEach(([itemKey, itemVal]) => {
+				state.beacons[key][itemKey as keyof BaseBeaconState] = itemVal
+			})
+	})
 }
 
 function useAvailableBeacons(contentTypeFilter?: string | ((contentType: string) => boolean)): Record<string, ConsumerBeacon> {
@@ -233,4 +279,4 @@ function useWatchMany(configs: Record<string, ConsumerBeacon>): Record<string, B
 	return beaconState
 }
 
-export { useControlTower, useDispatch, useAvailableBeacons, useJsonBeacons, useWatch, useWatchMany }
+export { useControlTower, dispatch, useDispatch, useDispatchMany, useAvailableBeacons, useJsonBeacons, useWatch, useWatchMany }

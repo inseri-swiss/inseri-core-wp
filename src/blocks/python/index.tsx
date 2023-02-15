@@ -4,7 +4,7 @@ import type { BlockEditProps, BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
 import { SetupEditorEnv, StateProvider } from '../../components'
-import { ConsumerBeacon, ProducerBeacon } from '../../globalScript'
+import { ConsumerBeacon } from '../../globalScript'
 import json from './block.json'
 import { PythonEdit } from './Component'
 import { storeCreator } from './state'
@@ -16,7 +16,7 @@ export interface Attributes {
 	blockId?: string
 	inputCode: ConsumerBeacon
 	inputs: Record<string, ConsumerBeacon>
-	output: ProducerBeacon
+	outputs: ConsumerBeacon[]
 	blockName: string
 	height: number
 	editable: boolean
