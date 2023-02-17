@@ -1,12 +1,13 @@
 import { ConsumerBeacon } from '@inseri/lighthouse'
 import { immer } from 'zustand/middleware/immer'
 import { Attributes } from './index'
+import { Action } from './WorkerActions'
 
 export interface GlobalState extends Attributes {
 	[i: string]: any
 
 	pyWorker: Worker
-	isWorkerReady: boolean
+	workerStatus: 'initial' | 'ready' | 'in-progress'
 	stdout: string
 	stderr: string
 	result: any
@@ -33,21 +34,25 @@ export const storeCreator = (initalState: Attributes) => {
 	const pyWorker = new Worker(new URL(inseriApiSettings.worker))
 
 	return immer<GlobalState>((set, get) => {
-		pyWorker.addEventListener('message', ({ data }) => {
-			if (['isWorkerReady', 'stdout', 'stderr', 'result'].some((e) => Object.hasOwn(data, e))) {
-				set((state) => {
-					Object.entries(data).forEach(([k, v]) => {
-						state[k] = v
-					})
-				})
-			}
+		pyWorker.addEventListener('message', ({ data }: MessageEvent<Action>) => {
+			set((state) => {
+				if (data.type === 'STATUS') {
+					state.workerStatus = data.payload
+				}
+				if (data.type === 'SET_STD_ERR') {
+					state.stderr = data.payload
+				}
+				if (data.type === 'SET_STD_OUT') {
+					state.stdout = data.payload
+				}
+			})
 		})
 
 		return {
 			...initalState,
 
 			pyWorker,
-			isWorkerReady: false,
+			workerStatus: 'initial',
 			stderr: '',
 			stdout: '',
 			result: null,
@@ -75,7 +80,7 @@ export const storeCreator = (initalState: Attributes) => {
 					})
 
 					const code = get().content
-					pyWorker.postMessage({ code })
+					pyWorker.postMessage({ type: 'RUN_CODE', payload: code })
 				},
 
 				addNewInput: () => {

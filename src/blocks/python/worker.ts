@@ -1,4 +1,5 @@
 import { loadPyodide, PyodideInterface, PyProxy } from 'pyodide'
+import { Action } from './WorkerActions'
 
 // version must match with npm package version
 const BINARY_URL = 'https://cdn.jsdelivr.net/pyodide/v0.22.1/full/'
@@ -6,13 +7,13 @@ const BINARY_URL = 'https://cdn.jsdelivr.net/pyodide/v0.22.1/full/'
 let pyodide: PyodideInterface | null = null
 let inputs: Record<string, any> = {}
 
-onmessage = ({ data }) => {
-	if (typeof data.code === 'string') {
-		runCode(data.code)
+onmessage = ({ data }: MessageEvent<Action>) => {
+	if (data.type === 'RUN_CODE') {
+		runCode(data.payload)
 	}
 
-	if (data.inputs) {
-		inputs = data.inputs
+	if (data.type === 'SET_INPUTS') {
+		inputs = data.payload
 	}
 }
 
@@ -33,19 +34,19 @@ function toInseri(name: string, data: PyProxy | any) {
 	}
 
 	if (pyodide?.isPyProxy(convertedData)) {
-		postMessage({ stderr: 'not JSON-serializable' })
+		postMessage({ type: 'SET_STD_ERR', stderr: 'not JSON-serializable' })
 	} else {
-		postMessage({ output: { [name]: convertedData } })
+		postMessage({ type: 'SET_OUTPUT', key: name, payload: convertedData })
 	}
 }
 
 async function init() {
 	pyodide = await loadPyodide({
 		indexURL: BINARY_URL,
-		stdout: (msg) => postMessage({ stdout: msg }),
-		stderr: (msg) => postMessage({ stderr: msg }),
+		stdout: (msg) => postMessage({ type: 'SET_STD_OUT', payload: msg }),
+		stderr: (msg) => postMessage({ type: 'SET_STD_ERR', payload: msg }),
 	})
-	postMessage({ isWorkerReady: true })
+	postMessage({ type: 'STATUS', payload: 'ready' })
 
 	pyodide.registerJsModule('inseri', { to_inseri: toInseri })
 }
@@ -55,15 +56,17 @@ async function runCode(code: string) {
 		if (pyodide) {
 			await pyodide.loadPackagesFromImports(code)
 
-			const result = await pyodide.runPythonAsync(code, { globals: pyodide.toPy(inputs) })
-			postMessage({ result })
+			postMessage({ type: 'STATUS', payload: 'in-progress' })
+			await pyodide.runPythonAsync(code, { globals: pyodide.toPy(inputs) })
 		}
 	} catch (error) {
 		if (error instanceof Error) {
-			postMessage({ stderr: error.message })
+			postMessage({ type: 'SET_STD_ERR', payload: error.message })
 		} else {
-			postMessage({ stderr: 'unknown error ocurred' })
+			postMessage({ type: 'SET_STD_ERR', payload: 'unknown error ocurred' })
 		}
+	} finally {
+		postMessage({ type: 'STATUS', payload: 'ready' })
 	}
 }
 

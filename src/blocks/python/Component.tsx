@@ -11,6 +11,7 @@ import config from './block.json'
 import { ExtendedView } from './ExtendedView'
 import { Attributes } from './index'
 import { GlobalState } from './state'
+import { Action } from './WorkerActions'
 
 export function PythonEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
@@ -150,7 +151,7 @@ interface ViewProps {
 
 export function PythonView(props: ViewProps) {
 	const { isGutenbergEditor, renderResizable } = props
-	const { height, editable, label, mode, inputCode, content, isWorkerReady, stderr, inputs, blockerr, pyWorker, blockId, blockName, outputs } = useGlobalState(
+	const { height, editable, label, mode, inputCode, content, workerStatus, stderr, inputs, blockerr, pyWorker, blockId, blockName, outputs } = useGlobalState(
 		(state: GlobalState) => state
 	)
 	const { updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
@@ -160,7 +161,7 @@ export function PythonView(props: ViewProps) {
 	const watchedValues = useWatchMany(inputs)
 	const watchedValuesIndicator = Object.values(watchedValues).reduce((acc, item) => acc + (item ? JSON.stringify(item).length : 0), 0)
 	const areWatchedValuesReady = Object.values(watchedValues).reduce((acc, item) => acc && item.status === 'ready', true)
-	const isReady = areWatchedValuesReady && isWorkerReady
+	const isReady = areWatchedValuesReady && workerStatus !== 'initial'
 
 	useEffect(() => {
 		if (!areWatchedValuesReady) {
@@ -175,7 +176,7 @@ export function PythonView(props: ViewProps) {
 			return acc
 		}, {} as any)
 
-		pyWorker.postMessage({ inputs: watchedInputs })
+		pyWorker.postMessage({ type: 'SET_INPUTS', payload: watchedInputs })
 	}, [watchedValuesIndicator, areWatchedValuesReady])
 
 	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, outputs)
@@ -187,13 +188,13 @@ export function PythonView(props: ViewProps) {
 
 	const dispatchRecord = useDispatchMany(producersBeacons)
 
-	pyWorker.addEventListener('message', ({ data }) => {
-		if (Object.hasOwn(data, 'output')) {
-			const key = Object.keys(data.output)[0]
+	pyWorker.addEventListener('message', ({ data }: MessageEvent<Action>) => {
+		if (data.type === 'SET_OUTPUT') {
+			const key = data.key
 			if (dispatchRecord[key]) {
-				dispatchRecord[key]({ status: 'ready', value: data.output[key] })
+				dispatchRecord[key]({ status: 'ready', value: data.payload })
 			} else {
-				dispatch(`${blockId}/${key}`, { status: 'ready', value: data.output[key] }, { contentType: 'application/json', description: '', key: '' })
+				dispatch(`${blockId}/${key}`, { status: 'ready', value: data.payload }, { contentType: 'application/json', description: '', key: '' })
 				updateState({ outputs: outputs.concat({ contentType: 'application/json', description: key, key }) })
 			}
 		}
@@ -226,7 +227,7 @@ export function PythonView(props: ViewProps) {
 			<Group position="apart" mb={4}>
 				{label.trim() && <Text fz={14}>{label}</Text>}
 				<div />
-				<Button variant="filled" onClick={runCode} leftIcon={<IconPlayerPlay size={20} />} disabled={!isReady}>
+				<Button variant="filled" onClick={runCode} leftIcon={<IconPlayerPlay size={20} />} disabled={!isReady} loading={workerStatus === 'in-progress'}>
 					{__('Run', 'inseri-core')}
 				</Button>
 			</Group>
