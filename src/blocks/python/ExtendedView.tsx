@@ -22,7 +22,7 @@ import { isVariableValid, Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import { GlobalState } from './state'
 
 export function ExtendedView() {
-	const { label, blockId, blockName, actions, isModalOpen, content, blockerr, stdout, stderr, isWorkerReady, newVarName, inputs } = useGlobalState(
+	const { label, blockId, blockName, actions, isModalOpen, content, blockerr, stdout, stderr, workerStatus, newVarName, inputs } = useGlobalState(
 		(state: GlobalState) => state
 	)
 	const { updateState, runCode, addNewInput, chooseInput, removeInput } = actions
@@ -82,7 +82,7 @@ export function ExtendedView() {
 										onMouseEnter={openPopover}
 										onMouseLeave={closePopover}
 										onClick={runCode}
-										disabled={!isWorkerReady}
+										disabled={workerStatus !== 'ready'}
 									>
 										{__('Run', 'inseri-core')}
 									</Button>
