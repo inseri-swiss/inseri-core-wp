@@ -1,5 +1,5 @@
 import { dispatch, useAvailableBeacons, useControlTower, useDispatchMany, useWatch, useWatchMany } from '@inseri/lighthouse'
-import { IconBrandPython, IconChevronLeft, IconPlayerPlay } from '@tabler/icons'
+import { IconBrandPython, IconChevronLeft } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
@@ -11,6 +11,7 @@ import config from './block.json'
 import { ExtendedView } from './ExtendedView'
 import { Attributes } from './index'
 import { GlobalState } from './state'
+import { TopBar } from './TopBar'
 import { Action } from './WorkerActions'
 
 export function PythonEdit(props: BlockEditProps<Attributes>) {
@@ -151,17 +152,16 @@ interface ViewProps {
 
 export function PythonView(props: ViewProps) {
 	const { isGutenbergEditor, renderResizable } = props
-	const { height, editable, label, mode, inputCode, content, workerStatus, stderr, inputs, blockerr, pyWorker, blockId, blockName, outputs } = useGlobalState(
+	const { height, editable, mode, inputCode, content, stderr, inputs, blockerr, pyWorker, blockId, blockName, outputs } = useGlobalState(
 		(state: GlobalState) => state
 	)
-	const { updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
+	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
 
 	const { value, status } = useWatch(inputCode)
 	const watchedValues = useWatchMany(inputs)
 	const watchedValuesIndicator = Object.values(watchedValues).reduce((acc, item) => acc + (item ? JSON.stringify(item).length : 0), 0)
 	const areWatchedValuesReady = Object.values(watchedValues).reduce((acc, item) => acc && item.status === 'ready', true)
-	const isReady = areWatchedValuesReady && workerStatus !== 'initial'
 
 	useEffect(() => {
 		if (!areWatchedValuesReady) {
@@ -224,12 +224,8 @@ export function PythonView(props: ViewProps) {
 
 	return (
 		<Box p="md">
-			<Group position="apart" mb={4}>
-				{label.trim() && <Text fz={14}>{label}</Text>}
-				<div />
-				<Button variant="filled" onClick={runCode} leftIcon={<IconPlayerPlay size={20} />} disabled={!isReady} loading={workerStatus === 'in-progress'}>
-					{__('Run', 'inseri-core')}
-				</Button>
+			<Group position="apart" mb={4} pl="sm" spacing="xs">
+				<TopBar />
 			</Group>
 			{renderResizable ? renderResizable(editorElement) : editorElement}
 			{(blockerr || stderr) && (
