@@ -1,4 +1,5 @@
 import { ConsumerBeacon } from '@inseri/lighthouse'
+import type { Draft } from 'immer'
 import { immer } from 'zustand/middleware/immer'
 import { Attributes } from './index'
 import { Action } from './WorkerActions'
@@ -23,35 +24,41 @@ export interface GlobalState extends Attributes {
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
 		runCode: () => void
+		terminate: () => void
 		addNewInput: () => void
 		chooseInput: (variable: string, beacon: ConsumerBeacon) => void
 		removeInput: (variable: string) => void
 	}
 }
 
+const createWorker = (set: (nextStateOrUpdater: (state: Draft<GlobalState>) => void) => void) => {
+	const worker = new Worker(new URL(inseriApiSettings.worker))
+
+	worker.addEventListener('message', ({ data }: MessageEvent<Action>) => {
+		set((state) => {
+			if (data.type === 'STATUS') {
+				state.workerStatus = data.payload
+			}
+			if (data.type === 'SET_STD_ERR') {
+				state.stderr = data.payload
+			}
+			if (data.type === 'SET_STD_OUT') {
+				state.stdout = data.payload
+			}
+		})
+	})
+
+	return worker
+}
+
 export const storeCreator = (initalState: Attributes) => {
 	const isValueSet = initalState.mode === 'editor' || (!!initalState.mode && initalState.inputCode.key)
-	const pyWorker = new Worker(new URL(inseriApiSettings.worker))
 
 	return immer<GlobalState>((set, get) => {
-		pyWorker.addEventListener('message', ({ data }: MessageEvent<Action>) => {
-			set((state) => {
-				if (data.type === 'STATUS') {
-					state.workerStatus = data.payload
-				}
-				if (data.type === 'SET_STD_ERR') {
-					state.stderr = data.payload
-				}
-				if (data.type === 'SET_STD_OUT') {
-					state.stdout = data.payload
-				}
-			})
-		})
-
 		return {
 			...initalState,
 
-			pyWorker,
+			pyWorker: createWorker(set),
 			workerStatus: 'initial',
 			stderr: '',
 			stdout: '',
@@ -79,8 +86,16 @@ export const storeCreator = (initalState: Attributes) => {
 						state.stdout = ''
 					})
 
-					const code = get().content
-					pyWorker.postMessage({ type: 'RUN_CODE', payload: code })
+					const { pyWorker, content } = get()
+					pyWorker.postMessage({ type: 'RUN_CODE', payload: content })
+				},
+
+				terminate: () => {
+					get().pyWorker.terminate()
+					set((state) => {
+						state.workerStatus = 'initial'
+						state.pyWorker = createWorker(set)
+					})
 				},
 
 				addNewInput: () => {
