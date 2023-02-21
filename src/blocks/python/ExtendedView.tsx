@@ -22,7 +22,7 @@ export function ExtendedView() {
 
 	useHotkeys([
 		['Escape', () => updateState({ isModalOpen: false })],
-		['ctrl+Enter', runCode],
+		['mod+Enter', runCode],
 	])
 
 	const consoleOut = (blockerr ? blockerr + '\n' : '') + (stderr ? stderr + '\n' : '') + stdout
@@ -57,6 +57,12 @@ export function ExtendedView() {
 							value={content}
 							onChange={(val) => {
 								updateState({ content: val })
+							}}
+							onKeyDown={(event) => {
+								if ((event.ctrlKey || event.metaKey) && event.code === 'Enter') {
+									runCode()
+									event.stopPropagation()
+								}
 							}}
 						/>
 					</Box>

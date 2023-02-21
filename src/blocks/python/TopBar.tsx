@@ -1,6 +1,6 @@
 import { useWatchMany } from '@inseri/lighthouse'
 import { useDisclosure } from '@mantine/hooks'
-import { IconPlayerPlay, IconSkull } from '@tabler/icons'
+import { IconPlayerPlay, IconX } from '@tabler/icons'
 import { __ } from '@wordpress/i18n'
 import { Button, Kbd, Loader, Popover, Text, useGlobalState } from '../../components'
 import { GlobalState } from './state'
@@ -30,7 +30,7 @@ export function TopBar({ showPopover }: { showPopover?: boolean }) {
 			</Popover.Target>
 			<Popover.Dropdown sx={{ pointerEvents: 'none' }}>
 				<Text size="sm">
-					Run Code with <Kbd>Ctrl</Kbd> + <Kbd>Enter</Kbd>
+					Run Code with <Kbd>Ctrl/Cmd</Kbd> + <Kbd>Enter</Kbd>
 				</Text>
 			</Popover.Dropdown>
 		</Popover>
@@ -46,7 +46,7 @@ export function TopBar({ showPopover }: { showPopover?: boolean }) {
 			<div style={{ flex: 1 }} />
 			{workerStatus === 'in-progress' && <Loader p={6} />}
 			{workerStatus === 'in-progress' ? (
-				<Button variant="outline" onClick={terminate} leftIcon={<IconSkull size={20} />} color="red">
+				<Button variant="outline" onClick={terminate} leftIcon={<IconX size={20} />} color="red">
 					{__('Stop', 'inseri-core')}
 				</Button>
 			) : (
