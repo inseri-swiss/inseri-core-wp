@@ -25,7 +25,6 @@ export function ExtendedView() {
 		['mod+Enter', runCode],
 	])
 
-	const consoleOut = (blockerr ? blockerr + '\n' : '') + (stderr ? stderr + '\n' : '') + stdout
 	return (
 		<Modal
 			zIndex={Z_INDEX_ABOVE_ADMIN}
@@ -47,7 +46,7 @@ export function ExtendedView() {
 		>
 			<Group align="stretch" style={{ flex: 1 }}>
 				<Stack style={{ flex: 1 }}>
-					<Box bg={'#fff'} style={{ flex: 1 }}>
+					<Stack bg={'#fff'} style={{ flex: 1 }}>
 						<Group px="sm" py="xs" position="apart" style={{ borderBottom: '2px solid #ced4da', height: '54px' }} spacing="xs">
 							<TopBar showPopover />
 						</Group>
@@ -65,22 +64,21 @@ export function ExtendedView() {
 								}
 							}}
 						/>
-					</Box>
-					<Tabs defaultValue="output" bg={'#fff'}>
+						<div style={{ flex: 1 }} />
+						{(blockerr || stderr) && (
+							<Text fz={14} color="red" p="sm" style={{ borderTop: '1px solid #ced4da' }}>
+								{blockerr || stderr}
+							</Text>
+						)}
+					</Stack>
+					<Tabs defaultValue="stdout" bg={'#fff'}>
 						<Tabs.List>
-							<Tabs.Tab value="output">{__('Output', 'inseri-core')}</Tabs.Tab>
-							<Tabs.Tab value="console">{__('Console', 'inseri-core')}</Tabs.Tab>
+							<Tabs.Tab value="stdout">{__('standard output', 'inseri-core')}</Tabs.Tab>
 						</Tabs.List>
 
-						<Tabs.Panel value="output">
+						<Tabs.Panel value="stdout">
 							<Box>
-								<CodeEditor type={'json'} value={content} showLineNo={false} withBorder={false} />
-							</Box>
-						</Tabs.Panel>
-
-						<Tabs.Panel value="console">
-							<Box>
-								<CodeEditor type={'text'} value={consoleOut} showLineNo={false} withBorder={false} />
+								<CodeEditor type={'text'} value={stdout} showLineNo={false} withBorder={false} />
 							</Box>
 						</Tabs.Panel>
 					</Tabs>

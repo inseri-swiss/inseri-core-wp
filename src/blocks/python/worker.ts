@@ -6,6 +6,8 @@ const BINARY_URL = 'https://cdn.jsdelivr.net/pyodide/v0.22.1/full/'
 
 let pyodide: PyodideInterface | null = null
 let inputs: Record<string, any> = {}
+let stdoutBuffer = ''
+let stderrBuffer = ''
 
 onmessage = ({ data }: MessageEvent<Action>) => {
 	if (data.type === 'RUN_CODE') {
@@ -34,7 +36,7 @@ function toInseri(name: string, data: PyProxy | any) {
 	}
 
 	if (pyodide?.isPyProxy(convertedData)) {
-		postMessage({ type: 'SET_STD_ERR', stderr: 'not JSON-serializable' })
+		postMessage({ type: 'SET_STD_ERR', payload: 'not JSON-serializable' })
 	} else {
 		postMessage({ type: 'SET_OUTPUT', key: name, payload: convertedData })
 	}
@@ -43,8 +45,14 @@ function toInseri(name: string, data: PyProxy | any) {
 async function init() {
 	pyodide = await loadPyodide({
 		indexURL: BINARY_URL,
-		stdout: (msg) => postMessage({ type: 'SET_STD_OUT', payload: msg }),
-		stderr: (msg) => postMessage({ type: 'SET_STD_ERR', payload: msg }),
+		stdout: (msg) => {
+			const sep = stdoutBuffer ? '\n' : ''
+			stdoutBuffer += sep + msg
+		},
+		stderr: (msg) => {
+			const sep = stderrBuffer ? '\n' : ''
+			stderrBuffer += sep + msg
+		},
 	})
 	postMessage({ type: 'STATUS', payload: 'ready' })
 
@@ -54,17 +62,19 @@ async function init() {
 async function runCode(code: string) {
 	try {
 		if (pyodide) {
-			await pyodide.loadPackagesFromImports(code)
+			stdoutBuffer = ''
+			stderrBuffer = ''
 
 			postMessage({ type: 'STATUS', payload: 'in-progress' })
+			await pyodide.loadPackagesFromImports(code)
 			await pyodide.runPythonAsync(code, { globals: pyodide.toPy(inputs) })
+
+			postMessage({ type: 'SET_STD_OUT', payload: stdoutBuffer })
+			postMessage({ type: 'SET_STD_ERR', payload: stderrBuffer })
 		}
 	} catch (error) {
-		if (error instanceof Error) {
-			postMessage({ type: 'SET_STD_ERR', payload: error.message })
-		} else {
-			postMessage({ type: 'SET_STD_ERR', payload: 'unknown error ocurred' })
-		}
+		const payload = error instanceof Error ? error.message : 'unknown error ocurred'
+		postMessage({ type: 'SET_STD_ERR', payload })
 	} finally {
 		postMessage({ type: 'STATUS', payload: 'ready' })
 	}
