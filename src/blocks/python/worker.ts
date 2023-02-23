@@ -6,13 +6,8 @@ const BINARY_URL = 'https://cdn.jsdelivr.net/pyodide/v0.22.1/full/'
 
 let pyodide: PyodideInterface | null = null
 let inputs: Record<string, any> = {}
-let stdoutBuffer = ''
-let stderrBuffer = ''
-
-const append = (buffer: string, item: string) => {
-	const sep = buffer ? '\n' : ''
-	buffer += sep + item
-}
+const stdoutBuffer: string[] = []
+const stderrBuffer: string[] = []
 
 onmessage = ({ data }: MessageEvent<Action>) => {
 	if (data.type === 'RUN_CODE') {
@@ -45,21 +40,21 @@ function toInseri(name: string, data: PyProxy | any) {
 		}
 
 		if (pyodide?.isPyProxy(convertedData)) {
-			append(stderrBuffer, 'not JSON serializable')
+			stderrBuffer.push('not JSON serializable')
 		} else {
 			postMessage({ type: 'SET_OUTPUT', key: name, payload: convertedData })
 		}
 	} catch (error) {
 		const msg = error instanceof Error ? error.message : 'unknown type conversion error ocurred'
-		append(stderrBuffer, msg)
+		stderrBuffer.push(msg)
 	}
 }
 
 async function init() {
 	pyodide = await loadPyodide({
 		indexURL: BINARY_URL,
-		stdout: (msg) => append(stdoutBuffer, msg),
-		stderr: (msg) => append(stderrBuffer, msg),
+		stdout: (msg) => stdoutBuffer.push(msg),
+		stderr: (msg) => stderrBuffer.push(msg),
 	})
 	postMessage({ type: 'STATUS', payload: 'ready' })
 
@@ -69,8 +64,8 @@ async function init() {
 async function runCode(code: string) {
 	try {
 		if (pyodide) {
-			stdoutBuffer = ''
-			stderrBuffer = ''
+			stdoutBuffer.splice(0, stdoutBuffer.length)
+			stderrBuffer.splice(0, stderrBuffer.length)
 
 			postMessage({ type: 'STATUS', payload: 'in-progress' })
 			await pyodide.loadPackagesFromImports(code)
@@ -78,10 +73,10 @@ async function runCode(code: string) {
 		}
 	} catch (error) {
 		const msg = error instanceof Error ? error.message : 'unknown error ocurred'
-		append(stderrBuffer, msg)
+		stderrBuffer.push(msg)
 	} finally {
-		postMessage({ type: 'SET_STD_OUT', payload: stdoutBuffer })
-		postMessage({ type: 'SET_STD_ERR', payload: stderrBuffer })
+		postMessage({ type: 'SET_STD_OUT', payload: stdoutBuffer.filter(Boolean).join('\n') })
+		postMessage({ type: 'SET_STD_ERR', payload: stderrBuffer.filter(Boolean).join('\n') })
 		postMessage({ type: 'STATUS', payload: 'ready' })
 	}
 }

@@ -1,6 +1,7 @@
 import { useAvailableBeacons } from '@inseri/lighthouse'
-import { useHotkeys } from '@mantine/hooks'
+import { useHotkeys, usePrevious } from '@mantine/hooks'
 import { IconPlus, IconX } from '@tabler/icons'
+import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { ActionIcon, Box, CodeEditor, Group, Modal, SelectWithAction, Stack, Tabs, Text, TextInput, useGlobalState } from '../../components'
 import { isVariableValid, Z_INDEX_ABOVE_ADMIN } from '../../utils'
@@ -10,6 +11,10 @@ import { TopBar } from './TopBar'
 export function ExtendedView() {
 	const { blockId, blockName, actions, isModalOpen, content, blockerr, stdout, stderr, newVarName, inputs } = useGlobalState((state: GlobalState) => state)
 	const { updateState, runCode, addNewInput, chooseInput, removeInput } = actions
+	const [chosenTab, setChosenTab] = useState<string | null>('stdout')
+
+	const errors = [blockerr, stderr].filter(Boolean).join('\n')
+	const prevErrors = usePrevious(errors)
 
 	const nameIsNotUsed = !Object.keys(inputs).includes(newVarName)
 	const isVariableNameValid = isVariableValid(newVarName) && nameIsNotUsed
@@ -24,6 +29,12 @@ export function ExtendedView() {
 		['Escape', () => updateState({ isModalOpen: false })],
 		['mod+Enter', runCode],
 	])
+
+	useEffect(() => {
+		if (!prevErrors && errors) {
+			setChosenTab('stderr')
+		}
+	}, [errors])
 
 	return (
 		<Modal
@@ -64,21 +75,21 @@ export function ExtendedView() {
 								}
 							}}
 						/>
-						<div style={{ flex: 1 }} />
-						{(blockerr || stderr) && (
-							<Text fz={14} color="red" p="sm" style={{ borderTop: '1px solid #ced4da' }}>
-								{blockerr || stderr}
-							</Text>
-						)}
 					</Stack>
-					<Tabs defaultValue="stdout" bg={'#fff'}>
+					<Tabs value={chosenTab} onTabChange={setChosenTab} bg={'#fff'}>
 						<Tabs.List>
 							<Tabs.Tab value="stdout">{__('standard output', 'inseri-core')}</Tabs.Tab>
+							<Tabs.Tab value="stderr">{__('errors', 'inseri-core')}</Tabs.Tab>
 						</Tabs.List>
 
 						<Tabs.Panel value="stdout">
 							<Box>
 								<CodeEditor type={'text'} value={stdout} showLineNo={false} withBorder={false} />
+							</Box>
+						</Tabs.Panel>
+						<Tabs.Panel value="stderr">
+							<Box>
+								<CodeEditor type={'text'} value={errors} showLineNo={false} withBorder={false} fontColor={'#e03131'} />
 							</Box>
 						</Tabs.Panel>
 					</Tabs>

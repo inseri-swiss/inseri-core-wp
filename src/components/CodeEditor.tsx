@@ -64,9 +64,11 @@ interface Props {
 	withBorder?: boolean
 	showLineNo?: boolean
 	onKeyDown?: React.KeyboardEventHandler<any>
+	fontColor?: string
 }
 
-export function CodeEditor({ value, onChange = () => {}, type, textareaId, height, maxHeight, withBorder = true, showLineNo = true, onKeyDown }: Props) {
+export function CodeEditor(props: Props) {
+	const { value, onChange = () => {}, type, textareaId, height, maxHeight, withBorder = true, showLineNo = true, onKeyDown, fontColor } = props
 	const { editor, editorLineNumber, wrapper } = useStyles().classes
 
 	const processCode = (code: string) => {
@@ -101,6 +103,7 @@ export function CodeEditor({ value, onChange = () => {}, type, textareaId, heigh
 					background: '#fff',
 					fontFamily: 'monospace',
 					minHeight: '60px',
+					color: fontColor,
 				}}
 				textareaId={textareaId}
 			/>
