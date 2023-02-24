@@ -2,13 +2,14 @@ import { IconBrandPython } from '@tabler/icons'
 import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockEditProps, BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
+import 'allotment/dist/style.css'
 import stringify from 'json-stable-stringify'
+import 'prismjs/themes/prism.css'
 import { SetupEditorEnv, StateProvider } from '../../components'
 import { ConsumerBeacon } from '../../globalScript'
 import json from './block.json'
 import { PythonEdit } from './Component'
 import { storeCreator } from './state'
-import './style.scss'
 
 const { name, ...settings } = json as any
 
