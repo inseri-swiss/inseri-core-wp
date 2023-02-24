@@ -58,6 +58,6 @@
 	"textdomain": "inseri-core",
 	"editorScript": "file:./index.js",
 	"viewScript": ["file:./hydration.js"],
-	"style": ["file:./index.css"],
+	"style": ["file:./index.css", "file:./style-index.css"],
 	"script": "inseri-core"
 }
