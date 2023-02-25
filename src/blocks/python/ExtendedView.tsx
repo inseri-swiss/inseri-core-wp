@@ -4,7 +4,7 @@ import { IconChevronDown, IconChevronRight, IconChevronUp, IconPlus, IconX } fro
 import { useRef, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Allotment, AllotmentHandle } from 'allotment'
-import { ActionIcon, Box, Button, CodeEditor, Collapse, Group, Modal, SelectWithAction, Stack, Text, TextInput, useGlobalState } from '../../components'
+import { ActionIcon, Box, Button, CodeEditor, Group, Modal, SelectWithAction, Stack, Text, TextInput, useGlobalState } from '../../components'
 import { isVariableValid, Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import { GlobalState } from './state'
 import { TopBar } from './TopBar'
@@ -15,7 +15,7 @@ export function ExtendedView() {
 	const [isEditorVisible, setEditorVisible] = useState(true)
 	const [isInputsVisible, setInputsVisible] = useState(true)
 	const [isOutputsVisible, setOutputsVisible] = useState(true)
-	const ref = useRef<AllotmentHandle>(null)
+	const sidebarHandleRef = useRef<AllotmentHandle>(null)
 
 	const nameIsNotUsed = !Object.keys(inputs).includes(newVarName)
 	const isVariableNameValid = isVariableValid(newVarName) && nameIsNotUsed
@@ -51,7 +51,7 @@ export function ExtendedView() {
 			}
 		>
 			<Allotment>
-				<Allotment.Pane>
+				<Allotment.Pane minSize={300}>
 					<Allotment vertical>
 						<Allotment.Pane minSize={54} visible={isEditorVisible}>
 							<Stack bg={'#fff'} style={{ height: '100%' }} spacing={0}>
@@ -87,30 +87,27 @@ export function ExtendedView() {
 						</Allotment.Pane>
 					</Allotment>
 				</Allotment.Pane>
-				<Allotment.Pane preferredSize={'20%'}>
+				<Allotment.Pane preferredSize={'20%'} minSize={240}>
 					<Box bg={'#fff'} style={{ height: '100%' }}>
 						<Allotment
-							ref={ref}
+							ref={sidebarHandleRef}
 							vertical
 							onChange={(sizes) => {
-								if (sizes[0] > 36) {
-									setInputsVisible(true)
-								} else {
-									setInputsVisible(false)
-								}
+								setInputsVisible(sizes[0] > 36)
+								setOutputsVisible(sizes[1] > 36)
 							}}
 						>
 							<Allotment.Pane preferredSize={'50%'} minSize={36}>
-								<Box>
+								<Stack spacing={0} style={{ height: '100%' }}>
 									<Button
 										variant="default"
-										styles={{ root: { border: '0', width: '100%' }, inner: { justifyContent: 'left' } }}
+										styles={{ root: { border: '0', width: '100%', flexShrink: 0 }, inner: { justifyContent: 'left' } }}
 										onClick={() => {
 											setInputsVisible(!isInputsVisible)
 											if (isInputsVisible) {
-												ref.current?.resize([36, Infinity])
+												sidebarHandleRef.current?.resize([36, Infinity])
 											} else {
-												ref.current?.reset()
+												sidebarHandleRef.current?.reset()
 											}
 										}}
 										leftIcon={isInputsVisible ? <IconChevronDown size={18} /> : <IconChevronRight size={18} />}
@@ -118,51 +115,7 @@ export function ExtendedView() {
 										<Text fz={14}>{__('Inputs from Blocks', 'inseri-core')}</Text>
 									</Button>
 									{isInputsVisible && (
-										<Box style={{ overflow: 'auto' }}>
-											<Stack p="sm">
-												{Object.keys(inputs).map((varName) => (
-													<SelectWithAction
-														key={varName}
-														label={varName}
-														placeholder="Choose a block source"
-														title="Remove variable"
-														value={inputs[varName].key}
-														onChange={(key) => chooseInput(varName, availableBeacons[key!])}
-														onClick={() => removeInput(varName)}
-														icon={<IconX size={16} />}
-														data={selectData}
-													/>
-												))}
-
-												<TextInput
-													mt="sm"
-													placeholder={__('Enter variable name', 'inseri-core')}
-													value={newVarName}
-													onChange={(e) => updateState({ newVarName: e.currentTarget.value })}
-													error={!isVariableNameValid && __('invalid name', 'inseri-core')}
-													rightSection={
-														<ActionIcon title="Create" disabled={!isReadyForCreate} onClick={addNewInput}>
-															<IconPlus size={16} />
-														</ActionIcon>
-													}
-												/>
-											</Stack>
-										</Box>
-									)}
-								</Box>
-							</Allotment.Pane>
-							<Allotment.Pane preferredSize={'50%'} minSize={36}>
-								<Stack style={{ height: '100%' }}>
-									<Button
-										variant="default"
-										styles={{ root: { border: '0' }, inner: { justifyContent: 'left' } }}
-										onClick={() => setOutputsVisible(!isOutputsVisible)}
-										leftIcon={isOutputsVisible ? <IconChevronDown size={18} /> : <IconChevronRight size={18} />}
-									>
-										<Text fz={14}>{__('Inputs from Blocks', 'inseri-core')}</Text>
-									</Button>
-									<Collapse in={isOutputsVisible}>
-										<Stack p="sm">
+										<Stack p="sm" style={{ overflow: 'auto' }}>
 											{Object.keys(inputs).map((varName) => (
 												<SelectWithAction
 													key={varName}
@@ -190,7 +143,54 @@ export function ExtendedView() {
 												}
 											/>
 										</Stack>
-									</Collapse>
+									)}
+								</Stack>
+							</Allotment.Pane>
+							<Allotment.Pane preferredSize={'50%'} minSize={36}>
+								<Stack spacing={0} style={{ height: '100%' }}>
+									<Button
+										variant="default"
+										styles={{ root: { border: '0', width: '100%', flexShrink: 0 }, inner: { justifyContent: 'left' } }}
+										onClick={() => {
+											setOutputsVisible(!isOutputsVisible)
+											if (isOutputsVisible) {
+												sidebarHandleRef.current?.resize([Infinity, 36])
+											} else {
+												sidebarHandleRef.current?.reset()
+											}
+										}}
+										leftIcon={isOutputsVisible ? <IconChevronDown size={18} /> : <IconChevronRight size={18} />}
+									>
+										<Text fz={14}>{__('Outputs to Blocks', 'inseri-core')}</Text>
+									</Button>
+									<Stack p="sm" style={{ overflow: 'auto' }}>
+										{Object.keys(inputs).map((varName) => (
+											<SelectWithAction
+												key={varName}
+												label={varName}
+												placeholder="Choose a block source"
+												title="Remove variable"
+												value={inputs[varName].key}
+												onChange={(key) => chooseInput(varName, availableBeacons[key!])}
+												onClick={() => removeInput(varName)}
+												icon={<IconX size={16} />}
+												data={selectData}
+											/>
+										))}
+
+										<TextInput
+											mt="sm"
+											placeholder={__('Enter variable name', 'inseri-core')}
+											value={newVarName}
+											onChange={(e) => updateState({ newVarName: e.currentTarget.value })}
+											error={!isVariableNameValid && __('invalid name', 'inseri-core')}
+											rightSection={
+												<ActionIcon title="Create" disabled={!isReadyForCreate} onClick={addNewInput}>
+													<IconPlus size={16} />
+												</ActionIcon>
+											}
+										/>
+									</Stack>
 								</Stack>
 							</Allotment.Pane>
 						</Allotment>
