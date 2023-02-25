@@ -180,21 +180,6 @@ function useDispatchMany(configs: ConsumerBeacon[]): RecordUpdater {
 	return result
 }
 
-function dispatch(key: string, update: Partial<BaseBeaconState>, config: InitBeaconConfig = { contentType: '', description: '', key: '' }) {
-	useInternalStore.setState((state) => {
-		if (!state.beacons[key]) {
-			const { contentType } = config
-			state.beacons[key] = { default: config.default, contentType, value: config.default, status: 'initial' }
-		}
-
-		Object.entries(update)
-			.filter(([_, itemVal]) => itemVal !== undefined)
-			.forEach(([itemKey, itemVal]) => {
-				state.beacons[key][itemKey as keyof BaseBeaconState] = itemVal
-			})
-	})
-}
-
 function useAvailableBeacons(contentTypeFilter?: string | ((contentType: string) => boolean)): Record<string, ConsumerBeacon> {
 	const blocks = useInternalStore((state) => state.blocks)
 	const beacons = useInternalStore((state) => state.beacons)
@@ -279,4 +264,4 @@ function useWatchMany(configs: Record<string, ConsumerBeacon>): Record<string, B
 	return beaconState
 }
 
-export { useControlTower, dispatch, useDispatch, useDispatchMany, useAvailableBeacons, useJsonBeacons, useWatch, useWatchMany }
+export { useControlTower, useDispatch, useDispatchMany, useAvailableBeacons, useJsonBeacons, useWatch, useWatchMany }

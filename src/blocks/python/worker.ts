@@ -1,4 +1,4 @@
-import { loadPyodide, PyodideInterface, PyProxy } from 'pyodide'
+import { loadPyodide, PyodideInterface } from 'pyodide'
 import { Action } from './WorkerActions'
 
 // version must match with npm package version
@@ -6,6 +6,7 @@ const BINARY_URL = 'https://cdn.jsdelivr.net/pyodide/v0.22.1/full/'
 
 let pyodide: PyodideInterface | null = null
 let inputs: Record<string, any> = {}
+let outputs: string[] = []
 const stdBuffer: string[] = []
 
 onmessage = ({ data }: MessageEvent<Action>) => {
@@ -16,6 +17,10 @@ onmessage = ({ data }: MessageEvent<Action>) => {
 	if (data.type === 'SET_INPUTS') {
 		inputs = data.payload
 	}
+
+	if (data.type === 'SET_OUTPUTS') {
+		outputs = data.payload
+	}
 }
 
 function mapSetToArray(set: Set<any>): any[] {
@@ -23,15 +28,13 @@ function mapSetToArray(set: Set<any>): any[] {
 	return newArray.map((i: any) => (i instanceof Set ? mapSetToArray(i) : i))
 }
 
-function toInseri(name: string, data: PyProxy | any) {
-	let convertedData = data
+function retrievePyObjects(name: string): [string, any] {
+	let convertedData = pyodide!.globals.get(name)
 
 	try {
-		if (pyodide?.isPyProxy(data)) {
-			convertedData = data.toJs({
-				dict_converter: Object.fromEntries,
-			})
-			data.destroy()
+		if (pyodide?.isPyProxy(convertedData)) {
+			convertedData = convertedData.toJs({ dict_converter: Object.fromEntries })
+			convertedData.destroy()
 		}
 
 		if (convertedData instanceof Set) {
@@ -39,13 +42,15 @@ function toInseri(name: string, data: PyProxy | any) {
 		}
 
 		if (pyodide?.isPyProxy(convertedData)) {
-			stdBuffer.push('not JSON serializable')
+			stdBuffer.push(name + ' is not JSON serializable')
+			return [name, null]
 		} else {
-			postMessage({ type: 'SET_OUTPUT', key: name, payload: convertedData })
+			return [name, convertedData]
 		}
 	} catch (error) {
-		const msg = error instanceof Error ? error.message : 'unknown type conversion error ocurred'
+		const msg = error instanceof Error ? error.message : name + ': unknown type conversion error ocurred'
 		stdBuffer.push(msg)
+		return [name, null]
 	}
 }
 
@@ -56,8 +61,6 @@ async function init() {
 		stderr: (msg) => stdBuffer.push(msg),
 	})
 	postMessage({ type: 'STATUS', payload: 'ready' })
-
-	pyodide.registerJsModule('inseri', { to_inseri: toInseri })
 }
 
 async function runCode(code: string) {
@@ -66,8 +69,19 @@ async function runCode(code: string) {
 			stdBuffer.splice(0, stdBuffer.length)
 			postMessage({ type: 'STATUS', payload: 'in-progress' })
 
+			Object.entries(inputs).forEach(([k, v]) => {
+				pyodide?.globals.set(k, v)
+			})
+
 			await pyodide.loadPackagesFromImports(code)
-			await pyodide.runPythonAsync(code, { globals: pyodide.toPy(inputs) })
+			await pyodide.runPythonAsync(code)
+
+			const results = outputs.map(retrievePyObjects).reduce((acc, [name, val]) => {
+				acc[name] = val
+				return acc
+			}, {} as any)
+
+			postMessage({ type: 'SET_RESULTS', payload: results })
 		}
 	} catch (error) {
 		const msg = error instanceof Error ? error.message : 'unknown error ocurred'

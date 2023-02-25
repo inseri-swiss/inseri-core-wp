@@ -10,7 +10,6 @@ export interface GlobalState extends Attributes {
 	pyWorker: Worker
 	workerStatus: 'initial' | 'ready' | 'in-progress'
 	stdStream: string
-	result: any
 	blockerr: string
 
 	isModalOpen: boolean
@@ -18,15 +17,22 @@ export interface GlobalState extends Attributes {
 	selectedMode: 'editor' | 'viewer'
 	wizardStep: number
 
-	newVarName: string
+	newInputVarName: string
+	newOutputVarName: string
+	results: Record<string, any>
 
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
 		runCode: () => void
 		terminate: () => void
+
 		addNewInput: () => void
 		chooseInput: (variable: string, beacon: ConsumerBeacon) => void
 		removeInput: (variable: string) => void
+
+		addNewOutput: () => void
+		chooseContentType: (variable: string, contentType: string) => void
+		removeOutput: (variable: string) => void
 	}
 }
 
@@ -40,6 +46,9 @@ const createWorker = (set: (nextStateOrUpdater: (state: Draft<GlobalState>) => v
 			}
 			if (data.type === 'SET_STD_STREAM') {
 				state.stdStream = data.payload
+			}
+			if (data.type === 'SET_RESULTS') {
+				state.results = data.payload
 			}
 		})
 	})
@@ -57,7 +66,6 @@ export const storeCreator = (initalState: Attributes) => {
 			pyWorker: createWorker(set),
 			workerStatus: 'initial',
 			stdStream: '',
-			result: null,
 			blockerr: '',
 
 			isModalOpen: false,
@@ -65,7 +73,10 @@ export const storeCreator = (initalState: Attributes) => {
 			selectedMode: initalState.mode ? initalState.mode : 'editor',
 			wizardStep: 0,
 
-			newVarName: '',
+			newInputVarName: '',
+			newOutputVarName: '',
+			outputContentTypes: {},
+			results: {},
 
 			actions: {
 				updateState: (modifier: Partial<GlobalState>) =>
@@ -94,8 +105,8 @@ export const storeCreator = (initalState: Attributes) => {
 
 				addNewInput: () => {
 					set((state) => {
-						state.inputs[state.newVarName!] = { key: '', contentType: '', description: '' }
-						state.newVarName = ''
+						state.inputs[state.newInputVarName!] = { key: '', contentType: '', description: '' }
+						state.newInputVarName = ''
 					})
 				},
 
@@ -108,6 +119,29 @@ export const storeCreator = (initalState: Attributes) => {
 				removeInput: (variable: string) => {
 					set((state) => {
 						delete state.inputs[variable]
+					})
+				},
+
+				addNewOutput: () => {
+					set((state) => {
+						const key = state.newOutputVarName
+						state.outputs.push({ contentType: '', description: key, key })
+						state.newOutputVarName = ''
+					})
+				},
+
+				chooseContentType: (variable: string, contentType: string) => {
+					set((state) => {
+						const found = state.outputs.find((o) => o.description === variable)
+						if (found) {
+							found.contentType = contentType
+						}
+					})
+				},
+
+				removeOutput: (variable: string) => {
+					set((state) => {
+						state.outputs = state.outputs.filter((o) => o.description !== variable)
 					})
 				},
 			},
