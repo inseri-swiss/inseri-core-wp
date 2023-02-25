@@ -6,8 +6,7 @@ const BINARY_URL = 'https://cdn.jsdelivr.net/pyodide/v0.22.1/full/'
 
 let pyodide: PyodideInterface | null = null
 let inputs: Record<string, any> = {}
-const stdoutBuffer: string[] = []
-const stderrBuffer: string[] = []
+const stdBuffer: string[] = []
 
 onmessage = ({ data }: MessageEvent<Action>) => {
 	if (data.type === 'RUN_CODE') {
@@ -40,21 +39,21 @@ function toInseri(name: string, data: PyProxy | any) {
 		}
 
 		if (pyodide?.isPyProxy(convertedData)) {
-			stderrBuffer.push('not JSON serializable')
+			stdBuffer.push('not JSON serializable')
 		} else {
 			postMessage({ type: 'SET_OUTPUT', key: name, payload: convertedData })
 		}
 	} catch (error) {
 		const msg = error instanceof Error ? error.message : 'unknown type conversion error ocurred'
-		stderrBuffer.push(msg)
+		stdBuffer.push(msg)
 	}
 }
 
 async function init() {
 	pyodide = await loadPyodide({
 		indexURL: BINARY_URL,
-		stdout: (msg) => stdoutBuffer.push(msg),
-		stderr: (msg) => stderrBuffer.push(msg),
+		stdout: (msg) => stdBuffer.push(msg),
+		stderr: (msg) => stdBuffer.push(msg),
 	})
 	postMessage({ type: 'STATUS', payload: 'ready' })
 
@@ -64,19 +63,17 @@ async function init() {
 async function runCode(code: string) {
 	try {
 		if (pyodide) {
-			stdoutBuffer.splice(0, stdoutBuffer.length)
-			stderrBuffer.splice(0, stderrBuffer.length)
-
+			stdBuffer.splice(0, stdBuffer.length)
 			postMessage({ type: 'STATUS', payload: 'in-progress' })
+
 			await pyodide.loadPackagesFromImports(code)
 			await pyodide.runPythonAsync(code, { globals: pyodide.toPy(inputs) })
 		}
 	} catch (error) {
 		const msg = error instanceof Error ? error.message : 'unknown error ocurred'
-		stderrBuffer.push(msg)
+		stdBuffer.push(msg)
 	} finally {
-		postMessage({ type: 'SET_STD_OUT', payload: stdoutBuffer.filter(Boolean).join('\n') })
-		postMessage({ type: 'SET_STD_ERR', payload: stderrBuffer.filter(Boolean).join('\n') })
+		postMessage({ type: 'SET_STD_STREAM', payload: stdBuffer.filter(Boolean).join('\n') })
 		postMessage({ type: 'STATUS', payload: 'ready' })
 	}
 }

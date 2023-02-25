@@ -6,7 +6,7 @@ import { Button, Kbd, Loader, Popover, Text, useGlobalState } from '../../compon
 import { GlobalState } from './state'
 
 export function TopBar({ showPopover }: { showPopover?: boolean }) {
-	const { label, actions, workerStatus, inputs } = useGlobalState((state: GlobalState) => state)
+	const { label, actions, workerStatus, inputs, blockerr } = useGlobalState((state: GlobalState) => state)
 	const { runCode, terminate } = actions
 	const [isPopoverOpen, { close: closePopover, open: openPopover }] = useDisclosure(false)
 
@@ -44,7 +44,12 @@ export function TopBar({ showPopover }: { showPopover?: boolean }) {
 		<>
 			{label.trim() && <Text fz={14}>{label}</Text>}
 			<div style={{ flex: 1 }} />
-			{workerStatus === 'in-progress' && <Loader p={6} />}
+			{blockerr && (
+				<Text color="red" fz={12}>
+					{blockerr}
+				</Text>
+			)}
+			{workerStatus !== 'ready' && <Loader p={6} />}
 			{workerStatus === 'in-progress' ? (
 				<Button variant="outline" onClick={terminate} leftIcon={<IconX size={20} />} color="red">
 					{__('Stop', 'inseri-core')}

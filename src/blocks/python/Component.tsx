@@ -152,9 +152,7 @@ interface ViewProps {
 
 export function PythonView(props: ViewProps) {
 	const { isGutenbergEditor, renderResizable } = props
-	const { height, editable, mode, inputCode, content, stderr, inputs, blockerr, pyWorker, blockId, blockName, outputs } = useGlobalState(
-		(state: GlobalState) => state
-	)
+	const { height, editable, mode, inputCode, content, inputs, pyWorker, blockId, blockName, outputs } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
 
@@ -228,11 +226,6 @@ export function PythonView(props: ViewProps) {
 				<TopBar />
 			</Group>
 			{renderResizable ? renderResizable(editorElement) : editorElement}
-			{(blockerr || stderr) && (
-				<Text fz={14} color="red">
-					{blockerr || stderr}
-				</Text>
-			)}
 		</Box>
 	)
 }

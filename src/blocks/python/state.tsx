@@ -9,8 +9,7 @@ export interface GlobalState extends Attributes {
 
 	pyWorker: Worker
 	workerStatus: 'initial' | 'ready' | 'in-progress'
-	stdout: string
-	stderr: string
+	stdStream: string
 	result: any
 	blockerr: string
 
@@ -39,11 +38,8 @@ const createWorker = (set: (nextStateOrUpdater: (state: Draft<GlobalState>) => v
 			if (data.type === 'STATUS') {
 				state.workerStatus = data.payload
 			}
-			if (data.type === 'SET_STD_ERR') {
-				state.stderr = data.payload
-			}
-			if (data.type === 'SET_STD_OUT') {
-				state.stdout = data.payload
+			if (data.type === 'SET_STD_STREAM') {
+				state.stdStream = data.payload
 			}
 		})
 	})
@@ -60,8 +56,7 @@ export const storeCreator = (initalState: Attributes) => {
 
 			pyWorker: createWorker(set),
 			workerStatus: 'initial',
-			stderr: '',
-			stdout: '',
+			stdStream: '',
 			result: null,
 			blockerr: '',
 
@@ -82,8 +77,7 @@ export const storeCreator = (initalState: Attributes) => {
 
 				runCode: () => {
 					set((state) => {
-						state.stderr = ''
-						state.stdout = ''
+						state.stdStream = ''
 					})
 
 					const { pyWorker, content } = get()
