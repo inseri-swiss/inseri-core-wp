@@ -6,13 +6,14 @@ import { Button, Kbd, Loader, Popover, Text, useGlobalState } from '../../compon
 import { GlobalState } from './state'
 
 export function TopBar({ showPopover }: { showPopover?: boolean }) {
-	const { label, actions, workerStatus, inputs, blockerr } = useGlobalState((state: GlobalState) => state)
+	const { label, actions, workerStatus, inputs, blockerr, outputs } = useGlobalState((state: GlobalState) => state)
 	const { runCode, terminate } = actions
 	const [isPopoverOpen, { close: closePopover, open: openPopover }] = useDisclosure(false)
 
 	const watchedValues = useWatchMany(inputs)
 	const areWatchedValuesReady = Object.values(watchedValues).reduce((acc, item) => acc && item.status === 'ready', true)
-	const isReady = areWatchedValuesReady && workerStatus !== 'initial'
+	const areOutputsReady = outputs.every((o) => o.contentType !== '')
+	const isReady = areWatchedValuesReady && areOutputsReady && workerStatus !== 'initial'
 
 	const primaryButton = showPopover ? (
 		<Popover position="top" withArrow shadow="md" opened={isPopoverOpen}>

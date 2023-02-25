@@ -1,4 +1,4 @@
-import { dispatch, useAvailableBeacons, useControlTower, useDispatchMany, useWatch, useWatchMany } from '@inseri/lighthouse'
+import { useAvailableBeacons, useControlTower, useDispatchMany, useWatch, useWatchMany } from '@inseri/lighthouse'
 import { IconBrandPython, IconChevronLeft } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -160,24 +160,36 @@ export function PythonView(props: ViewProps) {
 	const watchedValues = useWatchMany(inputs)
 	const watchedValuesIndicator = Object.values(watchedValues).reduce((acc, item) => acc + (item ? JSON.stringify(item).length : 0), 0)
 	const areWatchedValuesReady = Object.values(watchedValues).reduce((acc, item) => acc && item.status === 'ready', true)
+	const joinedOutputKeys = outputs.map((o) => o.description).join('')
+	const areOutputsReady = outputs.every((o) => o.contentType !== '')
 
 	useEffect(() => {
 		if (!areWatchedValuesReady) {
 			updateState({ blockerr: 'Inputs are not ready' })
-			return
+		} else if (!areOutputsReady) {
+			updateState({ blockerr: 'Content type is not set for all outputs' })
+		} else {
+			updateState({ blockerr: '' })
 		}
+	}, [areWatchedValuesReady, areOutputsReady])
 
-		updateState({ blockerr: '' })
+	useEffect(() => {
+		if (areWatchedValuesReady) {
+			const watchedInputs = Object.entries(watchedValues).reduce((acc, [variable, watched]) => {
+				acc[variable] = watched.value
+				return acc
+			}, {} as any)
 
-		const watchedInputs = Object.entries(watchedValues).reduce((acc, [variable, watched]) => {
-			acc[variable] = watched.value
-			return acc
-		}, {} as any)
-
-		pyWorker.postMessage({ type: 'SET_INPUTS', payload: watchedInputs })
+			pyWorker.postMessage({ type: 'SET_INPUTS', payload: watchedInputs })
+		}
 	}, [watchedValuesIndicator, areWatchedValuesReady])
 
+	useEffect(() => {
+		pyWorker.postMessage({ type: 'SET_OUTPUTS', payload: outputs.map((o) => o.description) })
+	}, [joinedOutputKeys])
+
 	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, outputs)
+	const joinedOutputTypes = outputs.map((o) => o.contentType).join('')
 	const joinedKeys = outputs.reduce((acc, b) => acc + b.key, '')
 
 	useEffect(() => {
@@ -186,15 +198,17 @@ export function PythonView(props: ViewProps) {
 
 	const dispatchRecord = useDispatchMany(producersBeacons)
 
+	useEffect(() => {
+		outputs.forEach((o) => {
+			dispatchRecord[o.description]({ contentType: o.contentType })
+		})
+	}, [joinedOutputTypes])
+
 	pyWorker.addEventListener('message', ({ data }: MessageEvent<Action>) => {
-		if (data.type === 'SET_OUTPUT') {
-			const key = data.key
-			if (dispatchRecord[key]) {
-				dispatchRecord[key]({ status: 'ready', value: data.payload })
-			} else {
-				dispatch(`${blockId}/${key}`, { status: 'ready', value: data.payload }, { contentType: 'application/json', description: '', key: '' })
-				updateState({ outputs: outputs.concat({ contentType: 'application/json', description: key, key }) })
-			}
+		if (data.type === 'SET_RESULTS') {
+			Object.entries(data.payload).forEach(([key, val]) => {
+				dispatchRecord[key]({ status: 'ready', value: val })
+			})
 		}
 	})
 

@@ -5,23 +5,33 @@ import { useRef, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Allotment, AllotmentHandle } from 'allotment'
 import { ActionIcon, Box, Button, CodeEditor, Group, Modal, SelectWithAction, Stack, Text, TextInput, useGlobalState } from '../../components'
-import { isVariableValid, Z_INDEX_ABOVE_ADMIN } from '../../utils'
+import { COMMON_CONTENT_TYPES, isVariableValid, Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import { GlobalState } from './state'
 import { TopBar } from './TopBar'
 
+const isReadyForCreate = (varName: string, keys: string[]): boolean => {
+	const nameIsNotUsed = !keys.includes(varName)
+	const isVariableNameValid = isVariableValid(varName) && nameIsNotUsed
+	return isVariableNameValid && varName.length > 0
+}
+
 export function ExtendedView() {
-	const { blockId, blockName, actions, isModalOpen, content, stdStream, newVarName, inputs } = useGlobalState((state: GlobalState) => state)
-	const { updateState, runCode, addNewInput, chooseInput, removeInput } = actions
+	const { blockId, blockName, actions, isModalOpen, content, stdStream, newInputVarName, newOutputVarName, inputs, outputs } = useGlobalState(
+		(state: GlobalState) => state
+	)
+	const { updateState, runCode, addNewInput, chooseInput, removeInput, addNewOutput, chooseContentType, removeOutput } = actions
 	const [isEditorVisible, setEditorVisible] = useState(true)
 	const [isInputsVisible, setInputsVisible] = useState(true)
 	const [isOutputsVisible, setOutputsVisible] = useState(true)
 	const sidebarHandleRef = useRef<AllotmentHandle>(null)
 
-	const nameIsNotUsed = !Object.keys(inputs).includes(newVarName)
-	const isVariableNameValid = isVariableValid(newVarName) && nameIsNotUsed
-	const isReadyForCreate = isVariableNameValid && newVarName.length > 0
+	const isNewInputNameReady = isReadyForCreate(newInputVarName, Object.keys(inputs))
+	const isNewOutputNameReady = isReadyForCreate(
+		newOutputVarName,
+		outputs.map((i) => i.description)
+	)
 
-	const availableBeacons = useAvailableBeacons('application/json')
+	const availableBeacons = useAvailableBeacons()
 	const selectData = Object.keys(availableBeacons)
 		.filter((k) => !k.startsWith(blockId + '/'))
 		.map((k) => ({ label: availableBeacons[k].description, value: k }))
@@ -133,11 +143,11 @@ export function ExtendedView() {
 											<TextInput
 												mt="sm"
 												placeholder={__('Enter variable name', 'inseri-core')}
-												value={newVarName}
-												onChange={(e) => updateState({ newVarName: e.currentTarget.value })}
-												error={!isVariableNameValid && __('invalid name', 'inseri-core')}
+												value={newInputVarName}
+												onChange={(e) => updateState({ newInputVarName: e.currentTarget.value })}
+												error={newInputVarName && !isNewInputNameReady && __('invalid name', 'inseri-core')}
 												rightSection={
-													<ActionIcon title="Create" disabled={!isReadyForCreate} onClick={addNewInput}>
+													<ActionIcon title="Create" disabled={!isNewInputNameReady} onClick={addNewInput}>
 														<IconPlus size={16} />
 													</ActionIcon>
 												}
@@ -164,28 +174,28 @@ export function ExtendedView() {
 										<Text fz={14}>{__('Outputs to Blocks', 'inseri-core')}</Text>
 									</Button>
 									<Stack p="sm" style={{ overflow: 'auto' }}>
-										{Object.keys(inputs).map((varName) => (
+										{outputs.map(({ description: varName, contentType }) => (
 											<SelectWithAction
 												key={varName}
 												label={varName}
-												placeholder="Choose a block source"
+												placeholder="Choose content type"
 												title="Remove variable"
-												value={inputs[varName].key}
-												onChange={(key) => chooseInput(varName, availableBeacons[key!])}
-												onClick={() => removeInput(varName)}
+												value={contentType}
+												onChange={(newContentType) => chooseContentType(varName, newContentType ?? '')}
+												onClick={() => removeOutput(varName)}
 												icon={<IconX size={16} />}
-												data={selectData}
+												data={COMMON_CONTENT_TYPES}
 											/>
 										))}
 
 										<TextInput
 											mt="sm"
 											placeholder={__('Enter variable name', 'inseri-core')}
-											value={newVarName}
-											onChange={(e) => updateState({ newVarName: e.currentTarget.value })}
-											error={!isVariableNameValid && __('invalid name', 'inseri-core')}
+											value={newOutputVarName}
+											onChange={(e) => updateState({ newOutputVarName: e.currentTarget.value })}
+											error={newOutputVarName && !isNewOutputNameReady && __('invalid name', 'inseri-core')}
 											rightSection={
-												<ActionIcon title="Create" disabled={!isReadyForCreate} onClick={addNewInput}>
+												<ActionIcon title="Create" disabled={!isNewOutputNameReady} onClick={addNewOutput}>
 													<IconPlus size={16} />
 												</ActionIcon>
 											}

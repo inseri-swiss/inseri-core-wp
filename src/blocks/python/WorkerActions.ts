@@ -11,11 +11,13 @@ export interface SetInputs {
 	type: 'SET_INPUTS'
 	payload: Record<string, any>
 }
-
-export interface SetOutput {
-	type: 'SET_OUTPUT'
-	key: string
-	payload: any
+export interface SetOutputs {
+	type: 'SET_OUTPUTS'
+	payload: string[]
+}
+export interface SetResults {
+	type: 'SET_RESULTS'
+	payload: Record<string, any>
 }
 
 export interface SetStatus {
@@ -23,4 +25,4 @@ export interface SetStatus {
 	payload: 'initial' | 'ready' | 'in-progress'
 }
 
-export type Action = RunCode | SetStdStream | SetInputs | SetOutput | SetStatus
+export type Action = RunCode | SetStdStream | SetInputs | SetOutputs | SetStatus | SetResults
