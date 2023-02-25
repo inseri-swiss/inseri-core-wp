@@ -3,16 +3,10 @@ export interface RunCode {
 	payload: string
 }
 
-export interface SetStdOut {
-	type: 'SET_STD_OUT'
+export interface SetStdStream {
+	type: 'SET_STD_STREAM'
 	payload: string
 }
-
-export interface SetStdErr {
-	type: 'SET_STD_ERR'
-	payload: string
-}
-
 export interface SetInputs {
 	type: 'SET_INPUTS'
 	payload: Record<string, any>
@@ -29,4 +23,4 @@ export interface SetStatus {
 	payload: 'initial' | 'ready' | 'in-progress'
 }
 
-export type Action = RunCode | SetStdOut | SetStdErr | SetInputs | SetOutput | SetStatus
+export type Action = RunCode | SetStdStream | SetInputs | SetOutput | SetStatus
