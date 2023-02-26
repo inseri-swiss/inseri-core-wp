@@ -125,8 +125,8 @@ export function ExtendedView() {
 									>
 										<Text fz={14}>{__('Inputs from Blocks', 'inseri-core')}</Text>
 									</Button>
-									{isInputsVisible && (
-										<Stack p="sm" style={{ overflow: 'auto' }}>
+									<div style={{ overflow: 'auto', height: '100%' }}>
+										<Stack p="sm">
 											{Object.keys(inputs).map((varName) => (
 												<SelectWithAction
 													key={varName}
@@ -138,6 +138,7 @@ export function ExtendedView() {
 													onClick={() => removeInput(varName)}
 													icon={<IconX size={16} />}
 													data={selectData}
+													maxDropdownHeight={150}
 												/>
 											))}
 
@@ -153,7 +154,7 @@ export function ExtendedView() {
 												}
 											/>
 										</Stack>
-									)}
+									</div>
 								</Stack>
 							</Allotment.Pane>
 							<Allotment.Pane preferredSize={'50%'} minSize={36}>
@@ -173,33 +174,36 @@ export function ExtendedView() {
 									>
 										<Text fz={14}>{__('Outputs to Blocks', 'inseri-core')}</Text>
 									</Button>
-									<Stack p="sm" style={{ overflow: 'auto' }}>
-										{outputs.map(({ description: varName, contentType }) => (
-											<SelectWithAction
-												key={varName}
-												label={varName}
-												placeholder="Choose content type"
-												title="Remove variable"
-												value={contentType}
-												onChange={(newContentType) => chooseContentType(varName, newContentType ?? '')}
-												onClick={() => removeOutput(varName)}
-												icon={<IconX size={16} />}
-												data={COMMON_CONTENT_TYPES}
-											/>
-										))}
+									<div style={{ overflow: 'auto', height: '100%' }}>
+										<Stack p="sm">
+											{outputs.map(({ description: varName, contentType }) => (
+												<SelectWithAction
+													key={varName}
+													label={varName}
+													placeholder="Choose content type"
+													title="Remove variable"
+													value={contentType}
+													onChange={(newContentType) => chooseContentType(varName, newContentType ?? '')}
+													onClick={() => removeOutput(varName)}
+													icon={<IconX size={16} />}
+													data={COMMON_CONTENT_TYPES}
+													maxDropdownHeight={150}
+												/>
+											))}
 
-										<TextInput
-											placeholder={__('Enter variable name', 'inseri-core')}
-											value={newOutputVarName}
-											onChange={(e) => updateState({ newOutputVarName: e.currentTarget.value })}
-											error={newOutputVarName && !isNewOutputNameReady && __('invalid name', 'inseri-core')}
-											rightSection={
-												<ActionIcon title="Create" disabled={!isNewOutputNameReady} onClick={addNewOutput}>
-													<IconPlus size={16} />
-												</ActionIcon>
-											}
-										/>
-									</Stack>
+											<TextInput
+												placeholder={__('Enter variable name', 'inseri-core')}
+												value={newOutputVarName}
+												onChange={(e) => updateState({ newOutputVarName: e.currentTarget.value })}
+												error={newOutputVarName && !isNewOutputNameReady && __('invalid name', 'inseri-core')}
+												rightSection={
+													<ActionIcon title="Create" disabled={!isNewOutputNameReady} onClick={addNewOutput}>
+														<IconPlus size={16} />
+													</ActionIcon>
+												}
+											/>
+										</Stack>
+									</div>
 								</Stack>
 							</Allotment.Pane>
 						</Allotment>
