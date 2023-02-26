@@ -17,10 +17,21 @@ const isReadyForCreate = (varName: string, keys: string[]): boolean => {
 }
 
 export function ExtendedView() {
-	const { blockId, blockName, actions, isModalOpen, content, stdStream, newInputVarName, newOutputVarName, inputs, outputs, inputCode, mode } = useGlobalState(
-		(state: GlobalState) => state
-	)
-	const { updateState, runCode, addNewInput, chooseInput, removeInput, addNewOutput, chooseContentType, removeOutput } = actions
+	const {
+		blockId,
+		blockName,
+		actions: stateActions,
+		isModalOpen,
+		content,
+		stdStream,
+		newInputVarName,
+		newOutputVarName,
+		inputs,
+		outputs,
+		inputCode,
+		mode,
+	} = useGlobalState((state: GlobalState) => state)
+	const { updateState, runCode, addNewInput, chooseInput, removeInput, addNewOutput, chooseContentType, removeOutput } = stateActions
 	const [isEditorVisible, setEditorVisible] = useState(true)
 	const [isInputsVisible, setInputsVisible] = useState(true)
 	const [isOutputsVisible, setOutputsVisible] = useState(true)

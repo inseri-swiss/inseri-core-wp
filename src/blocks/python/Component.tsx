@@ -3,7 +3,7 @@ import { usePrevious } from '@mantine/hooks'
 import { IconBrandPython, IconChevronLeft } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
+import { Button as WPButton, PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit, external } from '@wordpress/icons'
@@ -74,6 +74,13 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 			</BlockControls>
 			<InspectorControls key="setting">
 				<PanelBody>
+					<PanelRow>
+						<Box mb="sm">
+							<WPButton icon={external} variant="primary" onClick={() => updateState({ isModalOpen: true })}>
+								{__('Open extended view', 'inseri-core')}
+							</WPButton>
+						</Box>
+					</PanelRow>
 					<PanelRow>
 						<TextControl label="Block Name" value={blockName} onChange={(value) => updateState({ blockName: value })} />
 					</PanelRow>
