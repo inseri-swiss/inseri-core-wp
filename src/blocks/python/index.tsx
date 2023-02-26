@@ -24,6 +24,8 @@ export interface Attributes {
 	content: string
 	label: string
 	mode: 'editor' | 'viewer' | ''
+	isVisible: boolean
+	autoTrigger: boolean
 }
 
 function Edit(props: BlockEditProps<Attributes>) {

@@ -50,6 +50,14 @@
 		"label": {
 			"type": "string",
 			"default": ""
+		},
+		"isVisible": {
+			"type": "boolean",
+			"default": true
+		},
+		"autoTrigger": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
