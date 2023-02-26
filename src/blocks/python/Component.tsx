@@ -207,6 +207,13 @@ export function PythonView(props: ViewProps) {
 	pyWorker.addEventListener('message', ({ data }: MessageEvent<Action>) => {
 		if (data.type === 'SET_RESULTS') {
 			Object.entries(data.payload).forEach(([key, val]) => {
+				let convertedData = val
+
+				if (convertedData instanceof Uint8Array) {
+					const found = outputs.find((o) => o.description === key)
+					convertedData = new Blob([convertedData.buffer], { type: found!.contentType })
+				}
+
 				dispatchRecord[key]({ status: 'ready', value: val })
 			})
 		}
