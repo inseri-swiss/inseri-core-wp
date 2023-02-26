@@ -5,7 +5,12 @@ import { __ } from '@wordpress/i18n'
 import { Button, Kbd, Loader, Popover, Text, useGlobalState } from '../../components'
 import { GlobalState } from './state'
 
-export function TopBar({ showPopover }: { showPopover?: boolean }) {
+interface Props {
+	code: string
+	showPopover?: boolean
+}
+
+export function TopBar({ code, showPopover }: Props) {
 	const { label, actions, workerStatus, inputs, blockerr, outputs } = useGlobalState((state: GlobalState) => state)
 	const { runCode, terminate } = actions
 	const [isPopoverOpen, { close: closePopover, open: openPopover }] = useDisclosure(false)
@@ -23,7 +28,7 @@ export function TopBar({ showPopover }: { showPopover?: boolean }) {
 					leftIcon={<IconPlayerPlay size={18} />}
 					onMouseEnter={openPopover}
 					onMouseLeave={closePopover}
-					onClick={runCode}
+					onClick={() => runCode(code)}
 					disabled={!isReady}
 				>
 					{__('Run', 'inseri-core')}
@@ -36,7 +41,7 @@ export function TopBar({ showPopover }: { showPopover?: boolean }) {
 			</Popover.Dropdown>
 		</Popover>
 	) : (
-		<Button variant="filled" leftIcon={<IconPlayerPlay size={18} />} onClick={runCode} disabled={!isReady}>
+		<Button variant="filled" leftIcon={<IconPlayerPlay size={18} />} onClick={() => runCode(code)} disabled={!isReady}>
 			{__('Run', 'inseri-core')}
 		</Button>
 	)

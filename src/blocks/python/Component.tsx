@@ -253,10 +253,18 @@ export function PythonView(props: ViewProps) {
 		}
 	})
 
+	let preparedValue = value
+
+	if ((status !== 'ready' && status !== 'initial') || !preparedValue) {
+		preparedValue = ''
+	}
+
+	const code = mode === 'viewer' ? preparedValue : content
+
 	// must be the last useEffect
 	useEffect(() => {
 		if (autoTrigger && areWatchedValuesReady && areOutputsReady && workerStatus === 'ready' && prevWorkerStatus !== 'in-progress') {
-			runCode()
+			runCode(code)
 		}
 	}, [
 		areWatchedValuesReady,
@@ -266,32 +274,23 @@ export function PythonView(props: ViewProps) {
 		workerStatus,
 	])
 
-	let preparedValue = value
-
-	if ((status !== 'ready' && status !== 'initial') || !preparedValue) {
-		preparedValue = ''
-	}
-
-	const editorElement =
-		mode === 'viewer' ? (
-			<CodeEditor height={height} type={'python'} value={preparedValue} />
-		) : (
-			<CodeEditor
-				height={height}
-				type={'python'}
-				value={content}
-				onChange={(val) => {
-					if (isEditable) {
-						updateState({ content: val })
-					}
-				}}
-			/>
-		)
+	const editorElement = (
+		<CodeEditor
+			height={height}
+			type={'python'}
+			value={code}
+			onChange={(val) => {
+				if (isEditable && mode === 'editor') {
+					updateState({ content: val })
+				}
+			}}
+		/>
+	)
 
 	return isVisible || isSelected ? (
 		<Box p="md">
 			<Group position="apart" mb={4} pl="sm" spacing="xs">
-				<TopBar />
+				<TopBar code={code} />
 			</Group>
 			{renderResizable ? renderResizable(editorElement) : editorElement}
 		</Box>
