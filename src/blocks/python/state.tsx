@@ -19,7 +19,6 @@ export interface GlobalState extends Attributes {
 
 	newInputVarName: string
 	newOutputVarName: string
-	results: Record<string, any>
 
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
@@ -47,9 +46,6 @@ const createWorker = (set: (nextStateOrUpdater: (state: Draft<GlobalState>) => v
 			if (data.type === 'SET_STD_STREAM') {
 				state.stdStream = data.payload
 			}
-			if (data.type === 'SET_RESULTS') {
-				state.results = data.payload
-			}
 		})
 	})
 
@@ -76,7 +72,6 @@ export const storeCreator = (initalState: Attributes) => {
 			newInputVarName: '',
 			newOutputVarName: '',
 			outputContentTypes: {},
-			results: {},
 
 			actions: {
 				updateState: (modifier: Partial<GlobalState>) =>

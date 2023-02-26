@@ -1,4 +1,5 @@
 import { useAvailableBeacons, useControlTower, useDispatchMany, useWatch, useWatchMany } from '@inseri/lighthouse'
+import { usePrevious } from '@mantine/hooks'
 import { IconBrandPython, IconChevronLeft } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -17,9 +18,8 @@ import { Action } from './WorkerActions'
 export function PythonEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { inputCode, label, mode, blockId, blockName, editable, isWizardMode, selectedMode, wizardStep, actions, isModalOpen } = useGlobalState(
-		(state: GlobalState) => state
-	)
+	const { inputCode, label, mode, blockId, blockName, editable, isWizardMode, selectedMode, wizardStep, actions, isModalOpen, isVisible, autoTrigger } =
+		useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
 	const isValueSet = mode === 'editor' || (!!mode && inputCode.key)
 	const inputBeaconKey = inputCode.key
@@ -80,10 +80,40 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 					<PanelRow>
 						<TextControl label="Label" value={label} onChange={(value) => updateState({ label: value })} />
 					</PanelRow>
-					{mode === 'editor' && (
+					<PanelRow>
+						<ToggleControl
+							label={__('Show block', 'inseri-core')}
+							help={isVisible ? __('Block is visible.', 'inseri-core') : __('Block is invisible.', 'inseri-core')}
+							checked={isVisible}
+							onChange={(newVisibility) => {
+								updateState({ isVisible: newVisibility })
+								if (!newVisibility) {
+									updateState({ autoTrigger: true })
+								}
+							}}
+						/>
+					</PanelRow>
+					<PanelRow>
+						<ToggleControl
+							label={__('Execute automatically', 'inseri-core')}
+							help={
+								autoTrigger
+									? __('Code is executed initially and on changes of inputs.', 'inseri-core')
+									: __('Code needs to be executed manually.', 'inseri-core')
+							}
+							checked={autoTrigger}
+							onChange={(newTriggerState) => {
+								if (isVisible) {
+									updateState({ autoTrigger: newTriggerState })
+								}
+							}}
+						/>
+					</PanelRow>
+					{mode === 'editor' && isVisible && (
 						<PanelRow>
 							<ToggleControl
 								label={__('publicly editable', 'inseri-core')}
+								help={editable ? __('Code is editable by anyone.', 'inseri-core') : __('Code cannot be modified by anyone.', 'inseri-core')}
 								checked={editable}
 								onChange={() => {
 									updateState({ editable: !editable })
@@ -138,7 +168,7 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 					)}
 				</Box>
 			) : (
-				<PythonView {...props} isGutenbergEditor renderResizable={renderResizable} />
+				<PythonView {...props} isGutenbergEditor renderResizable={renderResizable} isSelected={isSelected} />
 			)}
 		</>
 	)
@@ -147,14 +177,18 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 interface ViewProps {
 	attributes: Readonly<Attributes>
 	isGutenbergEditor?: boolean
+	isSelected?: boolean
 	renderResizable?: (EditorComponent: JSX.Element) => JSX.Element
 }
 
 export function PythonView(props: ViewProps) {
-	const { isGutenbergEditor, renderResizable } = props
-	const { height, editable, mode, inputCode, content, inputs, pyWorker, blockId, blockName, outputs } = useGlobalState((state: GlobalState) => state)
-	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
+	const { isGutenbergEditor, isSelected, renderResizable } = props
+	const { height, editable, mode, inputCode, content, inputs, pyWorker, blockId, blockName, outputs, isVisible, autoTrigger, workerStatus } = useGlobalState(
+		(state: GlobalState) => state
+	)
+	const { updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
+	const prevWorkerStatus = usePrevious(workerStatus)
 
 	const { value, status } = useWatch(inputCode)
 	const watchedValues = useWatchMany(inputs)
@@ -180,7 +214,7 @@ export function PythonView(props: ViewProps) {
 				return acc
 			}, {} as any)
 
-			pyWorker.postMessage({ type: 'SET_INPUTS', payload: watchedInputs })
+			setTimeout(() => pyWorker.postMessage({ type: 'SET_INPUTS', payload: watchedInputs }), 10000)
 		}
 	}, [watchedValuesIndicator, areWatchedValuesReady])
 
@@ -219,6 +253,19 @@ export function PythonView(props: ViewProps) {
 		}
 	})
 
+	// must be the last useEffect
+	useEffect(() => {
+		if (autoTrigger && areWatchedValuesReady && areOutputsReady && workerStatus === 'ready' && prevWorkerStatus !== 'in-progress') {
+			runCode()
+		}
+	}, [
+		areWatchedValuesReady,
+		areOutputsReady,
+		watchedValuesIndicator,
+		content,
+		workerStatus,
+	])
+
 	let preparedValue = value
 
 	if ((status !== 'ready' && status !== 'initial') || !preparedValue) {
@@ -241,12 +288,27 @@ export function PythonView(props: ViewProps) {
 			/>
 		)
 
-	return (
+	return isVisible || isSelected ? (
 		<Box p="md">
 			<Group position="apart" mb={4} pl="sm" spacing="xs">
 				<TopBar />
 			</Group>
 			{renderResizable ? renderResizable(editorElement) : editorElement}
 		</Box>
+	) : isGutenbergEditor ? (
+		<Box
+			style={{
+				height: height + 36 /* button */ + 32 /* padding */ + 4 /* marginBottom of button*/,
+				border: '1px dashed currentcolor',
+				borderRadius: '2px',
+			}}
+		>
+			<Box />
+			<svg width="100%" height="100%">
+				<line strokeDasharray="3" x1="0" y1="0" x2="100%" y2="100%" style={{ stroke: 'currentColor' }} />
+			</svg>
+		</Box>
+	) : (
+		<div />
 	)
 }

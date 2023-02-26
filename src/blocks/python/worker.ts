@@ -9,6 +9,8 @@ let inputs: Record<string, any> = {}
 let outputs: string[] = []
 const stdBuffer: string[] = []
 
+let areInputsInitiated = false
+
 onmessage = ({ data }: MessageEvent<Action>) => {
 	if (data.type === 'RUN_CODE') {
 		runCode(data.payload)
@@ -16,6 +18,11 @@ onmessage = ({ data }: MessageEvent<Action>) => {
 
 	if (data.type === 'SET_INPUTS') {
 		inputs = data.payload
+
+		if (!areInputsInitiated) {
+			areInputsInitiated = true
+			postMessage({ type: 'STATUS', payload: 'ready' })
+		}
 	}
 
 	if (data.type === 'SET_OUTPUTS') {
@@ -61,7 +68,10 @@ async function init() {
 		stdout: (msg) => stdBuffer.push(msg),
 		stderr: (msg) => stdBuffer.push(msg),
 	})
-	postMessage({ type: 'STATUS', payload: 'ready' })
+
+	if (areInputsInitiated) {
+		postMessage({ type: 'STATUS', payload: 'ready' })
+	}
 }
 
 async function runCode(code: string) {
