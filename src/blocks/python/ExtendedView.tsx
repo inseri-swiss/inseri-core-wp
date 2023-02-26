@@ -1,4 +1,4 @@
-import { useAvailableBeacons } from '@inseri/lighthouse'
+import { useAvailableBeacons, useWatch } from '@inseri/lighthouse'
 import { useHotkeys } from '@mantine/hooks'
 import { IconChevronDown, IconChevronRight, IconChevronUp, IconPlus, IconX } from '@tabler/icons'
 import { useRef, useState } from '@wordpress/element'
@@ -17,7 +17,7 @@ const isReadyForCreate = (varName: string, keys: string[]): boolean => {
 }
 
 export function ExtendedView() {
-	const { blockId, blockName, actions, isModalOpen, content, stdStream, newInputVarName, newOutputVarName, inputs, outputs } = useGlobalState(
+	const { blockId, blockName, actions, isModalOpen, content, stdStream, newInputVarName, newOutputVarName, inputs, outputs, inputCode, mode } = useGlobalState(
 		(state: GlobalState) => state
 	)
 	const { updateState, runCode, addNewInput, chooseInput, removeInput, addNewOutput, chooseContentType, removeOutput } = actions
@@ -32,14 +32,24 @@ export function ExtendedView() {
 		outputs.map((i) => i.description)
 	)
 
+	const isViewerMode = mode === 'viewer'
 	const availableBeacons = useAvailableBeacons()
 	const selectData = Object.keys(availableBeacons)
 		.filter((k) => !k.startsWith(blockId + '/'))
 		.map((k) => ({ label: availableBeacons[k].description, value: k }))
 
+	const { value, status } = useWatch(inputCode)
+	let preparedValue = value
+
+	if ((status !== 'ready' && status !== 'initial') || !preparedValue) {
+		preparedValue = ''
+	}
+
+	const code = isViewerMode ? preparedValue : content
+
 	useHotkeys([
 		['Escape', () => updateState({ isModalOpen: false })],
-		['mod+Enter', runCode],
+		['mod+Enter', () => runCode(code)],
 	])
 
 	return (
@@ -67,18 +77,20 @@ export function ExtendedView() {
 						<Allotment.Pane minSize={54} visible={isEditorVisible}>
 							<Stack bg={'#fff'} style={{ height: '100%' }} spacing={0}>
 								<Group px="sm" py="xs" position="apart" style={{ borderBottom: '2px solid #ced4da', height: '54px' }} spacing="xs">
-									<TopBar showPopover />
+									<TopBar code={code} showPopover />
 								</Group>
 								<CodeEditor
 									withBorder={false}
 									type={'python'}
-									value={content}
+									value={code}
 									onChange={(val) => {
-										updateState({ content: val })
+										if (mode === 'editor') {
+											updateState({ content: val })
+										}
 									}}
 									onKeyDown={(event) => {
 										if ((event.ctrlKey || event.metaKey) && event.code === 'Enter') {
-											runCode()
+											runCode(code)
 											event.stopPropagation()
 										}
 									}}

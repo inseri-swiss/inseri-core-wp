@@ -22,7 +22,7 @@ export interface GlobalState extends Attributes {
 
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
-		runCode: () => void
+		runCode: (code: string) => void
 		terminate: () => void
 
 		addNewInput: () => void
@@ -81,13 +81,13 @@ export const storeCreator = (initalState: Attributes) => {
 						})
 					}),
 
-				runCode: () => {
+				runCode: (code: string) => {
 					set((state) => {
 						state.stdStream = ''
 					})
 
-					const { pyWorker, content } = get()
-					pyWorker.postMessage({ type: 'RUN_CODE', payload: content })
+					const { pyWorker } = get()
+					pyWorker.postMessage({ type: 'RUN_CODE', payload: code })
 				},
 
 				terminate: () => {
