@@ -70,8 +70,13 @@ async function runCode(code: string) {
 			stdBuffer.splice(0, stdBuffer.length)
 			postMessage({ type: 'STATUS', payload: 'in-progress' })
 
-			Object.entries(inputs).forEach(([k, v]) => {
-				pyodide?.globals.set(k, pyodide.toPy(v))
+			Object.entries(inputs).forEach(async ([k, v]) => {
+				let convertedData = v
+				if (convertedData instanceof Blob) {
+					convertedData = await convertedData.arrayBuffer()
+				}
+
+				pyodide?.globals.set(k, pyodide.toPy(convertedData))
 			})
 
 			await pyodide.loadPackagesFromImports(code)
