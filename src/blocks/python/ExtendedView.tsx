@@ -3,7 +3,8 @@ import { useHotkeys } from '@mantine/hooks'
 import { IconChevronDown, IconChevronRight, IconChevronUp, IconPlus, IconX } from '@tabler/icons'
 import { useRef, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Allotment, AllotmentHandle } from 'allotment'
+import type { AllotmentHandle } from 'allotment'
+import { Allotment } from 'allotment'
 import { ActionIcon, Box, Button, CodeEditor, Group, Modal, SelectWithAction, Stack, Text, TextInput, useGlobalState } from '../../components'
 import { COMMON_CONTENT_TYPES, isVariableValid, Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import { GlobalState } from './state'
@@ -141,7 +142,6 @@ export function ExtendedView() {
 											))}
 
 											<TextInput
-												mt="sm"
 												placeholder={__('Enter variable name', 'inseri-core')}
 												value={newInputVarName}
 												onChange={(e) => updateState({ newInputVarName: e.currentTarget.value })}
@@ -189,7 +189,6 @@ export function ExtendedView() {
 										))}
 
 										<TextInput
-											mt="sm"
 											placeholder={__('Enter variable name', 'inseri-core')}
 											value={newOutputVarName}
 											onChange={(e) => updateState({ newOutputVarName: e.currentTarget.value })}
