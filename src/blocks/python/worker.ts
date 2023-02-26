@@ -29,12 +29,13 @@ function mapSetToArray(set: Set<any>): any[] {
 }
 
 function retrievePyObjects(name: string): [string, any] {
-	let convertedData = pyodide!.globals.get(name)
+	const data = pyodide!.globals.get(name)
+	let convertedData = data
 
 	try {
-		if (pyodide?.isPyProxy(convertedData)) {
-			convertedData = convertedData.toJs({ dict_converter: Object.fromEntries })
-			convertedData.destroy()
+		if (pyodide?.isPyProxy(data)) {
+			convertedData = data.toJs({ dict_converter: Object.fromEntries })
+			data.destroy()
 		}
 
 		if (convertedData instanceof Set) {
@@ -44,9 +45,9 @@ function retrievePyObjects(name: string): [string, any] {
 		if (pyodide?.isPyProxy(convertedData)) {
 			stdBuffer.push(name + ' is not JSON serializable')
 			return [name, null]
-		} else {
-			return [name, convertedData]
 		}
+
+		return [name, convertedData]
 	} catch (error) {
 		const msg = error instanceof Error ? error.message : name + ': unknown type conversion error ocurred'
 		stdBuffer.push(msg)
@@ -70,7 +71,7 @@ async function runCode(code: string) {
 			postMessage({ type: 'STATUS', payload: 'in-progress' })
 
 			Object.entries(inputs).forEach(([k, v]) => {
-				pyodide?.globals.set(k, v)
+				pyodide?.globals.set(k, pyodide.toPy(v))
 			})
 
 			await pyodide.loadPackagesFromImports(code)
