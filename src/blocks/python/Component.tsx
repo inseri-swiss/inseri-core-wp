@@ -221,7 +221,7 @@ export function PythonView(props: ViewProps) {
 				return acc
 			}, {} as any)
 
-			setTimeout(() => pyWorker.postMessage({ type: 'SET_INPUTS', payload: watchedInputs }), 10000)
+			pyWorker.postMessage({ type: 'SET_INPUTS', payload: watchedInputs })
 		}
 	}, [watchedValuesIndicator, areWatchedValuesReady])
 
