@@ -6,6 +6,7 @@ export interface GlobalState extends Attributes {
 	[i: string]: any
 
 	isWizardMode: boolean
+	mode: 'code' | 'preview'
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
 		chooseInputBeacon: (beacon: ConsumerBeacon) => void
@@ -18,6 +19,7 @@ export const storeCreator = (initalState: Attributes) => {
 	return immer<GlobalState>((set) => ({
 		...initalState,
 		isWizardMode: !isValueSet,
+		mode: 'preview',
 
 		actions: {
 			updateState: (modifier: Partial<GlobalState>) =>
