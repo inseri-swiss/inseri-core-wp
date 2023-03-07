@@ -13,7 +13,7 @@ import { GlobalState } from './state'
 export function HtmlEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { input, blockId, blockName, isWizardMode, actions } = useGlobalState((state: GlobalState) => state)
+	const { input, blockId, blockName, isWizardMode, mode, actions } = useGlobalState((state: GlobalState) => state)
 	const isValueSet = !!input.key
 	const inputBeaconKey = input.key
 
@@ -43,6 +43,16 @@ export function HtmlEdit(props: BlockEditProps<Attributes>) {
 				{isValueSet && (
 					<ToolbarGroup>
 						<ToolbarButton icon={edit} title={__('Edit', 'inseri-core')} isActive={isWizardMode} onClick={() => updateState({ isWizardMode: !isWizardMode })} />
+						{!isWizardMode && (
+							<>
+								<ToolbarButton isActive={mode === 'code'} onClick={() => updateState({ mode: 'code' })}>
+									{__('HTML', 'inseri-core')}
+								</ToolbarButton>
+								<ToolbarButton isActive={mode === 'preview'} onClick={() => updateState({ mode: 'preview' })}>
+									{__('preview', 'inseri-core')}
+								</ToolbarButton>{' '}
+							</>
+						)}
 					</ToolbarGroup>
 				)}
 			</BlockControls>
@@ -81,7 +91,7 @@ interface ViewProps {
 }
 
 export function HtmlView({}: ViewProps) {
-	const { height, input } = useGlobalState((state: GlobalState) => state)
+	const { input, mode } = useGlobalState((state: GlobalState) => state)
 	const { value, status } = useWatch(input)
 
 	let preparedValue = value
@@ -90,9 +100,11 @@ export function HtmlView({}: ViewProps) {
 		preparedValue = ''
 	}
 
-	return (
+	return mode === 'code' ? (
 		<Box p="md">
-			<CodeEditor height={height} type={'html'} value={preparedValue} />
+			<CodeEditor type={'html'} value={preparedValue} />
 		</Box>
+	) : (
+		<div dangerouslySetInnerHTML={{ __html: preparedValue }} />
 	)
 }
