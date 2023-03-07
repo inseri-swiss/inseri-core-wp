@@ -21,7 +21,10 @@ onmessage = ({ data }: MessageEvent<Action>) => {
 
 		if (!areInputsInitiated) {
 			areInputsInitiated = true
-			postMessage({ type: 'STATUS', payload: 'ready' })
+
+			if (pyodide) {
+				postMessage({ type: 'STATUS', payload: 'ready' })
+			}
 		}
 	}
 
