@@ -21,7 +21,7 @@ export interface Attributes {
 function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes } = props
 	return (
-		<SetupEditorEnv {...props} baseBlockName={'textEditor'}>
+		<SetupEditorEnv {...props} baseBlockName={'html'}>
 			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
 				<HtmlEdit {...props} />
 			</StateProvider>

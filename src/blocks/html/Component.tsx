@@ -42,14 +42,21 @@ export function HtmlEdit(props: BlockEditProps<Attributes>) {
 			<BlockControls>
 				{isValueSet && (
 					<ToolbarGroup>
-						<ToolbarButton icon={edit} title={__('Edit', 'inseri-core')} isActive={isWizardMode} onClick={() => updateState({ isWizardMode: !isWizardMode })} />
+						<ToolbarButton
+							icon={edit}
+							title={__('Edit', 'inseri-core')}
+							isActive={isWizardMode}
+							onClick={() => {
+								updateState({ isWizardMode: !isWizardMode })
+							}}
+						/>
 						{!isWizardMode && (
 							<>
 								<ToolbarButton isActive={mode === 'code'} onClick={() => updateState({ mode: 'code' })}>
 									{__('HTML', 'inseri-core')}
 								</ToolbarButton>
 								<ToolbarButton isActive={mode === 'preview'} onClick={() => updateState({ mode: 'preview' })}>
-									{__('preview', 'inseri-core')}
+									{__('Preview', 'inseri-core')}
 								</ToolbarButton>{' '}
 							</>
 						)}
