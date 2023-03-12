@@ -76,7 +76,13 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 				<PanelBody>
 					<PanelRow>
 						<Box mb="sm">
-							<WPButton icon={<IconWindowMaximize style={{ fill: 'none' }} />} variant="primary" onClick={() => updateState({ isModalOpen: true })}>
+							<WPButton
+								icon={<IconWindowMaximize style={{ fill: 'none' }} />}
+								variant="primary"
+								onClick={() => {
+									updateState({ isModalOpen: true })
+								}}
+							>
 								{__('Open extended view', 'inseri-core')}
 							</WPButton>
 						</Box>

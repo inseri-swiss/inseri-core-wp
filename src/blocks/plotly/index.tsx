@@ -23,7 +23,7 @@ export interface Attributes {
 function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes } = props
 	return (
-		<SetupEditorEnv {...props} baseBlockName={'image'}>
+		<SetupEditorEnv {...props} baseBlockName={'plotly'}>
 			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
 				<PlotlyEdit {...props} />
 			</StateProvider>

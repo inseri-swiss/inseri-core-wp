@@ -1,14 +1,14 @@
-import { BaseBeaconState, ConsumerBeacon, useControlTower, useDispatch, useJsonBeacons, useWatch } from '@inseri/lighthouse'
+import { useControlTower, useDispatch, useJsonBeacons, useWatch } from '@inseri/lighthouse'
 import { IconApi } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { Button as WPButton, PanelBody, PanelRow, TextControl, ToolbarGroup, ToggleControl } from '@wordpress/components'
+import { Button as WPButton, PanelBody, PanelRow, TextControl, ToggleControl, ToolbarGroup } from '@wordpress/components'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import { Box, Button, ContentTypeSelect, DatasourceState, Group, Modal, Select, Stack, Text, useGlobalState } from '../../components'
 import { DetailViewBody } from '../../components/DetailViewBody'
+import { isBeaconReady, Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import config from './block.json'
 import { Attributes } from './index'
 
@@ -261,8 +261,6 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 		</>
 	)
 }
-
-const isBeaconReady = (beacon: ConsumerBeacon, val: BaseBeaconState) => !beacon.key || val.status === 'ready'
 
 interface ViewProps {
 	isSelected?: boolean
