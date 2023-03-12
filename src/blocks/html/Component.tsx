@@ -1,12 +1,12 @@
 import { useAvailableBeacons, useWatch } from '@inseri/lighthouse'
-import { IconBrandHtml5 } from '@tabler/icons'
+import { IconBrandHtml5, IconCircleOff } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, CodeEditor, Group, Select, Text, useGlobalState } from '../../components'
+import { Box, CodeEditor, createStyles, Group, Select, Text, useGlobalState } from '../../components'
 import { Attributes } from './index'
 import { GlobalState } from './state'
 
@@ -87,31 +87,66 @@ export function HtmlEdit(props: BlockEditProps<Attributes>) {
 					/>
 				</Box>
 			) : (
-				<HtmlView />
+				<HtmlView isGutenbergEditor isSelected={isSelected} />
 			)}
 		</>
 	)
 }
 
+const useViewStyles = createStyles({
+	wrapper: {
+		'&:hover': {
+			borderRadius: '1px',
+			boxShadow: '0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color)',
+		},
+	},
+})
+
 interface ViewProps {
 	isGutenbergEditor?: boolean
+	isSelected?: boolean
 }
 
-export function HtmlView({}: ViewProps) {
+export function HtmlView({ isGutenbergEditor, isSelected }: ViewProps) {
 	const { input, mode } = useGlobalState((state: GlobalState) => state)
 	const { value, status } = useWatch(input)
+	const { wrapper } = useViewStyles().classes
+
+	const isEmpty = !value.trim()
+	let altText = __('No HTML code is set', 'inser-core')
 
 	let preparedValue = value
+	const hasError = status === 'error' || status === 'unavailable'
 
-	if ((status !== 'ready' && status !== 'initial') || !preparedValue) {
+	if (hasError) {
 		preparedValue = ''
+		altText = __('An error has occurred', 'inser-core')
 	}
 
 	return mode === 'code' ? (
 		<Box p="md">
 			<CodeEditor type={'html'} value={preparedValue} />
 		</Box>
+	) : isEmpty || hasError ? (
+		<Group
+			align="center"
+			position="center"
+			style={{
+				background: '#F8F9FA',
+				color: '#868E96',
+				padding: '8px',
+			}}
+		>
+			<IconCircleOff size={40} />
+			<Text size="xl" align="center">
+				{altText}
+			</Text>
+		</Group>
 	) : (
-		<div dangerouslySetInnerHTML={{ __html: preparedValue }} />
+		<div
+			className={isGutenbergEditor && !isSelected ? wrapper : undefined}
+			style={{ minHeight: isGutenbergEditor ? '50px' : undefined }}
+			dangerouslySetInnerHTML={{ __html: preparedValue }}
+		/>
 	)
 }
