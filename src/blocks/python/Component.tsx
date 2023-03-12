@@ -1,12 +1,12 @@
 import { useAvailableBeacons, useControlTower, useDispatchMany, useWatch, useWatchMany } from '@inseri/lighthouse'
 import { usePrevious } from '@mantine/hooks'
-import { IconBrandPython, IconChevronLeft } from '@tabler/icons'
+import { IconBrandPython, IconChevronLeft, IconWindowMaximize } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { Button as WPButton, PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { edit, external } from '@wordpress/icons'
+import { edit } from '@wordpress/icons'
 import { Box, Button, CodeEditor, Group, Select, Text, useGlobalState } from '../../components'
 import config from './block.json'
 import { ExtendedView } from './ExtendedView'
@@ -63,7 +63,7 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 					<ToolbarGroup>
 						<ToolbarButton icon={edit} title={__('Edit', 'inseri-core')} onClick={() => updateState({ isWizardMode: !isWizardMode })} />
 						<ToolbarButton
-							icon={external}
+							icon={<IconWindowMaximize style={{ fill: 'none' }} />}
 							title={__('Open extended view', 'inseri-core')}
 							onClick={() => {
 								updateState({ isModalOpen: !isModalOpen })
@@ -76,7 +76,7 @@ export function PythonEdit(props: BlockEditProps<Attributes>) {
 				<PanelBody>
 					<PanelRow>
 						<Box mb="sm">
-							<WPButton icon={external} variant="primary" onClick={() => updateState({ isModalOpen: true })}>
+							<WPButton icon={<IconWindowMaximize style={{ fill: 'none' }} />} variant="primary" onClick={() => updateState({ isModalOpen: true })}>
 								{__('Open extended view', 'inseri-core')}
 							</WPButton>
 						</Box>
