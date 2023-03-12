@@ -1,12 +1,14 @@
-import { useAvailableBeacons } from '@inseri/lighthouse'
-import { IconChartBar } from '@tabler/icons'
+import { useAvailableBeacons, useWatch } from '@inseri/lighthouse'
+import { IconChartBar, IconInfoCircle } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Group, Select, Text, useGlobalState } from '../../components'
+import Plot from 'react-plotly.js'
+import { isBeaconReady } from '../../utils'
+import { ActionIcon, Box, Button, Group, Select, Stack, Text, useGlobalState } from '../../components'
 import { Attributes } from './index'
 import { GlobalState } from './state'
 
@@ -16,9 +18,11 @@ const defaultInput = {
 	description: '',
 }
 
+const LINK_PLOTLY_DOC = 'https://plotly.com/javascript/reference/index/'
+
 export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { blockName, inputData, isWizardMode, actions, height } = useGlobalState((state: GlobalState) => state)
+	const { blockName, inputData, inputLayout, inputConfig, isWizardMode, actions, height } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
 
 	const isValueSet = !!inputData.key
@@ -29,8 +33,7 @@ export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 		}
 	}, [isSelected])
 
-	const jsonBeacons = useAvailableBeacons('json')
-	const availableBeacons = { ...jsonBeacons }
+	const availableBeacons = useAvailableBeacons('json')
 	const options = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
 
 	const renderResizable = (children: JSX.Element) => (
@@ -84,21 +87,47 @@ export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 				</PanelBody>
 			</InspectorControls>
 			{isWizardMode ? (
-				<Box p="md" style={{ border: '1px solid #000' }}>
-					<Group mb="lg" spacing={0}>
+				<Stack p="md" spacing="xs" style={{ border: '1px solid #000' }}>
+					<Group mb="sm" spacing={0}>
 						<IconChartBar size={28} />
 						<Text ml="xs" fz={24}>
 							{__('Plotly.js', 'inseri-core')}
 						</Text>
+						<Box ml="xs">
+							<ActionIcon component="a" href={LINK_PLOTLY_DOC} target="_blank" title={__('more info', 'inseri-core')}>
+								<IconInfoCircle size={20} style={{ color: '#5C5F66' }} />
+							</ActionIcon>
+						</Box>
 					</Group>
 					<Select
+						required
+						clearable
 						label={__('Choose data', 'inseri-core')}
 						data={options}
 						value={inputData.key}
 						searchable
-						onChange={(key) => updateState({ input: key ? availableBeacons[key] : defaultInput, isWizardMode: false })}
+						onChange={(key) => updateState({ inputData: key ? availableBeacons[key] : defaultInput })}
 					/>
-				</Box>
+					<Select
+						clearable
+						label={__('Choose layout', 'inseri-core')}
+						data={options}
+						value={inputLayout.key}
+						searchable
+						onChange={(key) => updateState({ inputLayout: key ? availableBeacons[key] : defaultInput })}
+					/>
+					<Select
+						clearable
+						label={__('Choose config', 'inseri-core')}
+						data={options}
+						value={inputConfig.key}
+						searchable
+						onChange={(key) => updateState({ inputConfig: key ? availableBeacons[key] : defaultInput })}
+					/>
+					<Button disabled={!isValueSet} onClick={() => updateState({ isWizardMode: false })}>
+						{__('Display chart', 'inseri-core')}
+					</Button>
+				</Stack>
 			) : (
 				<PlotlyView renderResizable={renderResizable} isSelected={isSelected} />
 			)}
@@ -112,19 +141,44 @@ interface ViewProps {
 }
 
 export function PlotlyView({ renderResizable }: ViewProps) {
-	const { height } = useGlobalState((state: GlobalState) => state)
+	const { height, inputData, inputLayout, inputConfig } = useGlobalState((state: GlobalState) => state)
+	const watchData = useWatch(inputData)
+	const watchLayout = useWatch(inputLayout)
+	const watchConfig = useWatch(inputConfig)
+
+	const hasInputsError = !(isBeaconReady(inputData, watchData) && isBeaconReady(inputLayout, watchLayout) && isBeaconReady(inputConfig, watchConfig))
+
+	let processedData = watchData.value
+	let processedLayout = watchLayout.value
+	let processedConfig = watchConfig.value
+
+	if (['ready', 'initial'].every((s) => s !== watchData.status) || !processedData) {
+		processedData = {}
+	}
+
+	if (['ready', 'initial'].every((s) => s !== watchLayout.status) || !processedLayout) {
+		processedLayout = {}
+	}
+
+	if (['ready', 'initial'].every((s) => s !== watchConfig.status) || !processedConfig) {
+		processedConfig = {}
+	}
+
+	processedLayout = { ...processedLayout, autosize: true }
+	processedConfig = { ...processedLayout, responsive: true }
+
+	const chart = (
+		<Plot data={processedData} layout={processedLayout} config={processedConfig} useResizeHandler={true} style={{ width: '100%', height: '100%' }} />
+	)
 
 	return (
-		<Box>
-			<div
-				style={{
-					height: height ?? 'auto',
-					position: 'relative',
-					textAlign: 'center',
-				}}
-			>
-				{renderResizable ? renderResizable(<div />) : <div />}
-			</div>
+		<Box style={{ height: height ?? 'auto' }}>
+			{hasInputsError && (
+				<Text fz={14} color="red">
+					{__('Not all inputs are ready!', 'inseri-core')}
+				</Text>
+			)}
+			{renderResizable ? renderResizable(chart) : chart}
 		</Box>
 	)
 }
