@@ -149,7 +149,7 @@ function useDispatch(config?: ProducerBeacon) {
 	}
 }
 
-type RecordUpdater = Record<string, (update: Partial<BaseBeaconState>) => void>
+export type RecordUpdater = Record<string, (update: Partial<BaseBeaconState>) => void>
 
 function useDispatchMany(configs: ConsumerBeacon[]): RecordUpdater {
 	const joinedKeys = configs.reduce((acc, c) => acc + c.key, '')

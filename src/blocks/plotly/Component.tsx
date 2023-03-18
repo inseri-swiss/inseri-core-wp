@@ -1,9 +1,9 @@
-import { useAvailableBeacons, useWatch } from '@inseri/lighthouse'
-import { IconChartBar, IconInfoCircle } from '@tabler/icons'
+import { BaseBeaconState, ConsumerBeacon, RecordUpdater, useAvailableBeacons, useControlTower, useDispatchMany, useWatch } from '@inseri/lighthouse'
+import { IconChartBar, IconInfoCircle, IconX } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
-import { useEffect } from '@wordpress/element'
+import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import Plot from 'react-plotly.js'
@@ -11,6 +11,9 @@ import { isBeaconReady } from '../../utils'
 import { ActionIcon, Box, Button, Group, Select, Stack, Text, useGlobalState } from '../../components'
 import { Attributes } from './index'
 import { GlobalState } from './state'
+import blockConfig from './block.json'
+import cloneDeep from 'lodash.clonedeep'
+import stringify from 'json-stable-stringify'
 
 const defaultInput = {
 	key: '',
@@ -18,11 +21,16 @@ const defaultInput = {
 	description: '',
 }
 
-const LINK_PLOTLY_DOC = 'https://plotly.com/javascript/reference/index/'
+const LINK_PLOTLY_DOC = 'https://plotly.com/chart-studio-help/json-chart-schema/'
+
+const EVENTS = [
+	{ label: 'click', value: 'onClick' },
+	{ label: 'hover', value: 'onHover' },
+]
 
 export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { blockName, inputData, inputLayout, inputConfig, isWizardMode, actions, height } = useGlobalState((state: GlobalState) => state)
+	const { blockName, inputData, inputLayout, inputConfig, isWizardMode, actions, height, outputs } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
 
 	const isValueSet = !!inputData.key
@@ -48,6 +56,9 @@ export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 		</ResizableBox>
 	)
 
+	const selectedEvents = outputs.map((b) => b.description)
+	const unselectedEvents = EVENTS.filter((e) => !selectedEvents.includes(e.value))
+
 	return (
 		<>
 			<BlockControls>
@@ -64,7 +75,7 @@ export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 					</ToolbarGroup>
 				)}
 			</BlockControls>
-			<InspectorControls key="setting">
+			<InspectorControls>
 				<PanelBody>
 					<PanelRow>
 						<TextControl label={__('Block Name', 'inseri-core')} value={blockName} onChange={(value) => updateState({ blockName: value })} />
@@ -83,6 +94,33 @@ export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 								help={__('Set 0 for automatic height adjustment', 'inseri-core')}
 							/>
 						</div>
+					</PanelRow>
+				</PanelBody>
+
+				<PanelBody title={__('Events', 'inseri-core')}>
+					<PanelRow>
+						<Stack style={{ width: '100%' }}>
+							<Select
+								placeholder={__('Add event to emit', 'inseri-core')}
+								data={unselectedEvents}
+								onChange={(val) => {
+									updateState({ outputs: [...outputs, { contentType: 'application/json', description: val!, key: val! }] })
+								}}
+							/>
+							{selectedEvents.map((item) => (
+								<Group key={item} position="apart">
+									{EVENTS.find((e) => e.value === item)?.label ?? item}
+									<ActionIcon
+										color="gray"
+										onClick={() => {
+											updateState({ outputs: outputs.filter((e) => e.description !== item) })
+										}}
+									>
+										<IconX size={12} />
+									</ActionIcon>
+								</Group>
+							))}
+						</Stack>
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
@@ -135,40 +173,99 @@ export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 	)
 }
 
+const simpleEventTransform = (event: Plotly.PlotHoverEvent | Plotly.PlotHoverEvent | Plotly.PlotSelectionEvent) => {
+	return event.points.map(({ curveNumber, data, x, y, pointIndex }) => ({ curveNumber, data, x, y, pointIndex }))
+}
+
+const propagateIfSet = (eventType: string, outputs: ConsumerBeacon[], recordUpdater: RecordUpdater) => (val: any) => {
+	const isSet = outputs.some((o) => o.description === eventType)
+	if (isSet && recordUpdater[eventType]) {
+		let processedVal = val
+
+		if (eventType === 'onClick' || eventType === 'onHover') {
+			processedVal = simpleEventTransform(val)
+		}
+
+		recordUpdater[eventType]({ status: 'ready', value: processedVal })
+	}
+}
+
+const useDefaultIfNotReady = (beacon: BaseBeaconState, defaultVal: any) => {
+	if (['ready', 'initial'].every((s) => s !== beacon.status) || !beacon.value) {
+		return defaultVal
+	}
+
+	return beacon.value
+}
+
 interface ViewProps {
 	renderResizable?: (Component: JSX.Element) => JSX.Element
 	isSelected?: boolean
 }
 
 export function PlotlyView({ renderResizable }: ViewProps) {
-	const { height, inputData, inputLayout, inputConfig } = useGlobalState((state: GlobalState) => state)
+	const { height, inputData, inputLayout, inputConfig, blockId, blockName, outputs } = useGlobalState((state: GlobalState) => state)
+	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
+
+	const [frames, setFrames] = useState<any>([])
+	const [data, setData] = useState<any>([])
+	const [layout, setLayout] = useState<any>({})
+	const [config, setConfig] = useState<any>({})
+
+	const producersBeacons = useControlTower({ blockId, blockType: blockConfig.name, instanceName: blockName }, outputs)
+	const joinedKeys = outputs.reduce((acc, b) => acc + b.key, '')
+
+	useEffect(() => {
+		updateState({ outputs: producersBeacons })
+	}, [producersBeacons.length, joinedKeys])
+
+	const dispatchRecord = useDispatchMany(producersBeacons)
+
 	const watchData = useWatch(inputData)
 	const watchLayout = useWatch(inputLayout)
 	const watchConfig = useWatch(inputConfig)
 
 	const hasInputsError = !(isBeaconReady(inputData, watchData) && isBeaconReady(inputLayout, watchLayout) && isBeaconReady(inputConfig, watchConfig))
 
-	let processedData = watchData.value
-	let processedLayout = watchLayout.value
-	let processedConfig = watchConfig.value
+	const processedData = useDefaultIfNotReady(watchData, [])
+	const processedLayout = useDefaultIfNotReady(watchLayout, {})
+	const processedConfig = useDefaultIfNotReady(watchConfig, {})
 
-	if (['ready', 'initial'].every((s) => s !== watchData.status) || !processedData) {
-		processedData = {}
-	}
+	useEffect(() => {
+		setData(cloneDeep(processedData))
+	}, [stringify(processedData)])
 
-	if (['ready', 'initial'].every((s) => s !== watchLayout.status) || !processedLayout) {
-		processedLayout = {}
-	}
+	useEffect(() => {
+		const { width, ...rest } = processedLayout
+		setLayout(cloneDeep({ ...rest, autosize: true }))
+	}, [stringify(processedLayout)])
 
-	if (['ready', 'initial'].every((s) => s !== watchConfig.status) || !processedConfig) {
-		processedConfig = {}
-	}
-
-	processedLayout = { ...processedLayout, autosize: true }
-	processedConfig = { ...processedLayout, responsive: true }
+	useEffect(() => {
+		setConfig(cloneDeep({ ...processedConfig, responsive: true }))
+	}, [stringify(processedConfig)])
 
 	const chart = (
-		<Plot data={processedData} layout={processedLayout} config={processedConfig} useResizeHandler={true} style={{ width: '100%', height: '100%' }} />
+		<Plot
+			frames={frames}
+			data={data}
+			layout={layout}
+			config={config}
+			useResizeHandler={true}
+			style={{ width: '100%', height: '100%' }}
+			onInitialized={(f) => {
+				setData(f.data)
+				setLayout(f.layout)
+				setFrames(f.frames)
+			}}
+			onUpdate={(f) => {
+				setData(f.data)
+				setLayout(f.layout)
+				setFrames(f.frames)
+			}}
+			// events
+			onClick={propagateIfSet('onClick', outputs, dispatchRecord)}
+			onHover={propagateIfSet('onHover', outputs, dispatchRecord)}
+		/>
 	)
 
 	return (
