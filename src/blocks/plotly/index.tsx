@@ -18,6 +18,7 @@ export interface Attributes {
 	inputLayout: ConsumerBeacon
 	inputConfig: ConsumerBeacon
 	height: number | null
+	outputs: ConsumerBeacon[]
 }
 
 function Edit(props: BlockEditProps<Attributes>) {

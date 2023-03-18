@@ -42,6 +42,10 @@
 		"height": {
 			"type": "integer",
 			"default": null
+		},
+		"outputs": {
+			"type": "array",
+			"default": []
 		}
 	},
 	"supports": {
