@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import Plot from 'react-plotly.js'
 import { isBeaconReady } from '../../utils'
-import { ActionIcon, Box, Button, Group, Select, Stack, Text, useGlobalState } from '../../components'
+import { Accordion, ActionIcon, Box, Button, Group, Select, Stack, Text, useGlobalState } from '../../components'
 import { Attributes } from './index'
 import { GlobalState } from './state'
 import blockConfig from './block.json'
@@ -30,10 +30,11 @@ const EVENTS = [
 
 export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { blockName, inputData, inputLayout, inputConfig, isWizardMode, actions, height, outputs } = useGlobalState((state: GlobalState) => state)
+	const { blockName, inputFull, inputData, inputLayout, inputConfig, isWizardMode, actions, height, outputs } = useGlobalState((state: GlobalState) => state)
 	const { updateState, setHeight } = actions
 
-	const isValueSet = !!inputData.key
+	const isValueSet = !!inputFull.key
+	const [openItems, setOpenItems] = useState<string[]>([])
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -127,8 +128,8 @@ export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 				</PanelBody>
 			</InspectorControls>
 			{isWizardMode ? (
-				<Stack p="md" spacing="xs" style={{ border: '1px solid #000' }}>
-					<Group mb="sm" spacing={0}>
+				<Stack spacing="xs" style={{ border: '1px solid #000' }}>
+					<Group pt="md" px="md" mb="sm" spacing={0}>
 						<IconChartBar size={28} />
 						<Text ml="xs" fz={24}>
 							{__('Plotly.js', 'inseri-core')}
@@ -139,32 +140,58 @@ export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 							</ActionIcon>
 						</Box>
 					</Group>
+
 					<Select
+						px="md"
 						required
 						clearable
-						label={__('Choose data', 'inseri-core')}
+						label={__('Provide full JSON description', 'inseri-core')}
 						data={options}
-						value={inputData.key}
+						value={inputFull.key}
 						searchable
-						onChange={(key) => updateState({ inputData: key ? availableBeacons[key] : defaultInput })}
+						onChange={(key) => updateState({ inputFull: key ? availableBeacons[key] : defaultInput })}
 					/>
-					<Select
-						clearable
-						label={__('Choose layout', 'inseri-core')}
-						data={options}
-						value={inputLayout.key}
-						searchable
-						onChange={(key) => updateState({ inputLayout: key ? availableBeacons[key] : defaultInput })}
-					/>
-					<Select
-						clearable
-						label={__('Choose config', 'inseri-core')}
-						data={options}
-						value={inputConfig.key}
-						searchable
-						onChange={(key) => updateState({ inputConfig: key ? availableBeacons[key] : defaultInput })}
-					/>
-					<Button disabled={!isValueSet} onClick={() => updateState({ isWizardMode: false })}>
+
+					<Accordion multiple value={openItems} onChange={setOpenItems} styles={{ label: { fontSize: '14px' } }}>
+						<Accordion.Item value="data">
+							<Accordion.Control>{__('Override data separately', 'inseri-core')}</Accordion.Control>
+							<Accordion.Panel>
+								<Select
+									clearable
+									data={options}
+									value={inputData.key}
+									searchable
+									onChange={(key) => updateState({ inputData: key ? availableBeacons[key] : defaultInput })}
+								/>
+							</Accordion.Panel>
+						</Accordion.Item>
+						<Accordion.Item value="layout">
+							<Accordion.Control>{__('Override layout separately', 'inseri-core')}</Accordion.Control>
+							<Accordion.Panel>
+								<Select
+									clearable
+									data={options}
+									value={inputLayout.key}
+									searchable
+									onChange={(key) => updateState({ inputLayout: key ? availableBeacons[key] : defaultInput })}
+								/>
+							</Accordion.Panel>
+						</Accordion.Item>
+						<Accordion.Item value="config">
+							<Accordion.Control>{__('Provide config', 'inseri-core')}</Accordion.Control>
+							<Accordion.Panel>
+								<Select
+									clearable
+									data={options}
+									value={inputConfig.key}
+									searchable
+									onChange={(key) => updateState({ inputConfig: key ? availableBeacons[key] : defaultInput })}
+								/>
+							</Accordion.Panel>
+						</Accordion.Item>
+					</Accordion>
+
+					<Button mx="md" mb="md" disabled={!isValueSet} onClick={() => updateState({ isWizardMode: false })}>
 						{__('Display chart', 'inseri-core')}
 					</Button>
 				</Stack>
@@ -206,7 +233,7 @@ interface ViewProps {
 }
 
 export function PlotlyView({ renderResizable }: ViewProps) {
-	const { height, inputData, inputLayout, inputConfig, blockId, blockName, outputs, revision } = useGlobalState((state: GlobalState) => state)
+	const { height, inputFull, inputData, inputLayout, inputConfig, blockId, blockName, outputs, revision } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 
 	const [frames, setFrames] = useState<any>([])
@@ -223,28 +250,53 @@ export function PlotlyView({ renderResizable }: ViewProps) {
 
 	const dispatchRecord = useDispatchMany(producersBeacons)
 
+	const watchFull = useWatch(inputFull)
 	const watchData = useWatch(inputData)
 	const watchLayout = useWatch(inputLayout)
 	const watchConfig = useWatch(inputConfig)
 
-	const hasInputsError = !(isBeaconReady(inputData, watchData) && isBeaconReady(inputLayout, watchLayout) && isBeaconReady(inputConfig, watchConfig))
+	const hasInputsError = !(
+		isBeaconReady(inputFull, watchFull) &&
+		isBeaconReady(inputData, watchData) &&
+		isBeaconReady(inputLayout, watchLayout) &&
+		isBeaconReady(inputConfig, watchConfig)
+	)
 
+	const processedFull = useDefaultIfNotReady(watchFull, { data: [], layout: {} })
 	const processedData = useDefaultIfNotReady(watchData, [])
 	const processedLayout = useDefaultIfNotReady(watchLayout, {})
 	const processedConfig = useDefaultIfNotReady(watchConfig, {})
 
-	useEffect(() => {
-		setData(cloneDeep(processedData))
-	}, [stringify(processedData)])
+	const strFull = stringify(processedFull)
+	const strData = stringify(processedData)
+	const strLayout = stringify(processedLayout)
+	const strConfig = stringify(processedConfig)
+
+	const setLayoutWithExtra = (newLayout: any) => {
+		const { width, ...rest } = newLayout
+		setLayout(cloneDeep({ ...rest, autosize: true }))
+	}
 
 	useEffect(() => {
-		const { width, ...rest } = processedLayout
-		setLayout(cloneDeep({ ...rest, autosize: true }))
-	}, [stringify(processedLayout)])
+		setData(cloneDeep(processedData))
+	}, [strData])
+
+	useEffect(() => {
+		setLayoutWithExtra(processedLayout)
+	}, [strLayout])
 
 	useEffect(() => {
 		setConfig(cloneDeep({ ...processedConfig, responsive: true }))
-	}, [stringify(processedConfig)])
+	}, [strConfig])
+
+	useEffect(() => {
+		if (processedFull.data && processedData.length === 0) {
+			setData(cloneDeep(processedFull.data))
+		}
+		if (processedFull.layout && Object.keys(processedLayout).length === 0) {
+			setLayoutWithExtra(processedFull.layout)
+		}
+	}, [strFull, strData, strLayout])
 
 	const chart = (
 		<Plot

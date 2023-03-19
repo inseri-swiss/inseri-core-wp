@@ -15,6 +15,14 @@
 			"type": "string",
 			"default": ""
 		},
+		"inputFull": {
+			"type": "object",
+			"default": {
+				"key": "",
+				"contentType": "",
+				"description": ""
+			}
+		},
 		"inputData": {
 			"type": "object",
 			"default": {
