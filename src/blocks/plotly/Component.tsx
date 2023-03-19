@@ -31,7 +31,7 @@ const EVENTS = [
 export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 	const { blockName, inputData, inputLayout, inputConfig, isWizardMode, actions, height, outputs } = useGlobalState((state: GlobalState) => state)
-	const { updateState } = actions
+	const { updateState, setHeight } = actions
 
 	const isValueSet = !!inputData.key
 
@@ -43,13 +43,15 @@ export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 
 	const availableBeacons = useAvailableBeacons('json')
 	const options = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
+	const resizerHeight = height ? height : 'auto'
 
 	const renderResizable = (children: JSX.Element) => (
 		<ResizableBox
+			size={{ height: resizerHeight, width: 'auto' }}
 			enable={{ bottom: true }}
 			showHandle={isSelected}
 			onResize={(_event, _direction, element) => {
-				updateState({ height: element.offsetHeight })
+				setHeight(element.offsetHeight)
 			}}
 		>
 			{children}
@@ -89,7 +91,7 @@ export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 								value={height ?? '0'}
 								onChange={(value) => {
 									const newVal = parseInt(value)
-									updateState({ height: newVal > 0 ? newVal : null })
+									setHeight(newVal > 0 ? newVal : null)
 								}}
 								help={__('Set 0 for automatic height adjustment', 'inseri-core')}
 							/>
@@ -204,7 +206,7 @@ interface ViewProps {
 }
 
 export function PlotlyView({ renderResizable }: ViewProps) {
-	const { height, inputData, inputLayout, inputConfig, blockId, blockName, outputs } = useGlobalState((state: GlobalState) => state)
+	const { height, inputData, inputLayout, inputConfig, blockId, blockName, outputs, revision } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 
 	const [frames, setFrames] = useState<any>([])
@@ -246,6 +248,7 @@ export function PlotlyView({ renderResizable }: ViewProps) {
 
 	const chart = (
 		<Plot
+			revision={revision}
 			frames={frames}
 			data={data}
 			layout={layout}
