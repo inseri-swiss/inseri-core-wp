@@ -6,6 +6,7 @@ import { PanelBody, PanelRow, TextControl, ToolbarButton, ToolbarGroup } from '@
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
+import stringify from 'json-stable-stringify'
 import { Box, Button, Group, Select, Text, useGlobalState } from '../../components'
 import { Attributes } from './index'
 import { GlobalState } from './state'
@@ -18,7 +19,7 @@ const defaultInput = {
 
 export function DownloadEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { blockName, input, isWizardMode, actions, label } = useGlobalState((state: GlobalState) => state)
+	const { blockName, input, isWizardMode, actions, label, fileName, extension } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
 
 	const isValueSet = !!input.key
@@ -63,6 +64,12 @@ export function DownloadEdit(props: BlockEditProps<Attributes>) {
 					<PanelRow>
 						<TextControl label={__('Label', 'inseri-core')} value={label} onChange={(value) => updateState({ label: value })} />
 					</PanelRow>
+					<PanelRow>
+						<TextControl label={__('File Name', 'inseri-core')} value={fileName} onChange={(value) => updateState({ fileName: value })} />
+					</PanelRow>
+					<PanelRow>
+						<TextControl label={__('File Extension', 'inseri-core')} value={extension} onChange={(value) => updateState({ extension: value })} />
+					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
 			{isWizardMode ? (
@@ -74,7 +81,7 @@ export function DownloadEdit(props: BlockEditProps<Attributes>) {
 						</Text>
 					</Group>
 					<Select
-						label={__('Let visitor download a block data', 'inseri-core')}
+						label={__('Let visitor download data by selecting a block source', 'inseri-core')}
 						data={options}
 						value={input.key}
 						searchable
@@ -89,8 +96,34 @@ export function DownloadEdit(props: BlockEditProps<Attributes>) {
 }
 
 export function DownloadView() {
-	const { label } = useGlobalState((state: GlobalState) => state)
-	//const { updateState } = useGlobalState((state: GlobalState) => state.actions)
+	const { input, label, fileName, extension, downloadLink } = useGlobalState((state: GlobalState) => state)
+	const { updateDownloadObject } = useGlobalState((state: GlobalState) => state.actions)
 
-	return <Button>{label}</Button>
+	const { value, status, contentType } = useWatch(input)
+	const isNotReady = status !== 'ready' || !downloadLink
+
+	useEffect(() => {
+		let processedValue = value
+
+		if (status === 'ready') {
+			if (contentType.includes('json')) {
+				processedValue = stringify(processedValue)
+			}
+
+			if (typeof processedValue === 'string') {
+				const mimeType = contentType.split(';')[0]
+				processedValue = new Blob([processedValue], { type: mimeType })
+			}
+
+			if (typeof processedValue === 'object' && processedValue instanceof Blob) {
+				updateDownloadObject(processedValue)
+			}
+		}
+	}, [value])
+
+	return (
+		<Button style={{ color: '#fff' }} component="a" href={downloadLink} download={fileName + '.' + extension} disabled={isNotReady}>
+			{label}
+		</Button>
+	)
 }
