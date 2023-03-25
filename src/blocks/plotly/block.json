@@ -49,7 +49,7 @@
 		},
 		"height": {
 			"type": "integer",
-			"default": null
+			"default": 500
 		},
 		"outputs": {
 			"type": "array",

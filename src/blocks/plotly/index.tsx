@@ -18,7 +18,7 @@ export interface Attributes {
 	inputData: ConsumerBeacon
 	inputLayout: ConsumerBeacon
 	inputConfig: ConsumerBeacon
-	height: number | null
+	height: number
 	outputs: ConsumerBeacon[]
 }
 
