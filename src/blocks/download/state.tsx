@@ -7,6 +7,7 @@ export interface GlobalState extends Attributes {
 
 	isWizardMode: boolean
 	downloadLink: string
+	extension: string
 
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
@@ -19,6 +20,7 @@ export const storeCreator = (initalState: Attributes) => {
 		...initalState,
 		isWizardMode: !initalState.input.key,
 		downloadLink: '',
+		extension: '',
 
 		actions: {
 			updateState: (modifier: RecursivePartial<GlobalState>) =>
