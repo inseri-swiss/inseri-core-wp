@@ -22,7 +22,7 @@ const defaultInput = {
 }
 
 const LINK_PLOTLY_DOC = 'https://plotly.com/chart-studio-help/json-chart-schema/'
-
+const MIN_HEIGHT = 100
 const EVENTS = [
 	{ label: 'click', value: 'onClick' },
 	{ label: 'hover', value: 'onHover' },
@@ -52,7 +52,10 @@ export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 			enable={{ bottom: true }}
 			showHandle={isSelected}
 			onResize={(_event, _direction, element) => {
-				setHeight(element.offsetHeight)
+				const newHeight = element.offsetHeight
+				if (newHeight >= MIN_HEIGHT) {
+					setHeight(newHeight)
+				}
 			}}
 		>
 			{children}
@@ -88,13 +91,14 @@ export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 							<TextControl
 								label={__('height', 'inseri-core')}
 								type="number"
-								min={0}
-								value={height ?? '0'}
+								min={MIN_HEIGHT}
+								value={height}
 								onChange={(value) => {
 									const newVal = parseInt(value)
-									setHeight(newVal > 0 ? newVal : null)
+									if (newVal >= MIN_HEIGHT) {
+										setHeight(newVal)
+									}
 								}}
-								help={__('Set 0 for automatic height adjustment', 'inseri-core')}
 							/>
 						</div>
 					</PanelRow>
@@ -273,7 +277,7 @@ export function PlotlyView({ renderResizable }: ViewProps) {
 	const strConfig = stringify(processedConfig)
 
 	const setLayoutWithExtra = (newLayout: any) => {
-		const { width, ...rest } = newLayout
+		const { width, height, ...rest } = newLayout
 		setLayout(cloneDeep({ ...rest, autosize: true }))
 	}
 
