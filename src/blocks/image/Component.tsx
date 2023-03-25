@@ -241,7 +241,8 @@ export function PhotoView({ renderResizable, imageRef, isSelected }: ViewProps) 
 				src={imageUrl}
 				alt={altText}
 				style={{
-					height: height ?? 'auto',
+					width: '100%',
+					height: height ?? '100%',
 					objectFit: fit,
 				}}
 			/>
