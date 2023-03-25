@@ -26,6 +26,14 @@
 		"label": {
 			"type": "string",
 			"default": "Download"
+		},
+		"fileName": {
+			"type": "string",
+			"default": "file"
+		},
+		"extension": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {
