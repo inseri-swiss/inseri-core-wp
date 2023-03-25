@@ -17,7 +17,6 @@ export interface Attributes {
 	input: ConsumerBeacon
 	label: string
 	fileName: string
-	extension: string
 }
 
 function Edit(props: BlockEditProps<Attributes>) {

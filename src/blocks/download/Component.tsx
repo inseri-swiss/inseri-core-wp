@@ -7,6 +7,7 @@ import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import stringify from 'json-stable-stringify'
+import { CONTENT_TYPE_TO_EXT } from '../../utils'
 import { Box, Button, Group, Select, Text, useGlobalState } from '../../components'
 import { Attributes } from './index'
 import { GlobalState } from './state'
@@ -19,7 +20,7 @@ const defaultInput = {
 
 export function DownloadEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { blockName, input, isWizardMode, actions, label, fileName, extension } = useGlobalState((state: GlobalState) => state)
+	const { blockName, input, isWizardMode, actions, label, fileName } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
 
 	const isValueSet = !!input.key
@@ -67,9 +68,6 @@ export function DownloadEdit(props: BlockEditProps<Attributes>) {
 					<PanelRow>
 						<TextControl label={__('File Name', 'inseri-core')} value={fileName} onChange={(value) => updateState({ fileName: value })} />
 					</PanelRow>
-					<PanelRow>
-						<TextControl label={__('File Extension', 'inseri-core')} value={extension} onChange={(value) => updateState({ extension: value })} />
-					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
 			{isWizardMode ? (
@@ -97,10 +95,20 @@ export function DownloadEdit(props: BlockEditProps<Attributes>) {
 
 export function DownloadView() {
 	const { input, label, fileName, extension, downloadLink } = useGlobalState((state: GlobalState) => state)
-	const { updateDownloadObject } = useGlobalState((state: GlobalState) => state.actions)
+	const { updateDownloadObject, updateState } = useGlobalState((state: GlobalState) => state.actions)
 
 	const { value, status, contentType } = useWatch(input)
 	const isNotReady = status !== 'ready' || !downloadLink
+
+	useEffect(() => {
+		let ext = ''
+		const found = CONTENT_TYPE_TO_EXT.find((c) => contentType.includes(c.value))
+		if (found) {
+			ext = found.ext
+		}
+
+		updateState({ extension: ext })
+	}, [contentType])
 
 	useEffect(() => {
 		let processedValue = value
@@ -121,8 +129,10 @@ export function DownloadView() {
 		}
 	}, [value])
 
+	const fullFileName = fileName + (extension ? '.' + extension : '')
+
 	return (
-		<Button style={{ color: '#fff' }} component="a" href={downloadLink} download={fileName + '.' + extension} disabled={isNotReady}>
+		<Button style={{ color: '#fff' }} component="a" href={downloadLink} download={fullFileName} disabled={isNotReady}>
 			{label}
 		</Button>
 	)
