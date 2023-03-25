@@ -144,6 +144,9 @@ export function MediaLibraryView({ isGutenbergEditor, isSelected }: ViewProps) {
 			if (!isLoading && !hasError && fileContent) {
 				dispatch({ status: 'ready', value: fileContent })
 			}
+			if (!fileContent) {
+				dispatch({ status: 'initial', value: fileContent })
+			}
 		}, 100)
 	}, [isLoading, hasError, fileContent])
 

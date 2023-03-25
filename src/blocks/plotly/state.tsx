@@ -10,7 +10,7 @@ export interface GlobalState extends Attributes {
 
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
-		setHeight: (height: number | null) => void
+		setHeight: (height: number) => void
 	}
 }
 
@@ -27,7 +27,7 @@ export const storeCreator = (initalState: Attributes) => {
 				})
 			},
 
-			setHeight: (height: number | null) => {
+			setHeight: (height: number) => {
 				set((state) => {
 					state.height = height
 					state.revision++
