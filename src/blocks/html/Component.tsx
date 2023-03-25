@@ -57,7 +57,7 @@ export function HtmlEdit(props: BlockEditProps<Attributes>) {
 								</ToolbarButton>
 								<ToolbarButton isActive={mode === 'preview'} onClick={() => updateState({ mode: 'preview' })}>
 									{__('Preview', 'inseri-core')}
-								</ToolbarButton>{' '}
+								</ToolbarButton>
 							</>
 						)}
 					</ToolbarGroup>
@@ -112,7 +112,7 @@ export function HtmlView({ isGutenbergEditor, isSelected }: ViewProps) {
 	const { value, status } = useWatch(input)
 	const { wrapper } = useViewStyles().classes
 
-	const isEmpty = !value.trim()
+	const isEmpty = !value || (typeof value === 'string' && !value.trim())
 	let altText = __('No HTML code is set', 'inser-core')
 
 	let preparedValue = value
