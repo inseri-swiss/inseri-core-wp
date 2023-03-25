@@ -46,6 +46,13 @@ export function PhotoEdit(props: BlockEditProps<Attributes>) {
 	const isValueSet = !!input.key
 	const imageRef = useRef<HTMLImageElement>(null)
 
+	const { status } = useWatch(input)
+	useEffect(() => {
+		if (status === 'unavailable') {
+			updateState({ input: { ...input, key: '' }, isWizardMode: true })
+		}
+	}, [status])
+
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
 			updateState({ isWizardMode: false })

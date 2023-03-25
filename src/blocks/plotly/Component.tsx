@@ -36,6 +36,13 @@ export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 	const isValueSet = !!inputFull.key
 	const [openItems, setOpenItems] = useState<string[]>([])
 
+	const { status } = useWatch(inputFull)
+	useEffect(() => {
+		if (status === 'unavailable') {
+			updateState({ inputFull: { ...inputFull, key: '' }, isWizardMode: true })
+		}
+	}, [status])
+
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
 			updateState({ isWizardMode: false })
@@ -277,7 +284,7 @@ export function PlotlyView({ renderResizable }: ViewProps) {
 	const strConfig = stringify(processedConfig)
 
 	const setLayoutWithExtra = (newLayout: any) => {
-		const { width, height, ...rest } = newLayout
+		const { width, height: _, ...rest } = newLayout
 		setLayout(cloneDeep({ ...rest, autosize: true }))
 	}
 
