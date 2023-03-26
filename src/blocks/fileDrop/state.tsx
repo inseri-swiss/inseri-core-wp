@@ -28,8 +28,17 @@ export const storeCreator = (initalState: Attributes) => {
 
 			addFiles: (files: File[]) => {
 				set((state) => {
+					if (!state.multiple) {
+						state.files = {}
+					}
+
 					files.forEach((f) => {
-						state.files[generateId(12)] = f
+						const key = generateId(12)
+						state.files[key] = f
+
+						if (!state.multiple) {
+							state.chosenFile = key
+						}
 					})
 				})
 			},
