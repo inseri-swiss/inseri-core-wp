@@ -21,6 +21,26 @@
 				"key": "",
 				"contentType": ""
 			}
+		},
+		"mainText": {
+			"type": "string",
+			"default": "Drag and drop a file or click here"
+		},
+		"subText": {
+			"type": "string",
+			"default": "provide your file to process..."
+		},
+		"accepts": {
+			"type": "array",
+			"default": []
+		},
+		"multiple": {
+			"type": "boolean",
+			"default": true
+		},
+		"height": {
+			"type": "integer",
+			"default": 150
 		}
 	},
 	"supports": {

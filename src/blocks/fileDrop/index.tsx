@@ -14,7 +14,12 @@ const { name, ...settings } = json as any
 export interface Attributes {
 	blockId: string
 	blockName: string
-	input: ProducerBeacon
+	output: ProducerBeacon
+	accepts: string[]
+	multiple: boolean
+	mainText: string
+	subText: string
+	height: number
 }
 
 function Edit(props: BlockEditProps<Attributes>) {
