@@ -349,3 +349,19 @@ export function isVariableValid(name: string): boolean {
 }
 
 export const isBeaconReady = (beacon: ConsumerBeacon, val: BaseBeaconState) => !beacon.key || val.status === 'ready'
+
+export const handleBody = async (blob: Blob, contentType: string) => {
+	let responseBody: any = blob
+
+	if (contentType.includes('application/json')) {
+		const textBlob = new Blob([responseBody])
+		responseBody = JSON.parse(await textBlob.text())
+	}
+
+	if (contentType.includes('text/') || contentType.includes('xml')) {
+		const textBlob = new Blob([responseBody])
+		responseBody = await textBlob.text()
+	}
+
+	return responseBody
+}
