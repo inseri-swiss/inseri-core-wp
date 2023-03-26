@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { AxiosResponse } from 'axios'
 import { __ } from '@wordpress/i18n'
-import { getPropertyCaseInsensitive } from './utils'
+import { getPropertyCaseInsensitive, handleBody } from './utils'
 
 const MEDIA_ROUTE = 'wp/v2/media/'
 const INSERI_ROUTE = 'inseri/v1/datasources/'
@@ -21,22 +21,6 @@ export interface DatasourceWithoutId {
 	headers: string
 	query_params: string
 	body?: string
-}
-
-const handleBody = async (blob: Blob, contentType: string) => {
-	let responseBody: any = blob
-
-	if (contentType.includes('application/json')) {
-		const textBlob = new Blob([responseBody])
-		responseBody = JSON.parse(await textBlob.text())
-	}
-
-	if (contentType.includes('text/') || contentType.includes('xml')) {
-		const textBlob = new Blob([responseBody])
-		responseBody = await textBlob.text()
-	}
-
-	return responseBody
 }
 
 export const callMediaFile = async (url: string, responseContentType: string): Promise<[string?, any?]> => {

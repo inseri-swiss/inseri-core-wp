@@ -1,13 +1,16 @@
+import { useControlTower, useDispatch } from '@inseri/lighthouse'
 import { Dropzone } from '@mantine/dropzone'
 import { IconUpload, IconX, IconCheck } from '@tabler/icons'
 import { InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextareaControl, TextControl, ToggleControl } from '@wordpress/components'
+import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { ActionIcon, Button, createStyles, Group, MultiSelect, Stack, Text, useGlobalState, useMantineTheme } from '../../components'
-import { COMMON_CONTENT_TYPES } from '../../utils'
+import { COMMON_CONTENT_TYPES, handleBody } from '../../utils'
 import { Attributes } from './index'
 import { GlobalState } from './state'
+import config from './block.json'
 
 const useStyles = createStyles((theme) => ({
 	label: {
@@ -44,13 +47,29 @@ const useStyles = createStyles((theme) => ({
 			backgroundColor: theme.colors[theme.primaryColor][1],
 		},
 	},
+
+	hoveringWrapper: {
+		'&:hover': {
+			borderRadius: '1px',
+			boxShadow: '0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color)',
+		},
+	},
 }))
 
-export function FileDropEdit({ isSelected }: BlockEditProps<Attributes>) {
-	const { blockName, actions, accepts, mainText, subText, multiple } = useGlobalState((state: GlobalState) => state)
-	const { updateState } = actions
+const baseBeacon = { contentType: '', description: 'visitor provided data', key: 'data', default: '' }
 
+export function FileDropEdit({ isSelected }: BlockEditProps<Attributes>) {
+	const { blockId, blockName, actions, accepts, mainText, subText, multiple, output } = useGlobalState((state: GlobalState) => state)
+	const { updateState } = actions
 	const { multiSelectValues, label } = useStyles().classes
+
+	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, [baseBeacon])
+
+	useEffect(() => {
+		if (producersBeacons.length > 0 && !output.key) {
+			updateState({ output: producersBeacons[0] })
+		}
+	}, [producersBeacons.length])
 
 	const renderResizable = (children: JSX.Element) => (
 		<ResizableBox
@@ -101,27 +120,43 @@ export function FileDropEdit({ isSelected }: BlockEditProps<Attributes>) {
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
-			<FileDropView renderResizable={renderResizable} isGutenbergEditor />
+			<FileDropView renderResizable={renderResizable} isGutenbergEditor isSelected={isSelected} />
 		</>
 	)
 }
 
 interface ViewProps {
 	isGutenbergEditor?: boolean
+	isSelected?: boolean
 	renderResizable?: (EditorComponent: JSX.Element) => JSX.Element
 }
 
-export function FileDropView({ renderResizable, isGutenbergEditor }: ViewProps) {
-	const { accepts, mainText, subText, multiple, height, files, chosenFile } = useGlobalState((state: GlobalState) => state)
+export function FileDropView({ renderResizable, isGutenbergEditor, isSelected }: ViewProps) {
+	const { accepts, mainText, subText, multiple, height, files, chosenFile, output } = useGlobalState((state: GlobalState) => state)
 	const { updateState, addFiles, removeFile } = useGlobalState((state: GlobalState) => state.actions)
-	const { itemButton, itemGroup } = useStyles().classes
+
+	const { itemButton, itemGroup, hoveringWrapper } = useStyles().classes
+	const dispatch = useDispatch(output)
 
 	const theme = useMantineTheme()
 	const primaryColor = theme.colors[theme.primaryColor][6]
 	const redColor = theme.colors.red[6]
 
+	useEffect(() => {
+		if (chosenFile) {
+			const file = files[chosenFile]
+			handleBody(file, file.type).then((processedData) => {
+				dispatch({ status: 'ready', value: processedData, contentType: file.type })
+			})
+		}
+
+		if (!chosenFile) {
+			dispatch({ status: 'initial', value: null })
+		}
+	}, [chosenFile])
+
 	const Zone = (
-		<Dropzone activateOnClick={!isGutenbergEditor} p={0} multiple={multiple} onDrop={(newFiles) => addFiles(newFiles)} accept={accepts}>
+		<Dropzone p={0} multiple={multiple} onDrop={(newFiles) => addFiles(newFiles)} accept={accepts}>
 			<Group position="center" spacing="xl" style={{ height, pointerEvents: 'none' }}>
 				<Dropzone.Accept>
 					<IconUpload size={50} stroke={1.5} color={primaryColor} />
@@ -150,7 +185,7 @@ export function FileDropView({ renderResizable, isGutenbergEditor }: ViewProps) 
 	}
 
 	return (
-		<div>
+		<div style={{ padding: isGutenbergEditor ? '32px 24px' : undefined }} className={isGutenbergEditor && !isSelected ? hoveringWrapper : undefined}>
 			{renderResizable ? renderResizable(Zone) : Zone}
 			<Stack mt="xs" spacing="xs">
 				{Object.entries(files).map(([key, f]) => {
