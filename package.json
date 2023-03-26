@@ -23,6 +23,7 @@
 	"dependencies": {
 		"@emotion/react": "^11.10.5",
 		"@mantine/core": "^5.10.0",
+		"@mantine/dropzone": "^5.10.5",
 		"@mantine/hooks": "^5.8.4",
 		"@prettier/plugin-php": "^0.18.9",
 		"@tabler/icons": "^1.119.0",
