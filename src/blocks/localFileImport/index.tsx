@@ -1,12 +1,12 @@
 import { ProducerBeacon } from '@inseri/lighthouse'
-import { IconUpload } from '@tabler/icons'
+import { IconDownload } from '@tabler/icons'
 import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockEditProps, BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
 import { SetupEditorEnv, StateProvider } from '../../components'
 import json from './block.json'
-import { FileDropEdit } from './Component'
+import { LocalFileImportEdit } from './Component'
 import { storeCreator } from './state'
 
 const { name, ...settings } = json as any
@@ -27,7 +27,7 @@ function Edit(props: BlockEditProps<Attributes>) {
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'file-drop'}>
 			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
-				<FileDropEdit {...props} />
+				<LocalFileImportEdit {...props} />
 			</StateProvider>
 		</SetupEditorEnv>
 	)
@@ -45,5 +45,5 @@ registerBlockType<Attributes>(name, {
 	...settings,
 	edit: Edit,
 	save: Save,
-	icon: <IconUpload style={{ fill: 'none' }} />,
+	icon: <IconDownload style={{ fill: 'none' }} />,
 })

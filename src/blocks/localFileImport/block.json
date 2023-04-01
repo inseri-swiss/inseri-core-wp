@@ -3,9 +3,9 @@
 	"apiVersion": 2,
 	"name": "inseri-core/file-drop",
 	"version": "0.1.0",
-	"title": "File Drop",
+	"title": "Local File Import",
 	"category": "inseri",
-	"description": "Let visitor provide data for other blocks",
+	"description": "Let visitor import data for other blocks",
 	"attributes": {
 		"blockId": {
 			"type": "string",
@@ -36,7 +36,7 @@
 		},
 		"multiple": {
 			"type": "boolean",
-			"default": true
+			"default": false
 		},
 		"height": {
 			"type": "integer",

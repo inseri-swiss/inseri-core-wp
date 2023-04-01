@@ -1,13 +1,13 @@
 import { useControlTower, useDispatch } from '@inseri/lighthouse'
 import { Dropzone } from '@mantine/dropzone'
-import { IconUpload, IconX, IconCheck } from '@tabler/icons'
+import { IconDownload, IconX, IconCheck } from '@tabler/icons'
 import { InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextareaControl, TextControl, ToggleControl } from '@wordpress/components'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { ActionIcon, Button, createStyles, Group, MultiSelect, Stack, Text, useGlobalState, useMantineTheme } from '../../components'
-import { COMMON_CONTENT_TYPES, handleBody } from '../../utils'
+import { COMMON_CONTENT_TYPES, guessContentTypeByExtension, handleBody } from '../../utils'
 import { Attributes } from './index'
 import { GlobalState } from './state'
 import config from './block.json'
@@ -58,7 +58,7 @@ const useStyles = createStyles((theme) => ({
 
 const baseBeacon = { contentType: '', description: 'visitor provided data', key: 'data', default: '' }
 
-export function FileDropEdit({ isSelected }: BlockEditProps<Attributes>) {
+export function LocalFileImportEdit({ isSelected }: BlockEditProps<Attributes>) {
 	const { blockId, blockName, actions, accepts, mainText, subText, multiple, output } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
 	const { multiSelectValues, label } = useStyles().classes
@@ -120,7 +120,7 @@ export function FileDropEdit({ isSelected }: BlockEditProps<Attributes>) {
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
-			<FileDropView renderResizable={renderResizable} isGutenbergEditor isSelected={isSelected} />
+			<LocalFileImportView renderResizable={renderResizable} isGutenbergEditor isSelected={isSelected} />
 		</>
 	)
 }
@@ -131,7 +131,7 @@ interface ViewProps {
 	renderResizable?: (EditorComponent: JSX.Element) => JSX.Element
 }
 
-export function FileDropView({ renderResizable, isGutenbergEditor, isSelected }: ViewProps) {
+export function LocalFileImportView({ renderResizable, isGutenbergEditor, isSelected }: ViewProps) {
 	const { accepts, mainText, subText, multiple, height, files, chosenFile, output } = useGlobalState((state: GlobalState) => state)
 	const { updateState, addFiles, removeFile } = useGlobalState((state: GlobalState) => state.actions)
 
@@ -141,12 +141,21 @@ export function FileDropView({ renderResizable, isGutenbergEditor, isSelected }:
 	const theme = useMantineTheme()
 	const primaryColor = theme.colors[theme.primaryColor][6]
 	const redColor = theme.colors.red[6]
+	const showDropZone = multiple || Object.keys(files).length === 0
 
 	useEffect(() => {
 		if (chosenFile) {
 			const file = files[chosenFile]
-			handleBody(file, file.type).then((processedData) => {
-				dispatch({ status: 'ready', value: processedData, contentType: file.type })
+			let contentType: string | undefined = file.type
+
+			if (!contentType) {
+				const splittedName = file.name.split('.')
+				const extension = splittedName[splittedName.length - 1]
+				contentType = guessContentTypeByExtension(extension)
+			}
+
+			handleBody(file, contentType ?? '').then((processedData) => {
+				dispatch({ status: 'ready', value: processedData, contentType })
 			})
 		}
 
@@ -159,13 +168,13 @@ export function FileDropView({ renderResizable, isGutenbergEditor, isSelected }:
 		<Dropzone p={0} multiple={multiple} onDrop={(newFiles) => addFiles(newFiles)} accept={accepts}>
 			<Group position="center" spacing="xl" style={{ height, pointerEvents: 'none' }}>
 				<Dropzone.Accept>
-					<IconUpload size={50} stroke={1.5} color={primaryColor} />
+					<IconDownload size={50} stroke={1.5} color={primaryColor} />
 				</Dropzone.Accept>
 				<Dropzone.Reject>
 					<IconX size={50} stroke={1.5} color={redColor} />
 				</Dropzone.Reject>
 				<Dropzone.Idle>
-					<IconUpload size={50} stroke={1.5} />
+					<IconDownload size={50} stroke={1.5} />
 				</Dropzone.Idle>
 
 				<div>
@@ -186,7 +195,7 @@ export function FileDropView({ renderResizable, isGutenbergEditor, isSelected }:
 
 	return (
 		<div style={{ padding: isGutenbergEditor ? '32px 24px' : undefined }} className={isGutenbergEditor && !isSelected ? hoveringWrapper : undefined}>
-			{renderResizable ? renderResizable(Zone) : Zone}
+			{showDropZone && (renderResizable ? renderResizable(Zone) : Zone)}
 			<Stack mt="xs" spacing="xs">
 				{Object.entries(files).map(([key, f]) => {
 					const styles = chosenFile === key ? selectedItemStyle : {}
