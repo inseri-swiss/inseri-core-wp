@@ -16,6 +16,6 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
-      - run: echo 'NODE_OPTIONS="--max-old-space-size=4012"' >> $GITHUB_ENV
+      - run: echo 'NODE_OPTIONS="--max-old-space-size=5012"' >> $GITHUB_ENV
       - run: npm ci
       - run: npm run ${{ inputs.cmd }}
