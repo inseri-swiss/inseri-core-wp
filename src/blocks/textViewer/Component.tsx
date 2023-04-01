@@ -1,5 +1,5 @@
 import { useAvailableBeacons, useWatch } from '@inseri/lighthouse'
-import { IconFileTypography } from '@tabler/icons'
+import { IconEye, IconFileTypography } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
@@ -7,7 +7,7 @@ import { useEffect, useMemo } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import stringify from 'json-stable-stringify'
-import { Box, CodeEditor, Group, Select, Text, useGlobalState } from '../../components'
+import { Box, CodeEditor, Group, Select, Text, Tooltip, useGlobalState } from '../../components'
 import { getBodyTypeByContenType, TEXTUAL_CONTENT_TYPES } from '../../utils'
 import { Attributes } from './index'
 import { GlobalState } from './state'
@@ -127,8 +127,14 @@ export function TextViewerView(props: ViewProps) {
 
 	return (
 		<Box p="md">
-			<Group position="left" mb={4}>
+			<Group spacing="xs" mb={4}>
 				{label.trim() && <Text fz={14}>{label}</Text>}
+				<div style={{ flex: 1 }} />
+				<Tooltip label={__('read-only', 'inseri-core')}>
+					<Group>
+						<IconEye size={22} />
+					</Group>
+				</Tooltip>
 			</Group>
 			{renderResizable ? renderResizable(editorElement) : editorElement}
 		</Box>
