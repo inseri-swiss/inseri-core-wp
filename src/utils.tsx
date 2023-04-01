@@ -129,6 +129,14 @@ export const CONTENT_TYPE_TO_EXT = [
 	{ ext: '7z', value: 'application/x-7z-compressed' },
 ]
 
+export const guessContentTypeByExtension = (extension: string) => {
+	const found = CONTENT_TYPE_TO_EXT.find((data) => extension === data.ext)
+	if (found) {
+		return found.value
+	}
+	return undefined
+}
+
 export const BODY_TYPE_TO_CONTENT_TYPE: Record<string, string> = {
 	text: 'text/plain',
 	json: 'application/json',
@@ -358,7 +366,8 @@ export const handleBody = async (blob: Blob, contentType: string) => {
 		responseBody = JSON.parse(await textBlob.text())
 	}
 
-	if (contentType.includes('text/') || contentType.includes('xml')) {
+	const found = TEXTUAL_CONTENT_TYPES.find((ct) => ct.value.includes(contentType))
+	if (found || contentType.includes('text/') || contentType.includes('xml')) {
 		const textBlob = new Blob([responseBody])
 		responseBody = await textBlob.text()
 	}

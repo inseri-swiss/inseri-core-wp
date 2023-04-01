@@ -1,6 +1,6 @@
 import domReady from '@wordpress/dom-ready'
 import { render } from '@wordpress/element'
-import { FileDropView } from './Component'
+import { LocalFileImportView } from './Component'
 import { InseriThemeProvider, StateProvider } from '../../components'
 import { storeCreator } from './state'
 
@@ -12,7 +12,7 @@ function initReactComponents() {
 			render(
 				<InseriThemeProvider>
 					<StateProvider stateCreator={storeCreator} initialState={attributes}>
-						<FileDropView />
+						<LocalFileImportView />
 					</StateProvider>
 				</InseriThemeProvider>,
 				item
