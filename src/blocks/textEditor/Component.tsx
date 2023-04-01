@@ -1,13 +1,13 @@
 import { useControlTower, useDispatch } from '@inseri/lighthouse'
 import { useDebouncedValue } from '@mantine/hooks'
-import { IconEdit } from '@tabler/icons'
+import { IconEdit, IconEye, IconPencil } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
 import { useEffect, useMemo, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Button, CodeEditor, Group, Select, Text, useGlobalState } from '../../components'
+import { Box, Button, CodeEditor, Group, Select, Text, Tooltip, useGlobalState } from '../../components'
 import { formatCode, getBodyTypeByContenType, isBeautifyType, TEXTUAL_CONTENT_TYPES } from '../../utils'
 import config from './block.json'
 import { Attributes } from './index'
@@ -212,9 +212,22 @@ export function TextEditorView(props: ViewProps) {
 
 	return isVisible || isSelected ? (
 		<Box p="md">
-			<Group position="apart" mb={4}>
+			<Group spacing="xs" mb={4}>
 				{label.trim() && <Text fz={14}>{label}</Text>}
-				<div />
+				<div style={{ flex: 1 }} />
+				{editable ? (
+					<Tooltip label={__('editable', 'inseri-core')}>
+						<Group>
+							<IconPencil size={22} />
+						</Group>
+					</Tooltip>
+				) : (
+					<Tooltip label={__('read-only', 'inseri-core')}>
+						<Group>
+							<IconEye size={22} />
+						</Group>
+					</Tooltip>
+				)}
 				{isBeautifyType(codeType) && isEditable && (
 					<Button variant="subtle" onClick={beautify}>
 						{__('Beautify', 'inseri-core')}

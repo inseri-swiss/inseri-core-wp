@@ -1,8 +1,8 @@
 import { useWatchMany } from '@inseri/lighthouse'
 import { useDisclosure } from '@mantine/hooks'
-import { IconPlayerPlay, IconX } from '@tabler/icons'
+import { IconEye, IconPencil, IconPlayerPlay, IconX } from '@tabler/icons'
 import { __ } from '@wordpress/i18n'
-import { Button, Kbd, Loader, Popover, Text, useGlobalState } from '../../components'
+import { Button, Group, Kbd, Loader, Popover, Text, Tooltip, useGlobalState } from '../../components'
 import { GlobalState } from './state'
 
 interface Props {
@@ -11,7 +11,7 @@ interface Props {
 }
 
 export function TopBar({ code, showPopover }: Props) {
-	const { label, actions, workerStatus, inputs, blockerr, outputs } = useGlobalState((state: GlobalState) => state)
+	const { label, actions, workerStatus, inputs, blockerr, outputs, editable, mode } = useGlobalState((state: GlobalState) => state)
 	const { runCode, terminate } = actions
 	const [isPopoverOpen, { close: closePopover, open: openPopover }] = useDisclosure(false)
 
@@ -19,6 +19,7 @@ export function TopBar({ code, showPopover }: Props) {
 	const areWatchedValuesReady = Object.values(watchedValues).reduce((acc, item) => acc && item.status === 'ready', true)
 	const areOutputsReady = outputs.every((o) => o.contentType !== '')
 	const isReady = areWatchedValuesReady && areOutputsReady && workerStatus !== 'initial'
+	const isCodeEditable = mode === 'editor' && editable
 
 	const primaryButton = showPopover ? (
 		<Popover position="top" withArrow shadow="md" opened={isPopoverOpen}>
@@ -56,6 +57,19 @@ export function TopBar({ code, showPopover }: Props) {
 				</Text>
 			)}
 			{workerStatus !== 'ready' && <Loader p={6} />}
+			{isCodeEditable ? (
+				<Tooltip label={__('The code is editable.', 'inseri-core')}>
+					<Group>
+						<IconPencil size={22} />
+					</Group>
+				</Tooltip>
+			) : (
+				<Tooltip label={__('The code is read-only.', 'inseri-core')}>
+					<Group>
+						<IconEye size={22} />
+					</Group>
+				</Tooltip>
+			)}
 			{workerStatus === 'in-progress' ? (
 				<Button variant="outline" onClick={terminate} leftIcon={<IconX size={20} />} color="red">
 					{__('Stop', 'inseri-core')}
