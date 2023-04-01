@@ -1,3 +1,4 @@
+import { ConsumerBeacon } from '../../globalScript'
 import { immer } from 'zustand/middleware/immer'
 import { Attributes } from './index'
 
@@ -5,20 +6,18 @@ export interface GlobalState extends Attributes {
 	[i: string]: any
 
 	isWizardMode: boolean
-	prevContentType: string
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
-		setContentType: (contentType: string) => void
+		chooseInputBeacon: (beacon: ConsumerBeacon) => void
 	}
 }
 
 export const storeCreator = (initalState: Attributes) => {
-	const isValueSet = !!initalState.output.contentType
+	const isValueSet = !!initalState.input.key
 
 	return immer<GlobalState>((set) => ({
 		...initalState,
 		isWizardMode: !isValueSet,
-		prevContentType: initalState.output.contentType,
 
 		actions: {
 			updateState: (modifier: Partial<GlobalState>) =>
@@ -28,11 +27,10 @@ export const storeCreator = (initalState: Attributes) => {
 					})
 				}),
 
-			setContentType: (contentType: string) =>
+			chooseInputBeacon: (beacon: ConsumerBeacon) =>
 				set((state) => {
 					state.isWizardMode = false
-					state.prevContentType = state.output.contentType
-					state.output.contentType = contentType
+					state.input = beacon
 				}),
 		},
 	}))

@@ -1,21 +1,22 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
-	"name": "inseri-core/text-editor",
+	"name": "inseri-core/text-viewer",
 	"version": "0.1.0",
-	"title": "Text Editor",
+	"title": "Text Viewer",
 	"category": "inseri",
-	"description": "Write JSON, XML, HTML, ...",
+	"description": "View JSON, XML, HTML, ...",
 	"attributes": {
 		"blockId": {
 			"type": "string",
 			"default": ""
 		},
-		"output": {
+		"input": {
 			"type": "object",
 			"default": {
 				"key": "",
-				"contentType": ""
+				"contentType": "",
+				"description": ""
 			}
 		},
 		"blockName": {
@@ -26,10 +27,6 @@
 			"type": "integer",
 			"default": 150
 		},
-		"editable": {
-			"type": "boolean",
-			"default": false
-		},
 		"content": {
 			"type": "string",
 			"default": ""
@@ -37,10 +34,6 @@
 		"label": {
 			"type": "string",
 			"default": ""
-		},
-		"isVisible": {
-			"type": "boolean",
-			"default": true
 		}
 	},
 	"supports": {
