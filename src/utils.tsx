@@ -224,11 +224,6 @@ export const HTTP_METHODS = [
 	'PATCH',
 ]
 
-export const PAGES = {
-	home: 'inseri-core-page',
-	'add-new': 'inseri-core-add-new-page',
-}
-
 export const CONTENT_TYPE = 'Content-Type'
 
 export const isFormType = (bodyType: string) => ['form-urlencoded', 'form-data'].some((i) => i === bodyType)
@@ -366,7 +361,7 @@ export const handleBody = async (blob: Blob, contentType: string) => {
 		responseBody = JSON.parse(await textBlob.text())
 	}
 
-	const found = TEXTUAL_CONTENT_TYPES.find((ct) => ct.value.includes(contentType))
+	const found = TEXTUAL_CONTENT_TYPES.filter((ct) => !ct.value.includes('json')).find((ct) => ct.value.includes(contentType))
 	if (found || contentType.includes('text/') || contentType.includes('xml')) {
 		const textBlob = new Blob([responseBody])
 		responseBody = await textBlob.text()

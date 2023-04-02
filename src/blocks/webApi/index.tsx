@@ -3,10 +3,12 @@ import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockEditProps, BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
-import { datasourceStoreCreator, datasourceInitialState, SetupEditorEnv, StateProvider } from '../../components'
+import { SetupEditorEnv, StateProvider } from '../../components'
 import { ConsumerBeacon, ProducerBeacon } from '../../globalScript'
 import json from './block.json'
 import { WebApiEdit } from './Component'
+import { datasourceStoreCreator } from './AdminState'
+import { ParamItem } from '../../components/ParamsTable'
 
 const { name, ...settings } = json as any
 
@@ -18,10 +20,20 @@ export interface Attributes {
 	inputHeadersParams: ConsumerBeacon
 	inputBody: ConsumerBeacon
 	blockName: string
-	webApiId: number
 	label: string
 	isVisible: boolean
 	autoTrigger: boolean
+
+	requestParams: {
+		method: string
+		url: string
+
+		queryParams: ParamItem[]
+		headerParams: ParamItem[]
+		bodyType: string
+		textBody: string
+		paramsBody: ParamItem[]
+	}
 }
 
 function Edit(props: BlockEditProps<Attributes>) {
@@ -29,7 +41,7 @@ function Edit(props: BlockEditProps<Attributes>) {
 		<SetupEditorEnv {...props} baseBlockName={'webApi'}>
 			<StateProvider
 				stateCreator={datasourceStoreCreator}
-				initialState={{ ...datasourceInitialState, ...props.attributes }}
+				initialState={props.attributes}
 				keysToSave={Object.keys(json.attributes)}
 				setAttributes={props.setAttributes}
 			>

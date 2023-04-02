@@ -54,14 +54,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"webApiId": {
-			"type": "number",
-			"default": -1
-		},
-		"mode": {
-			"type": "string",
-			"default": "read"
-		},
 		"label": {
 			"type": "string",
 			"default": "Call Web API"
@@ -73,6 +65,19 @@
 		"autoTrigger": {
 			"type": "boolean",
 			"default": true
+		},
+		"requestParams": {
+			"type": "object",
+			"default": {
+				"method": "GET",
+				"url": "",
+
+				"queryParams": [{ "isChecked": true, "key": "", "value": "" }],
+				"headerParams": [{ "isChecked": true, "key": "", "value": "" }],
+				"bodyType": "none",
+				"textBody": "",
+				"paramsBody": [{ "isChecked": true, "key": "", "value": "" }]
+			}
 		}
 	},
 	"supports": {

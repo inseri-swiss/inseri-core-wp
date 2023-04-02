@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n'
 import { Accordion, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Tabs, Text, useGlobalState } from '.'
 import { formatCode, isBeautifyType, isFormType } from '../utils'
 import { ParamsTable } from './ParamsTable'
-import { DatasourceState } from './AdminState'
+import { DatasourceState } from '../blocks/webApi/AdminState'
 import { UrlBar } from './UrlBar'
 
 const useStyles = createStyles((theme) => ({
@@ -41,20 +41,17 @@ export function DetailViewBody() {
 	const { primaryBtn, whiteBox, accordionContent, accordionLabel, tab } = useStyles().classes
 
 	const openAccordionItems = useGlobalState((state: DatasourceState) => state.openAccordionItems)
+	const { urlError, bodyError, isTryLoading } = useGlobalState((state: DatasourceState) => state.parameters)
 	const {
 		method,
 		url,
-		urlError,
 		queryParams,
 		headerParams,
 		bodyType: requestBodyType,
 		textBody,
 		paramsBody,
-		bodyError,
-		isTryLoading,
-	} = useGlobalState((state: DatasourceState) => state.parameters)
+	} = useGlobalState((state: DatasourceState) => state.requestParams)
 	const { status, headerParams: responseHeaders, body: responseBody, bodyType: responseBodyType } = useGlobalState((state: DatasourceState) => state.response)
-	const isReading = useGlobalState((state: DatasourceState) => state.mode === 'read')
 
 	const [debouncedUrl] = useDebouncedValue(url, 500)
 	const { updateState, tryRequest, updateRequestBodyType } = useGlobalState((state: DatasourceState) => state.actions)
@@ -66,7 +63,7 @@ export function DetailViewBody() {
 		updateState({ parameters: { bodyError: error } })
 
 		if (formattedCode) {
-			updateState({ parameters: { textBody: formattedCode } })
+			updateState({ requestParams: { textBody: formattedCode } })
 		}
 	}
 
@@ -84,14 +81,13 @@ export function DetailViewBody() {
 		<div className={whiteBox}>
 			<UrlBar
 				method={method}
-				onMethodChange={(val) => updateState({ parameters: { method: val } })}
+				onMethodChange={(val) => updateState({ requestParams: { method: val } })}
 				url={url}
-				onUrlChange={(val) => updateState({ parameters: { url: val } })}
+				onUrlChange={(val) => updateState({ requestParams: { url: val } })}
 				urlError={urlError}
 				setUrlError={(err) => updateState({ parameters: { urlError: err } })}
 				onTryClick={tryRequest}
 				isLoadingRequest={isTryLoading}
-				readonly={isReading}
 			/>
 
 			<Accordion
@@ -118,9 +114,8 @@ export function DetailViewBody() {
 								<ParamsTable
 									items={queryParams}
 									onItemsChange={(qs) => {
-										updateState({ parameters: { queryParams: qs } })
+										updateState({ requestParams: { queryParams: qs } })
 									}}
-									readonly={isReading}
 								/>
 							</Tabs.Panel>
 
@@ -128,9 +123,8 @@ export function DetailViewBody() {
 								<ParamsTable
 									items={headerParams}
 									onItemsChange={(hs) => {
-										updateState({ parameters: { headerParams: hs } })
+										updateState({ requestParams: { headerParams: hs } })
 									}}
-									readonly={isReading}
 								/>
 							</Tabs.Panel>
 
@@ -139,13 +133,11 @@ export function DetailViewBody() {
 									<SegmentedControl
 										value={requestBodyType}
 										onChange={(bodyType) => {
-											if (!isReading) {
-												updateRequestBodyType(bodyType)
-											}
+											updateRequestBodyType(bodyType)
 										}}
 										data={BODY_TYPES}
 									/>
-									{isBeautifyType(requestBodyType) && !isReading && (
+									{isBeautifyType(requestBodyType) && (
 										<Button variant="subtle" onClick={beautify}>
 											{__('Beautify', 'inseri-core')}
 										</Button>
@@ -162,9 +154,8 @@ export function DetailViewBody() {
 									<ParamsTable
 										items={paramsBody}
 										onItemsChange={(val) => {
-											updateState({ parameters: { paramsBody: val } })
+											updateState({ requestParams: { paramsBody: val } })
 										}}
-										readonly={isReading}
 									/>
 								) : (
 									<Box mt="sm">
@@ -178,9 +169,7 @@ export function DetailViewBody() {
 											type={requestBodyType}
 											value={textBody}
 											onChange={(val) => {
-												if (!isReading) {
-													updateState({ parameters: { textBody: val, bodyError: '' } })
-												}
+												updateState({ requestParams: { textBody: val }, parameters: { bodyError: '' } })
 											}}
 										/>
 									</Box>
