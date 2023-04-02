@@ -28,7 +28,6 @@ const initialEntrypoints = {
 			type: 'window',
 		},
 	},
-	'admin-panel': './src/admin-panel',
 }
 
 const blockEntrypoints = fs.readdirSync('./src/blocks').reduce((accumulator, item) => {

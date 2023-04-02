@@ -170,32 +170,6 @@ const handleRequest = async <T>(action: () => Promise<AxiosResponse<T>>): Promis
 	}
 }
 
-export const getAllItems = async (): Promise<[string?, Datasource[]?]> => {
-	const action = () => axios.get<Datasource[]>(inseriApiSettings.root + INSERI_ROUTE)
-	return handleRequest(action)
-}
-
-export const addNewItem = async (newItem: DatasourceWithoutId): Promise<[string?, Datasource?]> => {
-	const action = () => axios.post<Datasource>(inseriApiSettings.root + INSERI_ROUTE, newItem, { headers: { 'X-WP-Nonce': inseriApiSettings.nonce } })
-	return handleRequest(action)
-}
-
-export const removeItem = async (id: number): Promise<[string?, Datasource?]> => {
-	const action = () => axios.delete<Datasource>(inseriApiSettings.root + INSERI_ROUTE + id, { headers: { 'X-WP-Nonce': inseriApiSettings.nonce } })
-	return handleRequest(action)
-}
-
-export const getItem = async (id: number): Promise<[string?, Datasource?]> => {
-	const action = () => axios.get<Datasource>(inseriApiSettings.root + INSERI_ROUTE + id)
-	return handleRequest(action)
-}
-
-export const updateNewItem = async (newItem: Datasource): Promise<[string?, Datasource?]> => {
-	const action = () =>
-		axios.put<Datasource>(inseriApiSettings.root + INSERI_ROUTE + newItem.id, newItem, { headers: { 'X-WP-Nonce': inseriApiSettings.nonce } })
-	return handleRequest(action)
-}
-
 // it contains more properties
 // but only properties of interest are added here
 export interface Media {
