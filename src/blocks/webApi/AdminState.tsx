@@ -20,16 +20,10 @@ import { Attributes as BlockAttributes } from './index'
 
 interface DatasourceAttributes extends BlockAttributes {
 	openAccordionItems: string[]
-	isContentTypeLock: boolean
 
 	heading: {
 		pageError: string
 		isSaveLoading: boolean
-
-		name: string
-		id: number
-		webApiType: string
-		author: string
 	}
 
 	parameters: {
@@ -42,7 +36,13 @@ interface DatasourceAttributes extends BlockAttributes {
 		headerParams: ParamItem[]
 		bodyType: string
 		textBody: string
+		paramsBody: ParamItem[]
 		bodyError: string
+
+		isMethodUrlOverridden: boolean
+		isQueryParamsOverridden: boolean
+		isHeaderParamsOverridden: boolean
+		isBodyOverridden: boolean
 	}
 
 	response: {
@@ -82,25 +82,19 @@ export const datasourceStoreCreator = (initalState: BlockAttributes) => {
 		heading: {
 			pageError: '',
 			isSaveLoading: false,
-
-			name: '',
-			id: -1,
-			webApiType: 'general',
-			author: '',
 		},
 
 		parameters: {
-			method: 'GET',
-			url: '',
+			...initalState.requestParams,
+
 			urlError: '',
 			isTryLoading: false,
-
-			queryParams: [createParamItem()],
-			headerParams: [createParamItem()],
-			bodyType: 'none',
-			textBody: '',
-			paramsBody: [createParamItem()],
 			bodyError: '',
+
+			isMethodUrlOverridden: false,
+			isQueryParamsOverridden: false,
+			isHeaderParamsOverridden: false,
+			isBodyOverridden: false,
 		},
 		response: {
 			status: '',
@@ -126,16 +120,7 @@ export const datasourceStoreCreator = (initalState: BlockAttributes) => {
 					state.heading.pageError = ''
 				})
 
-				const { requestParams, parameters } = get()
-
-				const url = parameters.url ? parameters.url : requestParams.url
-				const method = parameters.method ? parameters.method : requestParams.method
-				const headerParams = parameters.headerParams.length > 0 ? parameters.headerParams : requestParams.headerParams
-				const queryParams = parameters.queryParams.length > 0 ? parameters.queryParams : requestParams.queryParams
-
-				const bodyType = parameters.bodyType ? parameters.bodyType : requestParams.bodyType
-				const paramsBody = requestParams.paramsBody
-				const textBody = parameters.bodyType && parameters.textBody ? parameters.textBody : requestParams.textBody
+				const { url, method, headerParams, queryParams, bodyType, paramsBody, textBody } = get().parameters
 
 				let body: any = null
 				if (bodyType === 'form-urlencoded') {
@@ -186,7 +171,7 @@ export const datasourceStoreCreator = (initalState: BlockAttributes) => {
 					}
 
 					set((state) => {
-						if (!state.isContentTypeLock) {
+						if (!state.requestParams.isContentTypeLock) {
 							state.output.contentType = responseContentType
 						}
 
@@ -207,16 +192,8 @@ export const datasourceStoreCreator = (initalState: BlockAttributes) => {
 			},
 
 			fireRequest: async () => {
-				const { requestParams, parameters, output } = get()
-
-				const url = parameters.url ? parameters.url : requestParams.url
-				const method = parameters.method ? parameters.method : requestParams.method
-				const headerParams = parameters.headerParams.length > 0 ? parameters.headerParams : requestParams.headerParams
-				const queryParams = parameters.queryParams.length > 0 ? parameters.queryParams : requestParams.queryParams
-
-				const bodyType = parameters.bodyType ? parameters.bodyType : requestParams.bodyType
-				const paramsBody = requestParams.paramsBody
-				const textBody = parameters.bodyType && parameters.textBody ? parameters.textBody : requestParams.textBody
+				const { parameters, output } = get()
+				const { url, method, headerParams, queryParams, bodyType, paramsBody, textBody } = parameters
 
 				let body: any = null
 				if (bodyType === 'form-urlencoded') {
@@ -249,6 +226,9 @@ export const datasourceStoreCreator = (initalState: BlockAttributes) => {
 				const updatedHeaders = [...headerParams.slice(0, foundIndex), ...itemsToInsert, ...headerParams.slice(beginIndex)]
 
 				set((state) => {
+					state.parameters.headerParams = updatedHeaders
+					state.parameters.bodyType = bodyType
+
 					state.requestParams.headerParams = updatedHeaders
 					state.requestParams.bodyType = bodyType
 				})
@@ -263,27 +243,36 @@ export const datasourceStoreCreator = (initalState: BlockAttributes) => {
 						state.parameters.url = url
 					}
 
+					if (method || url) {
+						state.parameters.isMethodUrlOverridden = true
+					}
+
 					if (!method && !url) {
-						state.parameters.method = ''
-						state.parameters.url = ''
+						state.parameters.method = state.requestParams.method
+						state.parameters.url = state.requestParams.url
+						state.parameters.isMethodUrlOverridden = false
 					}
 				})
 			},
 			overrideQueryParams: (record?: Record<string, string>) => {
 				set((state) => {
 					if (record) {
-						state.parameters.queryParams.push(...mapObjectToParams(record))
+						state.parameters.queryParams = mapObjectToParams(record)
+						state.parameters.isQueryParamsOverridden = true
 					} else {
-						state.parameters.queryParams = []
+						state.parameters.queryParams = state.requestParams.queryParams
+						state.parameters.isQueryParamsOverridden = false
 					}
 				})
 			},
 			overrideHeaderParams: (record?: Record<string, string>) => {
 				set((state) => {
 					if (record) {
-						state.parameters.headerParams.push(...mapObjectToParams(record))
+						state.parameters.headerParams = mapObjectToParams(record)
+						state.parameters.isHeaderParamsOverridden = true
 					} else {
-						state.parameters.headerParams = []
+						state.parameters.headerParams = state.requestParams.headerParams
+						state.parameters.isHeaderParamsOverridden = false
 					}
 				})
 			},
@@ -292,9 +281,11 @@ export const datasourceStoreCreator = (initalState: BlockAttributes) => {
 					if (newBody) {
 						state.parameters.bodyType = 'text'
 						state.parameters.textBody = newBody
+						state.parameters.isBodyOverridden = true
 					} else {
-						state.parameters.bodyType = ''
-						state.requestParams.textBody = ''
+						state.parameters.bodyType = state.requestParams.bodyType
+						state.parameters.textBody = state.requestParams.textBody
+						state.parameters.isBodyOverridden = false
 					}
 				})
 			},

@@ -71,6 +71,7 @@
 			"default": {
 				"method": "GET",
 				"url": "",
+				"isContentTypeLock": false,
 
 				"queryParams": [{ "isChecked": true, "key": "", "value": "" }],
 				"headerParams": [{ "isChecked": true, "key": "", "value": "" }],
