@@ -51,7 +51,6 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 		inputQueryParams,
 		inputHeadersParams,
 		inputBody,
-		isContentTypeLock,
 		label,
 		isVisible,
 		autoTrigger,
@@ -139,9 +138,9 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 						<ContentTypeSelect
 							withAsterisk
 							value={output.contentType}
-							isLocked={isContentTypeLock}
+							isLocked={requestParams.isContentTypeLock}
 							update={(val) => updateState({ output: { contentType: val } })}
-							setLocked={(isLocked) => updateState({ isContentTypeLock: isLocked })}
+							setLocked={(isLocked) => updateState({ requestParams: { isContentTypeLock: isLocked } })}
 						/>
 
 						<Select

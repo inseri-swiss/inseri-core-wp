@@ -41,7 +41,6 @@ export function DetailViewBody() {
 	const { primaryBtn, whiteBox, accordionContent, accordionLabel, tab } = useStyles().classes
 
 	const openAccordionItems = useGlobalState((state: DatasourceState) => state.openAccordionItems)
-	const { urlError, bodyError, isTryLoading } = useGlobalState((state: DatasourceState) => state.parameters)
 	const {
 		method,
 		url,
@@ -50,7 +49,14 @@ export function DetailViewBody() {
 		bodyType: requestBodyType,
 		textBody,
 		paramsBody,
-	} = useGlobalState((state: DatasourceState) => state.requestParams)
+		urlError,
+		bodyError,
+		isTryLoading,
+		isMethodUrlOverridden,
+		isHeaderParamsOverridden,
+		isQueryParamsOverridden,
+		isBodyOverridden,
+	} = useGlobalState((state: DatasourceState) => state.parameters)
 	const { status, headerParams: responseHeaders, body: responseBody, bodyType: responseBodyType } = useGlobalState((state: DatasourceState) => state.response)
 
 	const [debouncedUrl] = useDebouncedValue(url, 500)
@@ -67,6 +73,17 @@ export function DetailViewBody() {
 		}
 	}
 
+	let bodyTypes = BODY_TYPES
+	if (isBodyOverridden) {
+		bodyTypes = bodyTypes.map((bt) => {
+			if (bt.value !== requestBodyType) {
+				return { ...bt, disabled: true }
+			}
+
+			return bt
+		})
+	}
+
 	useEffect(() => {
 		try {
 			if (debouncedUrl) {
@@ -81,13 +98,14 @@ export function DetailViewBody() {
 		<div className={whiteBox}>
 			<UrlBar
 				method={method}
-				onMethodChange={(val) => updateState({ requestParams: { method: val } })}
+				onMethodChange={(val) => updateState({ requestParams: { method: val }, parameters: { method: val } })}
 				url={url}
-				onUrlChange={(val) => updateState({ requestParams: { url: val } })}
+				onUrlChange={(val) => updateState({ requestParams: { url: val }, parameters: { url: val } })}
 				urlError={urlError}
 				setUrlError={(err) => updateState({ parameters: { urlError: err } })}
 				onTryClick={tryRequest}
 				isLoadingRequest={isTryLoading}
+				readonly={isMethodUrlOverridden}
 			/>
 
 			<Accordion
@@ -113,8 +131,9 @@ export function DetailViewBody() {
 							<Tabs.Panel value="query-params" pt="xs">
 								<ParamsTable
 									items={queryParams}
+									readonly={isQueryParamsOverridden}
 									onItemsChange={(qs) => {
-										updateState({ requestParams: { queryParams: qs } })
+										updateState({ requestParams: { queryParams: qs }, parameters: { queryParams: qs } })
 									}}
 								/>
 							</Tabs.Panel>
@@ -122,8 +141,9 @@ export function DetailViewBody() {
 							<Tabs.Panel value="headers" pt="xs">
 								<ParamsTable
 									items={headerParams}
+									readonly={isHeaderParamsOverridden}
 									onItemsChange={(hs) => {
-										updateState({ requestParams: { headerParams: hs } })
+										updateState({ requestParams: { headerParams: hs }, parameters: { headerParams: hs } })
 									}}
 								/>
 							</Tabs.Panel>
@@ -135,7 +155,7 @@ export function DetailViewBody() {
 										onChange={(bodyType) => {
 											updateRequestBodyType(bodyType)
 										}}
-										data={BODY_TYPES}
+										data={bodyTypes}
 									/>
 									{isBeautifyType(requestBodyType) && (
 										<Button variant="subtle" onClick={beautify}>
@@ -154,7 +174,7 @@ export function DetailViewBody() {
 									<ParamsTable
 										items={paramsBody}
 										onItemsChange={(val) => {
-											updateState({ requestParams: { paramsBody: val } })
+											updateState({ requestParams: { paramsBody: val }, parameters: { paramsBody: val } })
 										}}
 									/>
 								) : (
@@ -169,7 +189,9 @@ export function DetailViewBody() {
 											type={requestBodyType}
 											value={textBody}
 											onChange={(val) => {
-												updateState({ requestParams: { textBody: val }, parameters: { bodyError: '' } })
+												if (!isBodyOverridden) {
+													updateState({ requestParams: { textBody: val }, parameters: { bodyError: '', textBody: val } })
+												}
 											}}
 										/>
 									</Box>

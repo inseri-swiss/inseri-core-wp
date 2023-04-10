@@ -27,6 +27,7 @@ export interface Attributes {
 	requestParams: {
 		method: string
 		url: string
+		isContentTypeLock: boolean
 
 		queryParams: ParamItem[]
 		headerParams: ParamItem[]
