@@ -2,7 +2,7 @@ import { useDebouncedValue } from '@mantine/hooks'
 import { IconCircleOff } from '@tabler/icons'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Accordion, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Tabs, Text, useGlobalState } from '.'
+import { Accordion, Alert, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Tabs, Text, useGlobalState } from '.'
 import { formatCode, isBeautifyType, isFormType } from '../utils'
 import { ParamsTable } from './ParamsTable'
 import { DatasourceState } from '../blocks/webApi/AdminState'
@@ -41,6 +41,7 @@ export function DetailViewBody() {
 	const { primaryBtn, whiteBox, accordionContent, accordionLabel, tab } = useStyles().classes
 
 	const openAccordionItems = useGlobalState((state: DatasourceState) => state.openAccordionItems)
+	const { pageError } = useGlobalState((state: DatasourceState) => state.heading)
 	const {
 		method,
 		url,
@@ -96,6 +97,19 @@ export function DetailViewBody() {
 
 	return (
 		<div className={whiteBox}>
+			{pageError && (
+				<Alert
+					mt="sm"
+					mx="md"
+					title={__('An error occurred', 'inseri-core')}
+					variant="outline"
+					color="red"
+					onClose={() => updateState({ heading: { pageError: '' } })}
+					withCloseButton
+				>
+					{pageError}
+				</Alert>
+			)}
 			<UrlBar
 				method={method}
 				onMethodChange={(val) => updateState({ requestParams: { method: val }, parameters: { method: val } })}

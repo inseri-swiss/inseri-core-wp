@@ -1,17 +1,17 @@
 import { useControlTower, useDispatch, useJsonBeacons, useWatch } from '@inseri/lighthouse'
-import { IconApi } from '@tabler/icons'
+import { IconApi, IconWindowMaximize } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { Button as WPButton, PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { edit } from '@wordpress/icons'
-import { Box, Button, ContentTypeSelect, Group, Modal, Select, Stack, Text, useGlobalState } from '../../components'
+import { Box, Button, ContentTypeSelect, Group, Modal, Select, Stack, Text, TextInput, useGlobalState } from '../../components'
 import { DetailViewBody } from '../../components/DetailViewBody'
 import { isBeaconReady, Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import config from './block.json'
 import { Attributes } from './index'
 import { DatasourceState } from './AdminState'
+import { useDebouncedValue } from '@mantine/hooks'
 
 const stringSchema = {
 	type: 'string',
@@ -59,8 +59,8 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 	} = useGlobalState((state: DatasourceState) => state)
 	const { isModalOpen, isWizardMode } = useGlobalState((state: DatasourceState) => state.block)
 	const { updateState } = useGlobalState((state: DatasourceState) => state.actions)
+	const { url, urlError, isMethodUrlOverridden } = parameters
 
-	const isValueSet = !parameters.urlError && !!requestParams.url && !!output.contentType
 	const availableUrlBeacons = useJsonBeacons(stringSchema, methodUrlSchema)
 	const availableRecordBeacons = useJsonBeacons(recordSchema)
 	const availableStringBeacons = useJsonBeacons(stringSchema)
@@ -76,23 +76,22 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 	const watchHeadersParams = useWatch(inputHeadersParams)
 	const watchBody = useWatch(inputBody)
 
+	const [debouncedUrl] = useDebouncedValue(url, 500)
+	useEffect(() => {
+		try {
+			if (debouncedUrl) {
+				new URL(debouncedUrl)
+			}
+		} catch (exception) {
+			updateState({ parameters: { urlError: __('invalid URL', 'inseri-core') } })
+		}
+	}, [debouncedUrl])
+
 	useEffect(() => {
 		if (producersBeacons.length > 0 && !output.key) {
 			updateState({ output: producersBeacons[0] })
 		}
 	}, [producersBeacons.length])
-
-	useEffect(() => {
-		if (isValueSet && !isSelected && isWizardMode) {
-			updateState({ block: { isWizardMode: false } })
-		}
-	}, [isSelected])
-
-	useEffect(() => {
-		if (!isValueSet && !isModalOpen && !isWizardMode) {
-			updateState({ block: { isWizardMode: true } })
-		}
-	}, [isValueSet, isModalOpen])
 
 	useEffect(() => {
 		if (watchMethodUrl.status === 'unavailable') {
@@ -129,6 +128,11 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 				onClose={() => updateState({ block: { isModalOpen: false } })}
 				styles={{ modal: { background: '#f0f0f1' } }}
 				overflow="inside"
+				title={
+					<Text fz="md" fw="bold">
+						{`Web API${blockName ? ': ' + blockName : ''}`}
+					</Text>
+				}
 			>
 				<Group px={1} align="stretch" spacing="lg">
 					<Box style={{ flex: 1, maxWidth: '77%' }}>
@@ -179,24 +183,27 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 				</Group>
 			</Modal>
 			<BlockControls>
-				{isValueSet && (
-					<ToolbarGroup>
-						<ToolbarButton
-							icon={edit}
-							isActive={isWizardMode}
-							onClick={() => {
-								updateState({ block: { isWizardMode: !isWizardMode } })
-							}}
-							title={__('Edit', 'inseri-core')}
-						/>
-					</ToolbarGroup>
-				)}
+				<ToolbarGroup>
+					<ToolbarButton
+						icon={<IconWindowMaximize style={{ fill: 'none' }} />}
+						title={__('Configure the settings', 'inseri-core')}
+						onClick={() => {
+							updateState({ block: { isModalOpen: !isModalOpen } })
+						}}
+					/>
+				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
 						<Box mb="sm">
-							<WPButton variant="primary" onClick={() => updateState({ block: { isModalOpen: true } })}>
+							<WPButton
+								variant="primary"
+								icon={<IconWindowMaximize style={{ fill: 'none' }} />}
+								onClick={() => {
+									updateState({ block: { isModalOpen: true } })
+								}}
+							>
 								{__('Configure the settings', 'inseri-core')}
 							</WPButton>
 						</Box>
@@ -246,9 +253,30 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 							{__('Web API', 'inseri-core')}
 						</Text>
 					</Group>
-					<Button variant="filled" onClick={() => updateState({ block: { isModalOpen: true } })}>
-						{__('Configure the settings', 'inseri-core')}
-					</Button>
+					<TextInput
+						label={__('Enter your URL', 'inseri-core')}
+						placeholder={__('URL', 'inseri-core')}
+						value={url}
+						onChange={(val) => {
+							const newVal = val.currentTarget.value
+							updateState({ requestParams: { url: newVal }, parameters: { url: newVal, urlError: '' } })
+						}}
+						error={urlError}
+						readOnly={isMethodUrlOverridden}
+						withAsterisk
+						rightSection={
+							<Button
+								variant="filled"
+								leftIcon={<IconWindowMaximize />}
+								onClick={() => {
+									updateState({ block: { isWizardMode: false, isModalOpen: true } })
+								}}
+							>
+								{__('Configure', 'inseri-core')}
+							</Button>
+						}
+						rightSectionWidth="auto"
+					/>
 				</Box>
 			) : (
 				<WebApiView isSelected={isSelected} isGutenbergEditor />
@@ -263,12 +291,14 @@ interface ViewProps {
 }
 
 export function WebApiView({ isSelected, isGutenbergEditor }: ViewProps) {
-	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, output, label, isVisible, autoTrigger } = useGlobalState(
+	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, output, label, isVisible, autoTrigger, parameters } = useGlobalState(
 		(state: DatasourceState) => state
 	)
 	const { overrideMethodUrl, overrideQueryParams, overrideHeaderParams, overrideBody, fireRequest } = useGlobalState((state: DatasourceState) => {
 		return state.actions
 	})
+	const { urlError, bodyError } = parameters
+	const contentTypeError = !output.contentType ? __('Content type is missing.', 'inseri-core') : ''
 
 	const dispatch = useDispatch(output)
 
@@ -361,6 +391,13 @@ export function WebApiView({ isSelected, isGutenbergEditor }: ViewProps) {
 			<Button variant="filled" disabled={!isCallReady} onClick={triggerRequest}>
 				{label}
 			</Button>
+			{(bodyError || urlError || contentTypeError) && (
+				<Text mt="xs" color="red" size="sm">
+					{bodyError}
+					{urlError}
+					{contentTypeError}
+				</Text>
+			)}
 		</Box>
 	) : isGutenbergEditor ? (
 		<Box
