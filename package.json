@@ -22,9 +22,9 @@
 	},
 	"dependencies": {
 		"@emotion/react": "^11.10.6",
-		"@mantine/core": "^5.10.0",
-		"@mantine/dropzone": "^5.10.5",
-		"@mantine/hooks": "^5.8.4",
+		"@mantine/core": "^6.0.7",
+		"@mantine/dropzone": "^6.0.7",
+		"@mantine/hooks": "^6.0.7",
 		"@prettier/plugin-php": "^0.18.9",
 		"@tabler/icons": "^1.119.0",
 		"@types/json-stable-stringify": "^1.0.34",

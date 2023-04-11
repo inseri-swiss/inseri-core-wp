@@ -102,6 +102,7 @@ export function LocalFileImportEdit({ isSelected }: BlockEditProps<Attributes>) 
 					</PanelRow>
 					<PanelRow>
 						<MultiSelect
+							styles={{ root: { width: '100%' } }}
 							classNames={{ values: multiSelectValues, label }}
 							data={COMMON_CONTENT_TYPES}
 							value={accepts}

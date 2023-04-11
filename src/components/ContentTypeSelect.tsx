@@ -1,18 +1,18 @@
 import { IconLock, IconLockOpen } from '@tabler/icons'
 import { __ } from '@wordpress/i18n'
 import { COMMON_CONTENT_TYPES } from '../utils'
-import { ActionIcon, createStyles, Group, Select } from './'
+import { ActionIcon, createStyles, Group, Select, getStylesRef } from './'
 
-const useStyles = createStyles((_theme, _params, getRef) => ({
+const useStyles = createStyles(() => ({
 	midSizeField: {
 		width: 'calc(100% - 28px)',
 	},
 	ctInputWrapper: {
-		[`& > .${getRef('input')}`]: {
+		[`& > .${getStylesRef('input')}`]: {
 			borderTopRightRadius: '0',
 			borderBottomRightRadius: '0',
 		},
-		[`& > .${getRef('input')}:read-only`]: {
+		[`& > .${getStylesRef('input')}:read-only`]: {
 			cursor: 'not-allowed',
 		},
 	},

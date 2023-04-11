@@ -1,8 +1,8 @@
 import { IconX } from '@tabler/icons'
 import { __ } from '@wordpress/i18n'
-import { ActionIcon, Checkbox, createStyles, Table, TextInput } from './index'
+import { ActionIcon, Checkbox, createStyles, Table, TextInput, getStylesRef } from './index'
 
-const useStyles = createStyles((theme, _params, getRef) => ({
+const useStyles = createStyles((theme) => ({
 	table: {
 		[`& td:first-of-type`]: {
 			width: '50px',
@@ -27,10 +27,10 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 	},
 
 	paramInput: {
-		ref: getRef('param-input'),
+		ref: getStylesRef('param-input'),
 	},
 	paramWrapper: {
-		[`& > .${getRef('param-input')}`]: {
+		[`& > .${getStylesRef('param-input')}`]: {
 			border: 'none',
 			'&:focus': {
 				border: '1px solid #8c8f94',
