@@ -3,7 +3,7 @@ import { usePrevious } from '@mantine/hooks'
 import { IconFiles } from '@tabler/icons'
 import { BlockControls, InspectorControls, MediaPlaceholder } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { PanelBody, PanelRow, TextControl, ToolbarGroup, ToggleControl } from '@wordpress/components'
+import { PanelBody, PanelRow, TextControl, ToolbarGroup, ToggleControl, ToolbarButton } from '@wordpress/components'
 import { useDispatch as useWpDispatch } from '@wordpress/data'
 import { forwardRef, useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
@@ -36,18 +36,22 @@ export function MediaLibraryEdit(props: BlockEditProps<Attributes>) {
 		}
 	}, [isSelected])
 
-	const toolbarControls = [
-		{
-			icon: edit,
-			isActive: isWizardMode,
-			onClick: () => updateState({ isWizardMode: !isWizardMode }),
-			title: __('Edit', 'inseri-core'),
-		},
-	]
-
 	return (
 		<>
-			<BlockControls>{isValueSet && <ToolbarGroup controls={toolbarControls} />}</BlockControls>
+			<BlockControls>
+				{isValueSet && (
+					<ToolbarGroup>
+						<ToolbarButton
+							icon={edit}
+							isActive={isWizardMode}
+							onClick={() => {
+								updateState({ isWizardMode: !isWizardMode })
+							}}
+							title={__('Edit', 'inseri-core')}
+						/>
+					</ToolbarGroup>
+				)}
+			</BlockControls>
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
