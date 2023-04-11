@@ -5,13 +5,29 @@ import type { BlockEditProps } from '@wordpress/blocks'
 import { Button as WPButton, PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Box, Button, ContentTypeSelect, Group, Modal, Select, Stack, Text, TextInput, useGlobalState } from '../../components'
+import { Box, Button, ContentTypeSelect, Group, Modal, Select, Stack, Text, TextInput, createStyles, useGlobalState } from '../../components'
 import { DetailViewBody } from '../../components/DetailViewBody'
-import { COMMON_CONTENT_TYPES, isBeaconReady, Z_INDEX_ABOVE_ADMIN } from '../../utils'
+import { COMMON_CONTENT_TYPES, isBeaconReady, PERSISTENT_IDS, Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import config from './block.json'
 import { Attributes } from './index'
 import { DatasourceState } from './AdminState'
 import { useDebouncedValue } from '@mantine/hooks'
+
+const useStyles = createStyles((_theme, _params, getRef) => ({
+	pidLeftInputWrapper: {
+		[`& > .${getRef('input')}`]: {
+			borderTopRightRadius: '0',
+			borderBottomRightRadius: '0',
+		},
+	},
+	pidRightInputWrapper: {
+		[`& > .${getRef('input')}`]: {
+			borderTopLeftRadius: '0',
+			borderBottomLeftRadius: '0',
+			borderLeftWidth: 0,
+		},
+	},
+}))
 
 const stringSchema = {
 	type: 'string',
@@ -56,11 +72,15 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 		autoTrigger,
 		requestParams,
 		parameters,
+		isContentTypeLock,
+		pid,
 	} = useGlobalState((state: DatasourceState) => state)
 	const { isModalOpen, isWizardMode } = useGlobalState((state: DatasourceState) => state.block)
 	const { updateState } = useGlobalState((state: DatasourceState) => state.actions)
 	const { url, urlError, isMethodUrlOverridden } = parameters
 	const isValueSet = !parameters.urlError && !!requestParams.url && !!output.contentType
+
+	const { pidLeftInputWrapper, pidRightInputWrapper } = useStyles().classes
 
 	const availableUrlBeacons = useJsonBeacons(stringSchema, methodUrlSchema)
 	const availableRecordBeacons = useJsonBeacons(recordSchema)
@@ -143,10 +163,29 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 						<ContentTypeSelect
 							withAsterisk
 							value={output.contentType}
-							isLocked={requestParams.isContentTypeLock}
+							isLocked={isContentTypeLock}
 							update={(val) => updateState({ output: { contentType: val } })}
-							setLocked={(isLocked) => updateState({ requestParams: { isContentTypeLock: isLocked } })}
+							setLocked={(isLocked) => updateState({ isContentTypeLock: isLocked })}
 						/>
+
+						<Group spacing={0}>
+							<Select
+								classNames={{ wrapper: pidLeftInputWrapper }}
+								styles={{ root: { width: '80px' }, label: { fontWeight: 'normal' } }}
+								label={__('PID', 'inseri-core')}
+								clearable
+								data={PERSISTENT_IDS}
+								value={pid.type}
+								onChange={(type) => updateState({ pid: { type: type ?? '' } })}
+							/>
+							<TextInput
+								classNames={{ wrapper: pidRightInputWrapper }}
+								style={{ flex: 1 }}
+								label={__('Identifier', 'inseri-core')}
+								value={pid.identifier}
+								onChange={(event) => updateState({ pid: { identifier: event.currentTarget.value } })}
+							/>
+						</Group>
 
 						<Select
 							styles={{ label: { fontWeight: 'normal' } }}
@@ -273,7 +312,7 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 						value={output.contentType}
 						searchable
 						data={COMMON_CONTENT_TYPES}
-						onChange={(val) => updateState({ output: { contentType: val ?? '' }, requestParams: { isContentTypeLock: true } })}
+						onChange={(val) => updateState({ output: { contentType: val ?? '' }, isContentTypeLock: true })}
 						withAsterisk
 					/>
 					<Group position="right">

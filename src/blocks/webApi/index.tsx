@@ -23,11 +23,14 @@ export interface Attributes {
 	label: string
 	isVisible: boolean
 	autoTrigger: boolean
-
+	isContentTypeLock: boolean
+	pid: {
+		type: string
+		identifier: string
+	}
 	requestParams: {
 		method: string
 		url: string
-		isContentTypeLock: boolean
 
 		queryParams: ParamItem[]
 		headerParams: ParamItem[]

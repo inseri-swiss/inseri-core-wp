@@ -66,12 +66,24 @@
 			"type": "boolean",
 			"default": true
 		},
+		"isContentTypeLock": {
+			"type": "boolean",
+			"default": false
+		},
+
+		"pid": {
+			"type": "object",
+			"default": {
+				"type": "",
+				"identifier": ""
+			}
+		},
+
 		"requestParams": {
 			"type": "object",
 			"default": {
 				"method": "GET",
 				"url": "",
-				"isContentTypeLock": false,
 
 				"queryParams": [{ "isChecked": true, "key": "", "value": "" }],
 				"headerParams": [{ "isChecked": true, "key": "", "value": "" }],

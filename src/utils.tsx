@@ -369,3 +369,5 @@ export const handleBody = async (blob: Blob, contentType: string) => {
 
 	return responseBody
 }
+
+export const PERSISTENT_IDS = ['DOI', 'ARK', 'URN', 'PURL']
