@@ -5,7 +5,7 @@ import { useRef, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import type { AllotmentHandle } from 'allotment'
 import { Allotment } from 'allotment'
-import { ActionIcon, Box, Button, CodeEditor, Group, Modal, SelectWithAction, Stack, Text, TextInput, useGlobalState } from '../../components'
+import { ActionIcon, Box, Button, CodeEditor, Group, Modal, SelectWithAction, Stack, Text, TextInput, createStyles, useGlobalState } from '../../components'
 import { COMMON_CONTENT_TYPES, isVariableValid, Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import { GlobalState } from './state'
 import { TopBar } from './TopBar'
@@ -15,6 +15,12 @@ const isReadyForCreate = (varName: string, keys: string[]): boolean => {
 	const isVariableNameValid = isVariableValid(varName) && nameIsNotUsed
 	return isVariableNameValid && varName.length > 0
 }
+
+const useStyles = createStyles(() => ({
+	modalInner: {
+		padding: '5vh 2vw',
+	},
+}))
 
 export function ExtendedView() {
 	const {
@@ -43,6 +49,8 @@ export function ExtendedView() {
 		outputs.map((i) => i.description)
 	)
 
+	const { modalInner } = useStyles().classes
+
 	const isViewerMode = mode === 'viewer'
 	const availableBeacons = useAvailableBeacons()
 	const selectData = Object.keys(availableBeacons)
@@ -66,16 +74,14 @@ export function ExtendedView() {
 	return (
 		<Modal
 			zIndex={Z_INDEX_ABOVE_ADMIN}
-			size="100%"
-			overlayOpacity={0.7}
-			overlayBlur={3}
+			overlayProps={{ opacity: 0.7, blur: 3 }}
 			opened={isModalOpen}
 			onClose={() => updateState({ isModalOpen: false })}
+			classNames={{ inner: modalInner }}
 			styles={{
-				modal: { background: '#f0f0f1', height: '100%' },
-				body: { height: '100%', display: 'flex', flexDirection: 'column' },
+				content: { height: '100%' },
+				body: { height: 'calc(100% - 60px)', boxSizing: 'border-box' },
 			}}
-			overflow="inside"
 			title={
 				<Text fz="md" fw="bold">
 					{`Python Code${blockName ? ': ' + blockName : ''}`}

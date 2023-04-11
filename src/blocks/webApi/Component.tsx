@@ -5,7 +5,7 @@ import type { BlockEditProps } from '@wordpress/blocks'
 import { Button as WPButton, PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Box, Button, ContentTypeSelect, Group, Modal, Select, Stack, Text, TextInput, createStyles, useGlobalState } from '../../components'
+import { Box, Button, ContentTypeSelect, Group, Modal, Select, Stack, Text, TextInput, createStyles, useGlobalState, getStylesRef } from '../../components'
 import { DetailViewBody } from '../../components/DetailViewBody'
 import { COMMON_CONTENT_TYPES, isBeaconReady, PERSISTENT_IDS, Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import config from './block.json'
@@ -13,15 +13,15 @@ import { Attributes } from './index'
 import { DatasourceState } from './AdminState'
 import { useDebouncedValue } from '@mantine/hooks'
 
-const useStyles = createStyles((_theme, _params, getRef) => ({
+const useStyles = createStyles(() => ({
 	pidLeftInputWrapper: {
-		[`& > .${getRef('input')}`]: {
+		[`& > .${getStylesRef('input')}`]: {
 			borderTopRightRadius: '0',
 			borderBottomRightRadius: '0',
 		},
 	},
 	pidRightInputWrapper: {
-		[`& > .${getRef('input')}`]: {
+		[`& > .${getStylesRef('input')}`]: {
 			borderTopLeftRadius: '0',
 			borderBottomLeftRadius: '0',
 			borderLeftWidth: 0,
@@ -142,13 +142,9 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 		<>
 			<Modal
 				zIndex={Z_INDEX_ABOVE_ADMIN}
-				size="90%"
-				overlayOpacity={0.7}
-				overlayBlur={3}
+				overlayProps={{ opacity: 0.7, blur: 3 }}
 				opened={isModalOpen}
 				onClose={() => updateState({ block: { isModalOpen: false } })}
-				styles={{ modal: { background: '#f0f0f1' } }}
-				overflow="inside"
 				title={
 					<Text fz="md" fw="bold">
 						{`Web API${blockName ? ': ' + blockName : ''}`}

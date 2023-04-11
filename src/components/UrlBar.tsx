@@ -1,8 +1,8 @@
 import { __ } from '@wordpress/i18n'
-import { Button, createStyles, Group, Select, TextInput } from './index'
+import { Button, createStyles, Group, Select, TextInput, getStylesRef } from './index'
 import { HTTP_METHODS } from '../utils'
 
-const useStyles = createStyles((theme, _params, getRef) => ({
+const useStyles = createStyles((theme) => ({
 	sendBtn: {
 		fontWeight: 'bold',
 		background: theme.colors.blue[1],
@@ -12,19 +12,19 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 		width: '8em',
 	},
 	methodInput: {
-		ref: getRef('method-input'),
+		ref: getStylesRef('method-input'),
 	},
 	methodWrapper: {
-		[`& > .${getRef('method-input')}`]: {
+		[`& > .${getStylesRef('method-input')}`]: {
 			borderTopRightRadius: 0,
 			borderBottomRightRadius: 0,
 		},
 	},
 	urlInput: {
-		ref: getRef('url-input'),
+		ref: getStylesRef('url-input'),
 	},
 	urlWrapper: {
-		[`& > .${getRef('url-input')}`]: {
+		[`& > .${getStylesRef('url-input')}`]: {
 			borderTopLeftRadius: 0,
 			borderBottomLeftRadius: 0,
 			borderLeftWidth: 0,

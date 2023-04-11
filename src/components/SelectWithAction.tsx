@@ -1,19 +1,19 @@
 import { __ } from '@wordpress/i18n'
-import { ActionIcon, createStyles, Group, Select, SelectProps } from '.'
+import { ActionIcon, createStyles, Group, Select, SelectProps, getStylesRef } from '.'
 
-const useStyles = createStyles((theme, _params, getRef) => ({
+const useStyles = createStyles((theme) => ({
 	midSizeField: {
 		width: 'calc(100% - 28px)',
 		position: 'relative',
 	},
 	ctInputWrapper: {
-		[`& > .${getRef('input')}`]: {
+		[`& > .${getStylesRef('input')}`]: {
 			borderTopRightRadius: '0',
 			borderBottomRightRadius: '0',
 			height: '48px',
 			paddingTop: 18,
 		},
-		[`& > .${getRef('input')}:read-only`]: {
+		[`& > .${getStylesRef('input')}:read-only`]: {
 			cursor: 'not-allowed',
 		},
 	},
@@ -32,7 +32,7 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 		pointerEvents: 'none',
 		fontSize: theme.fontSizes.xs,
 		paddingLeft: 10,
-		paddingTop: theme.spacing.sm / 2,
+		paddingTop: `calc(${theme.spacing.sm} / 2)`,
 		zIndex: 1,
 	},
 }))

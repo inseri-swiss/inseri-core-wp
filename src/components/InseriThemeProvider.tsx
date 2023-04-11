@@ -1,18 +1,18 @@
-import { createStyles, MantineProvider } from '@mantine/core'
+import { createStyles, MantineProvider, getStylesRef } from '@mantine/core'
 import type { MantineThemeOverride } from '@mantine/core'
 import type { PropsWithChildren } from 'react'
 
-const useStyles = createStyles((theme, _params, getRef) => ({
+const useStyles = createStyles((theme) => ({
 	input: {
-		ref: getRef('input'),
+		ref: getStylesRef('input'),
 	},
 	inputWrapper: {
-		[`& > .${getRef('input')}`]: {
+		[`& > .${getStylesRef('input')}`]: {
 			backgroundColor: '#fff',
 			borderRadius: '3px',
 			minHeight: 'unset',
 		},
-		[`& > .${getRef('input')}:focus`]: {
+		[`& > .${getStylesRef('input')}:focus`]: {
 			borderColor: theme.colors.blue[8],
 		},
 	},
@@ -38,11 +38,15 @@ const useStyles = createStyles((theme, _params, getRef) => ({
 			boxShadow: 'unset',
 		},
 	},
+
+	modalInner: {
+		boxSizing: 'border-box',
+	},
 }))
 
 export function InseriThemeProvider({ children }: PropsWithChildren<{}>) {
 	const { classes } = useStyles()
-	const { inputWrapper, input, buttonRoot, checkboxInner } = classes
+	const { inputWrapper, input, buttonRoot, checkboxInner, modalInner } = classes
 
 	const themeOverride: MantineThemeOverride = {
 		defaultRadius: 3,
@@ -59,6 +63,10 @@ export function InseriThemeProvider({ children }: PropsWithChildren<{}>) {
 			},
 			Checkbox: {
 				classNames: { inner: checkboxInner },
+			},
+			Modal: {
+				classNames: { inner: modalInner },
+				styles: { content: { flex: 1, background: '#f0f0f1' }, header: { background: '#f0f0f1' } },
 			},
 		},
 	}
