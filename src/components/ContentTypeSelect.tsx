@@ -1,4 +1,4 @@
-import { IconLock, IconLockOpen } from '@tabler/icons'
+import { IconLock, IconLockOpen } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
 import { COMMON_CONTENT_TYPES } from '../utils'
 import { ActionIcon, createStyles, Group, Select, getStylesRef } from './'

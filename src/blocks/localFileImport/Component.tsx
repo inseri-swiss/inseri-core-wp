@@ -1,6 +1,6 @@
 import { useControlTower, useDispatch } from '@inseri/lighthouse'
 import { Dropzone } from '@mantine/dropzone'
-import { IconDownload, IconX, IconCheck } from '@tabler/icons'
+import { IconDownload, IconX, IconCheck } from '@tabler/icons-react'
 import { InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextareaControl, TextControl, ToggleControl } from '@wordpress/components'

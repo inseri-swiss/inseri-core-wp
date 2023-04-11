@@ -1,6 +1,6 @@
 import { useWatchMany } from '@inseri/lighthouse'
 import { useDisclosure } from '@mantine/hooks'
-import { IconEye, IconPencil, IconPlayerPlay, IconX } from '@tabler/icons'
+import { IconEye, IconPencil, IconPlayerPlay, IconX } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
 import { Button, Group, Kbd, Loader, Popover, Text, Tooltip, useGlobalState } from '../../components'
 import { GlobalState } from './state'

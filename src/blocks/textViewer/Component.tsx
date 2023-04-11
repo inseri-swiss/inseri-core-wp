@@ -1,5 +1,5 @@
 import { useAvailableBeacons, useWatch } from '@inseri/lighthouse'
-import { IconEye, IconFileTypography } from '@tabler/icons'
+import { IconEye, IconFileTypography } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'

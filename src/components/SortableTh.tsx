@@ -1,5 +1,5 @@
 import { createStyles, UnstyledButton, Group, Center, Text } from '@mantine/core'
-import { IconSelector, IconChevronDown, IconChevronUp } from '@tabler/icons'
+import { IconSelector, IconChevronDown, IconChevronUp } from '@tabler/icons-react'
 
 const useStyles = createStyles((theme) => ({
 	th: {

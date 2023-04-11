@@ -1,5 +1,5 @@
 import { useAvailableBeacons, useWatch } from '@inseri/lighthouse'
-import { IconBrandHtml5, IconCircleOff } from '@tabler/icons'
+import { IconBrandHtml5, IconCircleOff } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'

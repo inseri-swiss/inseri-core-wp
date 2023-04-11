@@ -1,5 +1,5 @@
 import { useDebouncedValue } from '@mantine/hooks'
-import { IconCircleOff } from '@tabler/icons'
+import { IconCircleOff } from '@tabler/icons-react'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Accordion, Alert, Box, Button, CodeEditor, createStyles, Group, SegmentedControl, Tabs, Text, useGlobalState } from '.'

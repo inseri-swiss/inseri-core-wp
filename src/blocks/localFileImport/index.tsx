@@ -1,5 +1,5 @@
 import { ProducerBeacon } from '@inseri/lighthouse'
-import { IconDownload } from '@tabler/icons'
+import { IconDownload } from '@tabler/icons-react'
 import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockEditProps, BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'

@@ -1,5 +1,5 @@
 import { useControlTower, useDispatch, useJsonBeacons, useWatch } from '@inseri/lighthouse'
-import { IconCaretDown } from '@tabler/icons'
+import { IconCaretDown } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, TextControl, ToolbarGroup, ToggleControl, ToolbarButton } from '@wordpress/components'

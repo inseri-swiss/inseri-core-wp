@@ -1,5 +1,5 @@
 import { useControlTower, useDispatch, useJsonBeacons, useWatch } from '@inseri/lighthouse'
-import { IconApi, IconWindowMaximize } from '@tabler/icons'
+import { IconApi, IconWindowMaximize } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { Button as WPButton, PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
