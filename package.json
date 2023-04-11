@@ -17,9 +17,6 @@
 		"start": "wp-scripts start",
 		"start:hot": "wp-scripts start --hot"
 	},
-	"overrides": {
-		"@types/react": "^18.0.0"
-	},
 	"dependencies": {
 		"@emotion/react": "^11.10.6",
 		"@mantine/core": "^6.0.7",
