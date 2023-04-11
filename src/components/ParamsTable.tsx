@@ -1,4 +1,4 @@
-import { IconX } from '@tabler/icons'
+import { IconX } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
 import { ActionIcon, Checkbox, createStyles, Table, TextInput, getStylesRef } from './index'
 

@@ -1,6 +1,6 @@
 import { useControlTower, useDispatch } from '@inseri/lighthouse'
 import { usePrevious } from '@mantine/hooks'
-import { IconFiles } from '@tabler/icons'
+import { IconFiles } from '@tabler/icons-react'
 import { BlockControls, InspectorControls, MediaPlaceholder } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, TextControl, ToolbarGroup, ToggleControl, ToolbarButton } from '@wordpress/components'

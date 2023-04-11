@@ -1,5 +1,5 @@
 import { useAvailableBeacons, useJsonBeacons, useWatch } from '@inseri/lighthouse'
-import { IconPhoto, IconPhotoOff, IconCircleOff } from '@tabler/icons'
+import { IconPhoto, IconPhotoOff, IconCircleOff } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, SelectControl, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'

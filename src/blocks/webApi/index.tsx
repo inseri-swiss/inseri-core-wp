@@ -1,4 +1,4 @@
-import { IconApi } from '@tabler/icons'
+import { IconApi } from '@tabler/icons-react'
 import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockEditProps, BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'

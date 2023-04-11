@@ -1,6 +1,6 @@
 import { useAvailableBeacons, useControlTower, useDispatchMany, useWatch, useWatchMany } from '@inseri/lighthouse'
 import { usePrevious } from '@mantine/hooks'
-import { IconBrandPython, IconChevronLeft, IconWindowMaximize } from '@tabler/icons'
+import { IconBrandPython, IconChevronLeft, IconWindowMaximize } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { Button as WPButton, PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'

@@ -1,5 +1,5 @@
 import { BaseBeaconState, ConsumerBeacon, RecordUpdater, useAvailableBeacons, useControlTower, useDispatchMany, useWatch } from '@inseri/lighthouse'
-import { IconChartBar, IconInfoCircle, IconX } from '@tabler/icons'
+import { IconChartBar, IconInfoCircle, IconX } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'

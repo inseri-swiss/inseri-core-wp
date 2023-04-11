@@ -1,6 +1,6 @@
 import { useAvailableBeacons, useWatch } from '@inseri/lighthouse'
 import { useHotkeys } from '@mantine/hooks'
-import { IconChevronDown, IconChevronRight, IconChevronUp, IconPlus, IconX } from '@tabler/icons'
+import { IconChevronDown, IconChevronRight, IconChevronUp, IconPlus, IconX } from '@tabler/icons-react'
 import { useRef, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import type { AllotmentHandle } from 'allotment'
