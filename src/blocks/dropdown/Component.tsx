@@ -2,7 +2,7 @@ import { useControlTower, useDispatch, useJsonBeacons, useWatch } from '@inseri/
 import { IconCaretDown } from '@tabler/icons'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { PanelBody, PanelRow, TextControl, ToolbarGroup, ToggleControl } from '@wordpress/components'
+import { PanelBody, PanelRow, TextControl, ToolbarGroup, ToggleControl, ToolbarButton } from '@wordpress/components'
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
@@ -63,17 +63,15 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 		}
 	}, [isSelected])
 
-	const toolbarControls = [
-		{
-			icon: edit,
-			isActive: isWizardMode,
-			onClick: () => setWizardMode(!isWizardMode),
-			title: __('Edit', 'inseri-core'),
-		},
-	]
 	return (
 		<>
-			<BlockControls>{input && <ToolbarGroup controls={toolbarControls} />}</BlockControls>
+			<BlockControls>
+				{input && (
+					<ToolbarGroup>
+						<ToolbarButton icon={edit} isActive={isWizardMode} onClick={() => setWizardMode(!isWizardMode)} title={__('Edit', 'inseri-core')} />
+					</ToolbarGroup>
+				)}
+			</BlockControls>
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
