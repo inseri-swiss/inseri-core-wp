@@ -77,7 +77,6 @@ export const datasourceStoreCreator = (initalState: BlockAttributes) => {
 		...initalState,
 
 		openAccordionItems: ['request'],
-		isContentTypeLock: false,
 
 		heading: {
 			pageError: '',
@@ -171,7 +170,7 @@ export const datasourceStoreCreator = (initalState: BlockAttributes) => {
 					}
 
 					set((state) => {
-						if (!state.requestParams.isContentTypeLock) {
+						if (!state.isContentTypeLock) {
 							state.output.contentType = responseContentType
 						}
 
