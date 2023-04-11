@@ -7,7 +7,7 @@ import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Box, Button, ContentTypeSelect, Group, Modal, Select, Stack, Text, TextInput, useGlobalState } from '../../components'
 import { DetailViewBody } from '../../components/DetailViewBody'
-import { isBeaconReady, Z_INDEX_ABOVE_ADMIN } from '../../utils'
+import { COMMON_CONTENT_TYPES, isBeaconReady, Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import config from './block.json'
 import { Attributes } from './index'
 import { DatasourceState } from './AdminState'
@@ -60,6 +60,7 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 	const { isModalOpen, isWizardMode } = useGlobalState((state: DatasourceState) => state.block)
 	const { updateState } = useGlobalState((state: DatasourceState) => state.actions)
 	const { url, urlError, isMethodUrlOverridden } = parameters
+	const isValueSet = !parameters.urlError && !!requestParams.url && !!output.contentType
 
 	const availableUrlBeacons = useJsonBeacons(stringSchema, methodUrlSchema)
 	const availableRecordBeacons = useJsonBeacons(recordSchema)
@@ -246,15 +247,15 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 				</PanelBody>
 			</InspectorControls>
 			{isWizardMode ? (
-				<Box p="md" style={{ border: '1px solid #000' }}>
-					<Group mb="lg" spacing={0}>
+				<Stack p="md" style={{ border: '1px solid #000' }} spacing="sm">
+					<Group mb="md" spacing={0}>
 						<IconApi size={28} />
 						<Text ml="xs" fz={24}>
 							{__('Web API', 'inseri-core')}
 						</Text>
 					</Group>
 					<TextInput
-						label={__('Enter your URL', 'inseri-core')}
+						label={__('Enter the URL', 'inseri-core')}
 						placeholder={__('URL', 'inseri-core')}
 						value={url}
 						onChange={(val) => {
@@ -264,20 +265,38 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 						error={urlError}
 						readOnly={isMethodUrlOverridden}
 						withAsterisk
-						rightSection={
-							<Button
-								variant="filled"
-								leftIcon={<IconWindowMaximize />}
-								onClick={() => {
-									updateState({ block: { isWizardMode: false, isModalOpen: true } })
-								}}
-							>
-								{__('Configure', 'inseri-core')}
-							</Button>
-						}
-						rightSectionWidth="auto"
 					/>
-				</Box>
+
+					<Select
+						label={__('Content Type', 'inseri-core')}
+						placeholder={__('In which format is the data received?', 'inseri-core')}
+						value={output.contentType}
+						searchable
+						data={COMMON_CONTENT_TYPES}
+						onChange={(val) => updateState({ output: { contentType: val ?? '' }, requestParams: { isContentTypeLock: true } })}
+						withAsterisk
+					/>
+					<Group position="right">
+						<Button
+							variant="outline"
+							leftIcon={<IconWindowMaximize />}
+							onClick={() => {
+								updateState({ block: { isWizardMode: false, isModalOpen: true } })
+							}}
+						>
+							{__('Configure the settings', 'inseri-core')}
+						</Button>
+						<Button
+							disabled={!isValueSet}
+							variant="filled"
+							onClick={() => {
+								updateState({ block: { isWizardMode: false } })
+							}}
+						>
+							{__('Finish', 'inseri-core')}
+						</Button>
+					</Group>
+				</Stack>
 			) : (
 				<WebApiView isSelected={isSelected} isGutenbergEditor />
 			)}
@@ -391,10 +410,18 @@ export function WebApiView({ isSelected, isGutenbergEditor }: ViewProps) {
 			<Button variant="filled" disabled={!isCallReady} onClick={triggerRequest}>
 				{label}
 			</Button>
-			{(bodyError || urlError || contentTypeError) && (
+			{bodyError && (
 				<Text mt="xs" color="red" size="sm">
 					{bodyError}
+				</Text>
+			)}
+			{urlError && (
+				<Text mt="xs" color="red" size="sm">
 					{urlError}
+				</Text>
+			)}
+			{contentTypeError && (
+				<Text mt="xs" color="red" size="sm">
 					{contentTypeError}
 				</Text>
 			)}
