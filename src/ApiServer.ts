@@ -1,75 +1,14 @@
-import axios from 'axios'
-import type { AxiosResponse } from 'axios'
 import { __ } from '@wordpress/i18n'
-import { getPropertyCaseInsensitive, handleBody } from './utils'
+import type { AxiosResponse } from 'axios'
+import axios from 'axios'
+import { handleBody } from './utils'
 
 const MEDIA_ROUTE = 'wp/v2/media/'
-const INSERI_ROUTE = 'inseri/v1/datasources/'
-
-export type Datasource = DatasourceWithoutId & {
-	id: number
-	author: number
-	author_name: string
-}
-
-export interface DatasourceWithoutId {
-	description: string
-	content_type: string
-	type: string
-	method: string
-	url: string
-	headers: string
-	query_params: string
-	body?: string
-}
 
 export const callMediaFile = async (url: string, responseContentType: string): Promise<[string?, any?]> => {
 	try {
 		const mediaResponse = await axios.get<Blob>(url, { responseType: 'blob' })
 		const responseBody = await handleBody(mediaResponse.data, responseContentType)
-
-		return [undefined, responseBody]
-	} catch (exception) {
-		if (exception instanceof axios.AxiosError) {
-			return [exception.message, undefined]
-		}
-
-		return ['Unknown error occurred', undefined]
-	}
-}
-
-export const callWebApi = async (datasourceId: string, responseContentType: string) => {
-	try {
-		const datasource = await axios.get<Datasource>(inseriApiSettings.root + INSERI_ROUTE + datasourceId)
-		const { method, url, headers, query_params: queryParams, body } = datasource.data
-
-		const urlObject = new URL(url)
-		const queryParamsObj = new URLSearchParams(JSON.parse(queryParams))
-		urlObject.search = queryParamsObj.toString()
-
-		const headersObj = JSON.parse(headers)
-		const requestContentType = getPropertyCaseInsensitive(headersObj, 'content-type')
-		let requestBody: any = body
-
-		if (body && requestContentType?.includes('application/x-www-form-urlencoded')) {
-			requestBody = new URLSearchParams(JSON.parse(body))
-		}
-		if (body && requestContentType?.includes('multipart/form-data')) {
-			requestBody = Object.entries(JSON.parse(body)).reduce((bodyFormData, [key, value]: any) => {
-				bodyFormData.append(key, value)
-				return bodyFormData
-			}, new FormData())
-		}
-
-		const response = await axios({
-			method,
-			url: urlObject.toString(),
-			headers: headersObj,
-			data: requestBody,
-			responseType: 'blob',
-		})
-
-		const responseBody = await handleBody(response.data, responseContentType)
 
 		return [undefined, responseBody]
 	} catch (exception) {
