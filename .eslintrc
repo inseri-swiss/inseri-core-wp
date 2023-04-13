@@ -2,6 +2,7 @@
 	"extends": ["plugin:@wordpress/eslint-plugin/recommended"],
 	"rules": {
 		"no-nested-ternary": "off",
+		"react-hooks/exhaustive-deps": "off",
 		"import/no-unresolved": [2, { "ignore": ["^@inseri/"] }]
 	}
 }
