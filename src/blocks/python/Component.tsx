@@ -237,11 +237,14 @@ export function PythonView(props: ViewProps) {
 
 	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, outputs)
 	const joinedOutputTypes = outputs.map((o) => o.contentType).join('')
+	const joinedProducerKeys = producersBeacons.reduce((acc, b) => acc + b.key, '')
 	const joinedKeys = outputs.reduce((acc, b) => acc + b.key, '')
 
 	useEffect(() => {
-		updateState({ outputs: producersBeacons })
-	}, [producersBeacons.length, joinedKeys])
+		if (joinedProducerKeys !== joinedKeys) {
+			updateState({ outputs: producersBeacons })
+		}
+	}, [joinedProducerKeys])
 
 	const dispatchRecord = useDispatchMany(producersBeacons)
 
