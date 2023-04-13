@@ -1,5 +1,5 @@
 import { useAvailableBeacons, useWatch } from '@inseri/lighthouse'
-import { IconBrandHtml5, IconCircleOff } from '@tabler/icons-react'
+import { IconHtml, IconCircleOff } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
@@ -73,7 +73,7 @@ export function HtmlEdit(props: BlockEditProps<Attributes>) {
 			{isWizardMode ? (
 				<Box p="md" style={{ border: '1px solid #000' }}>
 					<Group mb="md" spacing={0}>
-						<IconBrandHtml5 size={28} />
+						<IconHtml size={28} />
 						<Text ml="xs" fz={24}>
 							{__('HTML Code', 'inseri-core')}
 						</Text>
