@@ -247,17 +247,19 @@ export function PlotlyView({ renderResizable }: ViewProps) {
 	const { height, inputFull, inputData, inputLayout, inputConfig, blockId, blockName, outputs, revision } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 
-	const [frames, setFrames] = useState<any>([])
 	const [data, setData] = useState<any>([])
 	const [layout, setLayout] = useState<any>({})
 	const [config, setConfig] = useState<any>({})
 
 	const producersBeacons = useControlTower({ blockId, blockType: blockConfig.name, instanceName: blockName }, outputs)
-	const joinedKeys = outputs.reduce((acc, b) => acc + b.key, '')
+	const joinedProducerKeys = producersBeacons.reduce((acc, b) => acc + b.key, '')
+	const joinedOutputsKeys = outputs.reduce((acc, b) => acc + b.key, '')
 
 	useEffect(() => {
-		updateState({ outputs: producersBeacons })
-	}, [producersBeacons.length, joinedKeys])
+		if (joinedProducerKeys !== joinedOutputsKeys) {
+			updateState({ outputs: producersBeacons })
+		}
+	}, [joinedProducerKeys])
 
 	const dispatchRecord = useDispatchMany(producersBeacons)
 
@@ -312,22 +314,11 @@ export function PlotlyView({ renderResizable }: ViewProps) {
 	const chart = (
 		<Plot
 			revision={revision}
-			frames={frames}
 			data={data}
 			layout={layout}
 			config={config}
 			useResizeHandler={true}
 			style={{ width: '100%', height: '100%' }}
-			onInitialized={(f) => {
-				setData(f.data)
-				setLayout(f.layout)
-				setFrames(f.frames)
-			}}
-			onUpdate={(f) => {
-				setData(f.data)
-				setLayout(f.layout)
-				setFrames(f.frames)
-			}}
 			// events
 			onClick={propagateIfSet('onClick', outputs, dispatchRecord)}
 			onHover={propagateIfSet('onHover', outputs, dispatchRecord)}

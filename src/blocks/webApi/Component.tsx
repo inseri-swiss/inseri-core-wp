@@ -152,7 +152,7 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 				}
 			>
 				<Group px={1} align="stretch" spacing="lg">
-					<Box style={{ flex: 1, maxWidth: '77%' }}>
+					<Box style={{ flex: 1 }}>
 						<DetailViewBody />
 					</Box>
 					<Stack p="md" style={{ background: '#fff', width: '300px', border: '1px solid #ced4da' }}>
