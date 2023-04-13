@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from '@wordpress/element'
 import produce, { setAutoFreeze } from 'immer'
 import type { Draft } from 'immer'
-import create from 'zustand'
+import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { immer } from 'zustand/middleware/immer'
 import { Schema } from 'ajv'
