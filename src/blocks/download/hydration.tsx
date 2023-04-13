@@ -1,5 +1,5 @@
 import domReady from '@wordpress/dom-ready'
-import { render } from '@wordpress/element'
+import { createRoot } from '@wordpress/element'
 import { DownloadView } from './Component'
 import { InseriThemeProvider, StateProvider } from '../../components'
 import { storeCreator } from './state'
@@ -9,13 +9,12 @@ function initReactComponents() {
 	if (items) {
 		Array.from(items).forEach((item: any) => {
 			const attributes = JSON.parse(item.dataset.attributes)
-			render(
+			createRoot(item!).render(
 				<InseriThemeProvider>
 					<StateProvider stateCreator={storeCreator} initialState={attributes}>
 						<DownloadView />
 					</StateProvider>
-				</InseriThemeProvider>,
-				item
+				</InseriThemeProvider>
 			)
 		})
 	}

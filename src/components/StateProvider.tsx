@@ -1,7 +1,7 @@
 import { createContext, useContext, useRef } from '@wordpress/element'
 import type { PropsWithChildren } from 'react'
 import { persistToAttributes } from '../utils'
-import create, { useStore, StateCreator, StoreApi } from 'zustand'
+import { create, useStore, StateCreator, StoreApi } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import { setAutoFreeze } from 'immer'
 

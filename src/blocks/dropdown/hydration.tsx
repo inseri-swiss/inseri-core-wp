@@ -1,5 +1,5 @@
 import domReady from '@wordpress/dom-ready'
-import { render } from '@wordpress/element'
+import { createRoot } from '@wordpress/element'
 import { DropdownView } from './Component'
 import { InseriThemeProvider } from '../../components'
 
@@ -8,11 +8,10 @@ function initReactComponents() {
 	if (items) {
 		Array.from(items).forEach((item: any) => {
 			const attributes = JSON.parse(item.dataset.attributes)
-			render(
+			createRoot(item!).render(
 				<InseriThemeProvider>
 					<DropdownView attributes={attributes} />
-				</InseriThemeProvider>,
-				item
+				</InseriThemeProvider>
 			)
 		})
 	}
