@@ -1,4 +1,4 @@
-import { IconBrandHtml5 } from '@tabler/icons-react'
+import { IconHtml } from '@tabler/icons-react'
 import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockEditProps, BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
@@ -41,5 +41,5 @@ registerBlockType<Attributes>(name, {
 	...settings,
 	edit: Edit,
 	save: Save,
-	icon: <IconBrandHtml5 style={{ fill: 'none' }} />,
+	icon: <IconHtml style={{ fill: 'none' }} />,
 })
