@@ -132,3 +132,29 @@ export const getAllMedia = async (ids: number[]): Promise<[string?, Media[]?]> =
 	const action = () => axios.get<Media[]>(inseriApiSettings.root + MEDIA_ROUTE + `&include=${ids.join(',')}`)
 	return handleRequest(action)
 }
+
+const RECORD_ROUTE = 'https://zenodo.org/api/records/'
+
+// it contains more properties
+// but only properties of interest are added here
+interface ZenodoFile {
+	filename: string
+	links: { download: string }
+	filesize: number
+	type: string
+}
+
+export interface ZenodoRecord {
+	created: string
+	doi: string
+	files: ZenodoFile[]
+	metadata: {
+		title: string
+		version?: string
+	}
+}
+
+export const getZenodoRecord = async (recordId: string): Promise<[string?, ZenodoRecord?]> => {
+	const action = () => axios.get<ZenodoRecord>(RECORD_ROUTE + recordId)
+	return handleRequest(action)
+}
