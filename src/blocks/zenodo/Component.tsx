@@ -7,17 +7,20 @@ import { PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, Toolbar
 import { forwardRef, useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Group, Image, Loader, Select, Text, useGlobalState } from '../../components'
+import { Button, Box, Checkbox, Group, Image, Loader, Select, Stack, Text, TextInput, useGlobalState } from '../../components'
 import config from './block.json'
 import { Attributes } from './index'
 import { GlobalState } from './state'
+import { getFormattedBytes } from '../../utils'
 
 const baseBeacon = { contentType: '', description: 'file', key: 'file', default: '' }
 
 export function ZenodoEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { output, blockId, blockName, label, isWizardMode, actions, fileIds, files, isVisible } = useGlobalState((state: GlobalState) => state)
-	const { updateState } = actions
+	const { output, blockId, blockName, label, isWizardMode, actions, fileIds, files, isVisible, doi, doiError, isLoading, record, hasError } = useGlobalState(
+		(state: GlobalState) => state
+	)
+	const { updateState, setDoi } = actions
 
 	const isValueSet = fileIds.length > 0
 	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, [baseBeacon])
@@ -73,14 +76,54 @@ export function ZenodoEdit(props: BlockEditProps<Attributes>) {
 				</PanelBody>
 			</InspectorControls>
 			{isWizardMode ? (
-				<Box p="md" style={{ border: '1px solid #000' }}>
-					<Group mb="md" spacing={0}>
+				<Stack p="md" style={{ border: '1px solid #000' }}>
+					<Group mb="sm" spacing={0}>
 						<IconBooks size={28} />
 						<Text ml="xs" fz={24}>
 							{__('Zenodo', 'inseri-core')}
 						</Text>
 					</Group>
-				</Box>
+					<TextInput
+						label="DOI"
+						value={doi}
+						onChange={(event) => setDoi(event.currentTarget.value)}
+						error={doiError}
+						rightSection={isLoading && <Loader size="xs" />}
+						withAsterisk
+					/>
+
+					{hasError && (
+						<>
+							<Group position="center" mt="md">
+								<Text fz={16} color="red">
+									{__('Record not found', 'inseri-core')}
+								</Text>
+							</Group>
+						</>
+					)}
+
+					{record && (
+						<>
+							<Group position="apart" mt="md">
+								<Text fz={16}>{record.metadata.title}</Text>
+								{record.metadata.version ? <Text fz={16}>Version: {record.metadata.version}</Text> : <div />}
+							</Group>
+
+							{record.files.map((f) => (
+								<Group position="apart">
+									<Checkbox label={f.filename} />
+									<Text fz={12}>{getFormattedBytes(f.filesize)}</Text>
+								</Group>
+							))}
+
+							<Group position="right">
+								<Button variant="filled" onClick={() => updateState({ isWizardMode: false })}>
+									{__('Use selected files', 'inseri-core')}
+								</Button>
+							</Group>
+						</>
+					)}
+				</Stack>
 			) : (
 				<ZenodoView isGutenbergEditor isSelected={isSelected} />
 			)}
