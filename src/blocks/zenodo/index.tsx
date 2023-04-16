@@ -3,7 +3,7 @@ import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockEditProps, BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
-import { SetupEditorEnv, StateProvider } from '../../components'
+import { SelectItem, SetupEditorEnv, StateProvider } from '../../components'
 import { ProducerBeacon } from '../../globalScript'
 import json from './block.json'
 import { ZenodoEdit } from './Component'
@@ -17,7 +17,8 @@ export interface Attributes {
 	label: string
 	output: ProducerBeacon
 	doi: string
-	fileIds: string[]
+	files: SelectItem[]
+	selectedFile: string | null
 	isVisible: boolean
 }
 

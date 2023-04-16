@@ -30,9 +30,14 @@
 			"type": "string",
 			"default": ""
 		},
-		"fileIds": {
+		"files": {
 			"type": "array",
 			"default": []
+		},
+
+		"selectedFile": {
+			"type": "string",
+			"default": null
 		},
 		"isVisible": {
 			"type": "boolean",

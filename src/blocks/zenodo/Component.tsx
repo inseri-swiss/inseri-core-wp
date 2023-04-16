@@ -4,25 +4,25 @@ import { IconBooks } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
-import { forwardRef, useEffect } from '@wordpress/element'
+import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Button, Box, Checkbox, Group, Image, Loader, Select, Stack, Text, TextInput, useGlobalState } from '../../components'
+import { Box, Button, Checkbox, Group, Loader, Select, Stack, Text, TextInput, useGlobalState } from '../../components'
+import { getFormattedBytes } from '../../utils'
 import config from './block.json'
 import { Attributes } from './index'
 import { GlobalState } from './state'
-import { getFormattedBytes } from '../../utils'
 
 const baseBeacon = { contentType: '', description: 'file', key: 'file', default: '' }
 
 export function ZenodoEdit(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { output, blockId, blockName, label, isWizardMode, actions, fileIds, files, isVisible, doi, doiError, isLoading, record, hasError } = useGlobalState(
+	const { output, blockId, blockName, label, isWizardMode, files, isVisible, doi, doiError, isWizardLoading, record, hasWizardError } = useGlobalState(
 		(state: GlobalState) => state
 	)
-	const { updateState, setDoi } = actions
+	const { updateState, setDoi, loadDoi } = useGlobalState((state: GlobalState) => state.actions)
 
-	const isValueSet = fileIds.length > 0
+	const isValueSet = files.length > 0
 	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, [baseBeacon])
 
 	useEffect(() => {
@@ -36,6 +36,10 @@ export function ZenodoEdit(props: BlockEditProps<Attributes>) {
 			updateState({ isWizardMode: false })
 		}
 	}, [isSelected])
+
+	useEffect(() => {
+		loadDoi()
+	}, [])
 
 	return (
 		<>
@@ -88,11 +92,11 @@ export function ZenodoEdit(props: BlockEditProps<Attributes>) {
 						value={doi}
 						onChange={(event) => setDoi(event.currentTarget.value)}
 						error={doiError}
-						rightSection={isLoading && <Loader size="xs" />}
+						rightSection={isWizardLoading && <Loader size="xs" />}
 						withAsterisk
 					/>
 
-					{hasError && (
+					{hasWizardError && (
 						<>
 							<Group position="center" mt="md">
 								<Text fz={16} color="red">
@@ -104,20 +108,36 @@ export function ZenodoEdit(props: BlockEditProps<Attributes>) {
 
 					{record && (
 						<>
-							<Group position="apart" mt="md">
-								<Text fz={16}>{record.metadata.title}</Text>
-								{record.metadata.version ? <Text fz={16}>Version: {record.metadata.version}</Text> : <div />}
-							</Group>
+							<Text fz={16} mt="md">
+								{record.metadata.title}
+							</Text>
+							{record.metadata.version && <Text fz={16}>Version: {record.metadata.version}</Text>}
 
-							{record.files.map((f) => (
-								<Group position="apart">
-									<Checkbox label={f.filename} />
-									<Text fz={12}>{getFormattedBytes(f.filesize)}</Text>
-								</Group>
-							))}
+							<Stack style={{ maxHeight: 400, overflow: 'auto', paddingRight: 16, paddingBottom: 10 }}>
+								{record.files.map((f) => (
+									<Group position="apart" key={f.filename}>
+										<Checkbox
+											label={f.filename}
+											checked={!!files.find((i) => i.label === f.filename)}
+											onChange={(event) => {
+												let newFiles = []
+
+												if (event.currentTarget.checked) {
+													newFiles = [...files, { label: f.filename, value: f.links.download }]
+												} else {
+													newFiles = files.filter((i) => i.label !== f.filename)
+												}
+
+												updateState({ files: newFiles, selectedFile: newFiles.length === 1 ? newFiles[0].value : null })
+											}}
+										/>
+										<Text fz={12}>{getFormattedBytes(f.filesize)}</Text>
+									</Group>
+								))}
+							</Stack>
 
 							<Group position="right">
-								<Button variant="filled" onClick={() => updateState({ isWizardMode: false })}>
+								<Button variant="filled" onClick={() => updateState({ isWizardMode: false })} disabled={!isValueSet}>
 									{__('Use selected files', 'inseri-core')}
 								</Button>
 							</Group>
@@ -130,28 +150,14 @@ export function ZenodoEdit(props: BlockEditProps<Attributes>) {
 		</>
 	)
 }
-
-interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {
-	thumbnail: string
-	label: string
-}
-
-const SelectItem = forwardRef<HTMLDivElement, ItemProps>(({ thumbnail, label, ...others }: ItemProps, ref) => (
-	<div ref={ref} {...others}>
-		<Group noWrap>
-			<Image src={thumbnail} width={38} height={38} fit="contain" />
-			<Text size="sm">{label}</Text>
-		</Group>
-	</div>
-))
-
 interface ViewProps {
 	isSelected?: boolean
 	isGutenbergEditor?: boolean
 }
 
 export function ZenodoView({ isGutenbergEditor, isSelected }: ViewProps) {
-	const { label, selectedFileId, files, output, isLoading, hasError, fileContent, mime, isVisible } = useGlobalState((state: GlobalState) => state)
+	const { label, selectedFile, files, output, isLoading, hasError, fileContent, mime, isVisible } = useGlobalState((state: GlobalState) => state)
+	const { chooseFile, loadFile } = useGlobalState((state: GlobalState) => state.actions)
 	const dispatch = useDispatch(output)
 	const prevMime = usePrevious(mime)
 
@@ -164,6 +170,10 @@ export function ZenodoView({ isGutenbergEditor, isSelected }: ViewProps) {
 	useEffect(() => {
 		dispatch({ contentType: mime })
 	}, [mime])
+
+	useEffect(() => {
+		loadFile()
+	}, [])
 
 	useEffect(() => {
 		setTimeout(() => {
@@ -187,10 +197,10 @@ export function ZenodoView({ isGutenbergEditor, isSelected }: ViewProps) {
 			<Select
 				clearable
 				readOnly={files.length === 1}
-				itemComponent={SelectItem}
 				label={label}
-				value={selectedFileId}
+				value={selectedFile}
 				data={files}
+				onChange={(val) => chooseFile(val)}
 				rightSection={isLoading && <Loader p="xs" />}
 				error={hasError ? __('An error has occurred.', 'inseri-core') : null}
 			/>

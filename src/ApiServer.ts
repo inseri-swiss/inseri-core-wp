@@ -141,7 +141,6 @@ interface ZenodoFile {
 	filename: string
 	links: { download: string }
 	filesize: number
-	type: string
 }
 
 export interface ZenodoRecord {
