@@ -58,6 +58,10 @@ export const storeCreator = (initalState: Attributes) => {
 					if (!isInitialLoad) {
 						const downloadLinks = data.files.map((f) => ({ label: f.filename, value: f.links.download }))
 						state.files = downloadLinks
+
+						if (downloadLinks.length === 1) {
+							state.selectedFile = downloadLinks[0].value
+						}
 					}
 				})
 			}
