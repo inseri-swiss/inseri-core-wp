@@ -129,7 +129,10 @@ export interface Media {
 }
 
 export const getAllMedia = async (ids: number[]): Promise<[string?, Media[]?]> => {
-	const action = () => axios.get<Media[]>(inseriApiSettings.root + MEDIA_ROUTE + `&include=${ids.join(',')}`)
+	const url = new URL(inseriApiSettings.root + MEDIA_ROUTE)
+	url.searchParams.append('include', ids.join(','))
+
+	const action = () => axios.get<Media[]>(url.toString())
 	return handleRequest(action)
 }
 
