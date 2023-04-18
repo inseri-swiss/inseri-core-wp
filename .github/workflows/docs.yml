@@ -2,7 +2,7 @@ name: docs
 on:
   push:
     branches:
-      - main
+      - feat/add-mkdocs
 jobs:
   deploy-documentation:
     runs-on: ubuntu-latest
