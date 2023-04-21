@@ -1,7 +1,5 @@
 # Dropdown
 
-namespace: `inseri-core/dropdown`
-
 The dropdown block can be used to make the content on your page dynamic.
 
 ## Input

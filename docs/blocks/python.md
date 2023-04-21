@@ -1,7 +1,5 @@
 # Python Code
 
-namespace: `inseri-core/...`
-
 The python code block can be used with its own code or code loaded from another source as a text editor with the type `Python`.
 
 This block allows multiple inputs and outputs. This makes it interesting to tie the behaviors of different blocks together.
@@ -36,6 +34,3 @@ Show or hide the code.
 The script will run automatically on load and any input change. If set to false, the script will have to be run explicitly.
 
 ### Publicly editable
-
-
-

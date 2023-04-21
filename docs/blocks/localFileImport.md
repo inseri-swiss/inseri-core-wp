@@ -1,7 +1,5 @@
 # Local File Import
 
-namespace: `inseri-core/...`
-
 Upload data from your computer for input in other blocks
 
 ## Parameters

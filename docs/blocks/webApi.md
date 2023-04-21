@@ -1,7 +1,5 @@
 # Web API
 
-namespace: `inseri-core/web-api`
-
 User has to choose one base web API which was previously defined in admin area.
 
 Each part of web API can be further customized by choosing a block input:

@@ -1,7 +1,5 @@
 # Plotly.js
 
-namespace: `inseri-core/...`
-
 Please check out the [Plotly JSON chart schema](https://plotly.com/chart-studio-help/json-chart-schema/).
 
 ## Input
@@ -71,7 +69,7 @@ The standard format by Plotly
 
 ### Events
 
-hover, click 
+hover, click
 
 ## Extended configuration
 
@@ -95,10 +93,6 @@ hover, click
 ],
 ```
 
-
 ### Override layout separately
 
 ### Provide config
-
-
-

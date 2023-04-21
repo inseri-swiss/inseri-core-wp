@@ -1,8 +1,6 @@
 # Image
 
-namespace: `inseri-core/...`
-
-The image viewer can show images from a remote source. 
+The image viewer can show images from a remote source.
 
 ## Input
 

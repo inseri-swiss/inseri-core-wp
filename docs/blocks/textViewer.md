@@ -1,7 +1,5 @@
 # Text Viewer
 
-namespace: `inseri-core/textViewer`
-
 The Text Viewer block can be fed with text from the output from any block in the post. If the data changes, the viewer will be updated.
 
 ## Text Editor
