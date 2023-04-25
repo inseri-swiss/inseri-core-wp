@@ -4,11 +4,46 @@ on: [push]
 
 jobs:
   lint:
-    uses: ./.github/workflows/npm-run.yml
-    with:
-      cmd: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/npm-run
+        with:
+          cmd: lint
 
   build:
-    uses: ./.github/workflows/npm-run.yml
-    with:
-      cmd: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/npm-run
+        with:
+          cmd: build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-asset
+          path: build/
+
+  release:
+    needs: [lint, build]
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.ref, 'refs/tags/v') # run on tags that starts with 'v'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-asset
+          path: build/
+
+      - uses: ./.github/actions/npm-run
+        with:
+          cmd: plugin-zip
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          draft: true
+          files: |
+            inseri-core.zip

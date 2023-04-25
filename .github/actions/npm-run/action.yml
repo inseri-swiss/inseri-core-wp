@@ -1,0 +1,22 @@
+name: Reusable npm command
+description: run npm command
+
+inputs:
+  cmd:
+    description: npm command
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version-file: '.nvmrc'
+        cache: 'npm'
+    - run: echo 'NODE_OPTIONS="--max-old-space-size=5012"' >> $GITHUB_ENV
+      shell: bash
+    - run: npm ci
+      shell: bash
+    - run: npm run ${{ inputs.cmd }}
+      shell: bash
