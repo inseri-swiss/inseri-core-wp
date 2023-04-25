@@ -1,0 +1,14 @@
+site_name: Documentation for inseri core (BETA)
+theme:
+  name: material
+  features:
+    - content.code.copy
+  palette:
+    primary: white
+    accent: yellow
+  logo: assets/inseri_logo_full.svg
+  favicon: assets/inseri_logo.svg
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
