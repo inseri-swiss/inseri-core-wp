@@ -4,11 +4,55 @@ on: [push]
 
 jobs:
   lint:
-    uses: ./.github/workflows/npm-run.yml
-    with:
-      cmd: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: |
+          npm ci
+          npm run lint
 
   build:
-    uses: ./.github/workflows/npm-run.yml
-    with:
-      cmd: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: |
+          npm ci
+          npm run build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-asset
+          path: build/
+
+  release:
+    needs: [lint, build]
+    runs-on: ubuntu-latest
+    if: startsWith(github.event.ref, 'refs/tags/v') # run on tags that starts with 'v'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/download-artifact@v3
+        with:
+          name: build-asset
+          path: build/
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+      - run: |
+          npm ci
+          npm run plugin-zip
+
+      - uses: ncipollo/release-action@v1
+        with:
+          draft: true
+          artifacts: "inseri-core.zip"
