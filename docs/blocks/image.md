@@ -10,7 +10,7 @@ It expects an image URL as input through a channel in the post (e.g. from a text
 
 ### Caption
 
-The caption will be shown below the image
+Set a caption that will appear below the image.
 
 ### Alt text
 
@@ -18,7 +18,7 @@ The alternative text is used for accessibility or if the image does not load.
 
 ### Height
 
-Height of the image in pixels
+Adjust the height of the image in pixels.
 
 ### Resizing behavior
 

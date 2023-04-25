@@ -1,8 +1,10 @@
 # Dropdown
 
-The dropdown block can be used to make the content on your page dynamic.
+The dropdown block can be used to make the content on your page dynamic by allowing to switch between different parameters.
 
 ## Input
+
+The expected input is an array in JSON.
 
 examples:
 
@@ -57,12 +59,12 @@ while the `"value"` are the block output
 
 ### Label
 
-The placeholder text if no value is selected
+You can change the text above the dropdown to something else than the default "Choose an item".
 
 ### Searchable
 
-Allow keyboard input to match labels
+Allow keyboard input to match labels.
 
 ### Clearable
 
-Allow the selection to be reset to undefined
+Allow the selection to be reset to undefined.

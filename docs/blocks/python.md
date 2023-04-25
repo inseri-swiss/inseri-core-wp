@@ -25,6 +25,8 @@ Like inputs, output variables can be deleted with `x`.
 
 ### Label
 
+Add a description above the code block.
+
 ### Show block
 
 Show or hide the code.
@@ -34,3 +36,6 @@ Show or hide the code.
 The script will run automatically on load and any input change. If set to false, the script will have to be run explicitly.
 
 ### Publicly editable
+
+Python blocks can be set to publicly editable. This may be interesting if you want to show calculations depending on certain parameters.
+After a page reload the changes in the code will be lost.
