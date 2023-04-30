@@ -1,6 +1,17 @@
-# inseri core for WordPress
+<p align="center"><a href="https://inseri.swiss/"><img src="https://raw.githubusercontent.com/inseri-swiss/inseri-core-wp/8820531f0db87ca285b11e05af40453b48e29ee8/docs/assets/inseri_logo.svg" alt="Logo" height=120></a>
+</p>
+<h1 align="center"><i>inseri core (beta)</i></h1>
 
-![CI workflow](https://github.com/inseri-swiss/inseri-core-wp/actions/workflows/ci.yml/badge.svg) [![License](https://img.shields.io/github/license/inseri-swiss/inseri-core-wp)](https://github.com/inseri-swiss/inseri-core-wp/blob/main/LICENSE)
+<p align="center">Scientific and interactive Gutenberg Blocks for WordPress</p>
+
+<p align="center">
+<img alt="CI workflow" src="https://github.com/inseri-swiss/inseri-core-wp/actions/workflows/ci.yml/badge.svg" />
+<a href="https://playground.inseri.swiss/"><img src="https://img.shields.io/badge/wp-playground-blue" alt="playground"></a>
+<a href="https://docs.inseri.swiss/"><img src="https://img.shields.io/badge/read-documentation-blue" alt="Documentation"></a>
+<a href="https://github.com/inseri-swiss/inseri-swiss/issues"><img src="https://img.shields.io/github/issues-raw/inseri-swiss/inseri-swiss?color=blue" alt="issues"></a>
+<a href="https://github.com/orgs/inseri-swiss/projects/2"><img src="https://img.shields.io/badge/view-roadmap-blue" alt="roadmap"></a>
+<a href="https://github.com/inseri-swiss/inseri-core-wp/blob/main/LICENSE"><img src="https://img.shields.io/badge/%20%20license-GPL--3.0--or--later-blue" alt="License"></a>
+</p>
 
 ## Development
 
