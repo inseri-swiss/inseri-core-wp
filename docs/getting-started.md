@@ -2,7 +2,9 @@
 
 ## Installation
 
-To install inseri locally with docker, follow the guide under [https://github.com/inseri-swiss/inseri-core-wp](https://github.com/inseri-swiss/inseri-core-wp).
+inseri core for WordPress is available as a WordPress plugin. You can find it as an asset `inseri-core.zip` and we recommend you our latest release available [here](https://github.com/inseri-swiss/inseri-core-wp/releases/latest). Please download it locally and install it following [Upload via WordPress Admin](https://wordpress.org/documentation/article/manage-plugins/#upload-via-wordpress-admin).
+
+To install inseri locally with Docker, follow the guide under [https://github.com/inseri-swiss/inseri-core-wp](https://github.com/inseri-swiss/inseri-core-wp).
 The last step is to go to [http://localhost:8888/wp-login.php](http://localhost:8888/wp-login.php) and use username `admin` and the password `password`.
 
 Alternatively you can check out the functionalities in the [playground](https://playground.inseri.swiss/).
