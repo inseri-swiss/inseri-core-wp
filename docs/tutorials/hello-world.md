@@ -1,7 +1,9 @@
-# Paging through images
+# Hello world
 
 This tutorial will give a simple example how you can display different images depending on user selection.
 For this we have to join a couple of inseri blocks.
+
+You can check out the result of this tutorial on [inseri.swiss](https://inseri.swiss/2023/02/hello-world/).
 
 ## Step 1: Create a new post
 
@@ -24,8 +26,8 @@ Copy this snippet into the text editor:
 
 ```json
 [
-	{ "label": "lighthouse", "value": "https://docs.inseri.swiss/assets/inseri_logo.svg" },
-	{ "label": "logo", "value": "https://docs.inseri.swiss/assets/inseri_logo_full.svg" }
+	{ "label": "UZH Acronym", "value": "https://www.cd.uzh.ch/cd/dam/jcr:31f38b33-1619-4ba1-a21c-4dae47e9d0e5/UZH-Logo-Akronym.2020-01-15-11-51-14.gif" },
+	{ "label": "UZH Logos", "value": "https://www.cd.uzh.ch/dam/jcr:79ffe4ce-bbe9-498e-94a8-d7d5b66400b2/UZH_logo_pos_d_e.gif" }
 ]
 ```
 
@@ -51,3 +53,19 @@ You can save and publish your post like any WordPress post.
 
 Once published (or in preview), you will see the text editor with the content as described above and a dropdown.
 The images will load after selecting from the dropdown.
+
+## Overview
+
+The following graph shows how the blocks are connected:
+
+```dot
+digraph G {
+    textEditor_imageOptions -> dropdown_selectedImage [label="textEditor-imageOptions: \n content (json)"];
+    dropdown_selectedImage -> imageViewer_unnamed [label="drowdown-selectedImage: \n content (text)"];
+
+    textEditor_imageOptions [shape=rect; label="Text Editor: \n textEditor-imageOptions"];
+    dropdown_selectedImage [shape=rect; label="Dropdown: \n dropdown-selectedImage"];
+    imageViewer_unnamed [shape=rect; label="Image Viewer: \n imageViewer-default"];
+  }
+
+```
