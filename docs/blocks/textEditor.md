@@ -21,3 +21,7 @@ The text editor block can be hidden from readers but its content is still availa
 ### Publicly editable
 
 Visitors of the page can play with the content. This can be useful in combination with Python scripts that do any standardized calculation on custom input.
+
+## Examples
+
+[Posts on inseri.swiss](https://inseri.swiss/tag/text-editor/) that make use of the text editor.

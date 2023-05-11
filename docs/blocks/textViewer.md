@@ -26,3 +26,7 @@ Only the following contentType are considered as viewer's input:
 ### Label
 
 Title above
+
+## Examples
+
+[Posts on inseri.swiss](https://inseri.swiss/tag/text-viewer/) that make use of the text viewer block.

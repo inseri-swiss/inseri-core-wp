@@ -18,3 +18,7 @@ The _label_ parameter allows changing it to something different from the default
 
 Set the name under which the file will be downloaded.
 The file extension will be added depending on the data type.
+
+## Examples
+
+[Posts on inseri.swiss](https://inseri.swiss/tag/download/) that make use of the download block.

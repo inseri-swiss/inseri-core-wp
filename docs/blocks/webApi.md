@@ -81,3 +81,7 @@ You can hide the web API block if you set it to execude automatically.
 ### Call automatically
 
 The web API will be called initailly and on changes of inputs.
+
+## Examples
+
+[Posts on inseri.swiss](https://inseri.swiss/tag/web-api/) that make use of the web API block.
