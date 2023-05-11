@@ -5,3 +5,7 @@ The HTML Code block is intended for displaying HTML that is created dynamically 
 ## Input
 
 The HTML Code block expects HTML from any block as input.
+
+## Examples
+
+[Posts on inseri.swiss](https://inseri.swiss/tag/html-code/) that make use of the HTML block.

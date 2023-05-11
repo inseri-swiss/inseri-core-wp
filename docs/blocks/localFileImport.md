@@ -20,3 +20,7 @@ You can change the text in the block to something different from the default "Dr
 ### Secondary text
 
 You can also change the subtitle in the block to be different from the default "provide your file to process...".
+
+## Examples
+
+[Posts on inseri.swiss](https://inseri.swiss/tag/local-file-import/) that make use of the local file import block.

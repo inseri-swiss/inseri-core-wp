@@ -23,3 +23,7 @@ Adjust the height of the image in pixels.
 ### Resizing behavior
 
 If the width and height of the block have a different ratio than the image, different view modes are available.
+
+## Examples
+
+[Posts on inseri.swiss](https://inseri.swiss/tag/image/) that make use of the image block.

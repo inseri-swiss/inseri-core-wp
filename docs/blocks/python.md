@@ -39,3 +39,7 @@ The script will run automatically on load and any input change. If set to false,
 
 Python blocks can be set to publicly editable. This may be interesting if you want to show calculations depending on certain parameters.
 After a page reload the changes in the code will be lost.
+
+## Examples
+
+[Posts on inseri.swiss](https://inseri.swiss/tag/python-code/) that make use of the Python code block.

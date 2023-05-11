@@ -90,3 +90,7 @@ hover, click
 ### Override layout separately
 
 ### Provide config
+
+## Examples
+
+[Posts on inseri.swiss](https://inseri.swiss/tag/plotly-chart/) that make use of the Plotly chart block.

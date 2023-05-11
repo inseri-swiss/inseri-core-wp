@@ -19,3 +19,7 @@ Caption: Text to be shown below images.
 Description:
 
 File URL
+
+## Examples
+
+[Posts on inseri.swiss](https://inseri.swiss/tag/media-library/) that make use of the zenodo repository block.

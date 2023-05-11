@@ -68,3 +68,7 @@ Allow keyboard input to match labels.
 ### Clearable
 
 Allow the selection to be reset to undefined.
+
+## Examples
+
+[Posts on inseri.swiss](https://inseri.swiss/tag/dropdown/) that make use of the dropdown block.
