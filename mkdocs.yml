@@ -12,3 +12,5 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.superfences
+  - mkdocs_graphviz:
+      color: 4051b5
