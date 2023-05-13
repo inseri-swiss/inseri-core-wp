@@ -3,9 +3,9 @@
 	"apiVersion": 2,
 	"name": "inseri-core/zenodo",
 	"version": "0.1.0",
-	"title": "Zenodo",
+	"title": "Zenodo Repository",
 	"category": "inseri",
-	"description": "Load data from Zenodo.org",
+	"description": "Load dataset from Zenodo.org",
 	"attributes": {
 		"blockId": {
 			"type": "string",

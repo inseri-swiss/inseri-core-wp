@@ -143,7 +143,7 @@ export function PlotlyEdit(props: BlockEditProps<Attributes>) {
 					<Group pt="md" px="md" mb="sm" spacing={0}>
 						<IconChartBar size={28} />
 						<Text ml="xs" fz={24}>
-							{__('Plotly.js', 'inseri-core')}
+							{__('Plotly Chart', 'inseri-core')}
 						</Text>
 						<Box ml="xs">
 							<ActionIcon component="a" href={LINK_PLOTLY_DOC} target="_blank" title={__('more info', 'inseri-core')}>

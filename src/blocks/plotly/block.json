@@ -3,7 +3,7 @@
 	"apiVersion": 2,
 	"name": "inseri-core/plotly",
 	"version": "0.1.0",
-	"title": "Plotly.js",
+	"title": "Plotly Chart",
 	"category": "inseri",
 	"description": "create interactive charts with plotly.js",
 	"attributes": {

@@ -139,7 +139,7 @@ export function PhotoEdit(props: BlockEditProps<Attributes>) {
 					<Group mb="lg" spacing={0}>
 						<IconPhoto size={28} />
 						<Text ml="xs" fz={24}>
-							{__('Image', 'inseri-core')}
+							{__('Image Box', 'inseri-core')}
 						</Text>
 					</Group>
 					<Select

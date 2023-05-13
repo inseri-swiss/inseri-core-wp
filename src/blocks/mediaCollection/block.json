@@ -1,11 +1,11 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
-	"name": "inseri-core/media-library",
+	"name": "inseri-core/media-collection",
 	"version": "0.1.0",
-	"title": "Media Library",
+	"title": "Media Collection",
 	"category": "inseri",
-	"description": "Load file from media library",
+	"description": "Load multiple files from media library",
 	"attributes": {
 		"blockId": {
 			"type": "string",

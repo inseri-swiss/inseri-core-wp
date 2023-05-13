@@ -3,7 +3,7 @@
 	"apiVersion": 2,
 	"name": "inseri-core/image",
 	"version": "0.1.0",
-	"title": "Image",
+	"title": "Image Box",
 	"category": "inseri",
 	"description": "Display image",
 	"attributes": {

@@ -87,7 +87,7 @@ export function MediaLibraryEdit(props: BlockEditProps<Attributes>) {
 						})
 					}}
 					multiple={true}
-					labels={{ title: 'Media Libray' }}
+					labels={{ title: 'Media Collection' }}
 					icon={<IconFiles style={{ fill: 'none' }} />}
 					onError={(err) => createErrorNotice(err, { type: 'snackbar' })}
 				></MediaPlaceholder>
