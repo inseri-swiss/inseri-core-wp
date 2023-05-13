@@ -84,7 +84,7 @@ export function ZenodoEdit(props: BlockEditProps<Attributes>) {
 					<Group mb="sm" spacing={0}>
 						<IconBooks size={28} />
 						<Text ml="xs" fz={24}>
-							{__('Zenodo', 'inseri-core')}
+							{__('Zenodo Repository', 'inseri-core')}
 						</Text>
 					</Group>
 					<TextInput

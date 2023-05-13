@@ -5,7 +5,7 @@ import { InseriThemeProvider, StateProvider } from '../../components'
 import { storeCreator } from './state'
 
 function initReactComponents() {
-	const items = document.querySelectorAll('.wp-block-inseri-core-media-library')
+	const items = document.querySelectorAll('.wp-block-inseri-core-media-collection')
 	if (items) {
 		Array.from(items).forEach((item: any) => {
 			const attributes = JSON.parse(item.dataset.attributes)

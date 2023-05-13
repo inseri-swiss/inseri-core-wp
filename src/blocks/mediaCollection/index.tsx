@@ -24,7 +24,7 @@ export interface Attributes {
 function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes } = props
 	return (
-		<SetupEditorEnv {...props} baseBlockName={'mediaLibrary'}>
+		<SetupEditorEnv {...props} baseBlockName={'mediaCollection'}>
 			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
 				<MediaLibraryEdit {...props} />
 			</StateProvider>
