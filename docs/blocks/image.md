@@ -1,6 +1,6 @@
-# Image
+# Image Box
 
-The image viewer can show images from a remote source.
+The image box can show images from a remote source.
 
 ## Input
 

@@ -1,4 +1,4 @@
-# Zenodo
+# Zenodo Repository
 
 Fetch data from Zenodo by a DOI and re-use data in your inseri post.
 
