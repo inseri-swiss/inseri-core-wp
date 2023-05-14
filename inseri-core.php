@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name:       inseri core
- * Description:       inseri rocks :)
- * Requires at least: 5.8
- * Requires PHP:      7.0
+ * Description:       Scientific and Interactive Gutenberg Blocks to facilitate Open Science
+ * Requires at least: 5.6
+ * Requires PHP:      5.6
  * Version:           0.1.0
- * Author:            inseri swiss
+ * Author:            inseri.swiss
  * Author URI:        https://inseri.swiss
  * License:           GPL-3.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
