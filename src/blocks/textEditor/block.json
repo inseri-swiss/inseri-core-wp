@@ -2,7 +2,6 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "inseri-core/text-editor",
-	"version": "0.1.0",
 	"title": "Text Editor",
 	"category": "inseri",
 	"description": "Write JSON, XML, HTML, ...",

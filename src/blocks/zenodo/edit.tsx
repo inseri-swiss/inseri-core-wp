@@ -1,5 +1,4 @@
-import { useControlTower, useDispatch } from '@inseri/lighthouse'
-import { usePrevious } from '@mantine/hooks'
+import { useControlTower } from '@inseri/lighthouse'
 import { IconBooks } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -7,15 +6,16 @@ import { PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, Toolbar
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Button, Checkbox, Group, Loader, Select, Stack, Text, TextInput, useGlobalState } from '../../components'
+import { Button, Checkbox, Group, Loader, SetupEditorEnv, Stack, StateProvider, Text, TextInput, useGlobalState } from '../../components'
 import { getFormattedBytes } from '../../utils'
-import config from './block.json'
+import { default as config, default as json } from './block.json'
 import { Attributes } from './index'
-import { GlobalState } from './state'
+import { GlobalState, storeCreator } from './state'
+import View from './view'
 
 const baseBeacon = { contentType: '', description: 'file', key: 'file', default: '' }
 
-export function ZenodoEdit(props: BlockEditProps<Attributes>) {
+function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 	const { output, blockId, blockName, label, isWizardMode, files, isVisible, doi, doiError, isWizardLoading, record, hasWizardError } = useGlobalState(
 		(state: GlobalState) => state
@@ -145,80 +145,19 @@ export function ZenodoEdit(props: BlockEditProps<Attributes>) {
 					)}
 				</Stack>
 			) : (
-				<ZenodoView isGutenbergEditor isSelected={isSelected} />
+				<View isGutenbergEditor isSelected={isSelected} />
 			)}
 		</>
 	)
 }
-interface ViewProps {
-	isSelected?: boolean
-	isGutenbergEditor?: boolean
-}
 
-export function ZenodoView({ isGutenbergEditor, isSelected }: ViewProps) {
-	const { label, selectedFile, files, output, isLoading, hasError, fileContent, mime, isVisible } = useGlobalState((state: GlobalState) => state)
-	const { chooseFile, loadFile } = useGlobalState((state: GlobalState) => state.actions)
-	const dispatch = useDispatch(output)
-	const prevMime = usePrevious(mime)
-
-	useEffect(() => {
-		if (prevMime && prevMime !== mime) {
-			dispatch({ status: 'unavailable' })
-		}
-	}, [mime])
-
-	useEffect(() => {
-		dispatch({ contentType: mime })
-	}, [mime])
-
-	useEffect(() => {
-		loadFile()
-	}, [])
-
-	useEffect(() => {
-		setTimeout(() => {
-			if (isLoading) {
-				dispatch({ status: 'loading' })
-			}
-			if (hasError) {
-				dispatch({ status: 'error' })
-			}
-			if (!isLoading && !hasError && fileContent) {
-				dispatch({ status: 'ready', value: fileContent })
-			}
-			if (!fileContent) {
-				dispatch({ status: 'initial', value: fileContent })
-			}
-		}, 100)
-	}, [isLoading, hasError, fileContent])
-
-	return isVisible || isSelected ? (
-		<Box p="md">
-			<Select
-				clearable
-				readOnly={files.length === 1}
-				label={label}
-				value={selectedFile}
-				data={files}
-				onChange={(val) => chooseFile(val)}
-				rightSection={isLoading && <Loader p="xs" />}
-				error={hasError ? __('An error has occurred.', 'inseri-core') : null}
-			/>
-		</Box>
-	) : isGutenbergEditor ? (
-		<Box
-			style={{
-				height: '68px',
-				border: '1px dashed currentcolor',
-				borderRadius: '2px',
-			}}
-		>
-			<Box />
-			<svg width="100%" height="100%">
-				<line strokeDasharray="3" x1="0" y1="0" x2="100%" y2="100%" style={{ stroke: 'currentColor' }} />
-			</svg>
-		</Box>
-	) : (
-		<div />
+export default function Edit(props: BlockEditProps<Attributes>) {
+	const { setAttributes, attributes } = props
+	return (
+		<SetupEditorEnv {...props} baseBlockName={'zenodo'}>
+			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
+				<EditComponent {...props} />
+			</StateProvider>
+		</SetupEditorEnv>
 	)
 }

@@ -1,14 +1,12 @@
 import { IconApi } from '@tabler/icons-react'
 import { useBlockProps } from '@wordpress/block-editor'
-import type { BlockEditProps, BlockSaveProps } from '@wordpress/blocks'
+import type { BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
-import { SetupEditorEnv, StateProvider } from '../../components'
+import { ParamItem } from '../../components/ParamsTable'
 import { ConsumerBeacon, ProducerBeacon } from '../../globalScript'
 import json from './block.json'
-import { WebApiEdit } from './Component'
-import { datasourceStoreCreator } from './AdminState'
-import { ParamItem } from '../../components/ParamsTable'
+import Edit from './edit'
 
 const { name, ...settings } = json as any
 
@@ -40,32 +38,15 @@ export interface Attributes {
 	}
 }
 
-function Edit(props: BlockEditProps<Attributes>) {
-	return (
-		<SetupEditorEnv {...props} baseBlockName={'webApi'}>
-			<StateProvider
-				stateCreator={datasourceStoreCreator}
-				initialState={props.attributes}
-				keysToSave={Object.keys(json.attributes)}
-				setAttributes={props.setAttributes}
-			>
-				<WebApiEdit {...props} />
-			</StateProvider>
-		</SetupEditorEnv>
-	)
-}
-
-function Save({ attributes }: BlockSaveProps<Attributes>) {
-	return (
-		<div {...useBlockProps.save()} data-attributes={stringify(attributes)}>
-			is loading ...
-		</div>
-	)
-}
-
 registerBlockType<Attributes>(name, {
 	...settings,
 	edit: Edit,
-	save: Save,
+	save: ({ attributes }: BlockSaveProps<Attributes>) => {
+		return (
+			<div {...useBlockProps.save()} data-attributes={stringify(attributes)}>
+				is loading ...
+			</div>
+		)
+	},
 	icon: <IconApi style={{ fill: 'none' }} />,
 })

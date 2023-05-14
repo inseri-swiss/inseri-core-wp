@@ -1,8 +1,8 @@
 import domReady from '@wordpress/dom-ready'
 import { createRoot } from '@wordpress/element'
-import { WebApiView } from './Component'
 import { InseriThemeProvider, StateProvider } from '../../components'
 import { datasourceStoreCreator } from './AdminState'
+import View from './view'
 
 function initReactComponents() {
 	const items = document.querySelectorAll('.wp-block-inseri-core-web-api')
@@ -12,7 +12,7 @@ function initReactComponents() {
 			createRoot(item!).render(
 				<InseriThemeProvider>
 					<StateProvider stateCreator={datasourceStoreCreator} initialState={attributes}>
-						<WebApiView />
+						<View />
 					</StateProvider>
 				</InseriThemeProvider>
 			)

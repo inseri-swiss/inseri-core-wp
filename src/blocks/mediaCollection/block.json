@@ -2,7 +2,6 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "inseri-core/media-collection",
-	"version": "0.1.0",
 	"title": "Media Collection",
 	"category": "inseri",
 	"description": "Load multiple files from media library",

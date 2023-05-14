@@ -1,8 +1,8 @@
 import domReady from '@wordpress/dom-ready'
 import { createRoot } from '@wordpress/element'
-import { PhotoView } from './Component'
 import { InseriThemeProvider, StateProvider } from '../../components'
 import { storeCreator } from './state'
+import View from './view'
 
 function initReactComponents() {
 	const items = document.querySelectorAll('.wp-block-inseri-core-image')
@@ -12,7 +12,7 @@ function initReactComponents() {
 			createRoot(item!).render(
 				<InseriThemeProvider>
 					<StateProvider stateCreator={storeCreator} initialState={attributes}>
-						<PhotoView />
+						<View />
 					</StateProvider>
 				</InseriThemeProvider>
 			)

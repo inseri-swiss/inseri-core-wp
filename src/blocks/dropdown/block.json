@@ -2,7 +2,6 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "inseri-core/dropdown",
-	"version": "0.1.0",
 	"title": "Dropdown",
 	"category": "inseri",
 	"description": "Provide options to choose from",

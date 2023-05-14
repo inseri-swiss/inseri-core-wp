@@ -2,7 +2,6 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "inseri-core/zenodo",
-	"version": "0.1.0",
 	"title": "Zenodo Repository",
 	"category": "inseri",
 	"description": "Load dataset from Zenodo.org",
