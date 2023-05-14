@@ -1,4 +1,4 @@
-# Media Library
+# Media Collection
 
 User can select multiple files from media library. Upon selection of a single file, the block will load the file and emit its content as an output.
 

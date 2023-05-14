@@ -1,4 +1,4 @@
-# Plotly.js
+# Plotly Chart
 
 Please check out the [Plotly JSON chart schema](https://plotly.com/chart-studio-help/json-chart-schema/).
 
