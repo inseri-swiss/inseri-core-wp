@@ -1,17 +1,33 @@
-import { useControlTower, useDispatch, useJsonBeacons, useWatch } from '@inseri/lighthouse'
+import { useControlTower, useJsonBeacons, useWatch } from '@inseri/lighthouse'
+import { useDebouncedValue } from '@mantine/hooks'
 import { IconApi, IconWindowMaximize } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { Button as WPButton, PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
+import { PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, ToolbarGroup, Button as WPButton } from '@wordpress/components'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Box, Button, ContentTypeSelect, Group, Modal, Select, Stack, Text, TextInput, createStyles, useGlobalState, getStylesRef } from '../../components'
+import {
+	Box,
+	Button,
+	ContentTypeSelect,
+	Group,
+	Modal,
+	Select,
+	SetupEditorEnv,
+	Stack,
+	StateProvider,
+	Text,
+	TextInput,
+	createStyles,
+	getStylesRef,
+	useGlobalState,
+} from '../../components'
 import { DetailViewBody } from '../../components/DetailViewBody'
-import { COMMON_CONTENT_TYPES, isBeaconReady, PERSISTENT_IDS, Z_INDEX_ABOVE_ADMIN } from '../../utils'
-import config from './block.json'
+import { COMMON_CONTENT_TYPES, PERSISTENT_IDS, Z_INDEX_ABOVE_ADMIN } from '../../utils'
+import { DatasourceState, datasourceStoreCreator } from './AdminState'
+import { default as config, default as json } from './block.json'
 import { Attributes } from './index'
-import { DatasourceState } from './AdminState'
-import { useDebouncedValue } from '@mantine/hooks'
+import View from './view'
 
 const useStyles = createStyles(() => ({
 	pidLeftInputWrapper: {
@@ -57,7 +73,7 @@ const defaultInput = {
 
 const baseOutputBeacon = [{ contentType: '', description: 'data', key: 'data' }]
 
-export function WebApiEdit(props: BlockEditProps<Attributes>) {
+function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 	const {
 		blockId,
@@ -333,148 +349,23 @@ export function WebApiEdit(props: BlockEditProps<Attributes>) {
 					</Group>
 				</Stack>
 			) : (
-				<WebApiView isSelected={isSelected} isGutenbergEditor />
+				<View isSelected={isSelected} isGutenbergEditor />
 			)}
 		</>
 	)
 }
 
-interface ViewProps {
-	isSelected?: boolean
-	isGutenbergEditor?: boolean
-}
-
-export function WebApiView({ isSelected, isGutenbergEditor }: ViewProps) {
-	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, output, label, isVisible, autoTrigger, parameters } = useGlobalState(
-		(state: DatasourceState) => state
-	)
-	const { overrideMethodUrl, overrideQueryParams, overrideHeaderParams, overrideBody, fireRequest } = useGlobalState((state: DatasourceState) => {
-		return state.actions
-	})
-	const { urlError, bodyError } = parameters
-	const contentTypeError = !output.contentType ? __('Content type is missing.', 'inseri-core') : ''
-
-	const dispatch = useDispatch(output)
-
-	const triggerRequest = async () => {
-		dispatch({ status: 'loading' })
-
-		const [errorMsg, data] = await fireRequest()
-
-		if (errorMsg) {
-			dispatch({ status: 'error' })
-		} else {
-			dispatch({ status: 'ready', value: data })
-		}
-	}
-
-	const watchMethodUrl = useWatch(inputMethodUrl)
-	const watchQueryParams = useWatch(inputQueryParams)
-	const watchHeadersParams = useWatch(inputHeadersParams)
-	const watchBody = useWatch(inputBody)
-
-	const isCallReady =
-		isBeaconReady(inputMethodUrl, watchMethodUrl) &&
-		isBeaconReady(inputQueryParams, watchQueryParams) &&
-		isBeaconReady(inputHeadersParams, watchHeadersParams) &&
-		isBeaconReady(inputBody, watchBody)
-
-	useEffect(() => {
-		dispatch({ contentType: output.contentType })
-	}, [output.contentType])
-
-	useEffect(() => {
-		if (watchMethodUrl.status === 'ready') {
-			if (typeof watchMethodUrl.value === 'object') {
-				overrideMethodUrl(watchMethodUrl.value.method, watchMethodUrl.value.url)
-			} else {
-				overrideMethodUrl(undefined, watchMethodUrl.value)
-			}
-		}
-
-		if (!inputMethodUrl.key) {
-			overrideMethodUrl(undefined, undefined)
-		}
-	}, [watchMethodUrl.status, watchMethodUrl.value, inputMethodUrl.key])
-
-	useEffect(() => {
-		if (watchQueryParams.status === 'ready') {
-			overrideQueryParams(watchQueryParams.value)
-		}
-
-		if (!inputQueryParams.key) {
-			overrideQueryParams(undefined)
-		}
-	}, [watchQueryParams.status, watchQueryParams.value, inputQueryParams.key])
-
-	useEffect(() => {
-		if (watchHeadersParams.status === 'ready') {
-			overrideHeaderParams(watchHeadersParams.value)
-		}
-
-		if (!inputHeadersParams.key) {
-			overrideHeaderParams(undefined)
-		}
-	}, [watchHeadersParams.status, watchHeadersParams.value, inputHeadersParams.key])
-
-	useEffect(() => {
-		if (watchBody.status === 'ready') {
-			overrideBody(watchBody.value)
-		}
-
-		if (!inputBody.key) {
-			overrideBody(undefined)
-		}
-	}, [watchBody.status, watchBody.value, inputBody.key])
-
-	// must be the last useEffect
-	useEffect(() => {
-		if (autoTrigger && isCallReady) {
-			triggerRequest()
-		}
-	}, [
-		watchMethodUrl.value,
-		watchQueryParams.value,
-		watchHeadersParams.value,
-		watchBody.value,
-		isCallReady,
-	])
-
-	return isVisible || isSelected ? (
-		<Box p="md">
-			<Button variant="filled" disabled={!isCallReady} onClick={triggerRequest}>
-				{label}
-			</Button>
-			{bodyError && (
-				<Text mt="xs" color="red" size="sm">
-					{bodyError}
-				</Text>
-			)}
-			{urlError && (
-				<Text mt="xs" color="red" size="sm">
-					{urlError}
-				</Text>
-			)}
-			{contentTypeError && (
-				<Text mt="xs" color="red" size="sm">
-					{contentTypeError}
-				</Text>
-			)}
-		</Box>
-	) : isGutenbergEditor ? (
-		<Box
-			style={{
-				height: '68px',
-				border: '1px dashed currentcolor',
-				borderRadius: '2px',
-			}}
-		>
-			<Box />
-			<svg width="100%" height="100%">
-				<line strokeDasharray="3" x1="0" y1="0" x2="100%" y2="100%" style={{ stroke: 'currentColor' }} />
-			</svg>
-		</Box>
-	) : (
-		<div />
+export default function Edit(props: BlockEditProps<Attributes>) {
+	return (
+		<SetupEditorEnv {...props} baseBlockName={'webApi'}>
+			<StateProvider
+				stateCreator={datasourceStoreCreator}
+				initialState={props.attributes}
+				keysToSave={Object.keys(json.attributes)}
+				setAttributes={props.setAttributes}
+			>
+				<EditComponent {...props} />
+			</StateProvider>
+		</SetupEditorEnv>
 	)
 }

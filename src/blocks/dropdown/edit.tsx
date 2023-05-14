@@ -1,14 +1,15 @@
-import { useControlTower, useDispatch, useJsonBeacons, useWatch } from '@inseri/lighthouse'
+import { useControlTower, useJsonBeacons, useWatch } from '@inseri/lighthouse'
 import { IconCaretDown } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { PanelBody, PanelRow, TextControl, ToolbarGroup, ToggleControl, ToolbarButton } from '@wordpress/components'
+import { PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Group, Select, Text } from '../../components'
-import { Attributes } from './index'
+import { Box, Group, Select, SetupEditorEnv, Text } from '../../components'
 import config from './block.json'
+import { Attributes } from './index'
+import View from './view'
 
 const objectSchema = {
 	type: 'array',
@@ -30,7 +31,7 @@ const stringSchema = {
 
 const dropdownBeacon = [{ contentType: 'application/json', description: __('chosen value', 'inseri-core'), key: 'selected' }]
 
-export function DropdownEdit(props: BlockEditProps<Attributes>) {
+function EditComponent(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes, isSelected } = props
 	const { input, blockId, label, searchable, clearable, blockName, output } = attributes
 
@@ -108,31 +109,16 @@ export function DropdownEdit(props: BlockEditProps<Attributes>) {
 					></Select>
 				</Box>
 			) : (
-				<DropdownView {...props} />
+				<View {...props} />
 			)}
 		</>
 	)
 }
 
-export function DropdownView(props: { attributes: Readonly<Attributes> }) {
-	const { attributes } = props
-	const { value, contentType, status } = useWatch(attributes.input)
-	const dispatch = useDispatch(attributes.output)
-
-	let data = []
-	if (contentType.match('/json') && status === 'ready') {
-		data = value
-	}
-
+export default function Edit(props: BlockEditProps<Attributes>) {
 	return (
-		<Box p="md">
-			<Select
-				label={attributes.label}
-				data={data}
-				onChange={(item) => dispatch({ status: 'ready', value: item })}
-				searchable={attributes.searchable}
-				clearable={attributes.clearable}
-			/>
-		</Box>
+		<SetupEditorEnv {...props} baseBlockName={'dropdown'}>
+			<EditComponent {...props} />
+		</SetupEditorEnv>
 	)
 }

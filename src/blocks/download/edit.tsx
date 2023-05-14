@@ -6,11 +6,11 @@ import { PanelBody, PanelRow, TextControl, ToolbarButton, ToolbarGroup } from '@
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import stringify from 'json-stable-stringify'
-import { CONTENT_TYPE_TO_EXT } from '../../utils'
-import { Box, Button, Group, Select, Text, useGlobalState } from '../../components'
+import { Box, Group, Select, SetupEditorEnv, StateProvider, Text, useGlobalState } from '../../components'
+import json from './block.json'
 import { Attributes } from './index'
-import { GlobalState } from './state'
+import { GlobalState, storeCreator } from './state'
+import View from './view'
 
 const defaultInput = {
 	key: '',
@@ -18,7 +18,7 @@ const defaultInput = {
 	description: '',
 }
 
-export function DownloadEdit(props: BlockEditProps<Attributes>) {
+function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 	const { blockName, input, isWizardMode, actions, label, fileName } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
@@ -87,53 +87,19 @@ export function DownloadEdit(props: BlockEditProps<Attributes>) {
 					/>
 				</Box>
 			) : (
-				<DownloadView />
+				<View />
 			)}
 		</>
 	)
 }
 
-export function DownloadView() {
-	const { input, label, fileName, extension, downloadLink } = useGlobalState((state: GlobalState) => state)
-	const { updateDownloadObject, updateState } = useGlobalState((state: GlobalState) => state.actions)
-
-	const { value, status, contentType } = useWatch(input)
-	const isNotReady = status !== 'ready' || !downloadLink
-
-	useEffect(() => {
-		let ext = ''
-		const found = CONTENT_TYPE_TO_EXT.find((c) => contentType.includes(c.value))
-		if (found) {
-			ext = found.ext
-		}
-
-		updateState({ extension: ext })
-	}, [contentType])
-
-	useEffect(() => {
-		let processedValue = value
-
-		if (status === 'ready') {
-			if (contentType.includes('json')) {
-				processedValue = stringify(processedValue)
-			}
-
-			if (typeof processedValue === 'string') {
-				const mimeType = contentType.split(';')[0]
-				processedValue = new Blob([processedValue], { type: mimeType })
-			}
-
-			if (typeof processedValue === 'object' && processedValue instanceof Blob) {
-				updateDownloadObject(processedValue)
-			}
-		}
-	}, [value])
-
-	const fullFileName = fileName + (extension ? '.' + extension : '')
-
+export default function Edit(props: BlockEditProps<Attributes>) {
+	const { setAttributes, attributes } = props
 	return (
-		<Button style={{ color: '#fff' }} component="a" href={downloadLink} download={fullFileName} disabled={isNotReady}>
-			{label}
-		</Button>
+		<SetupEditorEnv {...props} baseBlockName={'download'}>
+			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
+				<EditComponent {...props} />
+			</StateProvider>
+		</SetupEditorEnv>
 	)
 }

@@ -1,6 +1,6 @@
 import domReady from '@wordpress/dom-ready'
 import { createRoot } from '@wordpress/element'
-import { MediaLibraryView } from './Component'
+import View from './view'
 import { InseriThemeProvider, StateProvider } from '../../components'
 import { storeCreator } from './state'
 
@@ -12,7 +12,7 @@ function initReactComponents() {
 			createRoot(item!).render(
 				<InseriThemeProvider>
 					<StateProvider stateCreator={storeCreator} initialState={attributes}>
-						<MediaLibraryView />
+						<View />
 					</StateProvider>
 				</InseriThemeProvider>
 			)

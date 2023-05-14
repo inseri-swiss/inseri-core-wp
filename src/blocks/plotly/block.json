@@ -2,7 +2,6 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "inseri-core/plotly",
-	"version": "0.1.0",
 	"title": "Plotly Chart",
 	"category": "inseri",
 	"description": "create interactive charts with plotly.js",

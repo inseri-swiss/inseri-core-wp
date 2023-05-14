@@ -1,13 +1,12 @@
 import { IconBooks } from '@tabler/icons-react'
 import { useBlockProps } from '@wordpress/block-editor'
-import type { BlockEditProps, BlockSaveProps } from '@wordpress/blocks'
+import type { BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
-import { SelectItem, SetupEditorEnv, StateProvider } from '../../components'
+import { SelectItem } from '../../components'
 import { ProducerBeacon } from '../../globalScript'
 import json from './block.json'
-import { ZenodoEdit } from './Component'
-import { storeCreator } from './state'
+import Edit from './edit'
 
 const { name, ...settings } = json as any
 
@@ -22,28 +21,15 @@ export interface Attributes {
 	isVisible: boolean
 }
 
-function Edit(props: BlockEditProps<Attributes>) {
-	const { setAttributes, attributes } = props
-	return (
-		<SetupEditorEnv {...props} baseBlockName={'zenodo'}>
-			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
-				<ZenodoEdit {...props} />
-			</StateProvider>
-		</SetupEditorEnv>
-	)
-}
-
-function Save({ attributes }: BlockSaveProps<Attributes>) {
-	return (
-		<div {...useBlockProps.save()} data-attributes={stringify(attributes)}>
-			is loading ...
-		</div>
-	)
-}
-
 registerBlockType<Attributes>(name, {
 	...settings,
 	edit: Edit,
-	save: Save,
+	save: ({ attributes }: BlockSaveProps<Attributes>) => {
+		return (
+			<div {...useBlockProps.save()} data-attributes={stringify(attributes)}>
+				is loading ...
+			</div>
+		)
+	},
 	icon: <IconBooks style={{ fill: 'none' }} />,
 })

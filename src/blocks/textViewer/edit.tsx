@@ -1,18 +1,19 @@
 import { useAvailableBeacons, useWatch } from '@inseri/lighthouse'
-import { IconEye, IconFileTypography } from '@tabler/icons-react'
+import { IconFileTypography } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
-import { useEffect, useMemo } from '@wordpress/element'
+import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import stringify from 'json-stable-stringify'
-import { Box, CodeEditor, Group, Select, Text, Tooltip, useGlobalState } from '../../components'
-import { getBodyTypeByContenType, TEXTUAL_CONTENT_TYPES } from '../../utils'
+import { Box, Group, Select, SetupEditorEnv, StateProvider, Text, useGlobalState } from '../../components'
+import { TEXTUAL_CONTENT_TYPES } from '../../utils'
+import json from './block.json'
 import { Attributes } from './index'
-import { GlobalState } from './state'
+import { GlobalState, storeCreator } from './state'
+import View from './view'
 
-export function TextViewerEdit(props: BlockEditProps<Attributes>) {
+function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
 	const { input, label, blockId, blockName, isWizardMode, actions } = useGlobalState((state: GlobalState) => state)
@@ -94,49 +95,19 @@ export function TextViewerEdit(props: BlockEditProps<Attributes>) {
 					/>
 				</Box>
 			) : (
-				<TextViewerView renderResizable={renderResizable} />
+				<View renderResizable={renderResizable} />
 			)}
 		</>
 	)
 }
 
-interface ViewProps {
-	renderResizable?: (EditorComponent: JSX.Element) => JSX.Element
-}
-
-export function TextViewerView(props: ViewProps) {
-	const { renderResizable } = props
-	const { height, label, input } = useGlobalState((state: GlobalState) => state)
-	const { contentType: incomingContentType, value, status } = useWatch(input)
-
-	const codeType = useMemo(() => {
-		return getBodyTypeByContenType(incomingContentType) ?? 'text'
-	}, [incomingContentType])
-
-	let preparedValue = value
-
-	if (incomingContentType.match('/json') && preparedValue) {
-		preparedValue = stringify(value)
-	}
-
-	if ((status !== 'ready' && status !== 'initial') || !preparedValue) {
-		preparedValue = ''
-	}
-
-	const editorElement = <CodeEditor height={height} type={codeType} value={preparedValue} />
-
+export default function Edit(props: BlockEditProps<Attributes>) {
+	const { setAttributes, attributes } = props
 	return (
-		<Box p="md">
-			<Group spacing="xs" mb={4}>
-				{label.trim() && <Text fz={14}>{label}</Text>}
-				<div style={{ flex: 1 }} />
-				<Tooltip label={__('read-only', 'inseri-core')}>
-					<Group>
-						<IconEye size={22} />
-					</Group>
-				</Tooltip>
-			</Group>
-			{renderResizable ? renderResizable(editorElement) : editorElement}
-		</Box>
+		<SetupEditorEnv {...props} baseBlockName={'textViewer'}>
+			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
+				<EditComponent {...props} />
+			</StateProvider>
+		</SetupEditorEnv>
 	)
 }

@@ -2,7 +2,6 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 2,
 	"name": "inseri-core/file-drop",
-	"version": "0.1.0",
 	"title": "Local File Import",
 	"category": "inseri",
 	"description": "Let visitor import data for other blocks",
