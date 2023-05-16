@@ -1,6 +1,6 @@
 import { useControlTower, useDispatchMany, useWatch, useWatchMany } from '@inseri/lighthouse'
 import { usePrevious } from '@mantine/hooks'
-import { useEffect } from '@wordpress/element'
+import { useCallback, useEffect } from '@wordpress/element'
 import { Box, CodeEditor, Group, useGlobalState } from '../../components'
 import { TopBar } from './TopBar'
 import { Action } from './WorkerActions'
@@ -75,10 +75,10 @@ export default function View(props: ViewProps) {
 		})
 	}, [joinedOutputTypes])
 
-	useEffect(() => {
-		pyWorker.addEventListener('message', ({ data }: MessageEvent<Action>) => {
-			if (data.type === 'SET_RESULTS') {
-				Object.entries(data.payload).forEach(([key, val]) => {
+	const pyDispatcher = useCallback(
+		(message: MessageEvent<Action>) => {
+			if (message?.data?.type === 'SET_RESULTS') {
+				Object.entries(message.data.payload).forEach(([key, val]) => {
 					let convertedData = val
 					if (convertedData instanceof Uint8Array) {
 						const found = outputs.find((o) => o.description === key)
@@ -88,8 +88,14 @@ export default function View(props: ViewProps) {
 					dispatchRecord[key]({ status: 'ready', value: convertedData })
 				})
 			}
-		})
-	}, [])
+		},
+		[Object.keys(dispatchRecord).join('')]
+	)
+
+	useEffect(() => {
+		pyWorker.addEventListener('message', pyDispatcher)
+		return () => pyWorker.removeEventListener('message', pyDispatcher)
+	}, [pyDispatcher])
 
 	let preparedValue = value
 
