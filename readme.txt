@@ -12,7 +12,9 @@ Scientific and Interactive Gutenberg Blocks to facilitate Open Science
 
 == Description ==
 
-The main focus of inseri.swiss is to provide tools for scientific publications and to promote Open Access, in other words, to eliminate technical barriers and provide reproducibility. As a result, the inseri core provides special blocks that enable to share data between blocks.
+The vision of inseri is to enable scholars to design web pages without any prior knowledge. So that they can publish their research findings in an open, citable and interactive way in combination with own their data or any public data repository. Through interactivity, everyone is encouraged to play around with the parameters or use their own data to explore the research findings.
+
+As a result, inseri core introduces scientific and interactive Gutenberg blocks to facilitate open access. The inseri core blocks are not isolated elements but they can receive input from and give output to other blocks. A typical example would start with a Text Editor block containing the configuration for a Dropdown block. By selecting one option in the Dropdown block would provide a Web API block with the parameters to retrieve data from an external source. Using a Python Code block, the web API response could then be transformed into a suitable data format for a Plotly Chart block.
 
 ## Blocks:
 - **[Download Block](https://docs.inseri.swiss/blocks/download/)**: It gives guests the possibility to download data from other blocks.
@@ -27,6 +29,8 @@ The main focus of inseri.swiss is to provide tools for scientific publications a
 - **[Text Viewer Block](https://docs.inseri.swiss/blocks/textViewer/)**: It displays text content like JSON or XML from other block.
 - **[Web API Block](https://docs.inseri.swiss/blocks/webApi/)**: It enables to call web API and to share this data with other blocks.
 - **[Zenodo Repository Block](https://docs.inseri.swiss/blocks/zenodo/)**: Using a DOI, a dataset can be loaded from Zenodo.org and shared with other blocks.
+
+More information about the project can be found at [inseri.swiss](https://inseri.swiss).
 
 Detailed documentation is available at [docs.inseri.swiss](https://docs.inseri.swiss/).
 
