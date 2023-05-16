@@ -24,7 +24,7 @@ As a result, inseri core introduces scientific and interactive Gutenberg blocks 
 - **[Local File Import Block](https://docs.inseri.swiss/blocks/localFileImport/)**: It allows guests to provide their own data for blocks.
 - **[Media Collection Block](https://docs.inseri.swiss/blocks/mediaCollection/)**: A collection of media files is made available as data for other blocks.
 - **[Plotly Chart Block](https://docs.inseri.swiss/blocks/plotly/)**: It visualizes the data of another block using Plotly.
-- **[Python Code Block](https://docs.inseri.swiss/blocks/python/)**: Guests can execute Python code with data from other blocks and the result of the execution is made available to other blocks.
+- **[Python Code Block](https://docs.inseri.swiss/blocks/python/)**: Guests can run Python code with data from other blocks with the use of Pyodide and the result of the execution is made available to other blocks.
 - **[Text Editor Block](https://docs.inseri.swiss/blocks/textEditor/)**: It allows to share text content like JSON or XML with other blocks.
 - **[Text Viewer Block](https://docs.inseri.swiss/blocks/textViewer/)**: It displays text content like JSON or XML from other block.
 - **[Web API Block](https://docs.inseri.swiss/blocks/webApi/)**: It enables to call web API and to share this data with other blocks.
