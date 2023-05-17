@@ -4,7 +4,7 @@
 	"name": "inseri-core/python",
 	"title": "Python Code",
 	"category": "inseri",
-	"description": "Run Python code",
+	"description": "Let guests run Python code with data from other blocks using Pyodide and the result is made available to other blocks.",
 	"attributes": {
 		"blockId": {
 			"type": "string",

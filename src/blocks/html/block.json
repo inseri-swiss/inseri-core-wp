@@ -4,7 +4,7 @@
 	"name": "inseri-core/html",
 	"title": "HTML Code",
 	"category": "inseri",
-	"description": "Render HTML code",
+	"description": "Render HTML code using the other block's data.",
 	"attributes": {
 		"blockId": {
 			"type": "string",

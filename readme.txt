@@ -17,7 +17,7 @@ The vision of inseri is to enable scholars to design web pages without any prior
 As a result, inseri core introduces scientific and interactive Gutenberg blocks to facilitate open access. The inseri core blocks are not isolated elements but they can receive input from and give output to other blocks. A typical example would start with a Text Editor block containing the configuration for a Dropdown block. By selecting one option in the Dropdown block would provide a Web API block with the parameters to retrieve data from an external source. Using a Python Code block, the web API response could then be transformed into a suitable data format for a Plotly Chart block.
 
 ## Blocks:
-- **[Download Block](https://docs.inseri.swiss/blocks/download/)**: It gives guests the possibility to download data from other blocks.
+- **[Download Block](https://docs.inseri.swiss/blocks/download/)**: It gives guests the possibility to download data from another block.
 - **[Dropdown Block](https://docs.inseri.swiss/blocks/dropdown/)**: It provides guests options to choose from and the selected option can be reused in other blocks.
 - **[HTML Code Block](https://docs.inseri.swiss/blocks/html/)**: It renders HTML code using the other block's data.
 - **[Image Box Block](https://docs.inseri.swiss/blocks/image/)**: It displays an image utilizing the data of another block.
@@ -27,7 +27,7 @@ As a result, inseri core introduces scientific and interactive Gutenberg blocks 
 - **[Python Code Block](https://docs.inseri.swiss/blocks/python/)**: Guests can run Python code with data from other blocks with the use of Pyodide and the result of the execution is made available to other blocks.
 - **[Text Editor Block](https://docs.inseri.swiss/blocks/textEditor/)**: It allows to share text content like JSON or XML with other blocks.
 - **[Text Viewer Block](https://docs.inseri.swiss/blocks/textViewer/)**: It displays text content like JSON or XML from other block.
-- **[Web API Block](https://docs.inseri.swiss/blocks/webApi/)**: It enables to call web API and to share this data with other blocks.
+- **[Web API Block](https://docs.inseri.swiss/blocks/webApi/)**: It enables to call a web API and to share this data with other blocks.
 - **[Zenodo Repository Block](https://docs.inseri.swiss/blocks/zenodo/)**: Using a DOI, a dataset can be loaded from Zenodo.org and shared with other blocks.
 
 More information about the project can be found at [inseri.swiss](https://inseri.swiss).

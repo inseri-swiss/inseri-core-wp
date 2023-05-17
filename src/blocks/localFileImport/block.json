@@ -4,7 +4,7 @@
 	"name": "inseri-core/file-drop",
 	"title": "Local File Import",
 	"category": "inseri",
-	"description": "Let visitor import data for other blocks",
+	"description": "Let guests provide their own data for blocks.",
 	"attributes": {
 		"blockId": {
 			"type": "string",

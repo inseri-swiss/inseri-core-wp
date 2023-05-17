@@ -4,7 +4,7 @@
 	"name": "inseri-core/web-api",
 	"title": "Web API",
 	"category": "inseri",
-	"description": "Load data from a Web API",
+	"description": "Call a web API and share the data with other blocks.",
 	"attributes": {
 		"blockId": {
 			"type": "string",

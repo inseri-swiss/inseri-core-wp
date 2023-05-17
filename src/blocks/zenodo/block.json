@@ -4,7 +4,7 @@
 	"name": "inseri-core/zenodo",
 	"title": "Zenodo Repository",
 	"category": "inseri",
-	"description": "Load dataset from Zenodo.org",
+	"description": "Load a dataset from Zenodo.org using a DOI and share the dataset with other blocks.",
 	"attributes": {
 		"blockId": {
 			"type": "string",

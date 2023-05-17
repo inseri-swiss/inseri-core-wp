@@ -4,7 +4,7 @@
 	"name": "inseri-core/text-viewer",
 	"title": "Text Viewer",
 	"category": "inseri",
-	"description": "View JSON, XML, HTML, ...",
+	"description": "Display text content like JSON, XML or HTML from other block.",
 	"attributes": {
 		"blockId": {
 			"type": "string",
