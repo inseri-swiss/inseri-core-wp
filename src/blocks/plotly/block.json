@@ -4,7 +4,7 @@
 	"name": "inseri-core/plotly",
 	"title": "Plotly Chart",
 	"category": "inseri",
-	"description": "create interactive charts with plotly.js",
+	"description": "Visualize the data of another block using Plotly.",
 	"attributes": {
 		"blockId": {
 			"type": "string",

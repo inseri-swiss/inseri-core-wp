@@ -4,7 +4,7 @@
 	"name": "inseri-core/text-editor",
 	"title": "Text Editor",
 	"category": "inseri",
-	"description": "Write JSON, XML, HTML, ...",
+	"description": "Share text content like JSON, XML or HTML with other blocks.",
 	"attributes": {
 		"blockId": {
 			"type": "string",

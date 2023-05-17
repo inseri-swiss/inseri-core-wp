@@ -4,7 +4,7 @@
 	"name": "inseri-core/image",
 	"title": "Image Box",
 	"category": "inseri",
-	"description": "Display image",
+	"description": "Display image using the data of another block.",
 	"attributes": {
 		"blockId": {
 			"type": "string",

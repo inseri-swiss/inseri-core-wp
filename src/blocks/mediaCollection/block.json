@@ -4,7 +4,7 @@
 	"name": "inseri-core/media-collection",
 	"title": "Media Collection",
 	"category": "inseri",
-	"description": "Load multiple files from media library",
+	"description": "Make a collection of media files available as data for other blocks.",
 	"attributes": {
 		"blockId": {
 			"type": "string",

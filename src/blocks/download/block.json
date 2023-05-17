@@ -4,7 +4,7 @@
 	"name": "inseri-core/download",
 	"title": "Download",
 	"category": "inseri",
-	"description": "Let visitor download block data",
+	"description": "Let guests download data from another block.",
 	"attributes": {
 		"blockId": {
 			"type": "string",
