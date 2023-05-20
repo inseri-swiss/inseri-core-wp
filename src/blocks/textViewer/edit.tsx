@@ -84,7 +84,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					<Group mb="md" spacing={0}>
 						<IconFileTypography size={28} />
 						<Text ml="xs" fz={24}>
-							{__('Text Editor', 'inseri-core')}
+							{__('Text Viewer', 'inseri-core')}
 						</Text>
 					</Group>
 					<Select
