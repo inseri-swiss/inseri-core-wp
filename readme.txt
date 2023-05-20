@@ -4,7 +4,7 @@ Tags: Gutenberg blocks, WordPress blocks, gutenberg, blocks, inseri
 Requires at least: 5.6
 Tested up to: 6.2
 Requires PHP: 5.6
-Stable tag: 0.1.0
+Stable tag: 0.2.0
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -41,6 +41,11 @@ Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inser
 
 == Changelog ==
 
+### 0.2.0
+
+#### Breaking changes:
+- renaming block from 'Media Library' to 'Media Collection'
+
 ### 0.1.0 MVP
 added 12 new blocks:
 - Download
@@ -48,7 +53,7 @@ added 12 new blocks:
 - HTML Code
 - Image Box
 - Local File Import
-- Media Collection
+- Media Library
 - Plotly Chart
 - Python Code
 - Text Editor
