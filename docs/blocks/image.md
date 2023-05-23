@@ -26,4 +26,4 @@ If the width and height of the block have a different ratio than the image, diff
 
 ## Examples
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/image/) that make use of the image block.
+[Posts on inseri.swiss](https://inseri.swiss/tag/image-box/) that make use of the image block.
