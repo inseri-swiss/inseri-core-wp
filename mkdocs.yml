@@ -1,4 +1,5 @@
 site_name: Documentation for inseri core (beta)
+repo_url: https://github.com/inseri-swiss/inseri-core-wp
 theme:
   name: material
   features:
@@ -8,6 +9,8 @@ theme:
     accent: yellow
   logo: assets/inseri_logo_full.svg
   favicon: assets/inseri_logo.svg
+  icon:
+    repo: fontawesome/brands/github
 markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
