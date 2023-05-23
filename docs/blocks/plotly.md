@@ -61,9 +61,11 @@ The standard format by Plotly
 
 ### Height
 
+Size of the block in the post.
+
 ### Events
 
-hover, click
+Other blocks can listen to `hover`, `click` events from this block.
 
 ## Extended configuration
 
@@ -89,7 +91,20 @@ hover, click
 
 ### Override layout separately
 
+Replace `layout` in the input, following the same pattern:
+
+```json
+{
+	"title": "Division of the cake",
+	"width": 800,
+	"height": 500,
+	"autosize": false
+}
+```
+
 ### Provide config
+
+Additional [configuration options](https://plotly.com/javascript/configuration-options/) by Plotly.
 
 ## Examples
 

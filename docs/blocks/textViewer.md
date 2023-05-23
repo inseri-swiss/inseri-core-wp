@@ -25,7 +25,7 @@ Only the following contentType are considered as viewer's input:
 
 ### Label
 
-Title above
+Title above the displayed text.
 
 ## Examples
 
