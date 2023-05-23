@@ -21,4 +21,6 @@ The file extension will be added depending on the data type.
 
 ## Examples
 
+[Download Block](https://inseri.swiss/2023/03/download-block/) in inseri.swiss.
+
 [Posts on inseri.swiss](https://inseri.swiss/tag/download/) that make use of the download block.

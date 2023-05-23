@@ -22,4 +22,6 @@ File URL
 
 ## Examples
 
+[Media Collection and Image Box Blocks](https://inseri.swiss/2023/01/media-collection-and-image-box-blocks/) on inseri.swiss.
+
 [Posts on inseri.swiss](https://inseri.swiss/tag/media-collection/) that make use of the zenodo repository block.

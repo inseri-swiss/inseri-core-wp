@@ -26,4 +26,6 @@ If the width and height of the block have a different ratio than the image, diff
 
 ## Examples
 
+[Media Collection and Image Box Blocks](https://inseri.swiss/2023/01/media-collection-and-image-box-blocks/) on inseri.swiss.
+
 [Posts on inseri.swiss](https://inseri.swiss/tag/image-box/) that make use of the image block.

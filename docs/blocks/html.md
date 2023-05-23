@@ -8,4 +8,6 @@ The HTML Code block expects HTML from any block as input.
 
 ## Examples
 
+[HTML Code Block](https://inseri.swiss/2023/03/html-code-block/) on inseri.swiss.
+
 [Posts on inseri.swiss](https://inseri.swiss/tag/html-code/) that make use of the HTML block.

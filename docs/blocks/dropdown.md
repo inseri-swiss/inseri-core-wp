@@ -71,4 +71,6 @@ Allow the selection to be reset to undefined.
 
 ## Examples
 
+[Dropdown Block](https://inseri.swiss/2022/12/dropdown-block/) on inseri.swiss.
+
 [Posts on inseri.swiss](https://inseri.swiss/tag/dropdown/) that make use of the dropdown block.
