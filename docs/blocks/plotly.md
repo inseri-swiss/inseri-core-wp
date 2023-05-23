@@ -93,4 +93,6 @@ hover, click
 
 ## Examples
 
+[Plotly Chart Block](https://inseri.swiss/2023/03/plotly-chart-block/) on inseri.swiss.
+
 [Posts on inseri.swiss](https://inseri.swiss/tag/plotly-chart/) that make use of the Plotly chart block.

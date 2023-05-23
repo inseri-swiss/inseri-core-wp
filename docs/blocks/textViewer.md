@@ -29,4 +29,6 @@ Title above
 
 ## Examples
 
+[Text Editor and Text Viewer Blocks](https://inseri.swiss/2022/12/text-editor-and-text-viewer-blocks/) on inseri.swiss.
+
 [Posts on inseri.swiss](https://inseri.swiss/tag/text-viewer/) that make use of the text viewer block.

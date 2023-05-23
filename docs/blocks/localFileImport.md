@@ -23,4 +23,6 @@ You can also change the subtitle in the block to be different from the default "
 
 ## Examples
 
+[Local File Import Block](https://inseri.swiss/2023/03/local-file-import-block/) on inseri.swiss.
+
 [Posts on inseri.swiss](https://inseri.swiss/tag/local-file-import/) that make use of the local file import block.
