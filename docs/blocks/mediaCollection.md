@@ -16,9 +16,9 @@ Title: Label for the file. The default value is derived from the original file v
 
 Caption: Text to be shown below images.
 
-Description:
+Description: Text description of the file.
 
-File URL
+File URL: Location of the file after upload.
 
 ## Examples
 
