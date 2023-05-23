@@ -22,4 +22,4 @@ File URL
 
 ## Examples
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/media-library/) that make use of the zenodo repository block.
+[Posts on inseri.swiss](https://inseri.swiss/tag/media-collection/) that make use of the zenodo repository block.
