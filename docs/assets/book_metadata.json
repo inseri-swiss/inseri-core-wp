@@ -1,7 +1,9 @@
 {
 	"title": "Die Physiker",
 	"author": "Friedrich Dürrenmatt",
-	"publisher": "Arche",
-	"publicationPlace": "Zürich",
+	"publisher": {
+		"name": "Arche",
+		"place": "Zürich"
+	},
 	"year": 1962
 }

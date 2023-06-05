@@ -52,7 +52,7 @@ Set the block source to the option "dropdown-selectedImage: content".
 You can save and publish your post like any WordPress post.
 
 Once published (or in preview), you will see the text editor with the content as described above and a dropdown.
-The images will load after selecting from the dropdown.
+The image will load after selecting it from the dropdown.
 
 ## Overview
 
