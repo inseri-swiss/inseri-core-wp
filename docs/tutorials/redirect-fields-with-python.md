@@ -23,6 +23,21 @@ Choose the format "JSON" because that is what will be read by the dropdown that 
 
 Now, give your text editor a meaningful name.
 For this, open the configuration panel on the right and enter "webApi-book" under _block name_.
+Do not check the option "call automatically".
+
+Testing the request should give the following content:
+
+```json
+{
+	"title": "Die Physiker",
+	"author": "Friedrich Dürrenmatt",
+	"publisher": {
+		"name": "Arche",
+		"place": "Zürich"
+	},
+	"year": 1962
+}
+```
 
 ## Step 3: Add a python block
 
@@ -45,7 +60,7 @@ Obviously, this is not yet complete because `data` is not defined anywhere in th
 
 ## Step 4: Open the extended view for the python block
 
-Under "Inputs from Blocks", enter the variable name `data` and accept ith with selecting the `+`.
+Under "Inputs from Blocks", enter the variable name `data` and accept it with selecting the `+`.
 You can now select `webApi-book: data` to connect this block to the web API block.
 
 Now, you can set several output channels.
@@ -69,8 +84,9 @@ Set their inputs to `python-divide: author`, `python-divide: year`, `python-divi
 
 You can save and publish your post like any WordPress post.
 
-Once published (or in preview), you will see the text editor with the content as described above and a dropdown.
-The images will load after selecting from the dropdown.
+Once published (or in preview), the four text blocks will show their content after you press "Call Web API".
+
+If you change the web-API block to execute automatically, the content will appear immediately.
 
 ## Overview
 
@@ -78,15 +94,17 @@ The following graph shows how the blocks are connected:
 
 ```dot
 digraph G {
-    webApi_book -> dropdown_selectedImage [label="webApi-book: \n data (json)"];
-    dropdown_selectedImage -> textViewer_title [label="python-divide: \n title (text)"];
-    dropdown_selectedImage -> textViewer_author [label="python-divide: \n author (text)"];
-    dropdown_selectedImage -> textViewer_year [label="python-divide: \n year (json)"];
+    webApi_book -> python_divide [label="webApi-book: \n data (json)"];
+    python_divide -> textViewer_title [label="python-divide: \n title (text)"];
+    python_divide -> textViewer_author [label="python-divide: \n author (text)"];
+    python_divide -> textViewer_year [label="python-divide: \n year (json)"];
+    python_divide -> textViewer_publisher [label="python-divide: \n publisher (json)"];
 
     webApi_book [shape=rect; label="Web API: \n webApi-book"];
-    dropdown_selectedImage [shape=rect; label="Python Code: \n python-divide"];
+    python_divide [shape=rect; label="Python Code: \n python-divide"];
     textViewer_title [shape=rect; label="Text Viewer: \n textViewer-title"];
     textViewer_author [shape=rect; label="Text Viewer: \n textViewer-author"];
     textViewer_year [shape=rect; label="Text Viewer: \n textViewer-year"];
+    textViewer_publisher [shape=rect; label="Text Viewer: \n textViewer-publisher"];
   }
 ```
