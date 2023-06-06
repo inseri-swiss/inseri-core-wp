@@ -1,6 +1,6 @@
-# Redirect fields from responses with Python
+# Data mapping with Python
 
-This tutorial will give a simple example how you can split complex data coming from a block into simpler structures, using the python block.
+This tutorial will give a simple example how you can split complex data coming from a block (e.g. the web API block) into simpler structures, using the python block.
 For this we have to join a couple of inseri blocks.
 
 ## Step 1: Create a new post
