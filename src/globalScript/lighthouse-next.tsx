@@ -148,27 +148,24 @@ type Publish<T> = (value: T, contentType: string) => void
 type SetEmpty = () => void
 type Actions<T> = [Publish<T>, SetEmpty]
 
+type KeyDescPack = { key: string; description: string }
+
 function usePublish<T = any>(blockId: string, key: string, description: string): Actions<T>
-function usePublish<T = any>(blockId: string, keys: { key: string; description: string }[]): Record<string, Actions<T>>
-function usePublish(blockId: string, keys: string | { key: string; description: string }[], maybeDescription?: string): any {
-	if (typeof keys === 'string' && maybeDescription) {
-		const result = internalPublish(blockId, [keys], [maybeDescription])
-		if (result[0]) {
-			return result[0]
-		}
-		return (_val: any, _ct: any) => {}
-	} else if (Array.isArray(keys)) {
-		return internalPublish(
-			blockId,
-			keys.map((i) => i.key),
-			keys.map((i) => i.description)
-		)
+function usePublish<T = any>(blockId: string, keys: KeyDescPack[]): Record<string, Actions<T>>
+function usePublish(blockId: string, keys: string | KeyDescPack[], maybeDescription?: string): any {
+	const preparedKeys = typeof keys === 'string' ? [keys] : (keys as KeyDescPack[]).map((i) => i.key)
+	const preparedDescs = !!maybeDescription ? [maybeDescription] : typeof keys !== 'string' ? (keys as KeyDescPack[]).map((i) => i.description) : []
+
+	const result = useInternalPublish(blockId, preparedKeys, preparedDescs)
+
+	if (typeof keys === 'string') {
+		return result[0] ? result[0] : (_val: any, _ct: any) => {}
 	}
 
-	return {}
+	return result
 }
 
-function internalPublish(blockId: string, keys: string[], descriptions: string[]): Record<string, Actions<any>> {
+function useInternalPublish(blockId: string, keys: string[], descriptions: string[]): Record<string, Actions<any>> {
 	useEffect(() => {
 		const blockStore = blockStoreSubject.getValue()
 
@@ -219,9 +216,9 @@ function internalPublish(blockId: string, keys: string[], descriptions: string[]
 			}, {} as Record<string, Actions<any>>)
 
 			return callbackMap
-		} else {
-			return {}
 		}
+
+		return {}
 	}, [keys.join()])
 }
 
@@ -235,34 +232,26 @@ function useWatch<T = any>(keys: string | string[], onBlockRemoved?: (key: strin
 	useDeepCompareEffect(() => {
 		const longKeys = typeof keys === 'string' ? [keys] : keys
 
-		const sliceSubscriptions = longKeys
-			.map((key) => {
-				const [blockId, valueId] = key.split('/')
-				return [key, blockId, valueId] as [string, string, string]
-			})
-			.map(([key, blockId, valueId]) => {
-				const sub = blockStoreSubject
+		const onBlockRemovedSubs = longKeys
+			.map((key) => [key, ...key.split('/')])
+			.map(([key, blockId, valueId]) =>
+				blockStoreSubject
 					.pipe(
-						map((root) => [key, root[blockId]?.values?.[valueId]] as [string, ValueInfo]),
+						map((root) => root[blockId]?.values?.[valueId]),
 						pairwise()
 					)
 					.subscribe(([old, current]) => {
-						if (onBlockRemoved && !old[1] && current[1] === null) {
-							onBlockRemoved(old[0])
+						if (onBlockRemoved && !!old && current === null) {
+							onBlockRemoved(key)
 						}
 					})
+			)
 
-				return sub
-			})
-
-		const callbackSubscription = blockStoreSubject
+		const valueSubscription = blockStoreSubject
 			.pipe(
 				map((root) =>
 					longKeys
-						.map((key) => {
-							const [blockId, valueId] = key.split('/')
-							return [key, blockId, valueId] as [string, string, string]
-						})
+						.map((key) => [key, ...key.split('/')])
 						.reduce((acc, [fullKey, blockId, valueId]) => {
 							const valueInfo = root[blockId]?.values[valueId]
 							let simpleValueInfo: SimpleValueInfo
@@ -281,8 +270,8 @@ function useWatch<T = any>(keys: string | string[], onBlockRemoved?: (key: strin
 			.subscribe(setState)
 
 		return () => {
-			sliceSubscriptions.forEach((s) => s.unsubscribe())
-			callbackSubscription.unsubscribe()
+			onBlockRemovedSubs.forEach((s) => s.unsubscribe())
+			valueSubscription.unsubscribe()
 		}
 	}, [keys])
 
