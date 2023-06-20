@@ -12,7 +12,7 @@ In this example, we call the post "Image selection". You can type this at "Add t
 
 <figure markdown>
 ![Adding a new post in WordPress](/assets/new_post.png)
-  <figcaption>Step 1: Adding a new post in WordPress: (i) click on New and next, (ii) click on Post</figcaption>
+  <figcaption>Step 1: Adding a new post in WordPress: (i) hover on mouse pointer over New and next, (ii) click on Post (or click directly on New)</figcaption>
 </figure>
 
 ## Step 2: Text editor for the options
