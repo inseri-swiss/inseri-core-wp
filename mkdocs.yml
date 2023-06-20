@@ -1,5 +1,23 @@
 site_name: Documentation for inseri core (beta)
 repo_url: https://github.com/inseri-swiss/inseri-core-wp
+nav:
+  - "getting-started.md"
+  - "Tutorials":
+    - "tutorials/hello-world.md"
+    - "tutorials/data-mapping-with-python.md"
+  - "Blocks":
+    - "blocks/download.md"
+    - "blocks/dropdown.md"
+    - "blocks/html.md"
+    - "blocks/image.md"
+    - "blocks/localFileImport.md"
+    - "blocks/mediaCollection.md"
+    - "blocks/plotly.md"
+    - "blocks/python.md"
+    - "blocks/textEditor.md"
+    - "blocks/textViewer.md"
+    - "blocks/webApi.md"
+    - "blocks/zenodo.md"
 theme:
   name: material
   features:
@@ -17,3 +35,7 @@ markdown_extensions:
   - pymdownx.superfences
   - mkdocs_graphviz:
       color: 4051b5
+  - md_in_html
+plugins:
+  - glightbox
+  - search
