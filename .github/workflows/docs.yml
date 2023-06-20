@@ -14,5 +14,5 @@ jobs:
       - run: sudo apt-get install -y graphviz
       - run: pip install mkdocs
       - run: pip install mkdocs-material
-      - run: pip install mkdocs-graphviz
+      - run: pip install mkdocs-graphviz mkdocs-glightbox
       - run: mkdocs gh-deploy --force --clean --verbose
