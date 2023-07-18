@@ -1,33 +1,49 @@
 # Hello world
 
-This tutorial will give a simple example how you can display different images depending on user selection.
-For this we have to join a couple of inseri blocks.
+This tutorial allows you to chain multiple inseri blocks, with the specific example focusing on:
 
-You can check out the result of this tutorial on [inseri.swiss](https://inseri.swiss/2023/02/hello-world/).
+- Adding predefined images in dropdown menu
+- Allowing the end user to select the images to display
+
+For the final product, please [click here](https://inseri.swiss/2023/02/hello-world/).
+
+## Step 0: Initialize your inseri instance
+
+Open up an inseri or [playground instance](https://playground.inseri.swiss).
+Beware that changes done in the playground will not be saved.
 
 ## Step 1: Create a new post
 
-On your inseri instance or in the playground (remember, your changes will not be saved there), add a new post (see the figure below) and give it a title.
-In this example, we call the post "Image selection". You can type this at "Add title...".
+Add a new post with the title "Image Selection", as presented in the figure below.
 
 <figure markdown>
 ![Adding a new post in WordPress](/assets/new_post.png)
   <figcaption>Step 1: Adding a new post in WordPress: (i) hover on mouse pointer over New and next, (ii) click on Post (or click directly on New)</figcaption>
 </figure>
 
-## Step 2: Text editor for the options
+## Step 2: Add an inseri text editor block
 
 Add an inseri text editor by clicking the `+` below the title.
-Select "Browse all" and look for "Text Editor" in the category _inseri_.
+Select "Browse all" and look for "Text Editor" block under the top section _inseri_.
 
 <figure markdown>
 ![Adding a new block in WordPress](/assets/new_block_browse_all.png)
   <figcaption>Step 2: Adding a new block in WordPress: (i) click on "+" and next, (ii) click on Browse All</figcaption>
 </figure>
 
-Choose the format "JSON" because that is what will be read by the dropdown that we are going to add later.
+<figure markdown>
+![Inseri category](/assets/inseri_category.png)
+  <figcaption>Step 2: "Text editor" block category "inseri"</figcaption>
+</figure>
 
-Now, give your text editor a meaningful name.
+To chain more inseri blocks in this example (text editor block to dropdown menu block), please choose the format "JSON".
+
+<figure markdown>
+![Select the output format](/assets/select_json.png)
+  <figcaption>Step 2: Set the text viewer to "JSON"</figcaption>
+</figure>
+
+Next, give your text editor a meaningful name.
 For this, open the configuration panel on the right and enter "textEditor-imageOptions" under _block name_.
 
 <figure markdown>
@@ -35,9 +51,10 @@ For this, open the configuration panel on the right and enter "textEditor-imageO
   <figcaption>Step 2: Edit the block name: (i) open the configuration panel, (ii) enter the desired name under "BLOCK NAME"</figcaption>
 </figure>
 
-## Step 3: Add options to the text editor
+## Step 3: Add image information to the text editor
 
-Copy this snippet into the text editor:
+Now, copy the following snippet into the text editor.
+This will add to image options (UZH logo and acronym) with a label.
 
 ```json
 [
@@ -46,19 +63,17 @@ Copy this snippet into the text editor:
 ]
 ```
 
-It contains two options with a label each.
-
 ## Step 4: Add a dropdown
 
-Add a "Dropdown" from the category _inseri_ like you added the text editor before.
+Add a "Dropdown" from the category _inseri_ , as shown previously (step 2).
 
 In the dropdown block you can now select the block source with the name "textEditor-imageOptions: content".
 
-Like you did with the text editor, give the dropdown block a more meaningful name "dropdown-selectedImage".
+Similarly to the step 2 of the text editor, give the dropdown block a more meaningful name "dropdown-selectedImage".
 
 ## Step 5: Add an image viewer
 
-Add the block "Image Box" from the category _inseri_ to your post.
+To create a selection menu, add the block "Image Box" from the _inseri_ section.
 
 Set the block source to the option "dropdown-selectedImage: chosen value".
 
@@ -66,15 +81,16 @@ Give the image box block the name "image".
 
 ## Step 6: Save, preview and publish
 
-You can save and publish your post like any WordPress post. In case you use the playground you cannot publish it, but only preview it.
+For the final step, we must save our post and preview it.
+Furthermore, in case of a full instance, you can now publish it.
 
 <figure markdown>
 ![Save, preview and publish](/assets/save_preview_publish.png)
   <figcaption>Step 6: Save, preview and publish</figcaption>
 </figure>
 
-Once published (or in preview), you will see the text editor with the content as described above and a dropdown.
-The image will load after selecting it from the dropdown.
+Once published (or in a preview), you will see the text editor with the snippet (step 3) and a dropdown (step 4),
+where the corresponding image will load after its selection (step 5).
 
 ## Overview
 
