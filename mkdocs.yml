@@ -18,6 +18,9 @@ nav:
     - "blocks/textViewer.md"
     - "blocks/webApi.md"
     - "blocks/zenodo.md"
+  - "How to":
+    - "how-to/visualizations.md"
+    - "how-to/workWithFiles.md"
 theme:
   name: material
   features:
