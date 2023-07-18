@@ -1,6 +1,8 @@
 import domReady from '@wordpress/dom-ready'
 import { createRoot } from '@wordpress/element'
 import { InseriThemeProvider, StateProvider } from '../../components'
+import { InseriRoot } from '../../globalScript/lighthouse-next'
+import config from './block.json'
 import { storeCreator } from './state'
 import View from './view'
 
@@ -12,7 +14,9 @@ function initReactComponents() {
 			createRoot(item!).render(
 				<InseriThemeProvider>
 					<StateProvider stateCreator={storeCreator} initialState={attributes}>
-						<View />
+						<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={config.name}>
+							<View />
+						</InseriRoot>
 					</StateProvider>
 				</InseriThemeProvider>
 			)

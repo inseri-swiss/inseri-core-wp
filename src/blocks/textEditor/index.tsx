@@ -3,7 +3,6 @@ import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
-import { ProducerBeacon } from '../../globalScript'
 import json from './block.json'
 import Edit from './edit'
 import './style.scss'
@@ -11,12 +10,12 @@ import './style.scss'
 const { name, ...settings } = json as any
 
 export interface Attributes {
-	blockId?: string
-	output: ProducerBeacon
+	blockId: string
 	blockName: string
 	height: number
 	editable: boolean
 	content: string
+	contentType: string
 	label: string
 	isVisible: boolean
 }

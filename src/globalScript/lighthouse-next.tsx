@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from '@wordpress/element'
-import { generateId, initJsonValidator } from './utils'
 import type { PropsWithChildren } from 'react'
+import { generateId, initJsonValidator } from './utils'
 
-import { BehaviorSubject, map, pairwise, scan } from 'rxjs'
-import deepMerge from 'lodash.merge'
 import { Schema } from 'ajv'
+import deepMerge from 'lodash.merge'
 import { useDeepCompareEffect } from 'react-use'
+import { BehaviorSubject, map, pairwise, scan } from 'rxjs'
 
 interface ValueWrapper<T = any> {
 	readonly type: 'wrapper'
@@ -33,7 +33,12 @@ type Root = Record<string, BlockInfo>
 
 const observableRoot = new BehaviorSubject<RecursivePartial<Root>>({})
 const blockStoreSubject = new BehaviorSubject<Root>({})
-observableRoot.pipe<Root>(scan((acc, item) => deepMerge(acc, item), {})).subscribe(blockStoreSubject)
+observableRoot
+	.pipe(
+		scan((acc, item) => deepMerge(acc, item), {})
+		//tap((item) => console.log('>', item))
+	)
+	.subscribe(blockStoreSubject)
 
 interface RootProps extends PropsWithChildren {
 	blockId: string
@@ -44,24 +49,29 @@ interface RootProps extends PropsWithChildren {
 
 function InseriRoot(props: RootProps) {
 	const { children, blockId, setBlockId, blockName, blockType } = props
+	let [blockSlice, setBlockSlice] = useState<BlockInfo>()
+
+	useEffect(() => {
+		const sub = blockStoreSubject.pipe(map((root) => root[blockId])).subscribe(setBlockSlice)
+		return () => sub.unsubscribe()
+	}, [blockId])
+
 	useEffect(() => {
 		if (!blockId?.trim() && setBlockId) {
 			const newBlockId = generateId(21)
 			setBlockId(newBlockId)
 		}
 
-		const blockStore = blockStoreSubject.getValue()
-
-		if (!blockId?.trim() && !blockStore[blockId]) {
-			blockStore[blockId] = { blockName, blockType, state: 'ready', values: {} }
-		} else {
-			blockStore[blockId].blockName = blockName
+		if (blockId?.trim() && !blockSlice) {
+			blockSlice = { blockName, blockType, state: 'ready', values: {} }
+		} else if (blockSlice) {
+			blockSlice.blockName = blockName
 		}
 
-		blockStoreSubject.next(blockStore)
-	}, [blockId])
+		observableRoot.next({ [blockId]: blockSlice })
+	}, [blockId, blockName])
 
-	return children
+	return blockSlice ? <>{children}</> : <></>
 }
 
 interface DiscoverContentType {
@@ -159,16 +169,18 @@ function usePublish(blockId: string, keys: string | KeyDescPack[], maybeDescript
 	const result = useInternalPublish(blockId, preparedKeys, preparedDescs)
 
 	if (typeof keys === 'string') {
-		return result[0] ? result[0] : (_val: any, _ct: any) => {}
+		const firstAction = Object.values(result)[0]
+		return firstAction ? firstAction : [(_val: any, _ct: any) => {}, () => {}]
 	}
 
 	return result
 }
 
 function useInternalPublish(blockId: string, keys: string[], descriptions: string[]): Record<string, Actions<any>> {
-	useEffect(() => {
-		const blockStore = blockStoreSubject.getValue()
+	const blockStore = blockStoreSubject.getValue()
+	const blockStoreKeys = Object.keys(blockStore).join()
 
+	useEffect(() => {
 		if (blockId?.trim() && blockStore[blockId]) {
 			const descByKey = new Map(keys.map((item, idx) => [item, descriptions[idx]]))
 			const existingKeys = new Set(Object.keys(blockStore[blockId].values))
@@ -193,21 +205,19 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 			})
 
 			blockStore[blockId].values = values
-			observableRoot.next({ blockId: { values } })
+			observableRoot.next({ [blockId]: { values } })
 		}
-	}, [keys.join(), descriptions.join()])
+	}, [keys.join(), descriptions.join(), blockStoreKeys])
 
 	return useMemo(() => {
-		const blockStore = blockStoreSubject.getValue()
-
 		if (blockId?.trim() && blockStore[blockId]) {
 			const callbackMap = keys.reduce((acc, key) => {
 				const publish = (value: any, contentType: string) => {
-					observableRoot.next({ blockId: { values: { key: { type: 'wrapper', value, contentType } } } })
+					observableRoot.next({ [blockId]: { values: { [key]: { type: 'wrapper', value, contentType } } } })
 				}
 
 				const setEmpty = () => {
-					observableRoot.next({ blockId: { values: { key: { type: 'none', value: null, contentType: null } as any } } })
+					observableRoot.next({ [blockId]: { values: { [key]: { type: 'none', value: null, contentType: null } as any } } })
 				}
 
 				acc[key] = [publish, setEmpty]
@@ -219,7 +229,7 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 		}
 
 		return {}
-	}, [keys.join()])
+	}, [keys.join(), blockStoreKeys])
 }
 
 type SimpleValueInfo<T = any> = Omit<ValueInfo<T>, 'description'>

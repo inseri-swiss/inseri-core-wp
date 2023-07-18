@@ -1,9 +1,9 @@
-import { useDispatch } from '@inseri/lighthouse'
 import { useDebouncedValue } from '@mantine/hooks'
 import { IconEye, IconPencil } from '@tabler/icons-react'
 import { useEffect, useMemo, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Box, Button, CodeEditor, Group, Text, Tooltip, useGlobalState } from '../../components'
+import { usePublish } from '../../globalScript/lighthouse-next'
 import { formatCode, getBodyTypeByContenType, isBeautifyType } from '../../utils'
 import { GlobalState } from './state'
 
@@ -15,15 +15,15 @@ interface ViewProps {
 
 export default function View(props: ViewProps) {
 	const { isGutenbergEditor, isSelected, renderResizable } = props
-	const { height, editable, output, label, content, isVisible } = useGlobalState((state: GlobalState) => state)
+	const { blockId, height, editable, contentType, label, content, isVisible } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 
-	const dispatch = useDispatch(output)
+	const [publishValue, publishEmpty] = usePublish(blockId, 'content', 'content')
 	const isEditable = editable || isGutenbergEditor
 
 	const codeType = useMemo(() => {
-		return getBodyTypeByContenType(output.contentType) ?? 'text'
-	}, [output.contentType])
+		return getBodyTypeByContenType(contentType) ?? 'text'
+	}, [contentType])
 
 	const [code, setCode] = useState(content)
 	const [hasSyntaxError, setSyntaxError] = useState(false)
@@ -32,15 +32,15 @@ export default function View(props: ViewProps) {
 	const dispatchValue = (newValue: string) => {
 		setSyntaxError(false)
 
-		if (output?.contentType.match('/json') && newValue.trim().length > 0) {
+		if (contentType.match('/json') && newValue.trim().length > 0) {
 			try {
-				dispatch({ value: JSON.parse(newValue), status: 'ready' })
+				publishValue(JSON.parse(newValue), contentType)
 			} catch (error) {
 				setSyntaxError(true)
-				dispatch({ status: 'error' })
+				publishEmpty()
 			}
 		} else {
-			dispatch({ value: newValue, status: 'ready' })
+			publishValue(newValue, contentType)
 		}
 	}
 
