@@ -5,7 +5,6 @@ export interface GlobalState extends Attributes {
 	[i: string]: any
 
 	isWizardMode: boolean
-	prevContentType: string
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
 		setContentType: (contentType: string) => void
@@ -13,12 +12,11 @@ export interface GlobalState extends Attributes {
 }
 
 export const storeCreator = (initalState: Attributes) => {
-	const isValueSet = !!initalState.output.contentType
+	const isValueSet = !!initalState.contentType
 
 	return immer<GlobalState>((set) => ({
 		...initalState,
 		isWizardMode: !isValueSet,
-		prevContentType: initalState.output.contentType,
 
 		actions: {
 			updateState: (modifier: Partial<GlobalState>) =>
@@ -31,8 +29,7 @@ export const storeCreator = (initalState: Attributes) => {
 			setContentType: (contentType: string) =>
 				set((state) => {
 					state.isWizardMode = false
-					state.prevContentType = state.output.contentType
-					state.output.contentType = contentType
+					state.contentType = contentType
 				}),
 		},
 	}))

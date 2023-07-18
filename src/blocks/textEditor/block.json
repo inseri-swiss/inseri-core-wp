@@ -10,13 +10,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"output": {
-			"type": "object",
-			"default": {
-				"key": "",
-				"contentType": ""
-			}
-		},
 		"blockName": {
 			"type": "string",
 			"default": ""
@@ -30,6 +23,10 @@
 			"default": false
 		},
 		"content": {
+			"type": "string",
+			"default": ""
+		},
+		"contentType": {
 			"type": "string",
 			"default": ""
 		},
