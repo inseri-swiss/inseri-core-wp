@@ -1,15 +1,13 @@
 import { useEffect, useMemo, useState } from '@wordpress/element'
 import type { PropsWithChildren } from 'react'
 import { generateId, initJsonValidator } from './utils'
-
 import { Schema } from 'ajv'
 import deepMerge from 'lodash.merge'
-import { useDeepCompareEffect } from 'react-use'
-import { BehaviorSubject, map, pairwise, scan } from 'rxjs'
+import { useDeepCompareEffect, useEffectOnce } from 'react-use'
+import { BehaviorSubject, map, pairwise } from 'rxjs'
 
 interface ValueWrapper<T = any> {
 	readonly type: 'wrapper'
-	readonly description: string
 
 	readonly contentType: string
 	readonly value: T
@@ -17,28 +15,29 @@ interface ValueWrapper<T = any> {
 
 interface None {
 	readonly type: 'none'
-	readonly description: string
 }
 
 type ValueInfo<T = any> = ValueWrapper<T> | None
+type ValueInfoExtra<T = any> = ValueInfo<T> & {
+	description: string
+}
 
 interface BlockInfo {
 	blockType: string
 	blockName: string
 	state: 'ready' | 'pending' | 'failed'
-	values: Record<string, ValueInfo>
+	values: Record<string, ValueInfoExtra>
 }
 
 type Root = Record<string, BlockInfo>
 
-const observableRoot = new BehaviorSubject<RecursivePartial<Root>>({})
 const blockStoreSubject = new BehaviorSubject<Root>({})
-observableRoot
-	.pipe(
-		scan((acc, item) => deepMerge(acc, item), {})
-		//tap((item) => console.log('>', item))
-	)
-	.subscribe(blockStoreSubject)
+
+function onNext(partial: RecursivePartial<Root>) {
+	const base = blockStoreSubject.getValue()
+	const merged = deepMerge(base, partial)
+	blockStoreSubject.next(merged)
+}
 
 interface RootProps extends PropsWithChildren {
 	blockId: string
@@ -52,8 +51,8 @@ function InseriRoot(props: RootProps) {
 	let [blockSlice, setBlockSlice] = useState<BlockInfo>()
 
 	useEffect(() => {
-		const sub = blockStoreSubject.pipe(map((root) => root[blockId])).subscribe(setBlockSlice)
-		return () => sub.unsubscribe()
+		const subscription = blockStoreSubject.pipe(map((store) => store[blockId])).subscribe((slice) => setBlockSlice(slice))
+		return () => subscription.unsubscribe()
 	}, [blockId])
 
 	useEffect(() => {
@@ -68,7 +67,7 @@ function InseriRoot(props: RootProps) {
 			blockSlice.blockName = blockName
 		}
 
-		observableRoot.next({ [blockId]: blockSlice })
+		onNext({ [blockId]: blockSlice })
 	}, [blockId, blockName])
 
 	return blockSlice ? <>{children}</> : <></>
@@ -86,7 +85,7 @@ interface DiscoverJson {
 
 type DiscoverOptions = DiscoverContentType | DiscoverJson
 
-type RawValueItem = Omit<BlockInfo, 'values'> & ValueInfo & { key: string; blockId: string; valueId: string }
+type RawValueItem = Omit<BlockInfo, 'values'> & ValueInfoExtra & { key: string; blockId: string; valueId: string }
 
 interface ValueItem {
 	key: string
@@ -95,10 +94,12 @@ interface ValueItem {
 
 function flattenToRawItem(root: Root): RawValueItem[] {
 	return Object.entries(root).flatMap(([blockId, block]) =>
-		Object.entries(block.values).map(([valueId, val]) => {
-			const { values, ...restBlock } = block
-			return { key: blockId + '/' + valueId, valueId, blockId, ...restBlock, ...val, description: block.blockName + ' - ' + val.description }
-		})
+		Object.entries(block.values)
+			.filter(([_, val]) => !!val)
+			.map(([valueId, val]) => {
+				const { values, ...restBlock } = block
+				return { key: blockId + '/' + valueId, valueId, blockId, ...restBlock, ...val, description: block.blockName + ' - ' + val.description }
+			})
 	)
 }
 
@@ -205,19 +206,32 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 			})
 
 			blockStore[blockId].values = values
-			observableRoot.next({ [blockId]: { values } })
+			onNext({ [blockId]: { values } })
 		}
 	}, [keys.join(), descriptions.join(), blockStoreKeys])
+
+	useEffectOnce(() => {
+		return () => {
+			const values = { ...blockStore[blockId].values }
+
+			keys.forEach((key) => {
+				values[key] = null as any
+			})
+
+			blockStore[blockId].values = values
+			onNext({ [blockId]: { values } })
+		}
+	})
 
 	return useMemo(() => {
 		if (blockId?.trim() && blockStore[blockId]) {
 			const callbackMap = keys.reduce((acc, key) => {
 				const publish = (value: any, contentType: string) => {
-					observableRoot.next({ [blockId]: { values: { [key]: { type: 'wrapper', value, contentType } } } })
+					onNext({ [blockId]: { values: { [key]: { type: 'wrapper', value, contentType } } } })
 				}
 
 				const setEmpty = () => {
-					observableRoot.next({ [blockId]: { values: { [key]: { type: 'none', value: null, contentType: null } as any } } })
+					onNext({ [blockId]: { values: { [key]: { type: 'none', value: null, contentType: null } as any } } })
 				}
 
 				acc[key] = [publish, setEmpty]
@@ -232,16 +246,13 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 	}, [keys.join(), blockStoreKeys])
 }
 
-type SimpleValueInfo<T = any> = Omit<ValueInfo<T>, 'description'>
-
-function useWatch<T = any>(key: string, onBlockRemoved?: (key: string) => void): SimpleValueInfo<T>
-function useWatch<T = any>(keys: string, onBlockRemoved?: (key: string) => void): Record<string, SimpleValueInfo<T>>
+function useWatch<T = any>(key: string, onBlockRemoved?: (key: string) => void): ValueInfo<T>
+function useWatch<T = any>(keys: string, onBlockRemoved?: (key: string) => void): Record<string, ValueInfo<T>>
 function useWatch<T = any>(keys: string | string[], onBlockRemoved?: (key: string) => void): any {
-	const [state, setState] = useState<Record<string, SimpleValueInfo>>({})
+	const [state, setState] = useState<Record<string, ValueInfo>>({})
+	const longKeys = typeof keys === 'string' ? [keys] : keys
 
-	useDeepCompareEffect(() => {
-		const longKeys = typeof keys === 'string' ? [keys] : keys
-
+	useEffect(() => {
 		const onBlockRemovedSubs = longKeys
 			.map((key) => [key, ...key.split('/')])
 			.map(([key, blockId, valueId]) =>
@@ -264,7 +275,7 @@ function useWatch<T = any>(keys: string | string[], onBlockRemoved?: (key: strin
 						.map((key) => [key, ...key.split('/')])
 						.reduce((acc, [fullKey, blockId, valueId]) => {
 							const valueInfo = root[blockId]?.values[valueId]
-							let simpleValueInfo: SimpleValueInfo
+							let simpleValueInfo: ValueInfo
 
 							if (!valueInfo) {
 								simpleValueInfo = { type: 'none' }
@@ -274,7 +285,7 @@ function useWatch<T = any>(keys: string | string[], onBlockRemoved?: (key: strin
 							}
 
 							return { ...acc, [fullKey]: simpleValueInfo }
-						}, {} as Record<string, SimpleValueInfo<T>>)
+						}, {} as Record<string, ValueInfo<T>>)
 				)
 			)
 			.subscribe(setState)
@@ -283,7 +294,7 @@ function useWatch<T = any>(keys: string | string[], onBlockRemoved?: (key: strin
 			onBlockRemovedSubs.forEach((s) => s.unsubscribe())
 			valueSubscription.unsubscribe()
 		}
-	}, [keys])
+	}, [longKeys.join()])
 
 	const stateValues = Object.values(state)
 	if (typeof keys === 'string' && stateValues.length > 0) {

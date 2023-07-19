@@ -1,4 +1,4 @@
-import { useAvailableBeacons, useWatch } from '@inseri/lighthouse'
+import { InseriRoot, useDiscover } from '@inseri/lighthouse-next'
 import { IconFileTypography } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -13,26 +13,18 @@ import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
 import View from './view'
 
+const textualContentTypes = TEXTUAL_CONTENT_TYPES.map((t) => t.value)
+const contentTypeFilter = (c: string) => textualContentTypes.includes(c) || c.startsWith('text/')
+
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { input, label, blockId, blockName, isWizardMode, actions } = useGlobalState((state: GlobalState) => state)
-	const isValueSet = !!input.key
-	const inputBeaconKey = input.key
-	const { updateState, chooseInputBeacon } = actions
+	const { inputKey, label, blockName, isWizardMode, actions } = useGlobalState((state: GlobalState) => state)
+	const isValueSet = !!inputKey
+	const { updateState, chooseInput } = actions
 
-	const textualContentTypes = TEXTUAL_CONTENT_TYPES.map((t) => t.value)
-	const availableBeacons = useAvailableBeacons((c) => textualContentTypes.includes(c) || c.startsWith('text/'))
-	const selectData = Object.keys(availableBeacons)
-		.filter((k) => !k.startsWith(blockId + '/'))
-		.map((k) => ({ label: availableBeacons[k].description, value: k }))
-
-	const { status } = useWatch(input)
-	useEffect(() => {
-		if (status === 'unavailable') {
-			updateState({ input: { ...input, key: '' }, isWizardMode: true })
-		}
-	}, [status])
+	const sources = useDiscover({ contentTypeFilter })
+	const selectData = sources.map((item) => ({ label: item.description, value: item.key }))
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -90,8 +82,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					<Select
 						label={__('Display code by selecting a block source', 'inseri-core')}
 						data={selectData}
-						value={inputBeaconKey}
-						onChange={(key) => chooseInputBeacon(availableBeacons[key!])}
+						value={inputKey}
+						onChange={(key) => chooseInput(key ?? '')}
 					/>
 				</Box>
 			) : (
@@ -105,9 +97,18 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'textViewer'}>
-			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
-				<EditComponent {...props} />
-			</StateProvider>
+			<InseriRoot
+				blockId={attributes.blockId}
+				blockName={attributes.blockName}
+				blockType={json.name}
+				setBlockId={(blockId) => {
+					setAttributes({ blockId })
+				}}
+			>
+				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
+					<EditComponent {...props} />
+				</StateProvider>
+			</InseriRoot>
 		</SetupEditorEnv>
 	)
 }

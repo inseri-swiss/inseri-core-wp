@@ -3,6 +3,8 @@ import { createRoot } from '@wordpress/element'
 import { InseriThemeProvider, StateProvider } from '../../components'
 import { storeCreator } from './state'
 import View from './view'
+import { InseriRoot } from '@inseri/lighthouse-next'
+import config from './block.json'
 
 function initReactComponents() {
 	const items = document.querySelectorAll('.wp-block-inseri-core-text-viewer')
@@ -11,9 +13,11 @@ function initReactComponents() {
 			const attributes = JSON.parse(item.dataset.attributes)
 			createRoot(item!).render(
 				<InseriThemeProvider>
-					<StateProvider stateCreator={storeCreator} initialState={attributes}>
-						<View />
-					</StateProvider>
+					<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={config.name}>
+						<StateProvider stateCreator={storeCreator} initialState={attributes}>
+							<View />
+						</StateProvider>
+					</InseriRoot>
 				</InseriThemeProvider>
 			)
 		})
