@@ -3,7 +3,7 @@ import { IconEye, IconPencil } from '@tabler/icons-react'
 import { useEffect, useMemo, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Box, Button, CodeEditor, Group, Text, Tooltip, useGlobalState } from '../../components'
-import { usePublish } from '../../globalScript/lighthouse-next'
+import { usePublish } from '@inseri/lighthouse-next'
 import { formatCode, getBodyTypeByContenType, isBeautifyType } from '../../utils'
 import { GlobalState } from './state'
 

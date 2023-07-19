@@ -50,6 +50,7 @@ module.exports = {
 	],
 	externals: [
 		{ '@inseri/lighthouse': 'window.inseri.lighthouse' },
+		{ '@inseri/lighthouse-next': 'window.inseri.lighthouseNext' },
 		{ '@inseri/utils': 'window.inseri.utils' },
 	],
 }

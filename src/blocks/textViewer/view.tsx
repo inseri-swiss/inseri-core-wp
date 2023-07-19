@@ -1,4 +1,4 @@
-import { useWatch } from '@inseri/lighthouse'
+import { useWatch } from '@inseri/lighthouse-next'
 import { IconEye } from '@tabler/icons-react'
 import { useMemo } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
@@ -13,22 +13,25 @@ interface ViewProps {
 
 export default function View(props: ViewProps) {
 	const { renderResizable } = props
-	const { height, label, input } = useGlobalState((state: GlobalState) => state)
-	const { contentType: incomingContentType, value, status } = useWatch(input)
+	const { height, label, inputKey } = useGlobalState((state: GlobalState) => state)
+	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
+	const valueWrapper = useWatch(inputKey, () => updateState({ inputKey: '', isWizardMode: true }))
+
+	let incomingContentType = ''
+	let preparedValue = ''
+
+	if (valueWrapper.type === 'wrapper') {
+		incomingContentType = valueWrapper.contentType
+		preparedValue = valueWrapper.value
+
+		if (incomingContentType.match('/json')) {
+			preparedValue = stringify(valueWrapper.value)
+		}
+	}
 
 	const codeType = useMemo(() => {
 		return getBodyTypeByContenType(incomingContentType) ?? 'text'
 	}, [incomingContentType])
-
-	let preparedValue = value
-
-	if (incomingContentType.match('/json') && preparedValue) {
-		preparedValue = stringify(value)
-	}
-
-	if ((status !== 'ready' && status !== 'initial') || !preparedValue) {
-		preparedValue = ''
-	}
 
 	const editorElement = <CodeEditor height={height} type={codeType} value={preparedValue} />
 

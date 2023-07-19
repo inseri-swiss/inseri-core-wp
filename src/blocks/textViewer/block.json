@@ -10,13 +10,9 @@
 			"type": "string",
 			"default": ""
 		},
-		"input": {
-			"type": "object",
-			"default": {
-				"key": "",
-				"contentType": "",
-				"description": ""
-			}
+		"inputKey": {
+			"type": "string",
+			"default": ""
 		},
 		"blockName": {
 			"type": "string",

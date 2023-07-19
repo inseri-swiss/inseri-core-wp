@@ -15,6 +15,7 @@
 		"baseUrl": "./src",
 		"paths": {
 			"@inseri/lighthouse": ["./globalScript/lighthouse"],
+			"@inseri/lighthouse-next": ["./globalScript/lighthouse-next"],
 			"@inseri/utils": ["./globalScript/utils"]
 		}
 	},
