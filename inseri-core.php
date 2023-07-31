@@ -27,6 +27,11 @@
  * along with inseri core.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// Exit if accessed directly
+if (!defined('ABSPATH')) {
+	exit();
+}
+
 require_once plugin_dir_path(__FILE__) . 'includes/utils.php';
 
 /**
