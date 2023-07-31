@@ -4,7 +4,7 @@ Tags: Gutenberg blocks, WordPress blocks, gutenberg, blocks, inseri
 Requires at least: 5.6
 Tested up to: 6.2
 Requires PHP: 5.6
-Stable tag: 0.2.0
+Stable tag: 0.2.1
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -40,6 +40,8 @@ Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inser
 
 
 == Changelog ==
+### 0.2.1
+minor changes
 
 ### 0.2.0
 
