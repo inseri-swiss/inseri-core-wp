@@ -1,31 +1,29 @@
-import { useWatch } from '@inseri/lighthouse'
-import { useEffect } from '@wordpress/element'
+import { useWatch } from '@inseri/lighthouse-next'
 import stringify from 'json-stable-stringify'
+import { useDeepCompareEffect } from 'react-use'
 import { Button, useGlobalState } from '../../components'
 import { CONTENT_TYPE_TO_EXT } from '../../utils'
 import { GlobalState } from './state'
 
 export default function View() {
-	const { input, label, fileName, extension, downloadLink } = useGlobalState((state: GlobalState) => state)
+	const { inputKey, label, fileName, extension, downloadLink } = useGlobalState((state: GlobalState) => state)
 	const { updateDownloadObject, updateState } = useGlobalState((state: GlobalState) => state.actions)
 
-	const { value, status, contentType } = useWatch(input)
-	const isNotReady = status !== 'ready' || !downloadLink
+	const valueWrapper = useWatch(inputKey, () => {
+		updateState({ inputKey: '', isWizardMode: true })
+	})
+	const isNotReady = valueWrapper.type === 'none' || !downloadLink
 
-	useEffect(() => {
-		let ext = ''
-		const found = CONTENT_TYPE_TO_EXT.find((c) => contentType.includes(c.value))
-		if (found) {
-			ext = found.ext
-		}
+	useDeepCompareEffect(() => {
+		if (valueWrapper.type === 'wrapper') {
+			const { value, contentType } = valueWrapper
 
-		updateState({ extension: ext })
-	}, [contentType])
+			const found = CONTENT_TYPE_TO_EXT.find((c) => contentType.includes(c.value))
+			const ext = found ? found.ext : ''
+			updateState({ extension: ext })
 
-	useEffect(() => {
-		let processedValue = value
+			let processedValue = value
 
-		if (status === 'ready') {
 			if (contentType.includes('json')) {
 				processedValue = stringify(processedValue)
 			}
@@ -39,7 +37,7 @@ export default function View() {
 				updateDownloadObject(processedValue)
 			}
 		}
-	}, [value])
+	}, [valueWrapper])
 
 	const fullFileName = fileName + (extension ? '.' + extension : '')
 
