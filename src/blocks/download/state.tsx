@@ -1,39 +1,5 @@
-import { immer } from 'zustand/middleware/immer'
-import { updatePartially } from '../../utils'
-import { Attributes } from './index'
+import { atomFamily } from 'recoil'
 
-export interface GlobalState extends Attributes {
-	[i: string]: any
-
-	isWizardMode: boolean
-	downloadLink: string
-	extension: string
-
-	actions: {
-		updateState: (modifier: Partial<GlobalState>) => void
-		updateDownloadObject: (blob: Blob) => void
-	}
-}
-
-export const storeCreator = (initalState: Attributes) => {
-	return immer<GlobalState>((set) => ({
-		...initalState,
-		isWizardMode: !initalState.inputKey,
-		downloadLink: '',
-		extension: '',
-
-		actions: {
-			updateState: (modifier: RecursivePartial<GlobalState>) =>
-				set((state) => {
-					updatePartially(state, modifier)
-				}),
-
-			updateDownloadObject: (blob: Blob) => {
-				set((state) => {
-					URL.revokeObjectURL(state.downloadLink)
-					state.downloadLink = URL.createObjectURL(blob)
-				})
-			},
-		},
-	}))
-}
+export const downloadLinkState = atomFamily({ key: 'downloadLink', default: '' })
+export const extensionState = atomFamily({ key: 'extension', default: '' })
+export const wizardState = atomFamily({ key: 'isWizardMode', default: true })

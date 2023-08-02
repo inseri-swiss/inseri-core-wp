@@ -1,16 +1,25 @@
 import { useWatch } from '@inseri/lighthouse-next'
 import stringify from 'json-stable-stringify'
 import { useDeepCompareEffect } from 'react-use'
-import { Button, useGlobalState } from '../../components'
+import { useRecoilState, useSetRecoilState } from 'recoil'
+import { Button } from '../../components'
 import { CONTENT_TYPE_TO_EXT } from '../../utils'
-import { GlobalState } from './state'
+import { Attributes } from './index'
+import { downloadLinkState, extensionState, wizardState } from './state'
 
-export default function View() {
-	const { inputKey, label, fileName, extension, downloadLink } = useGlobalState((state: GlobalState) => state)
-	const { updateDownloadObject, updateState } = useGlobalState((state: GlobalState) => state.actions)
+export default function View(props: { attributes: Attributes; setAttributes?: (item: Partial<Attributes>) => void }) {
+	const { attributes, setAttributes } = props
+	const { blockId, inputKey, label, fileName } = attributes
+
+	const [downloadLink, setDownloadLink] = useRecoilState(downloadLinkState(blockId))
+	const [extension, setExtension] = useRecoilState(extensionState(blockId))
+	const setWizardMode = useSetRecoilState(wizardState(blockId))
 
 	const valueWrapper = useWatch(inputKey, () => {
-		updateState({ inputKey: '', isWizardMode: true })
+		if (setAttributes) {
+			setWizardMode(true)
+			setAttributes({ inputKey: '' })
+		}
 	})
 	const isNotReady = valueWrapper.type === 'none' || !downloadLink
 
@@ -20,7 +29,7 @@ export default function View() {
 
 			const found = CONTENT_TYPE_TO_EXT.find((c) => contentType.includes(c.value))
 			const ext = found ? found.ext : ''
-			updateState({ extension: ext })
+			setExtension(ext)
 
 			let processedValue = value
 
@@ -34,7 +43,8 @@ export default function View() {
 			}
 
 			if (typeof processedValue === 'object' && processedValue instanceof Blob) {
-				updateDownloadObject(processedValue)
+				URL.revokeObjectURL(downloadLink)
+				setDownloadLink(URL.createObjectURL(processedValue))
 			}
 		}
 	}, [valueWrapper])
