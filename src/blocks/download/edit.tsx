@@ -1,4 +1,4 @@
-import { useAvailableBeacons, useWatch } from '@inseri/lighthouse'
+import { InseriRoot, useDiscover } from '@inseri/lighthouse-next'
 import { IconFileDownload } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -12,25 +12,12 @@ import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
 import View from './view'
 
-const defaultInput = {
-	key: '',
-	contentType: '',
-	description: '',
-}
-
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { blockName, input, isWizardMode, actions, label, fileName } = useGlobalState((state: GlobalState) => state)
+	const { blockName, inputKey, isWizardMode, actions, label, fileName } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
 
-	const isValueSet = !!input.key
-
-	const { status } = useWatch(input)
-	useEffect(() => {
-		if (status === 'unavailable') {
-			updateState({ input: { ...input, key: '' }, isWizardMode: true })
-		}
-	}, [status])
+	const isValueSet = !!inputKey
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -38,8 +25,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 		}
 	}, [isSelected])
 
-	const availableBeacons = useAvailableBeacons('')
-	const options = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
+	const sources = useDiscover({ contentTypeFilter: '' })
+	const options = sources.map((item) => ({ label: item.description, value: item.key }))
 
 	return (
 		<>
@@ -81,9 +68,9 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					<Select
 						label={__('Let visitor download data by selecting a block source', 'inseri-core')}
 						data={options}
-						value={input.key}
+						value={inputKey}
 						searchable
-						onChange={(key) => updateState({ input: key ? availableBeacons[key] : defaultInput, isWizardMode: false })}
+						onChange={(key) => updateState({ inputKey: key ?? '', isWizardMode: false })}
 					/>
 				</Box>
 			) : (
@@ -98,7 +85,9 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'download'}>
 			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
-				<EditComponent {...props} />
+				<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name}>
+					<EditComponent {...props} />
+				</InseriRoot>
 			</StateProvider>
 		</SetupEditorEnv>
 	)

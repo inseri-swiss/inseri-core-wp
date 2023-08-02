@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from '@wordpress/element'
 import type { PropsWithChildren } from 'react'
-import { generateId, initJsonValidator } from './utils'
+import { initJsonValidator } from './utils'
 import { Schema } from 'ajv'
 import deepMerge from 'lodash.merge'
 import { useDeepCompareEffect, useEffectOnce } from 'react-use'
@@ -33,6 +33,7 @@ type Root = Record<string, BlockInfo>
 
 const blockStoreSubject = new BehaviorSubject<Root>({})
 
+// TODO replace with Action Reducer
 function onNext(partial: RecursivePartial<Root>) {
 	const base = blockStoreSubject.getValue()
 	const merged = deepMerge(base, partial)
@@ -43,11 +44,10 @@ interface RootProps extends PropsWithChildren {
 	blockId: string
 	blockName: string
 	blockType: string
-	setBlockId?: (blockId: string) => void
 }
 
 function InseriRoot(props: RootProps) {
-	const { children, blockId, setBlockId, blockName, blockType } = props
+	const { children, blockId, blockName, blockType } = props
 	let [blockSlice, setBlockSlice] = useState<BlockInfo>()
 
 	useEffect(() => {
@@ -56,11 +56,6 @@ function InseriRoot(props: RootProps) {
 	}, [blockId])
 
 	useEffect(() => {
-		if (!blockId?.trim() && setBlockId) {
-			const newBlockId = generateId(21)
-			setBlockId(newBlockId)
-		}
-
 		if (blockId?.trim() && !blockSlice) {
 			blockSlice = { blockName, blockType, state: 'ready', values: {} }
 		} else if (blockSlice) {
@@ -179,7 +174,7 @@ function usePublish(blockId: string, keys: string | KeyDescPack[], maybeDescript
 
 function useInternalPublish(blockId: string, keys: string[], descriptions: string[]): Record<string, Actions<any>> {
 	const blockStore = blockStoreSubject.getValue()
-	const blockStoreKeys = Object.keys(blockStore).join()
+	const joinedBlockIds = Object.keys(blockStore).join()
 
 	useEffect(() => {
 		if (blockId?.trim() && blockStore[blockId]) {
@@ -205,10 +200,9 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 				values[key] = { ...values[key], description: descByKey.get(key) ?? '' }
 			})
 
-			blockStore[blockId].values = values
 			onNext({ [blockId]: { values } })
 		}
-	}, [keys.join(), descriptions.join(), blockStoreKeys])
+	}, [keys.join(), descriptions.join(), joinedBlockIds])
 
 	useEffectOnce(() => {
 		return () => {
@@ -218,7 +212,6 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 				values[key] = null as any
 			})
 
-			blockStore[blockId].values = values
 			onNext({ [blockId]: { values } })
 		}
 	})
@@ -243,7 +236,7 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 		}
 
 		return {}
-	}, [keys.join(), blockStoreKeys])
+	}, [keys.join(), joinedBlockIds])
 }
 
 function useWatch<T = any>(key: string, onBlockRemoved?: (key: string) => void): ValueInfo<T>
