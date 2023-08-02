@@ -40,6 +40,11 @@ function onNext(partial: RecursivePartial<Root>) {
 	blockStoreSubject.next(merged)
 }
 
+if (process.env.NODE_ENV !== 'production') {
+	// eslint-disable-next-line no-console
+	blockStoreSubject.subscribe((root) => console.log('#lighthouse:', root))
+}
+
 interface RootProps extends PropsWithChildren {
 	blockId: string
 	blockName: string
