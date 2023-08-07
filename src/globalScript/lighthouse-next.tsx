@@ -19,14 +19,14 @@ interface None {
 
 type ValueInfo<T = any> = ValueWrapper<T> | None
 type ValueInfoExtra<T = any> = ValueInfo<T> & {
-	description: string
+	readonly description: string
 }
 
 interface BlockInfo {
-	blockType: string
-	blockName: string
-	state: 'ready' | 'pending' | 'failed'
-	values: Record<string, ValueInfoExtra>
+	readonly blockType: string
+	readonly blockName: string
+	readonly state: 'ready' | 'pending' | 'failed'
+	readonly values: Record<string, ValueInfoExtra>
 }
 
 type Root = Record<string, BlockInfo>
@@ -64,7 +64,7 @@ function InseriRoot(props: RootProps) {
 		if (blockId?.trim() && !blockSlice) {
 			blockSlice = { blockName, blockType, state: 'ready', values: {} }
 		} else if (blockSlice) {
-			blockSlice.blockName = blockName
+			blockSlice = { ...blockSlice, blockName }
 		}
 
 		onNext({ [blockId]: blockSlice })
