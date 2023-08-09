@@ -39,9 +39,18 @@ The development takes place on [GitHub](https://github.com/inseri-swiss/inseri-c
 Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inseri-swiss/issues).
 
 
+== Screenshots ==
+
+1. Create beautiful charts with Plotly
+2. Call any Web API
+3. Execute Python code
+4. Load data from Zenodo.org
+5. Enable guests to provide their own data
+6. Render HTML code
+
 == Changelog ==
 ### 0.2.1
-minor changes
+- minor changes
 
 ### 0.2.0
 
