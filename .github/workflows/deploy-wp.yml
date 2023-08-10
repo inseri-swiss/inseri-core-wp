@@ -1,0 +1,74 @@
+name: 'deploy to WP manually'
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Enter tag version (eg v0.1.0) or branch name (eg main)'
+        type: string
+        required: true
+        default: main
+      kind:
+        type: choice
+        description: 'Choose tag or branch'
+        default: branch
+        options:
+        - tag
+        - branch
+
+jobs:
+  build:
+    name: Create artifact
+    uses: ./.github/workflows/build.yml
+    with:
+      checkout-ref: ${{ inputs.version }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.version }}
+
+      - name: Download plugin
+        uses: actions/download-artifact@v3
+        with:
+          name: ready-zip
+          path: inseri-core.zip
+
+      - name: Extract Archive
+        run: |
+          mkdir zip-content
+          unzip inseri-core.zip -d zip-content
+          ls -lA
+
+      - name: Checkout from WordPress.org
+        run: |
+          svn co http://svn.wp-plugins.org/inseri-core wp/inseri-core
+
+      - name: Sync tag code changes
+        if: ${{github.event.inputs.kind == 'tag'}} && ${{ github.event.inputs.version != 'main'  }}
+        run: |
+          rm -rf wp/inseri-core/tags/${{ github.ref_name }}/*
+          cp -a zip-content/* wp/inseri-core/tags/${{ github.ref_name }}
+          ls -lA wp/inseri-core/tags/${{ github.ref_name }}
+
+      - name: Sync branch code changes
+        if: ${{github.event.inputs.kind == 'branch'}}
+        run: |
+          rm -rf wp/inseri-core/trunk/*
+          cp -a zip-content/* wp/inseri-core/trunk/
+          ls -lA wp/inseri-core/trunk/
+
+      - name: Sync asset changes
+        run: |
+          rm -rf wp/inseri-core/assets/*
+          cp -a .wordpress-org/* wp/inseri-core/assets/
+          ls -lA wp/inseri-core/assets/
+
+      - name: Deploy to WordPress.org
+        run: |
+          cd wp/inseri-core
+          svn add * --force
+          svn ci --no-auth-cache --username ${{ secrets.WP_USERNAME }} --password="${{ secrets.WP_PASSWORD }}" -m "Deploy ${{ inputs.version }} version"

@@ -1,0 +1,31 @@
+name: build
+
+on:
+  workflow_call:
+    inputs:
+      checkout-ref:
+        required: false
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ inputs.checkout-ref != '' && inputs.checkout-ref || github.event.repository.default_branch }}
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - run: |
+          npm ci
+          npm run build
+          npm run plugin-zip
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ready-zip
+          path: inseri-core.zip
