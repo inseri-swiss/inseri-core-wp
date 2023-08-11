@@ -3,6 +3,11 @@ name: 'deploy to WP manually'
 on:
   workflow_dispatch:
     inputs:
+      version:
+        description: 'Enter tag version (eg v0.1.0) or branch name (eg main)'
+        type: string
+        required: true
+        default: main
       push-tag:
         type: boolean
         description: 'Push to tag'
@@ -17,13 +22,13 @@ jobs:
     name: Create artifact
     uses: ./.github/workflows/build.yml
     with:
-      checkout-ref: ${{ github.ref_name }}
+      checkout-ref: ${{ inputs.version }}
 
   deploy:
     name: Deploy tag to WordPress.org
     needs: build
     uses: ./.github/workflows/deploy-wp.yml
     with:
-      push-tag: ${{ (github.ref_type == 'tag') && (inputs.push-tag) }}
+      push-tag: ${{ inputs.push-tag }}
       push-trunk: ${{ inputs.push-trunk }}
-      version: ${{ github.ref_name  }}
+      version: ${{ inputs.version }}
