@@ -28,43 +28,9 @@ jobs:
 
   deploy:
     name: Deploy tag to WordPress.org
-    needs: [release, build]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.ref_name }}
-
-      - name: Download plugin
-        uses: actions/download-artifact@v3
-        with:
-          name: ready-zip
-          path: inseri-core.zip
-
-      - name: Extract Archive
-        run: |
-          mkdir zip-content
-          unzip inseri-core.zip -d zip-content
-          ls -lA
-
-      - name: Checkout from WordPress.org
-        run: svn co http://svn.wp-plugins.org/inseri-core wp/inseri-core
-
-      - name: Create new tag
-        run: |
-          cp -a zip-content/* wp/inseri-core/tags/${{ github.ref_name }}
-          ls -lA wp/inseri-core/tags/${{ github.ref_name }}
-
-      - name: Sync asset changes
-        run: |
-          rm -rf wp/inseri-core/assets/*
-          cp -a .wordpress-org/* wp/inseri-core/assets/
-          ls -lA wp/inseri-core/assets/
-
-      - name: Deploy to WordPress.org
-        run: |
-          cd wp/inseri-core
-          svn add * --force
-          svn status | grep '^!' | awk '{print $2}' | xargs svn delete
-          svn ci --no-auth-cache --username ${{ secrets.WP_USERNAME }} --password ${{ secrets.WP_PASSWORD }} -m "Deploy ${{ github.ref_name }} version"
+    needs: [build, release]
+    uses: ./.github/workflows/deploy-wp.yml
+    with:
+      version: ${{ github.ref_name }}
+      push-tag: true
+      push-trunk: true
