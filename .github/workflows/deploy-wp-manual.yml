@@ -25,7 +25,7 @@ jobs:
       checkout-ref: ${{ inputs.version }}
 
   deploy:
-    name: Deploy tag to WordPress.org
+    name: Deploy to WordPress.org
     needs: build
     uses: ./.github/workflows/deploy-wp.yml
     with:
