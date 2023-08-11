@@ -27,7 +27,7 @@ jobs:
           artifacts: "inseri-core.zip"
 
   deploy:
-    name: Deploy tag to WordPress.org
+    name: Deploy to WordPress.org
     needs: [build, release]
     uses: ./.github/workflows/deploy-wp.yml
     with:
