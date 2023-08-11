@@ -55,9 +55,11 @@ jobs:
 
       - name: Sync asset changes
         run: |
-          rm -rf wp/inseri-core/assets/*
-          cp -a .wordpress-org/* wp/inseri-core/assets/
-          ls -lA wp/inseri-core/assets/
+          if [ -d .wordpress-org/ ]; then
+            rm -rf wp/inseri-core/assets/*
+            cp -a .wordpress-org/* wp/inseri-core/assets/
+            ls -lA wp/inseri-core/assets/
+          fi
 
       - name: Deploy to WordPress.org
         run: |
