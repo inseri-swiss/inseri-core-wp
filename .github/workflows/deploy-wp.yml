@@ -42,6 +42,7 @@ jobs:
         if: ${{inputs.push-tag}}
         run: |
           rm -rf wp/inseri-core/tags/${{ inputs.version }}/*
+          mkdir -p wp/inseri-core/tags/${{ inputs.version }}
           cp -a zip-content/* wp/inseri-core/tags/${{ inputs.version }}
           ls -lA wp/inseri-core/tags/${{ inputs.version }}
 
