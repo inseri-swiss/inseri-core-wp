@@ -58,11 +58,23 @@ jobs:
           if [ -d .wordpress-org/ ]; then
             rm -rf wp/inseri-core/assets/*
             cp -a .wordpress-org/* wp/inseri-core/assets/
+
+            if test -n "$(find wp/inseri-core/assets/ -maxdepth 1 -name "*.png" -print -quit)"; then
+                svn propset svn:mime-type image/png wp/inseri-core/assets/*.png || true
+            fi
+            if test -n "$(find wp/inseri-core/assets/ -maxdepth 1 -name "*.jpg" -print -quit)"; then
+                svn propset svn:mime-type image/jpeg wp/inseri-core/assets/*.jpg || true
+            fi
+            if test -n "$(find wp/inseri-core/assets/ -maxdepth 1 -name "*.gif" -print -quit)"; then
+                svn propset svn:mime-type image/gif wp/inseri-core/assets/*.gif || true
+            fi
+
             ls -lA wp/inseri-core/assets/
           fi
 
       - name: Deploy to WordPress.org
         run: |
           cd wp/inseri-core
-          svn add * --force
-          svn ci --no-auth-cache --username ${{ secrets.WP_USERNAME }} --password="${{ secrets.WP_PASSWORD }}" -m "Deploy ${{ inputs.version }} version"
+          svn add . --force
+          svn status | grep '^\!' | sed 's/! *//' | xargs -I% svn rm %@
+          svn commit --no-auth-cache --non-interactive --username ${{ secrets.WP_USERNAME }} --password="${{ secrets.WP_PASSWORD }}" -m "Deploy ${{ inputs.version }} version"
