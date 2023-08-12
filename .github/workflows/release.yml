@@ -30,6 +30,7 @@ jobs:
     name: Deploy to WordPress.org
     needs: [build, release]
     uses: ./.github/workflows/deploy-wp.yml
+    secrets: inherit
     with:
       version: ${{ github.ref_name }}
       push-tag: true

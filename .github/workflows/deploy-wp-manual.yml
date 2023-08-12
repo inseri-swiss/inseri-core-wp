@@ -28,6 +28,7 @@ jobs:
     name: Deploy to WordPress.org
     needs: build
     uses: ./.github/workflows/deploy-wp.yml
+    secrets: inherit
     with:
       push-tag: ${{ inputs.push-tag }}
       push-trunk: ${{ inputs.push-trunk }}
