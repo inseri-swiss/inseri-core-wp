@@ -3,16 +3,14 @@ import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
-import { ConsumerBeacon, ProducerBeacon } from '../../globalScript'
 import json from './block.json'
 import Edit from './edit'
 
 const { name, ...settings } = json as any
 
 export interface Attributes {
-	blockId?: string
-	input?: ConsumerBeacon
-	output?: ProducerBeacon
+	blockId: string
+	inputKey: string
 	blockName: string
 	label: string
 	searchable: boolean
