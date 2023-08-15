@@ -10,11 +10,9 @@
 			"type": "string",
 			"default": ""
 		},
-		"input": {
-			"type": "object"
-		},
-		"output": {
-			"type": "object"
+		"inputKey": {
+			"type": "string",
+			"default": ""
 		},
 		"blockName": {
 			"type": "string",
