@@ -52,7 +52,6 @@
 		"immer": "^9.0.16",
 		"json-stable-stringify": "^1.0.2",
 		"lodash.clonedeep": "^4.5.0",
-		"lodash.merge": "^4.6.2",
 		"nanoid": "^4.0.0",
 		"plotly.js": "^2.20.0",
 		"prettier": "^2.7.1",

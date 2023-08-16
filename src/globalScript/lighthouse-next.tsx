@@ -1,43 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element'
 import { Schema } from 'ajv'
-import deepMerge from 'lodash.merge'
 import type { PropsWithChildren } from 'react'
 import { useDeepCompareEffect, usePrevious } from 'react-use'
 import { BehaviorSubject, map, pairwise } from 'rxjs'
+import { reducer } from './reducer'
+import type { Action, BlockInfo, Root, ValueInfo, ValueInfoExtra } from './types'
 import { initJsonValidator } from './utils'
-
-interface ValueWrapper<T = any> {
-	readonly type: 'wrapper'
-
-	readonly contentType: string
-	readonly value: T
-}
-
-interface None {
-	readonly type: 'none'
-}
-
-type ValueInfo<T = any> = ValueWrapper<T> | None
-type ValueInfoExtra<T = any> = ValueInfo<T> & {
-	readonly description: string
-}
-
-interface BlockInfo {
-	readonly blockType: string
-	readonly blockName: string
-	readonly state: 'ready' | 'pending' | 'failed'
-	readonly values: Record<string, ValueInfoExtra>
-}
-
-type Root = Record<string, BlockInfo>
 
 const blockStoreSubject = new BehaviorSubject<Root>({})
 
-// TODO replace with Action Reducer
-function onNext(partial: RecursivePartial<Root>) {
-	const base = blockStoreSubject.getValue()
-	const merged = deepMerge(base, partial)
-	blockStoreSubject.next(merged)
+function onNext(action: Action) {
+	const reducedBase = reducer(blockStoreSubject.getValue(), action)
+	blockStoreSubject.next(reducedBase)
 }
 
 if (process.env.NODE_ENV !== 'production') {
@@ -53,7 +27,7 @@ interface RootProps extends PropsWithChildren {
 
 function InseriRoot(props: RootProps) {
 	const { children, blockId, blockName, blockType } = props
-	let [blockSlice, setBlockSlice] = useState<BlockInfo>()
+	const [blockSlice, setBlockSlice] = useState<BlockInfo>()
 
 	useEffect(() => {
 		const subscription = blockStoreSubject.pipe(map((store) => store[blockId])).subscribe((slice) => setBlockSlice(slice))
@@ -61,13 +35,7 @@ function InseriRoot(props: RootProps) {
 	}, [blockId])
 
 	useEffect(() => {
-		if (blockId?.trim() && !blockSlice) {
-			blockSlice = { blockName, blockType, state: 'ready', values: {} }
-		} else if (blockSlice) {
-			blockSlice = { ...blockSlice, blockName }
-		}
-
-		onNext({ [blockId]: blockSlice })
+		onNext({ type: 'update-block-slice', payload: { blockId, blockName, blockType } })
 	}, [blockId, blockName])
 
 	return blockSlice ? <>{children}</> : <></>
@@ -177,6 +145,12 @@ function usePublish(blockId: string, keys: string | KeyDescPack[], maybeDescript
 	return result
 }
 
+const getDescArrayByKeys =
+	(descMap: Map<string, string>) =>
+	(keys: string[]): string[] => {
+		return keys.map((k) => descMap.get(k) ?? '')
+	}
+
 function useInternalPublish(blockId: string, keys: string[], descriptions: string[]): Record<string, Actions<any>> {
 	const blockStore = blockStoreSubject.getValue()
 	const joinedBlockIds = Object.keys(blockStore).join()
@@ -190,25 +164,14 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 			const existingKeys = new Set(prevKeys)
 			const newKeys = new Set(keys)
 
-			const keysToRemove = new Set([...existingKeys].filter((x) => !newKeys.has(x)))
-			const keysToAdd = new Set([...newKeys].filter((x) => !existingKeys.has(x)))
-			const keysToUpdate = new Set([...newKeys].filter((x) => existingKeys.has(x)))
+			const keysToRemove = Array.from(new Set([...existingKeys].filter((x) => !newKeys.has(x))))
+			const keysToAdd = Array.from(new Set([...newKeys].filter((x) => !existingKeys.has(x))))
+			const keysToUpdate = Array.from(new Set([...newKeys].filter((x) => existingKeys.has(x))))
 
-			const values = { ...blockStore[blockId].values }
-
-			keysToRemove.forEach((key) => {
-				values[key] = null as any
-			})
-
-			keysToAdd.forEach((key) => {
-				values[key] = { description: descByKey.get(key) ?? '', type: 'none' }
-			})
-
-			keysToUpdate.forEach((key) => {
-				values[key] = { ...values[key], description: descByKey.get(key) ?? '' }
-			})
-
-			onNext({ [blockId]: { values } })
+			const descGetter = getDescArrayByKeys(descByKey)
+			onNext({ type: 'add-value-infos', payload: { blockId, keys: keysToAdd, descriptions: descGetter(keysToAdd) } })
+			onNext({ type: 'update-value-infos', payload: { blockId, keys: keysToUpdate, descriptions: descGetter(keysToUpdate) } })
+			onNext({ type: 'remove-value-infos', payload: { blockId, keys: keysToRemove } })
 		}
 	}, [keys.join(), descriptions.join(), joinedBlockIds])
 
@@ -221,13 +184,7 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 	useEffect(() => {
 		return () => {
 			if (componentWillUnmount.current) {
-				const values = { ...blockStore[blockId].values }
-
-				keys.forEach((key) => {
-					values[key] = null as any
-				})
-
-				onNext({ [blockId]: { values } })
+				onNext({ type: 'remove-value-infos', payload: { blockId, keys } })
 			}
 		}
 	}, [keys.join()])
@@ -235,13 +192,8 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 	return useMemo(() => {
 		if (blockId?.trim() && blockStore[blockId]) {
 			const callbackMap = keys.reduce((acc, key) => {
-				const publish = (value: any, contentType: string) => {
-					onNext({ [blockId]: { values: { [key]: { type: 'wrapper', value, contentType } } } })
-				}
-
-				const setEmpty = () => {
-					onNext({ [blockId]: { values: { [key]: { type: 'none', value: null, contentType: null } as any } } })
-				}
+				const publish = (value: any, contentType: string) => onNext({ type: 'set-value', payload: { blockId, key, value, contentType } })
+				const setEmpty = () => onNext({ type: 'set-empty', payload: { blockId, key } })
 
 				acc[key] = [publish, setEmpty]
 
