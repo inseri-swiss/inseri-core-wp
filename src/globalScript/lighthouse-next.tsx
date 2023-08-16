@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from '@wordpress/element'
-import type { PropsWithChildren } from 'react'
-import { initJsonValidator } from './utils'
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element'
 import { Schema } from 'ajv'
 import deepMerge from 'lodash.merge'
-import { useDeepCompareEffect, useEffectOnce } from 'react-use'
+import type { PropsWithChildren } from 'react'
+import { useDeepCompareEffect, usePrevious } from 'react-use'
 import { BehaviorSubject, map, pairwise } from 'rxjs'
+import { initJsonValidator } from './utils'
 
 interface ValueWrapper<T = any> {
 	readonly type: 'wrapper'
@@ -181,10 +181,13 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 	const blockStore = blockStoreSubject.getValue()
 	const joinedBlockIds = Object.keys(blockStore).join()
 
+	const prevKeys = usePrevious(keys) ?? []
+	const componentWillUnmount = useRef(false)
+
 	useEffect(() => {
 		if (blockId?.trim() && blockStore[blockId]) {
 			const descByKey = new Map(keys.map((item, idx) => [item, descriptions[idx]]))
-			const existingKeys = new Set(Object.keys(blockStore[blockId].values))
+			const existingKeys = new Set(prevKeys)
 			const newKeys = new Set(keys)
 
 			const keysToRemove = new Set([...existingKeys].filter((x) => !newKeys.has(x)))
@@ -209,17 +212,25 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 		}
 	}, [keys.join(), descriptions.join(), joinedBlockIds])
 
-	useEffectOnce(() => {
+	useEffect(() => {
 		return () => {
-			const values = { ...blockStore[blockId].values }
-
-			keys.forEach((key) => {
-				values[key] = null as any
-			})
-
-			onNext({ [blockId]: { values } })
+			componentWillUnmount.current = true
 		}
-	})
+	}, [])
+
+	useEffect(() => {
+		return () => {
+			if (componentWillUnmount.current) {
+				const values = { ...blockStore[blockId].values }
+
+				keys.forEach((key) => {
+					values[key] = null as any
+				})
+
+				onNext({ [blockId]: { values } })
+			}
+		}
+	}, [keys.join()])
 
 	return useMemo(() => {
 		if (blockId?.trim() && blockStore[blockId]) {
@@ -306,4 +317,4 @@ function useWatch<T = any>(keys: string | string[], onBlockRemoved?: (key: strin
 	return state
 }
 
-export { InseriRoot, usePublish, useDiscover, useWatch }
+export { InseriRoot, useDiscover, usePublish, useWatch }
