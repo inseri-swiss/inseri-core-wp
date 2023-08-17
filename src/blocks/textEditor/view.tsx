@@ -15,10 +15,10 @@ interface ViewProps {
 
 export default function View(props: ViewProps) {
 	const { isGutenbergEditor, isSelected, renderResizable } = props
-	const { blockId, height, editable, contentType, label, content, isVisible } = useGlobalState((state: GlobalState) => state)
+	const { height, editable, contentType, label, content, isVisible } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 
-	const [publishValue, publishEmpty] = usePublish(blockId, 'content', 'content')
+	const [publishValue, publishEmpty] = usePublish('content', 'content')
 	const isEditable = editable || isGutenbergEditor
 
 	const codeType = useMemo(() => {

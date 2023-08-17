@@ -12,8 +12,8 @@ interface ViewProps {
 
 export default function View(props: ViewProps) {
 	const { attributes, setAttributes, setWizardMode } = props
-	const { inputKey, label, searchable, clearable, blockId } = attributes
-	const [publishValue, publishEmpty] = usePublish(blockId, 'selected', __('chosen value', 'inseri-core'))
+	const { inputKey, label, searchable, clearable } = attributes
+	const [publishValue, publishEmpty] = usePublish('selected', __('chosen value', 'inseri-core'))
 
 	const wrapper = useWatch(inputKey, () => {
 		if (setAttributes && setWizardMode) {

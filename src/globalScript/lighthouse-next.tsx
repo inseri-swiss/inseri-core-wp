@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element'
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from '@wordpress/element'
 import { Schema } from 'ajv'
 import type { PropsWithChildren } from 'react'
 import { useDeepCompareEffect, usePrevious } from 'react-use'
@@ -25,6 +25,8 @@ interface RootProps extends PropsWithChildren {
 	blockType: string
 }
 
+const BlockIdContext = createContext('')
+
 function InseriRoot(props: RootProps) {
 	const { children, blockId, blockName, blockType } = props
 	const [blockSlice, setBlockSlice] = useState<BlockInfo>()
@@ -38,16 +40,14 @@ function InseriRoot(props: RootProps) {
 		onNext({ type: 'update-block-slice', payload: { blockId, blockName, blockType } })
 	}, [blockId, blockName])
 
-	return blockSlice ? <>{children}</> : <></>
+	return blockSlice ? <BlockIdContext.Provider value={blockId}>{children}</BlockIdContext.Provider> : <></>
 }
 
 interface DiscoverContentType {
-	blockId?: string
 	contentTypeFilter: string | ((contentType: string) => boolean)
 }
 
 interface DiscoverJson {
-	blockId?: string
 	jsonSchemas: Schema[]
 }
 
@@ -98,6 +98,7 @@ const filterByJsonSchemas = (jsonSchemas: Schema[]) => {
 
 function useDiscover(ops: DiscoverOptions): ValueItem[] {
 	const [state, setState] = useState<ValueItem[]>([])
+	const blockId = useContext(BlockIdContext)
 
 	useDeepCompareEffect(() => {
 		let filter: (d: RawValueItem[]) => RawValueItem[]
@@ -111,7 +112,7 @@ function useDiscover(ops: DiscoverOptions): ValueItem[] {
 		const sub = blockStoreSubject
 			.pipe(
 				map(flattenToRawItem),
-				map((rawItems) => rawItems.filter((i) => i.blockId !== ops.blockId)),
+				map((rawItems) => rawItems.filter((i) => i.blockId !== blockId)),
 				map(filter),
 				map(mapToValueItem)
 			)
@@ -129,11 +130,12 @@ type Actions<T> = [Publish<T>, SetEmpty]
 
 type KeyDescPack = { key: string; description: string }
 
-function usePublish<T = any>(blockId: string, key: string, description: string): Actions<T>
-function usePublish<T = any>(blockId: string, keys: KeyDescPack[]): Record<string, Actions<T>>
-function usePublish(blockId: string, keys: string | KeyDescPack[], maybeDescription?: string): any {
+function usePublish<T = any>(key: string, description: string): Actions<T>
+function usePublish<T = any>(keys: KeyDescPack[]): Record<string, Actions<T>>
+function usePublish(keys: string | KeyDescPack[], maybeDescription?: string): any {
 	const preparedKeys = typeof keys === 'string' ? [keys] : (keys as KeyDescPack[]).map((i) => i.key)
 	const preparedDescs = !!maybeDescription ? [maybeDescription] : typeof keys !== 'string' ? (keys as KeyDescPack[]).map((i) => i.description) : []
+	const blockId = useContext(BlockIdContext)
 
 	const result = useInternalPublish(blockId, preparedKeys, preparedDescs)
 
