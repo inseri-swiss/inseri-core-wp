@@ -54,6 +54,12 @@ interface RemoveValueInfosAction {
 		keys: string[]
 	}
 }
+interface RemoveAllValueInfosAction {
+	type: 'remove-all-value-infos'
+	payload: {
+		blockId: string
+	}
+}
 
 interface SetValueAction {
 	type: 'set-value'
@@ -72,4 +78,11 @@ interface SetEmptyAction {
 	}
 }
 
-export type Action = UpdateBlockAction | AddValueInfosAction | UpdateValueInfosAction | RemoveValueInfosAction | SetValueAction | SetEmptyAction
+export type Action =
+	| UpdateBlockAction
+	| AddValueInfosAction
+	| UpdateValueInfosAction
+	| RemoveValueInfosAction
+	| RemoveAllValueInfosAction
+	| SetValueAction
+	| SetEmptyAction

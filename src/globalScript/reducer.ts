@@ -43,6 +43,11 @@ export function reducer(base: Root, action: Action) {
 				blockSlice.values = Object.fromEntries(RemainingValueEntries)
 			}
 			break
+		case 'remove-all-value-infos':
+			{
+				blockSlice.values = {}
+			}
+			break
 		case 'set-value':
 			{
 				const { key, value, contentType } = action.payload

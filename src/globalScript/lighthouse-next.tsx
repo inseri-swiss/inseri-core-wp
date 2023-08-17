@@ -30,6 +30,7 @@ const BlockIdContext = createContext('')
 function InseriRoot(props: RootProps) {
 	const { children, blockId, blockName, blockType } = props
 	const [blockSlice, setBlockSlice] = useState<BlockInfo>()
+	const componentWillUnmount = useRef(false)
 
 	useEffect(() => {
 		const subscription = blockStoreSubject.pipe(map((store) => store[blockId])).subscribe((slice) => setBlockSlice(slice))
@@ -39,6 +40,20 @@ function InseriRoot(props: RootProps) {
 	useEffect(() => {
 		onNext({ type: 'update-block-slice', payload: { blockId, blockName, blockType } })
 	}, [blockId, blockName])
+
+	useEffect(() => {
+		return () => {
+			componentWillUnmount.current = true
+		}
+	}, [])
+
+	useEffect(() => {
+		return () => {
+			if (componentWillUnmount.current) {
+				onNext({ type: 'remove-all-value-infos', payload: { blockId } })
+			}
+		}
+	}, [blockId])
 
 	return blockSlice ? <BlockIdContext.Provider value={blockId}>{children}</BlockIdContext.Provider> : <></>
 }
@@ -156,9 +171,7 @@ const getDescArrayByKeys =
 function useInternalPublish(blockId: string, keys: string[], descriptions: string[]): Record<string, Actions<any>> {
 	const blockStore = blockStoreSubject.getValue()
 	const joinedBlockIds = Object.keys(blockStore).join()
-
 	const prevKeys = usePrevious(keys) ?? []
-	const componentWillUnmount = useRef(false)
 
 	useEffect(() => {
 		if (blockId?.trim() && blockStore[blockId]) {
@@ -176,20 +189,6 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 			onNext({ type: 'remove-value-infos', payload: { blockId, keys: keysToRemove } })
 		}
 	}, [keys.join(), descriptions.join(), joinedBlockIds])
-
-	useEffect(() => {
-		return () => {
-			componentWillUnmount.current = true
-		}
-	}, [])
-
-	useEffect(() => {
-		return () => {
-			if (componentWillUnmount.current) {
-				onNext({ type: 'remove-value-infos', payload: { blockId, keys } })
-			}
-		}
-	}, [keys.join()])
 
 	return useMemo(() => {
 		if (blockId?.trim() && blockStore[blockId]) {
