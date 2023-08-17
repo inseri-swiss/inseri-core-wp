@@ -225,7 +225,7 @@ function useWatch<T = any>(keys: string | string[], onBlockRemoved?: (key: strin
 						pairwise()
 					)
 					.subscribe(([old, current]) => {
-						if (onBlockRemoved && !!old && current === null) {
+						if (onBlockRemoved && !!old && !current) {
 							onBlockRemoved(key)
 						}
 					})
