@@ -1,4 +1,4 @@
-import { useAvailableBeacons, useWatch } from '@inseri/lighthouse'
+import { InseriRoot, useDiscover } from '@inseri/lighthouse-next'
 import { IconHtml } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -15,23 +15,12 @@ import View from './view'
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { input, blockId, blockName, isWizardMode, mode, actions } = useGlobalState((state: GlobalState) => state)
-	const isValueSet = !!input.key
-	const inputBeaconKey = input.key
+	const { inputKey, blockName, isWizardMode, mode, actions } = useGlobalState((state: GlobalState) => state)
+	const isValueSet = !!inputKey
+	const { updateState } = actions
 
-	const { updateState, chooseInputBeacon } = actions
-
-	const availableBeacons = useAvailableBeacons('html')
-	const selectData = Object.keys(availableBeacons)
-		.filter((k) => !k.startsWith(blockId + '/'))
-		.map((k) => ({ label: availableBeacons[k].description, value: k }))
-
-	const { status } = useWatch(input)
-	useEffect(() => {
-		if (status === 'unavailable') {
-			updateState({ input: { ...input, key: '' }, isWizardMode: true })
-		}
-	}, [status])
+	const sources = useDiscover({ contentTypeFilter: 'html' })
+	const options = sources.map((item) => ({ label: item.description, value: item.key }))
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -83,9 +72,9 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 
 					<Select
 						label={__('Render HTML by selecting a block source', 'inseri-core')}
-						data={selectData}
-						value={inputBeaconKey}
-						onChange={(key) => chooseInputBeacon(availableBeacons[key!])}
+						data={options}
+						value={inputKey}
+						onChange={(key) => updateState({ inputKey: key ?? '', isWizardMode: false })}
 					/>
 				</Box>
 			) : (
@@ -99,9 +88,11 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'html'}>
-			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
-				<EditComponent {...props} />
-			</StateProvider>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name}>
+				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
+					<EditComponent {...props} />
+				</StateProvider>
+			</InseriRoot>
 		</SetupEditorEnv>
 	)
 }

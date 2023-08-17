@@ -1,4 +1,4 @@
-import { useWatch } from '@inseri/lighthouse'
+import { useWatch } from '@inseri/lighthouse-next'
 import { IconCircleOff } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
 import { Box, CodeEditor, Group, Text, createStyles, useGlobalState } from '../../components'
@@ -19,21 +19,32 @@ interface ViewProps {
 }
 
 export default function View({ isGutenbergEditor, isSelected }: ViewProps) {
-	const { input, mode } = useGlobalState((state: GlobalState) => state)
-	const { value, status } = useWatch(input)
+	const { inputKey, mode } = useGlobalState((state: GlobalState) => state)
+	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
+
+	const valueWrapper = useWatch(inputKey, () => {
+		updateState({ inputKey: '', isWizardMode: true })
+	})
 	const { wrapper } = useViewStyles().classes
 
-	const isEmpty = !value || (typeof value === 'string' && !value.trim())
-	let altText = __('No HTML code is set', 'inser-core')
+	let isEmpty = true
+	let hasError = false
+	let altText = __('No HTML code is set', 'inseri-core')
 
-	let preparedValue = value
-	const hasError = status === 'error' || status === 'unavailable'
+	let preparedValue = ''
 
-	if (hasError) {
-		preparedValue = ''
-		altText = __('An error has occurred', 'inser-core')
+	if (valueWrapper.type === 'wrapper') {
+		isEmpty = false
+		preparedValue = valueWrapper.value
+
+		const { contentType } = valueWrapper
+
+		if (!contentType.includes('html')) {
+			hasError = true
+			preparedValue = ''
+			altText = `This content-type ${contentType} is not supported`
+		}
 	}
-
 	return mode === 'code' ? (
 		<Box p="md">
 			<CodeEditor type={'html'} value={preparedValue} />
