@@ -1,4 +1,4 @@
-import { useAvailableBeacons, useJsonBeacons, useWatch } from '@inseri/lighthouse'
+import { InseriRoot, useDiscover } from '@inseri/lighthouse-next'
 import { IconPhoto } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -12,16 +12,10 @@ import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
 import View from './view'
 
-const defaultInput = {
-	key: '',
-	contentType: '',
-	description: '',
-}
-
 const urlSchema = {
 	$ref: '#/definitions/URL',
 	definitions: {
-		URL: { format: 'uri', pattern: '^https?://' },
+		URL: { type: 'string', format: 'uri', pattern: '^https?://' },
 	},
 }
 
@@ -42,18 +36,11 @@ const resizingHelps = {
 
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { blockName, input, isWizardMode, actions, altText, caption, height, fit } = useGlobalState((state: GlobalState) => state)
+	const { blockName, inputKey, isWizardMode, actions, altText, caption, height, fit } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
 
-	const isValueSet = !!input.key
+	const isValueSet = !!inputKey
 	const imageRef = useRef<HTMLImageElement>(null)
-
-	const { status } = useWatch(input)
-	useEffect(() => {
-		if (status === 'unavailable') {
-			updateState({ input: { ...input, key: '' }, isWizardMode: true })
-		}
-	}, [status])
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -61,10 +48,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 		}
 	}, [isSelected])
 
-	const jsonBeacons = useJsonBeacons(urlSchema)
-	const contentTypeBeacons = useAvailableBeacons('image/')
-	const availableBeacons = { ...jsonBeacons, ...contentTypeBeacons }
-	const imageOptions = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
+	const sources = useDiscover({ jsonSchemas: [urlSchema], contentTypeFilter: 'image/' })
+	const options = sources.map((item) => ({ label: item.description, value: item.key }))
 
 	const resizerHeight = height ?? imageRef.current?.height ?? 'auto'
 
@@ -146,10 +131,10 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					</Group>
 					<Select
 						label={__('Display image by selecting a block source', 'inseri-core')}
-						data={imageOptions}
-						value={input.key}
+						data={options}
+						value={inputKey}
 						searchable
-						onChange={(key) => updateState({ input: key ? availableBeacons[key] : defaultInput, isWizardMode: false })}
+						onChange={(key) => updateState({ inputKey: key ?? '', isWizardMode: false })}
 					/>
 				</Box>
 			) : (
@@ -163,9 +148,11 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'image'}>
-			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
-				<EditComponent {...props} />
-			</StateProvider>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name}>
+				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
+					<EditComponent {...props} />
+				</StateProvider>
+			</InseriRoot>
 		</SetupEditorEnv>
 	)
 }

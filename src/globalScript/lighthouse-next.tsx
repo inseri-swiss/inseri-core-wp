@@ -116,19 +116,20 @@ function useDiscover(ops: DiscoverOptions): ValueItem[] {
 	const blockId = useContext(BlockIdContext)
 
 	useDeepCompareEffect(() => {
-		let filter: (d: RawValueItem[]) => RawValueItem[]
+		const filters: Array<(d: RawValueItem[]) => RawValueItem[]> = []
 
 		if ('contentTypeFilter' in ops) {
-			filter = filterByContentType(ops.contentTypeFilter)
-		} else {
-			filter = filterByJsonSchemas(ops.jsonSchemas)
+			filters.push(filterByContentType(ops.contentTypeFilter))
+		}
+		if ('jsonSchemas' in ops) {
+			filters.push(filterByJsonSchemas(ops.jsonSchemas))
 		}
 
 		const sub = blockStoreSubject
 			.pipe(
 				map(flattenToRawItem),
 				map((rawItems) => rawItems.filter((i) => i.blockId !== blockId)),
-				map(filter),
+				map((rawItems) => filters.flatMap((filterFn) => filterFn(rawItems))),
 				map(mapToValueItem)
 			)
 			.subscribe(setState)
