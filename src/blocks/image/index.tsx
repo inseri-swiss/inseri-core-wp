@@ -1,4 +1,3 @@
-import { ConsumerBeacon } from '@inseri/lighthouse'
 import { IconPhoto } from '@tabler/icons-react'
 import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockSaveProps } from '@wordpress/blocks'
@@ -12,7 +11,7 @@ const { name, ...settings } = json as any
 export interface Attributes {
 	blockId: string
 	blockName: string
-	input: ConsumerBeacon
+	inputKey: string
 	caption: string
 	altText: string
 	height: number | null

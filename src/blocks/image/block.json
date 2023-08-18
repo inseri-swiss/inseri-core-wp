@@ -15,13 +15,9 @@
 			"default": ""
 		},
 
-		"input": {
-			"type": "object",
-			"default": {
-				"key": "",
-				"contentType": "",
-				"description": ""
-			}
+		"inputKey": {
+			"type": "string",
+			"default": ""
 		},
 		"caption": {
 			"type": "string",

@@ -1,7 +1,7 @@
-import { useWatch } from '@inseri/lighthouse'
+import { useWatch } from '@inseri/lighthouse-next'
 import { IconCircleOff, IconPhotoOff } from '@tabler/icons-react'
-import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
+import { useDeepCompareEffect } from 'react-use'
 import { Box, Group, Text, useGlobalState } from '../../components'
 import { GlobalState } from './state'
 
@@ -12,9 +12,11 @@ interface ViewProps {
 }
 
 export default function View({ renderResizable, imageRef, isSelected }: ViewProps) {
-	const { input, isBlob, isPrevBlob, imageUrl, prevImageUrl, caption, altText, height, fit, hasError } = useGlobalState((state: GlobalState) => state)
+	const { inputKey, isBlob, isPrevBlob, imageUrl, prevImageUrl, caption, altText, height, fit, hasError } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
-	const { value, status, contentType } = useWatch(input)
+	const valueWrapper = useWatch(inputKey, () => {
+		updateState({ isWizardMode: true, inputKey: '' })
+	})
 
 	const isUrlEmpty = !imageUrl
 
@@ -26,10 +28,11 @@ export default function View({ renderResizable, imageRef, isSelected }: ViewProp
 			isPrevBlob: isBlob,
 		})
 
-	useEffect(() => {
-		let processedValue = value
+	useDeepCompareEffect(() => {
+		if (valueWrapper.type === 'wrapper') {
+			const { contentType, value } = valueWrapper
+			let processedValue = value
 
-		if (status === 'ready') {
 			if (typeof processedValue === 'string' && contentType.includes('image/svg+xml')) {
 				processedValue = new Blob([value], { type: 'image/svg+xml' })
 			}
@@ -41,18 +44,18 @@ export default function View({ renderResizable, imageRef, isSelected }: ViewProp
 			if (typeof processedValue === 'object' && processedValue instanceof Blob) {
 				update(URL.createObjectURL(processedValue), true)
 			}
-
-			if (!processedValue) {
-				update('', false)
-			}
-
-			if (isPrevBlob) {
-				URL.revokeObjectURL(prevImageUrl)
-			}
-
-			updateState({ hasError: false })
 		}
-	}, [value])
+
+		if (valueWrapper.type === 'none') {
+			update('', false)
+		}
+
+		if (isPrevBlob) {
+			URL.revokeObjectURL(prevImageUrl)
+		}
+
+		updateState({ hasError: false })
+	}, [valueWrapper])
 
 	const highlightBg = isSelected
 		? {
