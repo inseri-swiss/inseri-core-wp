@@ -3,8 +3,9 @@ import { Schema } from 'ajv'
 import type { PropsWithChildren } from 'react'
 import { useDeepCompareEffect, usePrevious } from 'react-use'
 import { BehaviorSubject, map, pairwise } from 'rxjs'
+import { Option, none, some } from './option'
 import { reducer } from './reducer'
-import type { Action, BlockInfo, Root, ValueInfo, ValueInfoExtra } from './types'
+import type { Action, Atom, BlockInfo, Nucleus, Root } from './types'
 import { initJsonValidator } from './utils'
 
 const blockStoreSubject = new BehaviorSubject<Root>({})
@@ -68,26 +69,30 @@ interface DiscoverJson {
 
 type DiscoverOptions = DiscoverContentType | DiscoverJson
 
-type RawValueItem = Omit<BlockInfo, 'values'> & ValueInfoExtra & { key: string; blockId: string; valueId: string }
+type RawValueItem = Omit<BlockInfo, 'atoms'> & Atom & { key: string; blockId: string; atomKey: string }
 
-interface ValueItem {
+interface DiscoveredItem {
 	key: string
 	description: string
 }
 
 function flattenToRawItem(root: Root): RawValueItem[] {
 	return Object.entries(root).flatMap(([blockId, block]) =>
-		Object.entries(block.values)
-			.filter(([_, val]) => !!val)
-			.map(([valueId, val]) => {
-				const { values, ...restBlock } = block
-				return { key: blockId + '/' + valueId, valueId, blockId, ...restBlock, ...val, description: block.blockName + ' - ' + val.description }
+		Object.entries(block.atoms)
+			.filter(([_, atom]) => !!atom)
+			.map(([atomKey, atom]) => {
+				const { atoms, ...restBlock } = block
+				return { key: blockId + '/' + atomKey, atomKey, blockId, ...restBlock, ...atom, description: block.blockName + ' - ' + atom.description }
 			})
 	)
 }
 
-function mapToValueItem(rawItems: RawValueItem[]): ValueItem[] {
+function mapToDiscoveredItem(rawItems: RawValueItem[]): DiscoveredItem[] {
 	return rawItems.map(({ key, description }) => ({ key, description }))
+}
+
+function distinctRawItems(rawItems: RawValueItem[]): RawValueItem[] {
+	return rawItems.filter((item, idx, self) => self.findIndex((i) => i.key === item.key) === idx)
 }
 
 const filterByContentType = (contentTypeFilter: string | ((contentType: string) => boolean)) => (rawItems: RawValueItem[]) => {
@@ -98,7 +103,7 @@ const filterByContentType = (contentTypeFilter: string | ((contentType: string) 
 		compareContentType = contentTypeFilter
 	}
 
-	return rawItems.filter((item) => item.type === 'wrapper' && compareContentType(item.contentType))
+	return rawItems.filter((item) => item.content.exists((nucleus) => compareContentType(nucleus.contentType)))
 }
 
 const filterByJsonSchemas = (jsonSchemas: Schema[]) => {
@@ -106,13 +111,13 @@ const filterByJsonSchemas = (jsonSchemas: Schema[]) => {
 
 	return (rawItems: RawValueItem[]) => {
 		return rawItems.filter((item) => {
-			return jsonValidators.some((check) => item.type === 'wrapper' && check(item.value))
+			return jsonValidators.some((check) => item.content.exists((nucleus) => check(nucleus.value)))
 		})
 	}
 }
 
-function useDiscover(ops: DiscoverOptions): ValueItem[] {
-	const [state, setState] = useState<ValueItem[]>([])
+function useDiscover(ops: DiscoverOptions): DiscoveredItem[] {
+	const [state, setState] = useState<DiscoveredItem[]>([])
 	const blockId = useContext(BlockIdContext)
 
 	useDeepCompareEffect(() => {
@@ -130,7 +135,8 @@ function useDiscover(ops: DiscoverOptions): ValueItem[] {
 				map(flattenToRawItem),
 				map((rawItems) => rawItems.filter((i) => i.blockId !== blockId)),
 				map((rawItems) => filters.flatMap((filterFn) => filterFn(rawItems))),
-				map(mapToValueItem)
+				map(distinctRawItems),
+				map(mapToDiscoveredItem)
 			)
 			.subscribe(setState)
 
@@ -194,8 +200,12 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 	return useMemo(() => {
 		if (blockId?.trim() && blockStore[blockId]) {
 			const callbackMap = keys.reduce((acc, key) => {
-				const publish = (value: any, contentType: string) => onNext({ type: 'set-value', payload: { blockId, key, value, contentType } })
-				const setEmpty = () => onNext({ type: 'set-empty', payload: { blockId, key } })
+				const publish = (value: any, contentType: string) => {
+					onNext({ type: 'set-value', payload: { blockId, key, content: some({ contentType, value }) } })
+				}
+				const setEmpty = () => {
+					onNext({ type: 'set-value', payload: { blockId, key, content: none } })
+				}
 
 				acc[key] = [publish, setEmpty]
 
@@ -209,19 +219,24 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 	}, [keys.join(), joinedBlockIds])
 }
 
-function useWatch<T = any>(key: string, onBlockRemoved?: (key: string) => void): ValueInfo<T>
-function useWatch<T = any>(keys: string, onBlockRemoved?: (key: string) => void): Record<string, ValueInfo<T>>
-function useWatch<T = any>(keys: string | string[], onBlockRemoved?: (key: string) => void): any {
-	const [state, setState] = useState<Record<string, ValueInfo>>({})
+interface WatchOptions {
+	onBlockRemoved?: (key: string) => void
+}
+
+function useWatch<T = any>(key: string, ops: WatchOptions): Option<Nucleus<T>>
+function useWatch<T = any>(keys: string, ops: WatchOptions): Record<string, Option<Nucleus<T>>>
+function useWatch<T = any>(keys: string | string[], ops: WatchOptions): any {
+	const { onBlockRemoved } = ops
+	const [state, setState] = useState<Record<string, Option<Nucleus<T>>>>({})
 	const longKeys = typeof keys === 'string' ? [keys] : keys
 
 	useEffect(() => {
 		const onBlockRemovedSubs = longKeys
 			.map((key) => [key, ...key.split('/')])
-			.map(([key, blockId, valueId]) =>
+			.map(([key, blockId, atomKey]) =>
 				blockStoreSubject
 					.pipe(
-						map((root) => root[blockId]?.values?.[valueId]),
+						map((root) => root[blockId]?.atoms?.[atomKey]),
 						pairwise()
 					)
 					.subscribe(([old, current]) => {
@@ -236,19 +251,11 @@ function useWatch<T = any>(keys: string | string[], onBlockRemoved?: (key: strin
 				map((root) =>
 					longKeys
 						.map((key) => [key, ...key.split('/')])
-						.reduce((acc, [fullKey, blockId, valueId]) => {
-							const valueInfo = root[blockId]?.values[valueId]
-							let simpleValueInfo: ValueInfo
+						.reduce((acc, [fullKey, blockId, atomKey]) => {
+							const nucleus = root[blockId]?.atoms[atomKey]?.content ?? none
 
-							if (!valueInfo) {
-								simpleValueInfo = { type: 'none' }
-							} else {
-								const { description, ...restInfo } = valueInfo
-								simpleValueInfo = { ...restInfo }
-							}
-
-							return { ...acc, [fullKey]: simpleValueInfo }
-						}, {} as Record<string, ValueInfo<T>>)
+							return { ...acc, [fullKey]: nucleus }
+						}, {} as Record<string, Option<Nucleus<T>>>)
 				)
 			)
 			.subscribe(setState)
@@ -259,13 +266,8 @@ function useWatch<T = any>(keys: string | string[], onBlockRemoved?: (key: strin
 		}
 	}, [longKeys.join()])
 
-	const stateValues = Object.values(state)
-	if (typeof keys === 'string' && stateValues.length > 0) {
-		return stateValues[0]
-	}
-
 	if (typeof keys === 'string') {
-		return { type: 'none' }
+		return Object.values(state)[0] ?? none
 	}
 
 	return state

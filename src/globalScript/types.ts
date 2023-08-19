@@ -1,3 +1,5 @@
+import { Option } from './option'
+
 interface ValueWrapper<T = any> {
 	readonly type: 'wrapper'
 
@@ -10,7 +12,14 @@ interface None {
 }
 
 export type ValueInfo<T = any> = ValueWrapper<T> | None
-export type ValueInfoExtra<T = any> = ValueInfo<T> & {
+
+export interface Nucleus<T> {
+	readonly contentType: string
+	readonly value: T
+}
+
+export interface Atom<T = any> {
+	readonly content: Option<Nucleus<T>>
 	readonly description: string
 }
 
@@ -18,7 +27,7 @@ export interface BlockInfo {
 	readonly blockType: string
 	readonly blockName: string
 	readonly state: 'ready' | 'pending' | 'failed'
-	readonly values: Record<string, ValueInfoExtra>
+	readonly atoms: Record<string, Atom>
 }
 
 export type Root = Record<string, BlockInfo>
@@ -66,23 +75,8 @@ interface SetValueAction {
 	payload: {
 		blockId: string
 		key: string
-		contentType: string
-		value: any
-	}
-}
-interface SetEmptyAction {
-	type: 'set-empty'
-	payload: {
-		blockId: string
-		key: string
+		content: Option<any>
 	}
 }
 
-export type Action =
-	| UpdateBlockAction
-	| AddValueInfosAction
-	| UpdateValueInfosAction
-	| RemoveValueInfosAction
-	| RemoveAllValueInfosAction
-	| SetValueAction
-	| SetEmptyAction
+export type Action = UpdateBlockAction | AddValueInfosAction | UpdateValueInfosAction | RemoveValueInfosAction | RemoveAllValueInfosAction | SetValueAction
