@@ -1,4 +1,4 @@
-import { useWatch } from '@inseri/lighthouse-next'
+import { useWatch, Nucleus } from '@inseri/lighthouse-next'
 import { IconCircleOff } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
 import { Box, CodeEditor, Group, Text, createStyles, useGlobalState } from '../../components'
@@ -22,34 +22,24 @@ export default function View({ isGutenbergEditor, isSelected }: ViewProps) {
 	const { inputKey, mode } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 
-	const valueWrapper = useWatch(inputKey, () => {
-		updateState({ inputKey: '', isWizardMode: true })
+	const { isEmpty, altText, value } = useWatch(inputKey, {
+		onBlockRemoved: () => updateState({ inputKey: '', isWizardMode: true }),
+		onNone: () => ({ isEmpty: true, altText: 'No HTML code is set', value: '' }),
+		onSome: (nucleus: Nucleus<string>) => {
+			if (!nucleus.contentType.includes('html')) {
+				return { isEmpty: true, altText: `This content-type ${nucleus.contentType} is not supported`, value: '' }
+			}
+
+			return { isEmpty: false, altText: '', value: nucleus.value }
+		},
 	})
 	const { wrapper } = useViewStyles().classes
 
-	let isEmpty = true
-	let hasError = false
-	let altText = __('No HTML code is set', 'inseri-core')
-
-	let preparedValue = ''
-
-	if (valueWrapper.type === 'wrapper') {
-		isEmpty = false
-		preparedValue = valueWrapper.value
-
-		const { contentType } = valueWrapper
-
-		if (!contentType.includes('html')) {
-			hasError = true
-			preparedValue = ''
-			altText = `This content-type ${contentType} is not supported`
-		}
-	}
 	return mode === 'code' ? (
 		<Box p="md">
-			<CodeEditor type={'html'} value={preparedValue} />
+			<CodeEditor type={'html'} value={value} />
 		</Box>
-	) : isEmpty || hasError ? (
+	) : isEmpty ? (
 		<Group
 			align="center"
 			position="center"
@@ -68,7 +58,7 @@ export default function View({ isGutenbergEditor, isSelected }: ViewProps) {
 		<div
 			className={isGutenbergEditor && !isSelected ? wrapper : undefined}
 			style={{ minHeight: isGutenbergEditor ? '50px' : undefined }}
-			dangerouslySetInnerHTML={{ __html: preparedValue }}
+			dangerouslySetInnerHTML={{ __html: value }}
 		/>
 	)
 }

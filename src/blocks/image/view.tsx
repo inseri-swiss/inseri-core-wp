@@ -1,7 +1,6 @@
-import { useWatch } from '@inseri/lighthouse-next'
+import { Nucleus, useWatch } from '@inseri/lighthouse-next'
 import { IconCircleOff, IconPhotoOff } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
-import { useDeepCompareEffect } from 'react-use'
 import { Box, Group, Text, useGlobalState } from '../../components'
 import { GlobalState } from './state'
 
@@ -14,11 +13,6 @@ interface ViewProps {
 export default function View({ renderResizable, imageRef, isSelected }: ViewProps) {
 	const { inputKey, isBlob, isPrevBlob, imageUrl, prevImageUrl, caption, altText, height, fit, hasError } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
-	const valueWrapper = useWatch(inputKey, () => {
-		updateState({ isWizardMode: true, inputKey: '' })
-	})
-
-	const isUrlEmpty = !imageUrl
 
 	const update = (url: string, blob: boolean) =>
 		updateState({
@@ -26,11 +20,14 @@ export default function View({ renderResizable, imageRef, isSelected }: ViewProp
 			prevImageUrl: imageUrl,
 			isBlob: blob,
 			isPrevBlob: isBlob,
+			hasError: false,
 		})
 
-	useDeepCompareEffect(() => {
-		if (valueWrapper.type === 'wrapper') {
-			const { contentType, value } = valueWrapper
+	useWatch(inputKey, {
+		onNone: () => {
+			update('', false)
+		},
+		onSome: ({ contentType, value }: Nucleus<any>) => {
 			let processedValue = value
 
 			if (typeof processedValue === 'string' && contentType.includes('image/svg+xml')) {
@@ -44,19 +41,17 @@ export default function View({ renderResizable, imageRef, isSelected }: ViewProp
 			if (typeof processedValue === 'object' && processedValue instanceof Blob) {
 				update(URL.createObjectURL(processedValue), true)
 			}
-		}
 
-		if (valueWrapper.type === 'none') {
-			update('', false)
-		}
+			if (isPrevBlob) {
+				URL.revokeObjectURL(prevImageUrl)
+			}
+		},
+		onBlockRemoved: () => {
+			updateState({ isWizardMode: true, inputKey: '' })
+		},
+	})
 
-		if (isPrevBlob) {
-			URL.revokeObjectURL(prevImageUrl)
-		}
-
-		updateState({ hasError: false })
-	}, [valueWrapper])
-
+	const isUrlEmpty = !imageUrl
 	const highlightBg = isSelected
 		? {
 				backgroundColor: '#fff',
