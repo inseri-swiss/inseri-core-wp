@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n'
 import { Box, Select } from '../../components'
 import { Attributes } from './index'
-import { useWatch, usePublish } from '@inseri/lighthouse-next'
+import { useWatch, usePublish, Nucleus } from '@inseri/lighthouse-next'
 import { isValueValid } from './utils'
 
 interface ViewProps {
@@ -15,18 +15,16 @@ export default function View(props: ViewProps) {
 	const { inputKey, label, searchable, clearable } = attributes
 	const [publishValue, publishEmpty] = usePublish('selected', __('chosen value', 'inseri-core'))
 
-	const wrapper = useWatch(inputKey, () => {
-		if (setAttributes && setWizardMode) {
-			setAttributes({ inputKey: '' })
-			setWizardMode(true)
-		}
+	const data = useWatch(inputKey, {
+		onNone: () => [] as any[],
+		onSome: ({ value }: Nucleus<Array<any>>) => (isValueValid(value) ? value : []),
+		onBlockRemoved: () => {
+			if (setAttributes && setWizardMode) {
+				setAttributes({ inputKey: '' })
+				setWizardMode(true)
+			}
+		},
 	})
-
-	let data = []
-
-	if (wrapper.type === 'wrapper' && isValueValid(wrapper.value)) {
-		data = wrapper.value
-	}
 
 	return (
 		<Box p="md">

@@ -218,16 +218,23 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 		return {}
 	}, [keys.join(), joinedBlockIds])
 }
-
-interface WatchOptions {
+interface WatchBase {
 	onBlockRemoved?: (key: string) => void
 }
+interface FullWatchOps<A, B> extends WatchBase {
+	onNone: () => B
+	onSome: (nucleus: Nucleus<A>) => B
+}
 
-function useWatch<T = any>(key: string, ops: WatchOptions): Option<Nucleus<T>>
-function useWatch<T = any>(keys: string, ops: WatchOptions): Record<string, Option<Nucleus<T>>>
-function useWatch<T = any>(keys: string | string[], ops: WatchOptions): any {
+function useWatch<A = any>(key: string, ops: WatchBase): Option<Nucleus<A>>
+function useWatch<A = any>(keys: string[], ops: WatchBase): Record<string, Option<Nucleus<A>>>
+
+function useWatch<A = any, B = any>(key: string, ops: FullWatchOps<A, B>): B
+function useWatch<A = any, B = any>(keys: string[], ops: FullWatchOps<A, B>): Record<string, B>
+
+function useWatch<A = any, B = any>(keys: string | string[], ops: WatchBase | FullWatchOps<A, B>): any {
 	const { onBlockRemoved } = ops
-	const [state, setState] = useState<Record<string, Option<Nucleus<T>>>>({})
+	const [state, setState] = useState<Record<string, Option<Nucleus<A>> | B>>({})
 	const longKeys = typeof keys === 'string' ? [keys] : keys
 
 	useEffect(() => {
@@ -254,8 +261,12 @@ function useWatch<T = any>(keys: string | string[], ops: WatchOptions): any {
 						.reduce((acc, [fullKey, blockId, atomKey]) => {
 							const nucleus = root[blockId]?.atoms[atomKey]?.content ?? none
 
+							if ('onNone' in ops && 'onSome' in ops) {
+								return { ...acc, [fullKey]: nucleus.fold(ops.onNone, ops.onSome) }
+							}
+
 							return { ...acc, [fullKey]: nucleus }
-						}, {} as Record<string, Option<Nucleus<T>>>)
+						}, {} as Record<string, Option<Nucleus<A>> | B>)
 				)
 			)
 			.subscribe(setState)
@@ -267,10 +278,15 @@ function useWatch<T = any>(keys: string | string[], ops: WatchOptions): any {
 	}, [longKeys.join()])
 
 	if (typeof keys === 'string') {
-		return Object.values(state)[0] ?? none
+		let fallback: Option<Nucleus<A>> | B = none
+		if ('onNone' in ops) {
+			fallback = ops.onNone()
+		}
+
+		return Object.values(state)[0] ?? fallback
 	}
 
 	return state
 }
 
-export { InseriRoot, useDiscover, usePublish, useWatch }
+export { InseriRoot, useDiscover, usePublish, useWatch, Nucleus }

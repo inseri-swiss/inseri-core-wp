@@ -1,6 +1,5 @@
-import { useWatch } from '@inseri/lighthouse-next'
+import { Nucleus, useWatch } from '@inseri/lighthouse-next'
 import stringify from 'json-stable-stringify'
-import { useDeepCompareEffect } from 'react-use'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 import { Button } from '../../components'
 import { CONTENT_TYPE_TO_EXT } from '../../utils'
@@ -15,18 +14,14 @@ export default function View(props: { attributes: Attributes; setAttributes?: (i
 	const [extension, setExtension] = useRecoilState(extensionState(blockId))
 	const setWizardMode = useSetRecoilState(wizardState(blockId))
 
-	const valueWrapper = useWatch(inputKey, () => {
-		if (setAttributes) {
-			setWizardMode(true)
-			setAttributes({ inputKey: '' })
-		}
-	})
-	const isNotReady = valueWrapper.type === 'none' || !downloadLink
+	const isReady = useWatch(inputKey, {
+		onNone: () => {
+			URL.revokeObjectURL(downloadLink)
+			setDownloadLink('')
 
-	useDeepCompareEffect(() => {
-		if (valueWrapper.type === 'wrapper') {
-			const { value, contentType } = valueWrapper
-
+			return false
+		},
+		onSome: ({ contentType, value }: Nucleus<any>) => {
 			const found = CONTENT_TYPE_TO_EXT.find((c) => contentType.includes(c.value))
 			const ext = found ? found.ext : ''
 			setExtension(ext)
@@ -46,13 +41,21 @@ export default function View(props: { attributes: Attributes; setAttributes?: (i
 				URL.revokeObjectURL(downloadLink)
 				setDownloadLink(URL.createObjectURL(processedValue))
 			}
-		}
-	}, [valueWrapper])
+
+			return true
+		},
+		onBlockRemoved: () => {
+			if (setAttributes) {
+				setWizardMode(true)
+				setAttributes({ inputKey: '' })
+			}
+		},
+	})
 
 	const fullFileName = fileName + (extension ? '.' + extension : '')
 
 	return (
-		<Button style={{ color: '#fff' }} component="a" href={downloadLink} download={fullFileName} disabled={isNotReady}>
+		<Button style={{ color: '#fff' }} component="a" href={downloadLink} download={fullFileName} disabled={!isReady}>
 			{label}
 		</Button>
 	)
