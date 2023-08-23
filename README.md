@@ -1,6 +1,6 @@
 <p align="center"><a href="https://inseri.swiss/"><img src="https://raw.githubusercontent.com/inseri-swiss/inseri-core-wp/8820531f0db87ca285b11e05af40453b48e29ee8/docs/assets/inseri_logo.svg" alt="Logo" height=120></a>
 </p>
-<h1 align="center"><i>inseri core (beta)</i></h1>
+<h1 align="center"><i>inseri core <sup>beta</sup></i></h1>
 
 <p align="center">Scientific and interactive Gutenberg Blocks for WordPress</p>
 
