@@ -72,7 +72,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					></Select>
 				</Box>
 			) : (
-				<View {...props} />
+				<View {...props} setWizardMode={setWizardMode} />
 			)}
 		</>
 	)
