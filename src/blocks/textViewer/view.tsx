@@ -3,8 +3,11 @@ import { IconEye } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
 import stringify from 'json-stable-stringify'
 import { Box, CodeEditor, Group, Text, Tooltip, useGlobalState } from '../../components'
-import { getBodyTypeByContenType } from '../../utils'
+import { TEXTUAL_CONTENT_TYPES, getBodyTypeByContenType } from '../../utils'
 import { GlobalState } from './state'
+
+const textualContentTypes = TEXTUAL_CONTENT_TYPES.map((t) => t.value)
+const isTextualContentType = (c: string) => textualContentTypes.includes(c.split(';')[0]) || c.startsWith('text/')
 
 interface ViewProps {
 	renderResizable?: (EditorComponent: JSX.Element) => JSX.Element
@@ -17,8 +20,18 @@ export default function View(props: ViewProps) {
 	const { value, codeType } = useWatch(inputKey, {
 		onNone: () => ({ value: '', codeType: 'text' }),
 		onSome: (nucleus: Nucleus<string>) => {
+			let processedVal = ''
+
+			if (isTextualContentType(nucleus.contentType)) {
+				processedVal = nucleus.value
+			}
+
+			if (nucleus.contentType.match('/json') && (typeof nucleus.value !== 'string' || !!nucleus.value.trim())) {
+				processedVal = stringify(nucleus.value)
+			}
+
 			return {
-				value: nucleus.contentType.match('/json') ? stringify(nucleus.value) : nucleus.value,
+				value: processedVal,
 				codeType: getBodyTypeByContenType(nucleus.contentType) ?? 'text',
 			}
 		},

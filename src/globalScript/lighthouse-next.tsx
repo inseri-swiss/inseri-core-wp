@@ -226,6 +226,24 @@ interface FullWatchOps<A, B> extends WatchBase {
 	onSome: (nucleus: Nucleus<A>) => B
 }
 
+const mapToWatchResult =
+	<A, B>(longKeys: string[], areKeysArray: boolean, ops: WatchBase | FullWatchOps<A, B>) =>
+	(root: Root) => {
+		let watchedVals: [string, any][] = longKeys
+			.map((key) => [key, ...key.split('/')])
+			.map(([fullKey, blockId, atomKey]) => [fullKey, root[blockId]?.atoms[atomKey]?.content ?? none])
+
+		if ('onNone' in ops && 'onSome' in ops) {
+			watchedVals = watchedVals.map((pair: [string, Option<Nucleus<A>>]) => [pair[0], pair[1].fold(ops.onNone, ops.onSome)])
+		}
+
+		if (areKeysArray) {
+			return watchedVals.reduce((accumulator, [fullKey, val]) => ({ ...accumulator, [fullKey]: val }), {} as Record<string, any>)
+		}
+
+		return watchedVals[0][1]
+	}
+
 function useWatch<A = any>(key: string, ops: WatchBase): Option<Nucleus<A>>
 function useWatch<A = any>(keys: string[], ops: WatchBase): Record<string, Option<Nucleus<A>>>
 
@@ -233,9 +251,14 @@ function useWatch<A = any, B = any>(key: string, ops: FullWatchOps<A, B>): B
 function useWatch<A = any, B = any>(keys: string[], ops: FullWatchOps<A, B>): Record<string, B>
 
 function useWatch<A = any, B = any>(keys: string | string[], ops: WatchBase | FullWatchOps<A, B>): any {
+	type ResultType = Option<Nucleus<A>> | B
+
 	const { onBlockRemoved } = ops
-	const [state, setState] = useState<Record<string, Option<Nucleus<A>> | B>>({})
-	const longKeys = typeof keys === 'string' ? [keys] : keys
+	const areKeysArray = typeof keys !== 'string'
+
+	const longKeys = areKeysArray ? keys : [keys]
+	const initRoot = blockStoreSubject.getValue()
+	const [state, setState] = useState<Record<string, ResultType> | ResultType>(() => mapToWatchResult(longKeys, areKeysArray, ops)(initRoot))
 
 	useEffect(() => {
 		const onBlockRemovedSubs = longKeys
@@ -253,23 +276,7 @@ function useWatch<A = any, B = any>(keys: string | string[], ops: WatchBase | Fu
 					})
 			)
 
-		const valueSubscription = blockStoreSubject
-			.pipe(
-				map((root) =>
-					longKeys
-						.map((key) => [key, ...key.split('/')])
-						.reduce((acc, [fullKey, blockId, atomKey]) => {
-							const nucleus = root[blockId]?.atoms[atomKey]?.content ?? none
-
-							if ('onNone' in ops && 'onSome' in ops) {
-								return { ...acc, [fullKey]: nucleus.fold(ops.onNone, ops.onSome) }
-							}
-
-							return { ...acc, [fullKey]: nucleus }
-						}, {} as Record<string, Option<Nucleus<A>> | B>)
-				)
-			)
-			.subscribe(setState)
+		const valueSubscription = blockStoreSubject.pipe(map(mapToWatchResult(longKeys, areKeysArray, ops))).subscribe(setState)
 
 		return () => {
 			onBlockRemovedSubs.forEach((s) => s.unsubscribe())
@@ -277,16 +284,7 @@ function useWatch<A = any, B = any>(keys: string | string[], ops: WatchBase | Fu
 		}
 	}, [longKeys.join()])
 
-	if (typeof keys === 'string') {
-		let fallback: Option<Nucleus<A>> | B = none
-		if ('onNone' in ops) {
-			fallback = ops.onNone()
-		}
-
-		return Object.values(state)[0] ?? fallback
-	}
-
 	return state
 }
 
-export { InseriRoot, useDiscover, usePublish, useWatch, Nucleus }
+export { InseriRoot, Nucleus, useDiscover, usePublish, useWatch }
