@@ -1,5 +1,4 @@
-import { useDispatch } from '@inseri/lighthouse'
-import { usePrevious } from '@mantine/hooks'
+import { usePublish } from '@inseri/lighthouse-next'
 import { forwardRef, useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Box, Group, Image, Loader, Select, Text, useGlobalState } from '../../components'
@@ -25,40 +24,24 @@ interface ViewProps {
 }
 
 export default function View({ isGutenbergEditor, isSelected }: ViewProps) {
-	const { label, selectedFileId, files, output, isLoading, hasError, fileContent, mime, isVisible } = useGlobalState((state: GlobalState) => state)
+	const { label, selectedFileId, files, isLoading, hasError, fileContent, mime, isVisible } = useGlobalState((state: GlobalState) => state)
 	const { loadMedias, chooseFile } = useGlobalState((state: GlobalState) => state.actions)
-	const dispatch = useDispatch(output)
-	const prevMime = usePrevious(mime)
+	const [publishValue, publishEmpty] = usePublish('file', 'file')
 
 	useEffect(() => {
 		loadMedias()
 	}, [])
 
 	useEffect(() => {
-		if (prevMime && prevMime !== mime) {
-			dispatch({ status: 'unavailable' })
+		if (hasError) {
+			publishEmpty()
 		}
-	}, [mime])
-
-	useEffect(() => {
-		dispatch({ contentType: mime })
-	}, [mime])
-
-	useEffect(() => {
-		setTimeout(() => {
-			if (isLoading) {
-				dispatch({ status: 'loading' })
-			}
-			if (hasError) {
-				dispatch({ status: 'error' })
-			}
-			if (!isLoading && !hasError && fileContent) {
-				dispatch({ status: 'ready', value: fileContent })
-			}
-			if (!fileContent) {
-				dispatch({ status: 'initial', value: fileContent })
-			}
-		}, 100)
+		if (!isLoading && !hasError && fileContent) {
+			publishValue(fileContent, mime)
+		}
+		if (!fileContent) {
+			publishEmpty()
+		}
 	}, [isLoading, hasError, fileContent])
 
 	return isVisible || isSelected ? (

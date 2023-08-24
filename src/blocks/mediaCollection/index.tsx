@@ -3,7 +3,6 @@ import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
-import { ProducerBeacon } from '../../globalScript'
 import json from './block.json'
 import Edit from './edit'
 
@@ -13,7 +12,6 @@ export interface Attributes {
 	blockId: string
 	blockName: string
 	label: string
-	output: ProducerBeacon
 	fileIds: number[]
 	selectedFileId: string | null
 	isVisible: boolean

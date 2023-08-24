@@ -1,4 +1,4 @@
-import { useControlTower } from '@inseri/lighthouse'
+import { InseriRoot } from '@inseri/lighthouse-next'
 import { IconFiles } from '@tabler/icons-react'
 import { BlockControls, InspectorControls, MediaPlaceholder } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -13,22 +13,13 @@ import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
 import View from './view'
 
-const baseBeacon = { contentType: '', description: 'file', key: 'file', default: '' }
-
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { createErrorNotice } = useWpDispatch('core/notices')
 	const { isSelected } = props
-	const { output, blockId, blockName, label, isWizardMode, actions, fileIds, files, isVisible } = useGlobalState((state: GlobalState) => state)
+	const { blockName, label, isWizardMode, actions, fileIds, files, isVisible } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
 
 	const isValueSet = fileIds.length > 0
-	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, [baseBeacon])
-
-	useEffect(() => {
-		if (producersBeacons.length > 0 && !output.key) {
-			updateState({ output: producersBeacons[0] })
-		}
-	}, [producersBeacons.length])
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -102,9 +93,11 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'mediaCollection'}>
-			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(config.attributes)} setAttributes={setAttributes} initialState={attributes}>
-				<EditComponent {...props} />
-			</StateProvider>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={config.name}>
+				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(config.attributes)} setAttributes={setAttributes} initialState={attributes}>
+					<EditComponent {...props} />
+				</StateProvider>
+			</InseriRoot>
 		</SetupEditorEnv>
 	)
 }
