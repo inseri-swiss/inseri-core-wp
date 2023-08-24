@@ -1,4 +1,4 @@
-import { useDispatch } from '@inseri/lighthouse'
+import { usePublish } from '@inseri/lighthouse-next'
 import { Dropzone } from '@mantine/dropzone'
 import { IconCheck, IconDownload, IconX } from '@tabler/icons-react'
 import { useEffect } from '@wordpress/element'
@@ -34,11 +34,11 @@ interface ViewProps {
 }
 
 export default function View({ renderResizable, isGutenbergEditor, isSelected }: ViewProps) {
-	const { accepts, mainText, subText, multiple, height, files, chosenFile, output } = useGlobalState((state: GlobalState) => state)
+	const { accepts, mainText, subText, multiple, height, files, chosenFile } = useGlobalState((state: GlobalState) => state)
 	const { updateState, addFiles, removeFile } = useGlobalState((state: GlobalState) => state.actions)
 
 	const { itemButton, itemGroup, hoveringWrapper } = useStyles().classes
-	const dispatch = useDispatch(output)
+	const [publishValue, publishEmpty] = usePublish('data', 'data provided by visitor')
 
 	const theme = useMantineTheme()
 	const primaryColor = theme.colors[theme.primaryColor][6]
@@ -48,21 +48,21 @@ export default function View({ renderResizable, isGutenbergEditor, isSelected }:
 	useEffect(() => {
 		if (chosenFile) {
 			const file = files[chosenFile]
-			let contentType: string | undefined = file.type
+			let contentType: string = file.type
 
 			if (!contentType) {
 				const splittedName = file.name.split('.')
 				const extension = splittedName[splittedName.length - 1]
-				contentType = guessContentTypeByExtension(extension)
+				contentType = guessContentTypeByExtension(extension) ?? ''
 			}
 
-			handleBody(file, contentType ?? '').then((processedData) => {
-				dispatch({ status: 'ready', value: processedData, contentType })
+			handleBody(file, contentType).then((processedData) => {
+				publishValue(processedData, contentType)
 			})
 		}
 
 		if (!chosenFile) {
-			dispatch({ status: 'initial', value: null })
+			publishEmpty()
 		}
 	}, [chosenFile])
 

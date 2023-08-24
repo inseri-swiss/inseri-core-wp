@@ -1,8 +1,7 @@
-import { useControlTower } from '@inseri/lighthouse'
+import { InseriRoot } from '@inseri/lighthouse-next'
 import { InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, TextareaControl, ToggleControl } from '@wordpress/components'
-import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { MultiSelect, SetupEditorEnv, StateProvider, createStyles, useGlobalState } from '../../components'
 import { COMMON_CONTENT_TYPES } from '../../utils'
@@ -36,20 +35,10 @@ const useStyles = createStyles(() => ({
 	},
 }))
 
-const baseBeacon = { contentType: '', description: 'visitor provided data', key: 'data', default: '' }
-
 function EditComponent({ isSelected }: BlockEditProps<Attributes>) {
-	const { blockId, blockName, actions, accepts, mainText, subText, multiple, output } = useGlobalState((state: GlobalState) => state)
+	const { blockName, actions, accepts, mainText, subText, multiple } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
 	const { multiSelectValues, label } = useStyles().classes
-
-	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, [baseBeacon])
-
-	useEffect(() => {
-		if (producersBeacons.length > 0 && !output.key) {
-			updateState({ output: producersBeacons[0] })
-		}
-	}, [producersBeacons.length])
 
 	const renderResizable = (children: JSX.Element) => (
 		<ResizableBox
@@ -110,9 +99,11 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'file-drop'}>
-			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
-				<EditComponent {...props} />
-			</StateProvider>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={config.name}>
+				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
+					<EditComponent {...props} />
+				</StateProvider>
+			</InseriRoot>
 		</SetupEditorEnv>
 	)
 }

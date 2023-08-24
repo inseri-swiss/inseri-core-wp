@@ -14,13 +14,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"output": {
-			"type": "object",
-			"default": {
-				"key": "",
-				"contentType": ""
-			}
-		},
 		"mainText": {
 			"type": "string",
 			"default": "Drag and drop a file or click here"
