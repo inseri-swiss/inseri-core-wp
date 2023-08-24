@@ -1,4 +1,3 @@
-import { ProducerBeacon } from '@inseri/lighthouse'
 import { IconDownload } from '@tabler/icons-react'
 import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockSaveProps } from '@wordpress/blocks'
@@ -12,7 +11,6 @@ const { name, ...settings } = json as any
 export interface Attributes {
 	blockId: string
 	blockName: string
-	output: ProducerBeacon
 	accepts: string[]
 	multiple: boolean
 	mainText: string
