@@ -1,8 +1,10 @@
+import { InseriRoot } from '@inseri/lighthouse-next'
 import domReady from '@wordpress/dom-ready'
 import { createRoot } from '@wordpress/element'
-import View from './view'
 import { InseriThemeProvider, StateProvider } from '../../components'
+import config from './block.json'
 import { storeCreator } from './state'
+import View from './view'
 
 function initReactComponents() {
 	const items = document.querySelectorAll('.wp-block-inseri-core-media-collection')
@@ -11,9 +13,11 @@ function initReactComponents() {
 			const attributes = JSON.parse(item.dataset.attributes)
 			createRoot(item!).render(
 				<InseriThemeProvider>
-					<StateProvider stateCreator={storeCreator} initialState={attributes}>
-						<View />
-					</StateProvider>
+					<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={config.name}>
+						<StateProvider stateCreator={storeCreator} initialState={attributes}>
+							<View />
+						</StateProvider>
+					</InseriRoot>
 				</InseriThemeProvider>
 			)
 		})
