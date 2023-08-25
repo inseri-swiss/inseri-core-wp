@@ -5,11 +5,12 @@ This tutorial allows you to chain multiple inseri blocks, with the specific exam
 - Adding predefined images in dropdown menu
 - Allowing the end user to select the images to display
 
-For the final product, please [click here](https://inseri.swiss/2023/02/hello-world/).
+For the final product, please [click here](https://inseri.swiss/2023/02/hello-world/){:target="\_blank"}.
 
 ## Step 0: Initialize your inseri instance
 
-Open up an inseri or [playground instance](https://playground.inseri.swiss).
+Open up an inseri or [playground instance](https://playground.inseri.swiss){:target="\_blank"}.
+
 Beware that changes done in the playground will not be saved.
 
 ## Step 1: Create a new post

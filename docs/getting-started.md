@@ -2,20 +2,19 @@
 
 ## Installation
 
-inseri core for WordPress is available as a WordPress plugin. You can find it as an asset `inseri-core.zip` and we recommend you our latest release available [here](https://github.com/inseri-swiss/inseri-core-wp/releases/latest). Please download it locally and install it following [Upload via WordPress Admin](https://wordpress.org/documentation/article/manage-plugins/#upload-via-wordpress-admin).
+inseri core for WordPress is available as an official [WordPress plugin](https://wordpress.org/plugins/inseri-core/){:target="\_blank"}.
 
-To install inseri locally with Docker, follow the guide under [https://github.com/inseri-swiss/inseri-core-wp](https://github.com/inseri-swiss/inseri-core-wp).
-The last step is to go to [http://localhost:8888/wp-login.php](http://localhost:8888/wp-login.php) and use username `admin` and the password `password`.
+If you have an WordPress deployment, simply follow [Finding and Installing Plugins](https://wordpress.org/documentation/article/manage-plugins/#finding-and-installing-plugins-1){:target="\_blank"}.
 
-Alternatively you can check out the functionalities in the [playground](https://playground.inseri.swiss/).
+Alternatively you can check out the functionalities in the [playground](https://inseri.swiss/playground/){:target="\_blank"}.
 Be aware that changes there are temporary and will be gone after a page refresh.
 
-## WordPress Posts
+## WordPress Posts and Pages
 
-The typical use case with WordPress and inseri is to write a [post](https://wordpress.com/support/post-vs-page/) consisting of several [blocks](https://wordpress.org/support/article/blocks/).
-For saving, previewing, and upating posts, follow the description about the [WordPress Block Editor](https://wordpress.org/support/article/wordpress-editor/).
+The typical use case with WordPress and inseri is to write a [post or page](https://wordpress.com/support/post-vs-page/){:target="\_blank"} consisting of several [blocks](https://wordpress.org/support/article/blocks/){:target="\_blank"}.
+For saving, previewing, and upating posts or pages, follow the description about the [WordPress Block Editor](https://wordpress.org/support/article/wordpress-editor/){:target="\_blank"}.
 
-The further documentation will always assume that you already have a post to work on.
+The further documentation will always assume that you already have a post or page to work on, and we will call it simply post.
 
 ## Adding inseri blocks to a post
 
