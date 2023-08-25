@@ -2,7 +2,7 @@ site_name: Documentation for inseri core <sup>beta</sub>
 site_url: https://docs.inseri.swiss/
 repo_url: https://github.com/inseri-swiss/inseri-core-wp
 nav:
-  - "inseri.swiss": "https://inseri.swiss/"
+  - "inseri.swiss": https://inseri.swiss/
   - "About": "index.md"
   - "getting-started.md"
   - "Tutorials":
@@ -54,6 +54,9 @@ markdown_extensions:
   - mkdocs_graphviz:
       color: 4051b5
   - md_in_html
+  - attr_list
+
+
 plugins:
   - glightbox
   - search

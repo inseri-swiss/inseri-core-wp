@@ -8,10 +8,10 @@ A typical example would start with a text block containing the configuration for
 Selecting one option in the dropdown would provide an API block with the parameters to query data from an external source.
 Using a Python block, the response could then be transformed into a format which a block for graphs can display.
 
-Try out our [playground](https://playground.inseri.swiss/). Be aware that your changes in the playground are temporary and will be gone after a page refresh.
+Try out our [playground](https://playground.inseri.swiss/){:target="\_blank"}. Be aware that your changes in the playground are temporary and will be gone after a page refresh.
 
-Information about the project: [inseri.swiss](https://inseri.swiss).
+Information about the project: [inseri.swiss](https://inseri.swiss){:target="\_blank"}.
 
-Code on GitHub: [https://github.com/inseri-swiss/inseri-core-wp](https://github.com/inseri-swiss/inseri-core-wp).
+Code on GitHub: [https://github.com/inseri-swiss/inseri-core-wp](https://github.com/inseri-swiss/inseri-core-wp){:target="\_blank"}.
 
-[Get in Touch](https://inseri.swiss/get-in-touch/)
+[Get in Touch](https://inseri.swiss/get-in-touch/){:target="\_blank"}

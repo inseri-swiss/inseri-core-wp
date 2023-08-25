@@ -3,11 +3,11 @@
 This tutorial will give a simple example how you can display different images depending on user selection.
 For this we have to join a couple of inseri blocks.
 
-You can check out the result of this tutorial on [inseri.swiss](https://inseri.swiss/2023/02/hello-world/).
+You can check out the result of this tutorial on [inseri.swiss](https://inseri.swiss/2023/02/hello-world/){:target="\_blank"}.
 
 ## Step 1: Create a new post
 
-On your inseri instance or in the [playground](https://inseri.swiss/playground/) (remember, your changes will not be saved there), add a new post (see the figure below) and give it a title.
+On your inseri instance or in the [playground](https://inseri.swiss/playground/){:target="\_blank"} (remember, your changes will not be saved there), add a new post (see the figure below) and give it a title.
 In this example, we call the post "Image selection". You can type this at "Add title...".
 
 <figure markdown>
