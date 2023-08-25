@@ -17,7 +17,7 @@ export interface GlobalState extends Attributes {
 export const storeCreator = (initalState: Attributes) => {
 	return immer<GlobalState>((set) => ({
 		...initalState,
-		isWizardMode: !initalState.inputFull.key,
+		isWizardMode: !initalState.inputFull,
 		revision: 0,
 
 		actions: {

@@ -15,36 +15,20 @@
 			"default": ""
 		},
 		"inputFull": {
-			"type": "object",
-			"default": {
-				"key": "",
-				"contentType": "",
-				"description": ""
-			}
+			"type": "string",
+			"default": ""
 		},
 		"inputData": {
-			"type": "object",
-			"default": {
-				"key": "",
-				"contentType": "",
-				"description": ""
-			}
+			"type": "string",
+			"default": ""
 		},
 		"inputLayout": {
-			"type": "object",
-			"default": {
-				"key": "",
-				"contentType": "",
-				"description": ""
-			}
+			"type": "string",
+			"default": ""
 		},
 		"inputConfig": {
-			"type": "object",
-			"default": {
-				"key": "",
-				"contentType": "",
-				"description": ""
-			}
+			"type": "string",
+			"default": ""
 		},
 		"height": {
 			"type": "integer",

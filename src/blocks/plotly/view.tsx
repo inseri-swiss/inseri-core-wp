@@ -1,134 +1,118 @@
-import { BaseBeaconState, ConsumerBeacon, RecordUpdater, useControlTower, useDispatchMany, useWatch } from '@inseri/lighthouse'
-import { useEffect, useState } from '@wordpress/element'
-import { __ } from '@wordpress/i18n'
-import stringify from 'json-stable-stringify'
+import { Actions, Nucleus, usePublish, useWatch } from '@inseri/lighthouse-next'
+import { useState } from '@wordpress/element'
 import cloneDeep from 'lodash.clonedeep'
 import Plot from 'react-plotly.js'
-import { Box, Text, useGlobalState } from '../../components'
-import { isBeaconReady } from '../../utils'
-import blockConfig from './block.json'
+import { Box, useGlobalState } from '../../components'
 import { GlobalState } from './state'
 
 const simpleEventTransform = (event: Plotly.PlotHoverEvent | Plotly.PlotHoverEvent | Plotly.PlotSelectionEvent) => {
 	return event.points.map(({ curveNumber, data, x, y, pointIndex }) => ({ curveNumber, data, x, y, pointIndex }))
 }
 
-const propagateIfSet = (eventType: string, outputs: ConsumerBeacon[], recordUpdater: RecordUpdater) => (val: any) => {
-	const isSet = outputs.some((o) => o.description === eventType)
-	if (isSet && recordUpdater[eventType]) {
+const propagateIfSet = (eventType: string, outputs: [string, string][], recordUpdater: Record<string, Actions<any>>) => (val: any) => {
+	const isSet = outputs.some((o) => o[0] === eventType)
+	if (isSet) {
 		let processedVal = val
 
 		if (eventType === 'onClick' || eventType === 'onHover') {
 			processedVal = simpleEventTransform(val)
 		}
 
-		recordUpdater[eventType]({ status: 'ready', value: processedVal })
+		recordUpdater[eventType][0](processedVal, 'application/json')
 	}
 }
 
-const useDefaultIfNotReady = (beacon: BaseBeaconState, defaultVal: any) => {
-	if (['ready', 'initial'].every((s) => s !== beacon.status) || !beacon.value) {
-		return defaultVal
-	}
-
-	return beacon.value
+const prepareLayout = (newLayout: any) => {
+	const { width, height, ...rest } = newLayout
+	return cloneDeep({ ...rest, autosize: true })
 }
-
+const prepareConfig = (newConfig: any) => {
+	return cloneDeep({ ...newConfig, responsive: true })
+}
 interface ViewProps {
 	renderResizable?: (Component: JSX.Element) => JSX.Element
 	isSelected?: boolean
 }
 
 export default function View({ renderResizable }: ViewProps) {
-	const { height, inputFull, inputData, inputLayout, inputConfig, blockId, blockName, outputs, revision } = useGlobalState((state: GlobalState) => state)
+	const { height, inputFull, inputData, inputLayout, inputConfig, outputs, revision } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 
-	const [data, setData] = useState<any>([])
+	const [full, setFull] = useState({ data: [], layout: {} })
+	const [data, setData] = useState<any[]>([])
 	const [layout, setLayout] = useState<any>({})
-	const [config, setConfig] = useState<any>({})
+	const [config, setConfig] = useState<any>({ responsive: true })
 
-	const producersBeacons = useControlTower({ blockId, blockType: blockConfig.name, instanceName: blockName }, outputs)
-	const joinedProducerKeys = producersBeacons.reduce((acc, b) => acc + b.key, '')
-	const joinedOutputsKeys = outputs.reduce((acc, b) => acc + b.key, '')
+	const publishRecord = usePublish(outputs.map((i) => ({ key: i[0], description: i[1] })))
 
-	useEffect(() => {
-		if (joinedProducerKeys !== joinedOutputsKeys) {
-			updateState({ outputs: producersBeacons })
-		}
-	}, [joinedProducerKeys])
-
-	const dispatchRecord = useDispatchMany(producersBeacons)
-
-	const watchFull = useWatch(inputFull)
-	const watchData = useWatch(inputData)
-	const watchLayout = useWatch(inputLayout)
-	const watchConfig = useWatch(inputConfig)
-
-	const hasInputsError = !(
-		isBeaconReady(inputFull, watchFull) &&
-		isBeaconReady(inputData, watchData) &&
-		isBeaconReady(inputLayout, watchLayout) &&
-		isBeaconReady(inputConfig, watchConfig)
+	const reverseMap = new Map(
+		[
+			[inputFull, 'inputFull'],
+			[inputData, 'inputData'],
+			[inputLayout, 'inputLayout'],
+			[inputConfig, 'inputConfig'],
+		].filter(([key]) => !!key) as [string, string][]
 	)
 
-	const processedFull = useDefaultIfNotReady(watchFull, { data: [], layout: {} })
-	const processedData = useDefaultIfNotReady(watchData, [])
-	const processedLayout = useDefaultIfNotReady(watchLayout, {})
-	const processedConfig = useDefaultIfNotReady(watchConfig, {})
+	useWatch([inputFull, inputData, inputLayout, inputConfig], {
+		onBlockRemoved: (fullKey) => {
+			const keyName = reverseMap.get(fullKey) ?? ''
+			updateState({ [keyName]: '', isWizardMode: true })
+		},
+		onNone: (fullKey: string) => {
+			const keyName = reverseMap.get(fullKey) ?? ''
 
-	const strFull = stringify(processedFull)
-	const strData = stringify(processedData)
-	const strLayout = stringify(processedLayout)
-	const strConfig = stringify(processedConfig)
+			switch (keyName) {
+				case 'inputFull':
+					setFull({ data: [], layout: {} })
+					break
+				case 'inputData':
+					setData([])
+					break
+				case 'inputLayout':
+					setLayout({})
+					break
+				case 'inputConfig':
+					setConfig({})
+					break
+			}
+		},
+		onSome: ({ value }: Nucleus<any>, fullKey: string) => {
+			const keyName = reverseMap.get(fullKey) ?? ''
 
-	const setLayoutWithExtra = (newLayout: any) => {
-		const { width, height: _, ...rest } = newLayout
-		setLayout(cloneDeep({ ...rest, autosize: true }))
-	}
+			switch (keyName) {
+				case 'inputFull':
+					setFull({ data: value?.data, layout: prepareLayout(value?.layout ?? {}) })
+					break
+				case 'inputData':
+					setData(cloneDeep(value ?? []))
+					break
+				case 'inputLayout':
+					setLayout(prepareLayout(value ?? {}))
+					break
+				case 'inputConfig':
+					setConfig(prepareConfig(value ?? {}))
+					break
+			}
+		},
+	})
 
-	useEffect(() => {
-		setData(cloneDeep(processedData))
-	}, [strData])
-
-	useEffect(() => {
-		setLayoutWithExtra(processedLayout)
-	}, [strLayout])
-
-	useEffect(() => {
-		setConfig(cloneDeep({ ...processedConfig, responsive: true }))
-	}, [strConfig])
-
-	useEffect(() => {
-		if (processedFull.data && processedData.length === 0) {
-			setData(cloneDeep(processedFull.data))
-		}
-		if (processedFull.layout && Object.keys(processedLayout).length === 0) {
-			setLayoutWithExtra(processedFull.layout)
-		}
-	}, [strFull, strData, strLayout])
+	const preparedData = data.length === 0 ? full.data : data
+	const preparedLayout = Object.keys(layout).length === 0 ? full.layout : layout
 
 	const chart = (
 		<Plot
 			revision={revision}
-			data={data}
-			layout={layout}
+			data={preparedData}
+			layout={preparedLayout}
 			config={config}
 			useResizeHandler={true}
 			style={{ width: '100%', height: '100%' }}
 			// events
-			onClick={propagateIfSet('onClick', outputs, dispatchRecord)}
-			onHover={propagateIfSet('onHover', outputs, dispatchRecord)}
+			onClick={propagateIfSet('onClick', outputs, publishRecord)}
+			onHover={propagateIfSet('onHover', outputs, publishRecord)}
 		/>
 	)
 
-	return (
-		<Box style={{ height: height ?? 'auto' }}>
-			{hasInputsError && (
-				<Text fz={14} color="red">
-					{__('Not all inputs are ready!', 'inseri-core')}
-				</Text>
-			)}
-			{renderResizable ? renderResizable(chart) : chart}
-		</Box>
-	)
+	return <Box style={{ height: height ?? 'auto' }}>{renderResizable ? renderResizable(chart) : chart}</Box>
 }
