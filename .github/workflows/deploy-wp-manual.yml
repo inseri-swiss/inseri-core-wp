@@ -1,0 +1,35 @@
+name: 'deploy to WP manually'
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Enter tag version (eg v0.1.0) or branch name (eg main)'
+        type: string
+        required: true
+        default: main
+      push-tag:
+        type: boolean
+        description: 'Push to tag'
+        default: false
+      push-trunk:
+        type: boolean
+        description: 'Push to trunk'
+        default: false
+
+jobs:
+  build:
+    name: Create artifact
+    uses: ./.github/workflows/build.yml
+    with:
+      checkout-ref: ${{ inputs.version }}
+
+  deploy:
+    name: Deploy to WordPress.org
+    needs: build
+    uses: ./.github/workflows/deploy-wp.yml
+    secrets: inherit
+    with:
+      push-tag: ${{ inputs.push-tag }}
+      push-trunk: ${{ inputs.push-trunk }}
+      version: ${{ inputs.version }}

@@ -4,7 +4,7 @@
  * Description:       Scientific and Interactive Gutenberg Blocks to facilitate Open Science
  * Requires at least: 5.6
  * Requires PHP:      5.6
- * Version:           0.2.0
+ * Version:           0.2.1
  * Author:            inseri.swiss
  * Author URI:        https://inseri.swiss
  * License:           GPL-3.0-or-later
@@ -26,6 +26,11 @@
  * You should have received a copy of the GNU General Public License
  * along with inseri core.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+// Exit if accessed directly
+if (!defined('ABSPATH')) {
+	exit();
+}
 
 require_once plugin_dir_path(__FILE__) . 'includes/utils.php';
 

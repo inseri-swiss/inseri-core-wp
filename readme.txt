@@ -4,7 +4,7 @@ Tags: Gutenberg blocks, WordPress blocks, gutenberg, blocks, inseri
 Requires at least: 5.6
 Tested up to: 6.2
 Requires PHP: 5.6
-Stable tag: 0.2.0
+Stable tag: 0.2.1
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -39,7 +39,18 @@ The development takes place on [GitHub](https://github.com/inseri-swiss/inseri-c
 Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inseri-swiss/issues).
 
 
+== Screenshots ==
+
+1. Create beautiful charts with Plotly
+2. Call any Web API
+3. Execute Python code
+4. Load data from Zenodo.org
+5. Enable guests to provide their own data
+6. Render HTML code
+
 == Changelog ==
+### 0.2.1
+- minor changes
 
 ### 0.2.0
 

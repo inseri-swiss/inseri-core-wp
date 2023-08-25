@@ -1,0 +1,37 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yml
+    with:
+      checkout-ref: ${{ github.ref_name }}
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: ready-zip
+          path: inseri-core.zip
+
+      - uses: ncipollo/release-action@v1
+        with:
+          draft: true
+          artifacts: "inseri-core.zip"
+
+  deploy:
+    name: Deploy to WordPress.org
+    needs: [build, release]
+    uses: ./.github/workflows/deploy-wp.yml
+    secrets: inherit
+    with:
+      version: ${{ github.ref_name }}
+      push-tag: true
+      push-trunk: true
