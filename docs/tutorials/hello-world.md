@@ -1,14 +1,20 @@
 # Hello world
 
-This tutorial will give a simple example how you can display different images depending on user selection.
-For this we have to join a couple of inseri blocks.
+This tutorial allows you to chain multiple inseri blocks, with the specific example focusing on:
 
-You can check out the result of this tutorial on [inseri.swiss](https://inseri.swiss/2023/02/hello-world/){:target="\_blank"}.
+- Adding predefined images in dropdown menu
+- Allowing the end user to select the images to display
+
+For the final product, please [click here](https://inseri.swiss/2023/02/hello-world/){:target="\_blank"}.
+
+## Step 0: Initialize your inseri instance
+
+Open up an inseri or [playground instance](https://playground.inseri.swiss){:target="\_blank"}.
+Beware that changes done in the playground will not be saved.
 
 ## Step 1: Create a new post
 
-On your inseri instance or in the [playground](https://inseri.swiss/playground/){:target="\_blank"} (remember, your changes will not be saved there), add a new post (see the figure below) and give it a title.
-In this example, we call the post "Image selection". You can type this at "Add title...".
+Add a new post with the title "Image Selection", as presented in the figure below.
 
 <figure markdown>
 ![Adding a new post in WordPress](/assets/new_post.png)
