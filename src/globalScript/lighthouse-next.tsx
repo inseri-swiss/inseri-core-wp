@@ -222,19 +222,25 @@ interface WatchBase {
 	onBlockRemoved?: (key: string) => void
 }
 interface FullWatchOps<A, B> extends WatchBase {
-	onNone: () => B
-	onSome: (nucleus: Nucleus<A>) => B
+	onNone: (key: string) => B
+	onSome: (nucleus: Nucleus<A>, key: string) => B
 }
 
 const mapToWatchResult =
-	<A, B>(longKeys: string[], areKeysArray: boolean, ops: WatchBase | FullWatchOps<A, B>) =>
+	<A, B>(longKeys: string[], areKeysArray: boolean, ops?: WatchBase | FullWatchOps<A, B>) =>
 	(root: Root) => {
 		let watchedVals: [string, any][] = longKeys
 			.map((key) => [key, ...key.split('/')])
 			.map(([fullKey, blockId, atomKey]) => [fullKey, root[blockId]?.atoms[atomKey]?.content ?? none])
 
-		if ('onNone' in ops && 'onSome' in ops) {
-			watchedVals = watchedVals.map((pair: [string, Option<Nucleus<A>>]) => [pair[0], pair[1].fold(ops.onNone, ops.onSome)])
+		if (ops && 'onNone' in ops && 'onSome' in ops) {
+			watchedVals = watchedVals.map((pair: [string, Option<Nucleus<A>>]) => [
+				pair[0],
+				pair[1].fold(
+					() => ops.onNone(pair[0]),
+					(a) => ops.onSome(a, pair[0])
+				),
+			])
 		}
 
 		if (areKeysArray) {
@@ -244,16 +250,16 @@ const mapToWatchResult =
 		return watchedVals[0][1]
 	}
 
-function useWatch<A = any>(key: string, ops: WatchBase): Option<Nucleus<A>>
-function useWatch<A = any>(keys: string[], ops: WatchBase): Record<string, Option<Nucleus<A>>>
+function useWatch<A = any>(key: string, ops?: WatchBase): Option<Nucleus<A>>
+function useWatch<A = any>(keys: string[], ops?: WatchBase): Record<string, Option<Nucleus<A>>>
 
-function useWatch<A = any, B = any>(key: string, ops: FullWatchOps<A, B>): B
-function useWatch<A = any, B = any>(keys: string[], ops: FullWatchOps<A, B>): Record<string, B>
+function useWatch<A = any, B = any>(key: string, ops?: FullWatchOps<A, B>): B
+function useWatch<A = any, B = any>(keys: string[], ops?: FullWatchOps<A, B>): Record<string, B>
 
-function useWatch<A = any, B = any>(keys: string | string[], ops: WatchBase | FullWatchOps<A, B>): any {
+function useWatch<A = any, B = any>(keys: string | string[], ops?: WatchBase | FullWatchOps<A, B>): any {
 	type ResultType = Option<Nucleus<A>> | B
 
-	const { onBlockRemoved } = ops
+	const onBlockRemoved = ops?.onBlockRemoved
 	const areKeysArray = typeof keys !== 'string'
 
 	const longKeys = areKeysArray ? keys : [keys]
@@ -287,4 +293,4 @@ function useWatch<A = any, B = any>(keys: string | string[], ops: WatchBase | Fu
 	return state
 }
 
-export { InseriRoot, Nucleus, useDiscover, usePublish, useWatch }
+export { Actions, InseriRoot, Nucleus, useDiscover, usePublish, useWatch }

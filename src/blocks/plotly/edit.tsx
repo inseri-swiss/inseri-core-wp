@@ -1,4 +1,4 @@
-import { useAvailableBeacons, useWatch } from '@inseri/lighthouse'
+import { InseriRoot, useDiscover } from '@inseri/lighthouse-next'
 import { IconChartBar, IconInfoCircle, IconX } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -12,12 +12,6 @@ import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
 import View from './view'
 
-const defaultInput = {
-	key: '',
-	contentType: '',
-	description: '',
-}
-
 const LINK_PLOTLY_DOC = 'https://plotly.com/chart-studio-help/json-chart-schema/'
 const MIN_HEIGHT = 100
 const EVENTS = [
@@ -30,15 +24,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const { blockName, inputFull, inputData, inputLayout, inputConfig, isWizardMode, actions, height, outputs } = useGlobalState((state: GlobalState) => state)
 	const { updateState, setHeight } = actions
 
-	const isValueSet = !!inputFull.key
+	const isValueSet = !!inputFull
 	const [openItems, setOpenItems] = useState<string[]>([])
-
-	const { status } = useWatch(inputFull)
-	useEffect(() => {
-		if (status === 'unavailable') {
-			updateState({ inputFull: { ...inputFull, key: '' }, isWizardMode: true })
-		}
-	}, [status])
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -46,8 +33,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 		}
 	}, [isSelected])
 
-	const availableBeacons = useAvailableBeacons('json')
-	const options = Object.keys(availableBeacons).map((k) => ({ label: availableBeacons[k].description, value: k }))
+	const sources = useDiscover({ contentTypeFilter: 'json' })
+	const options = sources.map((item) => ({ label: item.description, value: item.key }))
 	const resizerHeight = height ? height : 'auto'
 
 	const renderResizable = (children: JSX.Element) => (
@@ -66,8 +53,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 		</ResizableBox>
 	)
 
-	const selectedEvents = outputs.map((b) => b.description)
-	const unselectedEvents = EVENTS.filter((e) => !selectedEvents.includes(e.value))
+	const unselectedEvents = EVENTS.filter((e) => outputs.every(([key, _]) => key !== e.value))
 
 	return (
 		<>
@@ -115,16 +101,19 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 								placeholder={__('Add event to emit', 'inseri-core')}
 								data={unselectedEvents}
 								onChange={(val) => {
-									updateState({ outputs: [...outputs, { contentType: 'application/json', description: val!, key: val! }] })
+									if (val) {
+										const label = EVENTS.find((e) => e.value === val)?.label ?? ''
+										updateState({ outputs: [...outputs, [val, label]] })
+									}
 								}}
 							/>
-							{selectedEvents.map((item) => (
-								<Group key={item} position="apart">
-									{EVENTS.find((e) => e.value === item)?.label ?? item}
+							{outputs.map(([key, desc]) => (
+								<Group key={key} position="apart">
+									{desc}
 									<ActionIcon
 										color="gray"
 										onClick={() => {
-											updateState({ outputs: outputs.filter((e) => e.description !== item) })
+											updateState({ outputs: outputs.filter((e) => e[0] !== key) })
 										}}
 									>
 										<IconX size={12} />
@@ -155,46 +144,28 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						clearable
 						label={__('Provide full JSON description', 'inseri-core')}
 						data={options}
-						value={inputFull.key}
+						value={inputFull}
 						searchable
-						onChange={(key) => updateState({ inputFull: key ? availableBeacons[key] : defaultInput })}
+						onChange={(key) => updateState({ inputFull: key ?? '' })}
 					/>
 
 					<Accordion multiple value={openItems} onChange={setOpenItems} styles={{ label: { fontSize: '14px' } }}>
 						<Accordion.Item value="data">
 							<Accordion.Control>{__('Override data separately', 'inseri-core')}</Accordion.Control>
 							<Accordion.Panel>
-								<Select
-									clearable
-									data={options}
-									value={inputData.key}
-									searchable
-									onChange={(key) => updateState({ inputData: key ? availableBeacons[key] : defaultInput })}
-								/>
+								<Select clearable data={options} value={inputData} searchable onChange={(key) => updateState({ inputData: key ?? '' })} />
 							</Accordion.Panel>
 						</Accordion.Item>
 						<Accordion.Item value="layout">
 							<Accordion.Control>{__('Override layout separately', 'inseri-core')}</Accordion.Control>
 							<Accordion.Panel>
-								<Select
-									clearable
-									data={options}
-									value={inputLayout.key}
-									searchable
-									onChange={(key) => updateState({ inputLayout: key ? availableBeacons[key] : defaultInput })}
-								/>
+								<Select clearable data={options} value={inputLayout} searchable onChange={(key) => updateState({ inputLayout: key ?? '' })} />
 							</Accordion.Panel>
 						</Accordion.Item>
 						<Accordion.Item value="config">
 							<Accordion.Control>{__('Provide config', 'inseri-core')}</Accordion.Control>
 							<Accordion.Panel>
-								<Select
-									clearable
-									data={options}
-									value={inputConfig.key}
-									searchable
-									onChange={(key) => updateState({ inputConfig: key ? availableBeacons[key] : defaultInput })}
-								/>
+								<Select clearable data={options} value={inputConfig} searchable onChange={(key) => updateState({ inputConfig: key ?? '' })} />
 							</Accordion.Panel>
 						</Accordion.Item>
 					</Accordion>
@@ -214,9 +185,11 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'plotly'}>
-			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
-				<EditComponent {...props} />
-			</StateProvider>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name}>
+				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
+					<EditComponent {...props} />
+				</StateProvider>
+			</InseriRoot>
 		</SetupEditorEnv>
 	)
 }
