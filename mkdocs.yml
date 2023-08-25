@@ -1,4 +1,4 @@
-site_name: Documentation for inseri core (beta)
+site_name: Documentation for inseri core <sup>beta</sub>
 repo_url: https://github.com/inseri-swiss/inseri-core-wp
 nav:
   - "getting-started.md"
