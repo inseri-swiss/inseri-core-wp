@@ -7,7 +7,7 @@ You can check out the result of this tutorial on [inseri.swiss](https://inseri.s
 
 ## Step 1: Create a new post
 
-On your inseri instance or in the playground (remember, your changes will not be saved there), add a new post (see the figure below) and give it a title.
+On your inseri instance or in the [playground](https://inseri.swiss/playground/) (remember, your changes will not be saved there), add a new post (see the figure below) and give it a title.
 In this example, we call the post "Image selection". You can type this at "Add title...".
 
 <figure markdown>
