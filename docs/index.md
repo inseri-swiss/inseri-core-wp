@@ -1,4 +1,4 @@
-# inseri
+# inseri core
 
 ## Introduction
 
