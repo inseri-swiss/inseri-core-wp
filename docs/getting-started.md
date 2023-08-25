@@ -6,7 +6,7 @@ inseri core for WordPress is available as an official [WordPress plugin](https:/
 
 If you have an WordPress deployment, simply follow [Finding and Installing Plugins](https://wordpress.org/documentation/article/manage-plugins/#finding-and-installing-plugins-1).
 
-Alternatively you can check out the functionalities in the [playground](https://playground.inseri.swiss/).
+Alternatively you can check out the functionalities in the [playground](https://inseri.swiss/playground/).
 Be aware that changes there are temporary and will be gone after a page refresh.
 
 ## WordPress Posts and Pages
