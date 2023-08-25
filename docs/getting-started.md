@@ -9,12 +9,12 @@ If you have an WordPress deployment, simply follow [Finding and Installing Plugi
 Alternatively you can check out the functionalities in the [playground](https://playground.inseri.swiss/).
 Be aware that changes there are temporary and will be gone after a page refresh.
 
-## WordPress Posts
+## WordPress Posts and Pages
 
-The typical use case with WordPress and inseri is to write a [post](https://wordpress.com/support/post-vs-page/) consisting of several [blocks](https://wordpress.org/support/article/blocks/).
-For saving, previewing, and upating posts, follow the description about the [WordPress Block Editor](https://wordpress.org/support/article/wordpress-editor/).
+The typical use case with WordPress and inseri is to write a [post or page](https://wordpress.com/support/post-vs-page/) consisting of several [blocks](https://wordpress.org/support/article/blocks/).
+For saving, previewing, and upating posts or pages, follow the description about the [WordPress Block Editor](https://wordpress.org/support/article/wordpress-editor/).
 
-The further documentation will always assume that you already have a post to work on.
+The further documentation will always assume that you already have a post or page to work on, and we will call it simply post.
 
 ## Adding inseri blocks to a post
 
