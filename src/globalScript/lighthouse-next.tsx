@@ -219,7 +219,7 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 	}, [keys.join(), joinedBlockIds])
 }
 interface WatchBase {
-	onBlockRemoved?: (key: string) => void
+	onBlockRemoved?: (name: string) => void
 }
 interface FullWatchOps<A, B> extends WatchBase {
 	onNone: (key: string) => B
@@ -227,11 +227,11 @@ interface FullWatchOps<A, B> extends WatchBase {
 }
 
 const mapToWatchResult =
-	<A, B>(longKeys: string[], areKeysArray: boolean, ops?: WatchBase | FullWatchOps<A, B>) =>
+	<A, B>(keysByName: Record<string, string>, isRecord: boolean, ops?: WatchBase | FullWatchOps<A, B>) =>
 	(root: Root) => {
-		let watchedVals: [string, any][] = longKeys
-			.map((key) => [key, ...key.split('/')])
-			.map(([fullKey, blockId, atomKey]) => [fullKey, root[blockId]?.atoms[atomKey]?.content ?? none])
+		let watchedVals: [string, any][] = Object.entries(keysByName)
+			.map(([name, key]) => [name, ...key.split('/')])
+			.map(([name, blockId, atomKey]) => [name, root[blockId]?.atoms[atomKey]?.content ?? none])
 
 		if (ops && 'onNone' in ops && 'onSome' in ops) {
 			watchedVals = watchedVals.map((pair: [string, Option<Nucleus<A>>]) => [
@@ -243,33 +243,36 @@ const mapToWatchResult =
 			])
 		}
 
-		if (areKeysArray) {
-			return watchedVals.reduce((accumulator, [fullKey, val]) => ({ ...accumulator, [fullKey]: val }), {} as Record<string, any>)
+		if (isRecord) {
+			return watchedVals.reduce((accumulator, [name, val]) => ({ ...accumulator, [name]: val }), {} as Record<string, any>)
 		}
 
 		return watchedVals[0][1]
 	}
 
 function useWatch<A = any>(key: string, ops?: WatchBase): Option<Nucleus<A>>
-function useWatch<A = any>(keys: string[], ops?: WatchBase): Record<string, Option<Nucleus<A>>>
+function useWatch<A = any>(keys: Record<string, string>, ops?: WatchBase): Record<string, Option<Nucleus<A>>>
 
 function useWatch<A = any, B = any>(key: string, ops?: FullWatchOps<A, B>): B
-function useWatch<A = any, B = any>(keys: string[], ops?: FullWatchOps<A, B>): Record<string, B>
+function useWatch<A = any, B = any>(keys: Record<string, string>, ops?: FullWatchOps<A, B>): Record<string, B>
 
-function useWatch<A = any, B = any>(keys: string | string[], ops?: WatchBase | FullWatchOps<A, B>): any {
+function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?: WatchBase | FullWatchOps<A, B>): any {
 	type ResultType = Option<Nucleus<A>> | B
 
 	const onBlockRemoved = ops?.onBlockRemoved
-	const areKeysArray = typeof keys !== 'string'
+	const isRecord = typeof keys !== 'string'
 
-	const longKeys = areKeysArray ? keys : [keys]
+	const longKeys = isRecord ? Object.values(keys) : [keys]
+	const names = isRecord ? Object.keys(keys) : ['']
+	const keysByName = isRecord ? keys : { '': keys }
+
 	const initRoot = blockStoreSubject.getValue()
-	const [state, setState] = useState<Record<string, ResultType> | ResultType>(() => mapToWatchResult(longKeys, areKeysArray, ops)(initRoot))
+	const [state, setState] = useState<Record<string, ResultType> | ResultType>(() => mapToWatchResult(keysByName, isRecord, ops)(initRoot))
 
 	useEffect(() => {
-		const onBlockRemovedSubs = longKeys
-			.map((key) => [key, ...key.split('/')])
-			.map(([key, blockId, atomKey]) =>
+		const onBlockRemovedSubs = Object.entries(keysByName)
+			.map(([name, key]) => [name, ...key.split('/')])
+			.map(([name, blockId, atomKey]) =>
 				blockStoreSubject
 					.pipe(
 						map((root) => root[blockId]?.atoms?.[atomKey]),
@@ -277,18 +280,18 @@ function useWatch<A = any, B = any>(keys: string | string[], ops?: WatchBase | F
 					)
 					.subscribe(([old, current]) => {
 						if (onBlockRemoved && !!old && !current) {
-							onBlockRemoved(key)
+							onBlockRemoved(name)
 						}
 					})
 			)
 
-		const valueSubscription = blockStoreSubject.pipe(map(mapToWatchResult(longKeys, areKeysArray, ops))).subscribe(setState)
+		const valueSubscription = blockStoreSubject.pipe(map(mapToWatchResult(keysByName, isRecord, ops))).subscribe(setState)
 
 		return () => {
 			onBlockRemovedSubs.forEach((s) => s.unsubscribe())
 			valueSubscription.unsubscribe()
 		}
-	}, [longKeys.join()])
+	}, [longKeys.join(), names.join()])
 
 	return state
 }
