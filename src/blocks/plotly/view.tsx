@@ -45,57 +45,46 @@ export default function View({ renderResizable }: ViewProps) {
 
 	const publishRecord = usePublish(outputs.map((i) => ({ key: i[0], description: i[1] })))
 
-	const reverseMap = new Map(
-		[
-			[inputFull, 'inputFull'],
-			[inputData, 'inputData'],
-			[inputLayout, 'inputLayout'],
-			[inputConfig, 'inputConfig'],
-		].filter(([key]) => !!key) as [string, string][]
+	useWatch(
+		{ inputFull, inputData, inputLayout, inputConfig },
+		{
+			onBlockRemoved: (keyName) => {
+				updateState({ [keyName]: '', isWizardMode: true })
+			},
+			onNone: (keyName: string) => {
+				switch (keyName) {
+					case 'inputFull':
+						setFull({ data: [], layout: {} })
+						break
+					case 'inputData':
+						setData([])
+						break
+					case 'inputLayout':
+						setLayout({})
+						break
+					case 'inputConfig':
+						setConfig({})
+						break
+				}
+			},
+			onSome: ({ value }: Nucleus<any>, keyName: string) => {
+				switch (keyName) {
+					case 'inputFull':
+						setFull({ data: value?.data, layout: prepareLayout(value?.layout ?? {}) })
+						break
+					case 'inputData':
+						setData(cloneDeep(value ?? []))
+						break
+					case 'inputLayout':
+						setLayout(prepareLayout(value ?? {}))
+						break
+					case 'inputConfig':
+						setConfig(prepareConfig(value ?? {}))
+						break
+				}
+			},
+		}
 	)
-
-	useWatch([inputFull, inputData, inputLayout, inputConfig], {
-		onBlockRemoved: (fullKey) => {
-			const keyName = reverseMap.get(fullKey) ?? ''
-			updateState({ [keyName]: '', isWizardMode: true })
-		},
-		onNone: (fullKey: string) => {
-			const keyName = reverseMap.get(fullKey) ?? ''
-
-			switch (keyName) {
-				case 'inputFull':
-					setFull({ data: [], layout: {} })
-					break
-				case 'inputData':
-					setData([])
-					break
-				case 'inputLayout':
-					setLayout({})
-					break
-				case 'inputConfig':
-					setConfig({})
-					break
-			}
-		},
-		onSome: ({ value }: Nucleus<any>, fullKey: string) => {
-			const keyName = reverseMap.get(fullKey) ?? ''
-
-			switch (keyName) {
-				case 'inputFull':
-					setFull({ data: value?.data, layout: prepareLayout(value?.layout ?? {}) })
-					break
-				case 'inputData':
-					setData(cloneDeep(value ?? []))
-					break
-				case 'inputLayout':
-					setLayout(prepareLayout(value ?? {}))
-					break
-				case 'inputConfig':
-					setConfig(prepareConfig(value ?? {}))
-					break
-			}
-		},
-	})
 
 	const preparedData = data.length === 0 ? full.data : data
 	const preparedLayout = Object.keys(layout).length === 0 ? full.layout : layout
