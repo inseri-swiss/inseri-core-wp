@@ -19,3 +19,5 @@ For more details please see [Pyodide - Installing packages](https://pyodide.org/
 
 `requests` package is not available in Pyodide. However you can fetch a given url using the `pyodide.http` built-in module. </br>
 For more details please see [pyodide.http API](https://pyodide.org/en/stable/usage/api/python-api/http.html){:target="\_blank"}.
+
+For a fully working example see [Python and Requests Package](https://inseri.swiss/2023/08/python-and-requests/){:target="\_blank"}.
