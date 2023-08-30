@@ -2,7 +2,6 @@ site_name: Documentation for inseri core <sup>beta</sub>
 site_url: https://docs.inseri.swiss/
 repo_url: https://github.com/inseri-swiss/inseri-core-wp
 nav:
-  - "inseri.swiss": https://inseri.swiss/
   - "About": "index.md"
   - "getting-started.md"
   - "Tutorials":
@@ -24,6 +23,8 @@ nav:
   - "How to":
     - "how-to/visualizations.md"
     - "how-to/workWithFiles.md"
+  - "inseri.swiss ↗": https://inseri.swiss/
+
 theme:
   name: material
   features:
@@ -45,6 +46,8 @@ theme:
 extra:
   social:
     - icon: material/home
+      link: https://docs.s3it.uzh.ch/
+    - icon: material/arrow-top-right
       link: https://inseri.swiss/
 
 markdown_extensions:
