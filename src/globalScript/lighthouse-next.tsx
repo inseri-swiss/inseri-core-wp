@@ -218,30 +218,31 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 		return {}
 	}, [keys.join(), joinedBlockIds])
 }
-interface WatchBase {
+
+type NoneCb<B> = (key: string) => B
+type SomeCb<A, B> = (nucleus: Nucleus<A>, key: string) => B
+
+interface WatchOps<A = any, B = any> {
 	onBlockRemoved?: (name: string) => void
-}
-interface FullWatchOps<A, B> extends WatchBase {
-	onNone: (key: string) => B
-	onSome: (nucleus: Nucleus<A>, key: string) => B
+	deps?: any[]
+	onNone?: NoneCb<B>
+	onSome?: SomeCb<A, B>
 }
 
 const mapToWatchResult =
-	<A, B>(keysByName: Record<string, string>, isRecord: boolean, ops?: WatchBase | FullWatchOps<A, B>) =>
+	<A, B>(keysByName: Record<string, string>, isRecord: boolean, noneRef: React.MutableRefObject<NoneCb<B>>, someRef: React.MutableRefObject<SomeCb<A, B>>) =>
 	(root: Root) => {
 		let watchedVals: [string, any][] = Object.entries(keysByName)
 			.map(([name, key]) => [name, ...key.split('/')])
 			.map(([name, blockId, atomKey]) => [name, root[blockId]?.atoms[atomKey]?.content ?? none])
 
-		if (ops && 'onNone' in ops && 'onSome' in ops) {
-			watchedVals = watchedVals.map((pair: [string, Option<Nucleus<A>>]) => [
-				pair[0],
-				pair[1].fold(
-					() => ops.onNone(pair[0]),
-					(a) => ops.onSome(a, pair[0])
-				),
-			])
-		}
+		watchedVals = watchedVals.map((pair: [string, Option<Nucleus<A>>]) => [
+			pair[0],
+			pair[1].fold(
+				() => noneRef.current(pair[0]),
+				(a) => someRef.current(a, pair[0])
+			),
+		])
 
 		if (isRecord) {
 			return watchedVals.reduce((accumulator, [name, val]) => ({ ...accumulator, [name]: val }), {} as Record<string, any>)
@@ -250,15 +251,12 @@ const mapToWatchResult =
 		return watchedVals[0][1]
 	}
 
-function useWatch<A = any>(key: string, ops?: WatchBase): Option<Nucleus<A>>
-function useWatch<A = any>(keys: Record<string, string>, ops?: WatchBase): Record<string, Option<Nucleus<A>>>
+const NullFn = () => null
+const IdentityFn = (a: Nucleus<any>) => a.value
 
-function useWatch<A = any, B = any>(key: string, ops?: FullWatchOps<A, B>): B
-function useWatch<A = any, B = any>(keys: Record<string, string>, ops?: FullWatchOps<A, B>): Record<string, B>
-
-function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?: WatchBase | FullWatchOps<A, B>): any {
-	type ResultType = Option<Nucleus<A>> | B
-
+function useWatch<A = any, B = any>(key: string, ops?: WatchOps): B
+function useWatch<A = any, B = any>(keys: Record<string, string>, ops?: WatchOps): Record<string, B>
+function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?: WatchOps<A, B>): any {
 	const onBlockRemoved = ops?.onBlockRemoved
 	const isRecord = typeof keys !== 'string'
 
@@ -266,8 +264,18 @@ function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?:
 	const names = isRecord ? Object.keys(keys) : ['']
 	const keysByName = isRecord ? keys : { '': keys }
 
+	const someRef = useRef(ops?.onSome ?? IdentityFn)
+	const noneRef = useRef(ops?.onNone ?? NullFn)
+
 	const initRoot = blockStoreSubject.getValue()
-	const [state, setState] = useState<Record<string, ResultType> | ResultType>(() => mapToWatchResult(keysByName, isRecord, ops)(initRoot))
+	const [state, setState] = useState<Record<string, B> | B>(() => mapToWatchResult(keysByName, isRecord, noneRef, someRef)(initRoot))
+
+	const deps = ops?.deps ?? []
+
+	useEffect(() => {
+		someRef.current = ops?.onSome ?? IdentityFn
+		noneRef.current = ops?.onNone ?? NullFn
+	}, [...deps])
 
 	useEffect(() => {
 		const onBlockRemovedSubs = Object.entries(keysByName)
@@ -285,7 +293,7 @@ function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?:
 					})
 			)
 
-		const valueSubscription = blockStoreSubject.pipe(map(mapToWatchResult(keysByName, isRecord, ops))).subscribe(setState)
+		const valueSubscription = blockStoreSubject.pipe(map(mapToWatchResult(keysByName, isRecord, noneRef, someRef))).subscribe(setState)
 
 		return () => {
 			onBlockRemovedSubs.forEach((s) => s.unsubscribe())

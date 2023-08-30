@@ -49,6 +49,7 @@ export default function View({ renderResizable, imageRef, isSelected }: ViewProp
 		onBlockRemoved: () => {
 			updateState({ isWizardMode: true, inputKey: '' })
 		},
+		deps: [prevImageUrl],
 	})
 
 	const isUrlEmpty = !imageUrl

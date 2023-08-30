@@ -1,4 +1,3 @@
-import { useWatchMany } from '@inseri/lighthouse'
 import { useDisclosure } from '@mantine/hooks'
 import { IconEye, IconPencil, IconPlayerPlay, IconX } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
@@ -11,14 +10,15 @@ interface Props {
 }
 
 export function TopBar({ code, showPopover }: Props) {
-	const { label, actions, workerStatus, inputs, blockerr, outputs, editable, mode } = useGlobalState((state: GlobalState) => state)
+	const { label, actions, workerStatus, hasInputError, inputerr, outputs, editable, mode } = useGlobalState((state: GlobalState) => state)
 	const { runCode, terminate } = actions
 	const [isPopoverOpen, { close: closePopover, open: openPopover }] = useDisclosure(false)
 
-	const watchedValues = useWatchMany(inputs)
-	const areWatchedValuesReady = Object.values(watchedValues).reduce((acc, item) => acc && item.status === 'ready', true)
-	const areOutputsReady = outputs.every((o) => o.contentType !== '')
-	const isReady = areWatchedValuesReady && areOutputsReady && workerStatus !== 'initial'
+	const areInputsReady = Object.values(hasInputError).every((b) => !b)
+	const areOutputsReady = outputs.every((o) => o[1] !== '')
+	const outputErrText = 'Content type is not set for all outputs'
+
+	const isReady = areInputsReady && areOutputsReady && workerStatus !== 'initial'
 	const isCodeEditable = mode === 'editor' && editable
 
 	const primaryButton = showPopover ? (
@@ -51,9 +51,9 @@ export function TopBar({ code, showPopover }: Props) {
 		<>
 			{label.trim() && <Text fz={14}>{label}</Text>}
 			<div style={{ flex: 1 }} />
-			{blockerr && (
+			{(inputerr || !areOutputsReady) && (
 				<Text color="red" fz={12}>
-					{blockerr}
+					{inputerr || outputErrText}
 				</Text>
 			)}
 			{workerStatus !== 'ready' && <Loader p={6} />}
