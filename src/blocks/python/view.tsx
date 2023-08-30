@@ -1,10 +1,9 @@
-import { useControlTower, useDispatchMany, useWatch, useWatchMany } from '@inseri/lighthouse'
+import { Nucleus, usePublish, useWatch } from '@inseri/lighthouse-next'
 import { usePrevious } from '@mantine/hooks'
 import { useCallback, useEffect } from '@wordpress/element'
 import { Box, CodeEditor, Group, useGlobalState } from '../../components'
 import { TopBar } from './TopBar'
 import { Action } from './WorkerActions'
-import config from './block.json'
 import { Attributes } from './index'
 import { GlobalState } from './state'
 
@@ -17,79 +16,88 @@ interface ViewProps {
 
 export default function View(props: ViewProps) {
 	const { isGutenbergEditor, isSelected, renderResizable } = props
-	const { height, editable, mode, inputCode, content, inputs, pyWorker, blockId, blockName, outputs, isVisible, autoTrigger, workerStatus } = useGlobalState(
-		(state: GlobalState) => state
-	)
+	const {
+		inputerr,
+		height,
+		editable,
+		mode,
+		inputCode,
+		inputRecord,
+		content,
+		inputs,
+		pyWorker,
+		outputs,
+		isVisible,
+		autoTrigger,
+		workerStatus,
+		hasInputError,
+		inputRevision,
+	} = useGlobalState((state: GlobalState) => state)
 	const { updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
 	const prevWorkerStatus = usePrevious(workerStatus)
 
-	const { value, status } = useWatch(inputCode)
-	const watchedValues = useWatchMany(inputs)
-	const watchedValuesIndicator = Object.values(watchedValues).reduce((acc, item) => acc + (item ? JSON.stringify(item).length : 0), 0)
-	const areWatchedValuesReady = Object.values(watchedValues).reduce((acc, item) => acc && item.status === 'ready', true)
-	const joinedOutputKeys = outputs.map((o) => o.description).join('')
-	const areOutputsReady = outputs.every((o) => o.contentType !== '')
+	useWatch(inputs, {
+		onBlockRemoved: (varName) => {
+			updateState({
+				inputerr: `Input for ${varName} is not available anymore`,
+				hasInputError: { ...hasInputError, [varName]: true },
+			})
+		},
+		onNone: (varName: string) => {
+			updateState({
+				inputerr: `Input for ${varName} is not ready`,
+				hasInputError: { ...hasInputError, [varName]: true },
+			})
+		},
+		onSome: (nucleus: Nucleus<any>, varName: string) => {
+			const newInputError = { ...hasInputError, [varName]: false }
+			const hasNoError = Object.values(newInputError).every((b) => !b)
+
+			const newInputRecord = { ...inputRecord, [varName]: nucleus.value }
+
+			updateState({
+				inputerr: hasNoError ? '' : inputerr,
+				hasInputError: newInputError,
+				inputRecord: newInputRecord,
+				inputRevision: inputRevision + 1,
+			})
+		},
+		deps: [inputRevision, hasInputError, inputRecord, inputerr],
+	})
+
+	const areInputsReady = Object.values(hasInputError).every((b) => !b)
+	const publishRecord = usePublish(outputs.map((i) => ({ key: i[0], description: i[0] })))
+	const areOutputsReady = outputs.every((o) => o[1] !== '')
 
 	useEffect(() => {
-		if (!areWatchedValuesReady) {
-			updateState({ blockerr: 'Inputs are not ready' })
-		} else if (!areOutputsReady) {
-			updateState({ blockerr: 'Content type is not set for all outputs' })
-		} else {
-			updateState({ blockerr: '' })
+		if (areInputsReady) {
+			pyWorker.postMessage({ type: 'SET_INPUTS', payload: inputRecord })
 		}
-	}, [areWatchedValuesReady, areOutputsReady])
+	}, [inputRevision])
+
+	const outputKeys = outputs.map((o) => o[0])
 
 	useEffect(() => {
-		if (areWatchedValuesReady) {
-			const watchedInputs = Object.entries(watchedValues).reduce((acc, [variable, watched]) => {
-				acc[variable] = watched.value
-				return acc
-			}, {} as any)
-
-			pyWorker.postMessage({ type: 'SET_INPUTS', payload: watchedInputs })
-		}
-	}, [watchedValuesIndicator, areWatchedValuesReady])
-
-	useEffect(() => {
-		pyWorker.postMessage({ type: 'SET_OUTPUTS', payload: outputs.map((o) => o.description) })
-	}, [joinedOutputKeys])
-
-	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, outputs)
-	const joinedOutputTypes = outputs.map((o) => o.contentType).join('')
-	const joinedProducerKeys = producersBeacons.reduce((acc, b) => acc + b.key, '')
-	const joinedKeys = outputs.reduce((acc, b) => acc + b.key, '')
-
-	useEffect(() => {
-		if (joinedProducerKeys !== joinedKeys) {
-			updateState({ outputs: producersBeacons })
-		}
-	}, [joinedProducerKeys])
-
-	const dispatchRecord = useDispatchMany(producersBeacons)
-
-	useEffect(() => {
-		outputs.forEach((o) => {
-			dispatchRecord[o.description]({ contentType: o.contentType })
-		})
-	}, [joinedOutputTypes])
+		pyWorker.postMessage({ type: 'SET_OUTPUTS', payload: outputKeys })
+	}, [outputKeys.join()])
 
 	const pyDispatcher = useCallback(
 		(message: MessageEvent<Action>) => {
 			if (message?.data?.type === 'SET_RESULTS') {
 				Object.entries(message.data.payload).forEach(([key, val]) => {
+					const contentType = outputs.find((o) => o[0] === key)![1]
 					let convertedData = val
+
 					if (convertedData instanceof Uint8Array) {
-						const found = outputs.find((o) => o.description === key)
-						convertedData = new Blob([convertedData.buffer], { type: found!.contentType })
+						convertedData = new Blob([convertedData.buffer], { type: contentType })
 					}
 
-					dispatchRecord[key]({ status: 'ready', value: convertedData })
+					publishRecord[key][0](convertedData, contentType)
 				})
 			}
 		},
-		[Object.keys(dispatchRecord).join('')]
+		[outputKeys.join('')]
 	)
 
 	useEffect(() => {
@@ -97,23 +105,23 @@ export default function View(props: ViewProps) {
 		return () => pyWorker.removeEventListener('message', pyDispatcher)
 	}, [pyDispatcher])
 
-	let preparedValue = value
+	const watchedCode = useWatch(inputCode, {
+		onBlockRemoved: () => updateState({ inputCode: '', isWizardMode: true, wizardStep: 1, mode: '' }),
+		onNone: () => '',
+		onSome: ({ value, contentType }: Nucleus<any>) => (contentType.includes('python') ? value : ''),
+	})
 
-	if ((status !== 'ready' && status !== 'initial') || !preparedValue) {
-		preparedValue = ''
-	}
-
-	const code = mode === 'viewer' ? preparedValue : content
+	const code = mode === 'viewer' ? watchedCode : content
 
 	// must be the last useEffect
 	useEffect(() => {
-		if (autoTrigger && areWatchedValuesReady && areOutputsReady && workerStatus === 'ready' && prevWorkerStatus !== 'in-progress') {
+		if (autoTrigger && areInputsReady && areOutputsReady && workerStatus === 'ready' && prevWorkerStatus !== 'in-progress') {
 			runCode(code)
 		}
 	}, [
-		areWatchedValuesReady,
+		areInputsReady,
 		areOutputsReady,
-		watchedValuesIndicator,
+		inputRevision,
 		content,
 		workerStatus,
 	])

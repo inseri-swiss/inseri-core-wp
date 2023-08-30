@@ -11,12 +11,8 @@
 			"default": ""
 		},
 		"inputCode": {
-			"type": "object",
-			"default": {
-				"key": "",
-				"contentType": "",
-				"description": ""
-			}
+			"type": "string",
+			"default": ""
 		},
 		"inputs": {
 			"type": "object",

@@ -5,17 +5,16 @@ import { registerBlockType } from '@wordpress/blocks'
 import 'allotment/dist/style.css'
 import stringify from 'json-stable-stringify'
 import 'prismjs/themes/prism.css'
-import { ConsumerBeacon } from '../../globalScript'
 import json from './block.json'
 import Edit from './edit'
 
 const { name, ...settings } = json as any
 
 export interface Attributes {
-	blockId?: string
-	inputCode: ConsumerBeacon
-	inputs: Record<string, ConsumerBeacon>
-	outputs: ConsumerBeacon[]
+	blockId: string
+	inputCode: string
+	inputs: Record<string, string>
+	outputs: [string /* key */, string /* contentType */][]
 	blockName: string
 	height: number
 	editable: boolean

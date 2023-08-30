@@ -1,4 +1,4 @@
-import { useAvailableBeacons, useWatch } from '@inseri/lighthouse'
+import { Nucleus, useDiscover, useWatch } from '@inseri/lighthouse-next'
 import { useHotkeys } from '@mantine/hooks'
 import { IconChevronDown, IconChevronRight, IconChevronUp, IconPlus, IconX } from '@tabler/icons-react'
 import { useRef, useState } from '@wordpress/element'
@@ -6,9 +6,9 @@ import { __ } from '@wordpress/i18n'
 import type { AllotmentHandle } from 'allotment'
 import { Allotment } from 'allotment'
 import { ActionIcon, Box, Button, CodeEditor, Group, Modal, SelectWithAction, Stack, Text, TextInput, createStyles, useGlobalState } from '../../components'
-import { COMMON_CONTENT_TYPES, isVariableValid, Z_INDEX_ABOVE_ADMIN } from '../../utils'
-import { GlobalState } from './state'
+import { COMMON_CONTENT_TYPES, Z_INDEX_ABOVE_ADMIN, isVariableValid } from '../../utils'
 import { TopBar } from './TopBar'
+import { GlobalState } from './state'
 
 const isReadyForCreate = (varName: string, keys: string[]): boolean => {
 	const nameIsNotUsed = !keys.includes(varName)
@@ -24,7 +24,6 @@ const useStyles = createStyles(() => ({
 
 export function ExtendedView() {
 	const {
-		blockId,
 		blockName,
 		actions: stateActions,
 		isModalOpen,
@@ -46,25 +45,21 @@ export function ExtendedView() {
 	const isNewInputNameReady = isReadyForCreate(newInputVarName, Object.keys(inputs))
 	const isNewOutputNameReady = isReadyForCreate(
 		newOutputVarName,
-		outputs.map((i) => i.description)
+		outputs.map((i) => i[0])
 	)
 
 	const { modalInner } = useStyles().classes
 
 	const isViewerMode = mode === 'viewer'
-	const availableBeacons = useAvailableBeacons()
-	const selectData = Object.keys(availableBeacons)
-		.filter((k) => !k.startsWith(blockId + '/'))
-		.map((k) => ({ label: availableBeacons[k].description, value: k }))
 
-	const { value, status } = useWatch(inputCode)
-	let preparedValue = value
+	const sources = useDiscover({ contentTypeFilter: '' })
+	const options = sources.map((item) => ({ label: item.description, value: item.key }))
 
-	if ((status !== 'ready' && status !== 'initial') || !preparedValue) {
-		preparedValue = ''
-	}
-
-	const code = isViewerMode ? preparedValue : content
+	const watchedCode = useWatch(inputCode, {
+		onNone: () => '',
+		onSome: ({ value, contentType }: Nucleus<any>) => (contentType.includes('python') ? value : ''),
+	})
+	const code = isViewerMode ? watchedCode : content
 
 	useHotkeys([
 		['Escape', () => updateState({ isModalOpen: false })],
@@ -162,11 +157,11 @@ export function ExtendedView() {
 													label={varName}
 													placeholder="Choose a block source"
 													title="Remove variable"
-													value={inputs[varName].key}
-													onChange={(key) => chooseInput(varName, availableBeacons[key!])}
+													value={inputs[varName]}
+													onChange={(key) => chooseInput(varName, key ?? '')}
 													onClick={() => removeInput(varName)}
 													icon={<IconX size={16} />}
-													data={selectData}
+													data={options}
 													maxDropdownHeight={150}
 												/>
 											))}
@@ -205,7 +200,7 @@ export function ExtendedView() {
 									</Button>
 									<div style={{ overflow: 'auto', height: '100%' }}>
 										<Stack p="sm">
-											{outputs.map(({ description: varName, contentType }) => (
+											{outputs.map(([varName, contentType]) => (
 												<SelectWithAction
 													key={varName}
 													label={varName}

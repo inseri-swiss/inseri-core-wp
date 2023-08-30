@@ -1,4 +1,4 @@
-import { useAvailableBeacons, useWatch } from '@inseri/lighthouse'
+import { InseriRoot, useDiscover } from '@inseri/lighthouse-next'
 import { IconBrandPython, IconChevronLeft, IconWindowMaximize } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -16,23 +16,14 @@ import View from './view'
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { inputCode, label, mode, blockId, blockName, editable, isWizardMode, selectedMode, wizardStep, actions, isModalOpen, isVisible, autoTrigger } =
-		useGlobalState((state: GlobalState) => state)
-	const { updateState } = actions
-	const isValueSet = mode === 'editor' || (!!mode && inputCode.key)
-	const inputBeaconKey = inputCode.key
+	const { inputCode, label, mode, blockName, editable, isWizardMode, selectedMode, wizardStep, isModalOpen, isVisible, autoTrigger } = useGlobalState(
+		(state: GlobalState) => state
+	)
+	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
+	const isValueSet = mode === 'editor' || (!!mode && !!inputCode)
 
-	const availableBeacons = useAvailableBeacons('python')
-	const selectData = Object.keys(availableBeacons)
-		.filter((k) => !k.startsWith(blockId + '/'))
-		.map((k) => ({ label: availableBeacons[k].description, value: k }))
-
-	const { status } = useWatch(inputCode)
-	useEffect(() => {
-		if (status === 'unavailable') {
-			updateState({ input: { ...inputCode, key: '' }, isWizardMode: true, wizardStep: 1, mode: '' })
-		}
-	}, [status])
+	const sources = useDiscover({ contentTypeFilter: 'python' })
+	const options = sources.map((item) => ({ label: item.description, value: item.key }))
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -161,9 +152,9 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						<>
 							<Select
 								label={__('Display code by selecting a block source', 'inseri-core')}
-								data={selectData}
-								value={inputBeaconKey}
-								onChange={(key) => updateState({ inputCode: availableBeacons[key!], isWizardMode: false, mode: 'viewer' })}
+								data={options}
+								value={inputCode}
+								onChange={(key) => updateState({ inputCode: key ?? '', isWizardMode: false, mode: 'viewer' })}
 								mb="lg"
 							/>
 							<Button
@@ -189,9 +180,11 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'python'}>
-			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
-				<EditComponent {...props} />
-			</StateProvider>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name}>
+				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
+					<EditComponent {...props} />
+				</StateProvider>
+			</InseriRoot>
 		</SetupEditorEnv>
 	)
 }

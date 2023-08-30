@@ -1,4 +1,3 @@
-import { ConsumerBeacon } from '@inseri/lighthouse'
 import type { Draft } from 'immer'
 import { immer } from 'zustand/middleware/immer'
 import { Attributes } from './index'
@@ -10,7 +9,10 @@ export interface GlobalState extends Attributes {
 	pyWorker: Worker
 	workerStatus: 'initial' | 'ready' | 'in-progress'
 	stdStream: string
-	blockerr: string
+	inputerr: string
+	hasInputError: Record<string, boolean>
+	inputRecord: Record<string, any>
+	inputRevision: number
 
 	isModalOpen: boolean
 	isWizardMode: boolean
@@ -26,7 +28,7 @@ export interface GlobalState extends Attributes {
 		terminate: () => void
 
 		addNewInput: () => void
-		chooseInput: (variable: string, beacon: ConsumerBeacon) => void
+		chooseInput: (variable: string, key: string) => void
 		removeInput: (variable: string) => void
 
 		addNewOutput: () => void
@@ -53,7 +55,7 @@ const createWorker = (set: (nextStateOrUpdater: (state: Draft<GlobalState>) => v
 }
 
 export const storeCreator = (initalState: Attributes) => {
-	const isValueSet = initalState.mode === 'editor' || (!!initalState.mode && initalState.inputCode.key)
+	const isValueSet = initalState.mode === 'editor' || (!!initalState.mode && !!initalState.inputCode)
 
 	return immer<GlobalState>((set, get) => {
 		return {
@@ -62,7 +64,10 @@ export const storeCreator = (initalState: Attributes) => {
 			pyWorker: createWorker(set),
 			workerStatus: 'initial',
 			stdStream: '',
-			blockerr: '',
+			inputerr: '',
+			hasInputError: {},
+			inputRecord: {},
+			inputRevision: 0,
 
 			isModalOpen: false,
 			isWizardMode: !isValueSet,
@@ -100,14 +105,14 @@ export const storeCreator = (initalState: Attributes) => {
 
 				addNewInput: () => {
 					set((state) => {
-						state.inputs[state.newInputVarName!] = { key: '', contentType: '', description: '' }
+						state.inputs[state.newInputVarName!] = ''
 						state.newInputVarName = ''
 					})
 				},
 
-				chooseInput: (variable: string, beacon: ConsumerBeacon) => {
+				chooseInput: (variable: string, key: string) => {
 					set((state) => {
-						state.inputs[variable] = beacon
+						state.inputs[variable] = key
 					})
 				},
 
@@ -119,24 +124,23 @@ export const storeCreator = (initalState: Attributes) => {
 
 				addNewOutput: () => {
 					set((state) => {
-						const key = state.newOutputVarName
-						state.outputs.push({ contentType: '', description: key, key })
+						state.outputs.push([state.newOutputVarName, ''])
 						state.newOutputVarName = ''
 					})
 				},
 
 				chooseContentType: (variable: string, contentType: string) => {
 					set((state) => {
-						const found = state.outputs.find((o) => o.description === variable)
+						const found = state.outputs.find((o) => o[0] === variable)
 						if (found) {
-							found.contentType = contentType
+							found[1] = contentType
 						}
 					})
 				},
 
 				removeOutput: (variable: string) => {
 					set((state) => {
-						state.outputs = state.outputs.filter((o) => o.description !== variable)
+						state.outputs = state.outputs.filter((o) => o[0] !== variable)
 					})
 				},
 			},
