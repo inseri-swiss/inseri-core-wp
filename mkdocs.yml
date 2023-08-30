@@ -45,7 +45,7 @@ theme:
 extra:
   social:
     - icon: material/home
-      link: https://docs.s3it.uzh.ch/
+      link: https://docs.inseri.swiss/
     - icon: material/arrow-top-right
       link: https://inseri.swiss/
 
