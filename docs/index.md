@@ -1,8 +1,6 @@
-# inseri core
+# inseri core <sup>beta</sub>
 
-## Introduction
-
-inseri uses special blocks to make content created on WordPress interactive.
+[inseri core](https://wordpress.org/plugins/inseri-core/){:target="\_blank"} for WordPress uses special blocks to make content created on WordPress interactive.
 These blocks are not isolated elements but they can receive input from and give output to other blocks.
 A typical example would start with a text block containing the configuration for a dropdown.
 Selecting one option in the dropdown would provide an API block with the parameters to query data from an external source.

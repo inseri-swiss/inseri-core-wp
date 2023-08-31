@@ -8,7 +8,7 @@ Please see [Python and Plotly](https://inseri.swiss/2023/06/python-and-plotly/){
 
 Please see [Python and Matplotlib](https://inseri.swiss/2023/06/python-and-matplotlib/){:target="\_blank"}.
 
-## Plotly or Matplotlib?
+## Plotly or Matplotlib
 
 inseri supports both Plotly and Matplotlib. Which one you want to use is first of all a matter of taste.
 

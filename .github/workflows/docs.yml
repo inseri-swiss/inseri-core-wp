@@ -12,7 +12,7 @@ jobs:
         with:
           python-version: 3.11
       - run: sudo apt-get install -y graphviz
-      - run: pip install mkdocs
-      - run: pip install mkdocs-material
-      - run: pip install mkdocs-graphviz mkdocs-glightbox
-      - run: mkdocs gh-deploy --force --clean --verbose
+      - name: Install pipenv
+        run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
+      - run: pipenv install
+      - run: pipenv run mkdocs gh-deploy --force --clean --verbose
