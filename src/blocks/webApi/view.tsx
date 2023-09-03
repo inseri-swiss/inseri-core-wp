@@ -1,8 +1,7 @@
-import { useDispatch, useWatch } from '@inseri/lighthouse'
+import { Nucleus, usePublish, useWatch } from '@inseri/lighthouse-next'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Box, Button, Text, useGlobalState } from '../../components'
-import { isBeaconReady } from '../../utils'
 import { DatasourceState } from './AdminState'
 
 interface ViewProps {
@@ -11,87 +10,77 @@ interface ViewProps {
 }
 
 export default function View({ isSelected, isGutenbergEditor }: ViewProps) {
-	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, output, label, isVisible, autoTrigger, parameters } = useGlobalState(
-		(state: DatasourceState) => state
-	)
-	const { overrideMethodUrl, overrideQueryParams, overrideHeaderParams, overrideBody, fireRequest } = useGlobalState((state: DatasourceState) => {
+	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, outputContenType, label, isVisible, autoTrigger, parameters, inputRevision } =
+		useGlobalState((state: DatasourceState) => state)
+	const { overrideMethodUrl, overrideQueryParams, overrideHeaderParams, overrideBody, fireRequest, updateState } = useGlobalState((state: DatasourceState) => {
 		return state.actions
 	})
 	const { urlError, bodyError } = parameters
-	const contentTypeError = !output.contentType ? __('Content type is missing.', 'inseri-core') : ''
+	const contentTypeError = !outputContenType ? __('Content type is missing.', 'inseri-core') : ''
 
-	const dispatch = useDispatch(output)
+	const [publish, setEmpty] = usePublish('data', 'data')
 
 	const triggerRequest = async () => {
-		dispatch({ status: 'loading' })
-
 		const [errorMsg, data] = await fireRequest()
 
 		if (errorMsg) {
-			dispatch({ status: 'error' })
+			setEmpty()
 		} else {
-			dispatch({ status: 'ready', value: data })
+			publish(data, outputContenType)
 		}
 	}
 
-	const watchMethodUrl = useWatch(inputMethodUrl)
-	const watchQueryParams = useWatch(inputQueryParams)
-	const watchHeadersParams = useWatch(inputHeadersParams)
-	const watchBody = useWatch(inputBody)
+	useWatch(
+		{ inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody },
+		{
+			onBlockRemoved: (keyName) => updateState({ [keyName]: '' }),
+			onNone: (keyName: string) => {
+				switch (keyName) {
+					case 'inputMethodUrl':
+						overrideMethodUrl(undefined, undefined)
+						break
+					case 'inputQueryParams':
+						overrideQueryParams(undefined)
+						break
+					case 'inputHeadersParams':
+						overrideHeaderParams(undefined)
+						break
+					case 'inputBody':
+						overrideBody(undefined)
+						break
+				}
+			},
+			onSome: ({ value }: Nucleus<any>, keyName: string) => {
+				updateState({ inputRevision: inputRevision + 1 })
+
+				switch (keyName) {
+					case 'inputMethodUrl':
+						if (typeof value === 'object') {
+							overrideMethodUrl(value.method, value.url)
+						} else {
+							overrideMethodUrl(undefined, value)
+						}
+						break
+					case 'inputQueryParams':
+						overrideQueryParams(value)
+						break
+					case 'inputHeadersParams':
+						overrideHeaderParams(value)
+						break
+					case 'inputBody':
+						overrideBody(value)
+						break
+				}
+			},
+			deps: [inputRevision],
+		}
+	)
 
 	const isCallReady =
-		isBeaconReady(inputMethodUrl, watchMethodUrl) &&
-		isBeaconReady(inputQueryParams, watchQueryParams) &&
-		isBeaconReady(inputHeadersParams, watchHeadersParams) &&
-		isBeaconReady(inputBody, watchBody)
-
-	useEffect(() => {
-		dispatch({ contentType: output.contentType })
-	}, [output.contentType])
-
-	useEffect(() => {
-		if (watchMethodUrl.status === 'ready') {
-			if (typeof watchMethodUrl.value === 'object') {
-				overrideMethodUrl(watchMethodUrl.value.method, watchMethodUrl.value.url)
-			} else {
-				overrideMethodUrl(undefined, watchMethodUrl.value)
-			}
-		}
-
-		if (!inputMethodUrl.key) {
-			overrideMethodUrl(undefined, undefined)
-		}
-	}, [watchMethodUrl.status, watchMethodUrl.value, inputMethodUrl.key])
-
-	useEffect(() => {
-		if (watchQueryParams.status === 'ready') {
-			overrideQueryParams(watchQueryParams.value)
-		}
-
-		if (!inputQueryParams.key) {
-			overrideQueryParams(undefined)
-		}
-	}, [watchQueryParams.status, watchQueryParams.value, inputQueryParams.key])
-
-	useEffect(() => {
-		if (watchHeadersParams.status === 'ready') {
-			overrideHeaderParams(watchHeadersParams.value)
-		}
-
-		if (!inputHeadersParams.key) {
-			overrideHeaderParams(undefined)
-		}
-	}, [watchHeadersParams.status, watchHeadersParams.value, inputHeadersParams.key])
-
-	useEffect(() => {
-		if (watchBody.status === 'ready') {
-			overrideBody(watchBody.value)
-		}
-
-		if (!inputBody.key) {
-			overrideBody(undefined)
-		}
-	}, [watchBody.status, watchBody.value, inputBody.key])
+		(!inputMethodUrl || parameters.isMethodUrlOverridden) &&
+		(!inputQueryParams || parameters.isQueryParamsOverridden) &&
+		(!inputHeadersParams || parameters.isHeaderParamsOverridden) &&
+		(!inputBody || parameters.isBodyOverridden)
 
 	// must be the last useEffect
 	useEffect(() => {
@@ -99,10 +88,7 @@ export default function View({ isSelected, isGutenbergEditor }: ViewProps) {
 			triggerRequest()
 		}
 	}, [
-		watchMethodUrl.value,
-		watchQueryParams.value,
-		watchHeadersParams.value,
-		watchBody.value,
+		inputRevision,
 		isCallReady,
 	])
 

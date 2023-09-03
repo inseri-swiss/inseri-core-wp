@@ -20,6 +20,7 @@ import { Attributes as BlockAttributes } from './index'
 
 interface DatasourceAttributes extends BlockAttributes {
 	openAccordionItems: string[]
+	inputRevision: number
 
 	heading: {
 		pageError: string
@@ -77,6 +78,7 @@ export const datasourceStoreCreator = (initalState: BlockAttributes) => {
 		...initalState,
 
 		openAccordionItems: ['request'],
+		inputRevision: 0,
 
 		heading: {
 			pageError: '',
@@ -103,7 +105,7 @@ export const datasourceStoreCreator = (initalState: BlockAttributes) => {
 		},
 
 		block: {
-			isWizardMode: !initalState.requestParams.url || !initalState.output.contentType,
+			isWizardMode: !initalState.requestParams.url || !initalState.outputContenType,
 			isModalOpen: false,
 		},
 
@@ -171,7 +173,7 @@ export const datasourceStoreCreator = (initalState: BlockAttributes) => {
 
 					set((state) => {
 						if (!state.isContentTypeLock) {
-							state.output.contentType = responseContentType
+							state.outputContenType = responseContentType
 						}
 
 						state.openAccordionItems = Array.from(new Set([...state.openAccordionItems, 'response']))
@@ -191,7 +193,7 @@ export const datasourceStoreCreator = (initalState: BlockAttributes) => {
 			},
 
 			fireRequest: async () => {
-				const { parameters, output } = get()
+				const { parameters, outputContenType } = get()
 				const { url, method, headerParams, queryParams, bodyType, paramsBody, textBody } = parameters
 
 				let body: any = null
@@ -209,7 +211,7 @@ export const datasourceStoreCreator = (initalState: BlockAttributes) => {
 					body = textBody
 				}
 
-				return await fireWebApi(method, url, mapParamsToObject(queryParams), mapParamsToObject(headerParams), body, output.contentType)
+				return await fireWebApi(method, url, mapParamsToObject(queryParams), mapParamsToObject(headerParams), body, outputContenType)
 			},
 
 			updateRequestBodyType: (bodyType: string) => {
