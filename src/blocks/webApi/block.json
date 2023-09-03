@@ -10,44 +10,25 @@
 			"type": "string",
 			"default": ""
 		},
-		"output": {
-			"type": "object",
-			"default": {
-				"key": "",
-				"contentType": ""
-			}
+		"outputContenType": {
+			"type": "string",
+			"default": ""
 		},
 		"inputMethodUrl": {
-			"type": "object",
-			"default": {
-				"key": "",
-				"contentType": "",
-				"description": ""
-			}
+			"type": "string",
+			"default": ""
 		},
 		"inputQueryParams": {
-			"type": "object",
-			"default": {
-				"key": "",
-				"contentType": "",
-				"description": ""
-			}
+			"type": "string",
+			"default": ""
 		},
 		"inputHeadersParams": {
-			"type": "object",
-			"default": {
-				"key": "",
-				"contentType": "",
-				"description": ""
-			}
+			"type": "string",
+			"default": ""
 		},
 		"inputBody": {
-			"type": "object",
-			"default": {
-				"key": "",
-				"contentType": "",
-				"description": ""
-			}
+			"type": "string",
+			"default": ""
 		},
 		"blockName": {
 			"type": "string",

@@ -232,17 +232,16 @@ interface WatchOps<A = any, B = any> {
 const mapToWatchResult =
 	<A, B>(keysByName: Record<string, string>, isRecord: boolean, noneRef: React.MutableRefObject<NoneCb<B>>, someRef: React.MutableRefObject<SomeCb<A, B>>) =>
 	(root: Root) => {
-		let watchedVals: [string, any][] = Object.entries(keysByName)
+		const watchedVals: [string, B][] = Object.entries(keysByName)
 			.map(([name, key]) => [name, ...key.split('/')])
-			.map(([name, blockId, atomKey]) => [name, root[blockId]?.atoms[atomKey]?.content ?? none])
-
-		watchedVals = watchedVals.map((pair: [string, Option<Nucleus<A>>]) => [
-			pair[0],
-			pair[1].fold(
-				() => noneRef.current(pair[0]),
-				(a) => someRef.current(a, pair[0])
-			),
-		])
+			.map(([name, blockId, atomKey]) => [name, root[blockId]?.atoms[atomKey]?.content ?? none] as [string, Option<Nucleus<A>>])
+			.map((pair) => [
+				pair[0],
+				pair[1].fold(
+					() => noneRef.current(pair[0]),
+					(a) => someRef.current(a, pair[0])
+				),
+			])
 
 		if (isRecord) {
 			return watchedVals.reduce((accumulator, [name, val]) => ({ ...accumulator, [name]: val }), {} as Record<string, any>)

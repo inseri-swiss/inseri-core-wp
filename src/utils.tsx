@@ -1,4 +1,3 @@
-import { BaseBeaconState, ConsumerBeacon } from '@inseri/lighthouse'
 import { __ } from '@wordpress/i18n'
 import xmlFormatter from 'xml-formatter'
 import { StateCreator } from 'zustand'
@@ -350,8 +349,6 @@ export function isVariableValid(name: string): boolean {
 
 	return true
 }
-
-export const isBeaconReady = (beacon: ConsumerBeacon, val: BaseBeaconState) => !beacon.key || val.status === 'ready'
 
 export const handleBody = async (blob: Blob, contentType: string) => {
 	let responseBody: any = blob

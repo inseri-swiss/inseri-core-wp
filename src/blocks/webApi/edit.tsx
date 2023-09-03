@@ -1,4 +1,4 @@
-import { useControlTower, useJsonBeacons, useWatch } from '@inseri/lighthouse'
+import { InseriRoot, useDiscover } from '@inseri/lighthouse-next'
 import { useDebouncedValue } from '@mantine/hooks'
 import { IconApi, IconWindowMaximize } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
@@ -25,7 +25,7 @@ import {
 import { DetailViewBody } from '../../components/DetailViewBody'
 import { COMMON_CONTENT_TYPES, PERSISTENT_IDS, Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import { DatasourceState, datasourceStoreCreator } from './AdminState'
-import { default as config, default as json } from './block.json'
+import json from './block.json'
 import { Attributes } from './index'
 import View from './view'
 
@@ -65,20 +65,11 @@ const recordSchema = {
 	},
 }
 
-const defaultInput = {
-	key: '',
-	contentType: '',
-	description: '',
-}
-
-const baseOutputBeacon = [{ contentType: '', description: 'data', key: 'data' }]
-
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 	const {
-		blockId,
 		blockName,
-		output,
+		outputContenType,
 		inputMethodUrl,
 		inputQueryParams,
 		inputHeadersParams,
@@ -94,24 +85,13 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isModalOpen, isWizardMode } = useGlobalState((state: DatasourceState) => state.block)
 	const { updateState } = useGlobalState((state: DatasourceState) => state.actions)
 	const { url, urlError, isMethodUrlOverridden } = parameters
-	const isValueSet = !parameters.urlError && !!requestParams.url && !!output.contentType
+	const isValueSet = !parameters.urlError && !!requestParams.url && !!outputContenType
 
 	const { pidLeftInputWrapper, pidRightInputWrapper } = useStyles().classes
 
-	const availableUrlBeacons = useJsonBeacons(stringSchema, methodUrlSchema)
-	const availableRecordBeacons = useJsonBeacons(recordSchema)
-	const availableStringBeacons = useJsonBeacons(stringSchema)
-
-	const methodUrlOptions = Object.entries(availableUrlBeacons).map(([k, { description }]) => ({ label: description, value: k }))
-	const recordOptions = Object.entries(availableRecordBeacons).map(([k, { description }]) => ({ label: description, value: k }))
-	const bodyOptions = Object.entries(availableStringBeacons).map(([k, { description }]) => ({ label: description, value: k }))
-
-	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, baseOutputBeacon)
-
-	const watchMethodUrl = useWatch(inputMethodUrl)
-	const watchQueryParams = useWatch(inputQueryParams)
-	const watchHeadersParams = useWatch(inputHeadersParams)
-	const watchBody = useWatch(inputBody)
+	const methodUrlOptions = useDiscover({ jsonSchemas: [stringSchema, methodUrlSchema] }).map((item) => ({ label: item.description, value: item.key }))
+	const recordOptions = useDiscover({ jsonSchemas: [recordSchema] }).map((item) => ({ label: item.description, value: item.key }))
+	const bodyOptions = useDiscover({ jsonSchemas: [stringSchema] }).map((item) => ({ label: item.description, value: item.key }))
 
 	const [debouncedUrl] = useDebouncedValue(url, 500)
 	useEffect(() => {
@@ -123,36 +103,6 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 			updateState({ parameters: { urlError: __('invalid URL', 'inseri-core') } })
 		}
 	}, [debouncedUrl])
-
-	useEffect(() => {
-		if (producersBeacons.length > 0 && !output.key) {
-			updateState({ output: producersBeacons[0] })
-		}
-	}, [producersBeacons.length])
-
-	useEffect(() => {
-		if (watchMethodUrl.status === 'unavailable') {
-			updateState({ inputMethodUrl: { ...defaultInput } })
-		}
-	}, [watchMethodUrl.status])
-
-	useEffect(() => {
-		if (watchQueryParams.status === 'unavailable') {
-			updateState({ inputQueryParams: { ...defaultInput } })
-		}
-	}, [watchQueryParams.status])
-
-	useEffect(() => {
-		if (watchHeadersParams.status === 'unavailable') {
-			updateState({ inputHeadersParams: { ...defaultInput } })
-		}
-	}, [watchHeadersParams.status])
-
-	useEffect(() => {
-		if (watchBody.status === 'unavailable') {
-			updateState({ inputBody: { ...defaultInput } })
-		}
-	}, [watchBody.status])
 
 	return (
 		<>
@@ -174,9 +124,9 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					<Stack p="md" style={{ background: '#fff', width: '300px', border: '1px solid #ced4da' }}>
 						<ContentTypeSelect
 							withAsterisk
-							value={output.contentType}
+							value={outputContenType}
 							isLocked={isContentTypeLock}
-							update={(val) => updateState({ output: { contentType: val } })}
+							update={(val) => updateState({ outputContenType: val })}
 							setLocked={(isLocked) => updateState({ isContentTypeLock: isLocked })}
 						/>
 
@@ -204,32 +154,32 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 							label={__('Override method and URL', 'inseri-core')}
 							clearable
 							data={methodUrlOptions}
-							value={inputMethodUrl.key}
-							onChange={(key) => updateState({ inputMethodUrl: key ? availableUrlBeacons[key!] : { ...defaultInput } })}
+							value={inputMethodUrl}
+							onChange={(key) => updateState({ inputMethodUrl: key ?? '' })}
 						/>
 						<Select
 							styles={{ label: { fontWeight: 'normal' } }}
 							label={__('Extend query params', 'inseri-core')}
 							clearable
 							data={recordOptions}
-							value={inputQueryParams.key}
-							onChange={(key) => updateState({ inputQueryParams: key ? availableRecordBeacons[key!] : { ...defaultInput } })}
+							value={inputQueryParams}
+							onChange={(key) => updateState({ inputQueryParams: key ?? '' })}
 						/>
 						<Select
 							styles={{ label: { fontWeight: 'normal' } }}
 							label={__('Extend headers', 'inseri-core')}
 							clearable
 							data={recordOptions}
-							value={inputHeadersParams.key}
-							onChange={(key) => updateState({ inputHeadersParams: key ? availableRecordBeacons[key!] : { ...defaultInput } })}
+							value={inputHeadersParams}
+							onChange={(key) => updateState({ inputHeadersParams: key ?? '' })}
 						/>
 						<Select
 							styles={{ label: { fontWeight: 'normal' } }}
 							label={__('Override body', 'inseri-core')}
 							clearable
 							data={bodyOptions}
-							value={inputBody.key}
-							onChange={(key) => updateState({ inputBody: key ? availableStringBeacons[key!] : { ...defaultInput } })}
+							value={inputBody}
+							onChange={(key) => updateState({ inputBody: key ?? '' })}
 						/>
 					</Stack>
 				</Group>
@@ -321,10 +271,10 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					<Select
 						label={__('Content Type', 'inseri-core')}
 						placeholder={__('In which format is the data received?', 'inseri-core')}
-						value={output.contentType}
+						value={outputContenType}
 						searchable
 						data={COMMON_CONTENT_TYPES}
-						onChange={(val) => updateState({ output: { contentType: val ?? '' }, isContentTypeLock: true })}
+						onChange={(val) => updateState({ outputContenType: val ?? '', isContentTypeLock: true })}
 						withAsterisk
 					/>
 					<Group position="right">
@@ -356,16 +306,19 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 }
 
 export default function Edit(props: BlockEditProps<Attributes>) {
+	const { attributes } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'webApi'}>
-			<StateProvider
-				stateCreator={datasourceStoreCreator}
-				initialState={props.attributes}
-				keysToSave={Object.keys(json.attributes)}
-				setAttributes={props.setAttributes}
-			>
-				<EditComponent {...props} />
-			</StateProvider>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name}>
+				<StateProvider
+					stateCreator={datasourceStoreCreator}
+					initialState={props.attributes}
+					keysToSave={Object.keys(json.attributes)}
+					setAttributes={props.setAttributes}
+				>
+					<EditComponent {...props} />
+				</StateProvider>
+			</InseriRoot>
 		</SetupEditorEnv>
 	)
 }
