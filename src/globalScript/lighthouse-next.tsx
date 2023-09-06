@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 import { Schema } from 'ajv'
 import type { PropsWithChildren } from 'react'
 import { useDeepCompareEffect, usePrevious } from 'react-use'
-import { BehaviorSubject, map, pairwise } from 'rxjs'
+import { BehaviorSubject, map, pairwise, distinctUntilChanged, combineLatest, Observable } from 'rxjs'
 import { Option, none, some } from './option'
 import { reducer } from './reducer'
 import type { Action, Atom, BlockInfo, Nucleus, Root } from './types'
@@ -229,32 +229,50 @@ interface WatchOps<A = any, B = any> {
 	onSome?: SomeCb<A, B>
 }
 
-const mapToWatchResult =
-	<A, B>(keysByName: Record<string, string>, isRecord: boolean, noneRef: React.MutableRefObject<NoneCb<B>>, someRef: React.MutableRefObject<SomeCb<A, B>>) =>
-	(root: Root) => {
-		const watchedVals: [string, B][] = Object.entries(keysByName)
-			.map(([name, key]) => [name, ...key.split('/')])
-			.map(([name, blockId, atomKey]) => [name, root[blockId]?.atoms[atomKey]?.content ?? none] as [string, Option<Nucleus<A>>])
-			.map((pair) => [
-				pair[0],
-				pair[1].fold(
-					() => noneRef.current(pair[0]),
-					(a) => someRef.current(a, pair[0])
-				),
-			])
+const splitTheKey = (keysByName: Record<string, string>) => Object.entries(keysByName).map(([name, key]) => [name, ...key.split('/')])
+const transformToOptionTuple = <A,>(
+	root: Root,
+	[name,blockId,atomKey,]: [string,string,string] // prettier-ignore
+) => [name, root[blockId]?.atoms[atomKey]?.content ?? none] as [string, Option<Nucleus<A>>]
 
-		if (isRecord) {
-			return watchedVals.reduce((accumulator, [name, val]) => ({ ...accumulator, [name]: val }), {} as Record<string, any>)
-		}
+const foldValues =
+	<A, B>(noneRef: React.MutableRefObject<NoneCb<B> | (() => null)>, someRef: React.MutableRefObject<SomeCb<A, B>>) =>
+	(
+		[name,maybeNucleus,]: [string,Option<Nucleus<A>>] // prettier-ignore
+	) =>
+		[
+			name,
+			maybeNucleus.fold(
+				() => noneRef.current(name),
+				(a: any) => someRef.current(a, name)
+			),
+		] as [string, B | null]
 
-		return watchedVals[0][1]
+const reduceIfNeeded =
+	<B,>(isRecord: boolean) =>
+	(listOfValues: [string, B | null][]) =>
+		isRecord ? listOfValues.reduce((accumulator, [name, val]) => ({ ...accumulator, [name]: val }), {} as Record<string, any>) : listOfValues[0][1]
+
+const initState =
+	<A, B>(
+		keysByName: Record<string, string>,
+		noneRef: React.MutableRefObject<NoneCb<B> | (() => null)>,
+		someRef: React.MutableRefObject<SomeCb<A, B>>,
+		isRecord: boolean
+	) =>
+	() => {
+		const listOfValues = splitTheKey(keysByName)
+			.map((triple) => transformToOptionTuple<A>(blockStoreSubject.getValue(), triple as [string, string, string]))
+			.map(foldValues<A, B>(noneRef, someRef))
+
+		return reduceIfNeeded<B>(isRecord)(listOfValues)
 	}
 
 const NullFn = () => null
 const IdentityFn = (a: Nucleus<any>) => a.value
 
-function useWatch<A = any, B = any>(key: string, ops?: WatchOps): B
-function useWatch<A = any, B = any>(keys: Record<string, string>, ops?: WatchOps): Record<string, B>
+function useWatch<A = any, B = any>(key: string, ops?: WatchOps): B | null
+function useWatch<A = any, B = any>(keys: Record<string, string>, ops?: WatchOps): Record<string, B | null>
 function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?: WatchOps<A, B>): any {
 	const onBlockRemoved = ops?.onBlockRemoved
 	const isRecord = typeof keys !== 'string'
@@ -266,9 +284,7 @@ function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?:
 	const someRef = useRef(ops?.onSome ?? IdentityFn)
 	const noneRef = useRef(ops?.onNone ?? NullFn)
 
-	const initRoot = blockStoreSubject.getValue()
-	const [state, setState] = useState<Record<string, B> | B>(() => mapToWatchResult(keysByName, isRecord, noneRef, someRef)(initRoot))
-
+	const [state, setState] = useState<Record<string, B | null> | B | null>(initState(keysByName, noneRef, someRef, isRecord))
 	const deps = ops?.deps ?? []
 
 	useEffect(() => {
@@ -277,22 +293,30 @@ function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?:
 	}, [...deps])
 
 	useEffect(() => {
-		const onBlockRemovedSubs = Object.entries(keysByName)
-			.map(([name, key]) => [name, ...key.split('/')])
-			.map(([name, blockId, atomKey]) =>
-				blockStoreSubject
-					.pipe(
-						map((root) => root[blockId]?.atoms?.[atomKey]),
-						pairwise()
-					)
-					.subscribe(([old, current]) => {
-						if (onBlockRemoved && !!old && !current) {
-							onBlockRemoved(name)
-						}
-					})
-			)
+		const onBlockRemovedSubs = splitTheKey(keysByName).map(([name, blockId, atomKey]) =>
+			blockStoreSubject
+				.pipe(
+					map((root) => root[blockId]?.atoms?.[atomKey]),
+					pairwise()
+				)
+				.subscribe(([old, current]) => {
+					if (onBlockRemoved && !!old && !current) {
+						onBlockRemoved(name)
+					}
+				})
+		)
 
-		const valueSubscription = blockStoreSubject.pipe(map(mapToWatchResult(keysByName, isRecord, noneRef, someRef))).subscribe(setState)
+		const valueObs: Observable<[string, B | null]>[] = splitTheKey(keysByName).map((triple) =>
+			blockStoreSubject.pipe(
+				map((root) => transformToOptionTuple<A>(root, triple as [string, string, string])),
+				distinctUntilChanged(([_, a], [__, b]) => a.equals(b, (i1, i2) => i1.contentType === i2.contentType && i1.value === i2.value)),
+				map(foldValues<A, B>(noneRef, someRef))
+			)
+		)
+
+		const valueSubscription = combineLatest(valueObs)
+			.pipe(map(reduceIfNeeded<B>(isRecord)))
+			.subscribe(setState)
 
 		return () => {
 			onBlockRemovedSubs.forEach((s) => s.unsubscribe())

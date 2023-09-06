@@ -60,8 +60,16 @@ abstract class Option<A> {
 		return this
 	}
 
-	equals(target: Option<A>): boolean {
-		return (this.isDefined() && target.isDefined() && this.get() === target.get()) || (this.isEmpty() && target.isEmpty())
+	equals(target: Option<A>, compare?: (a: A, b: A) => boolean): boolean {
+		if (this.isDefined() && target.isDefined()) {
+			if (compare) {
+				return compare(this.get(), target.get())
+			}
+
+			return this.get() === target.get()
+		}
+
+		return this.isEmpty() && target.isEmpty()
 	}
 
 	*[Symbol.iterator]() {

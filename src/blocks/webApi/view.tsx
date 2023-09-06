@@ -12,9 +12,9 @@ interface ViewProps {
 export default function View({ isSelected, isGutenbergEditor }: ViewProps) {
 	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, outputContenType, label, isVisible, autoTrigger, parameters, inputRevision } =
 		useGlobalState((state: DatasourceState) => state)
-	const { overrideMethodUrl, overrideQueryParams, overrideHeaderParams, overrideBody, fireRequest, updateState } = useGlobalState((state: DatasourceState) => {
-		return state.actions
-	})
+	const { overrideMethodUrl, overrideQueryParams, overrideHeaderParams, overrideBody, fireRequest, updateState } = useGlobalState(
+		(state: DatasourceState) => state.actions
+	)
 	const { urlError, bodyError } = parameters
 	const contentTypeError = !outputContenType ? __('Content type is missing.', 'inseri-core') : ''
 
