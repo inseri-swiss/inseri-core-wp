@@ -17,23 +17,20 @@ export default function View(props: ViewProps) {
 	const { renderResizable } = props
 	const { height, label, inputKey } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
-	const { value, codeType } = useWatch(inputKey, {
-		onNone: () => ({ value: '', codeType: 'text' }),
+	const { value, codeType, hasError } = useWatch(inputKey, {
+		onNone: () => ({ value: '', codeType: 'text', hasError: false }),
 		onSome: (nucleus: Nucleus<string>) => {
-			let processedVal = ''
+			const type = getBodyTypeByContenType(nucleus.contentType) ?? 'text'
 
-			if (isTextualContentType(nucleus.contentType)) {
-				processedVal = nucleus.value
+			if (nucleus.contentType.match('/json')) {
+				return { value: stringify(nucleus.value), codeType: type, hasError: false }
 			}
 
-			if (nucleus.contentType.match('/json') && (typeof nucleus.value !== 'string' || !!nucleus.value.trim())) {
-				processedVal = stringify(nucleus.value)
+			if (isTextualContentType(nucleus.contentType) && typeof nucleus.value === 'string') {
+				return { value: nucleus.value, codeType: type, hasError: false }
 			}
 
-			return {
-				value: processedVal,
-				codeType: getBodyTypeByContenType(nucleus.contentType) ?? 'text',
-			}
+			return { value: '', codeType: type, hasError: true }
 		},
 		onBlockRemoved: () => updateState({ inputKey: '', isWizardMode: true }),
 	})
@@ -52,6 +49,11 @@ export default function View(props: ViewProps) {
 				</Tooltip>
 			</Group>
 			{renderResizable ? renderResizable(editorElement) : editorElement}
+			{hasError && (
+				<Text fz={14} color="red">
+					{__('The content type is not supported.', 'inseri-core')}
+				</Text>
+			)}
 		</Box>
 	)
 }
