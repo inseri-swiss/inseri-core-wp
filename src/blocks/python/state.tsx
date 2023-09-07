@@ -24,6 +24,8 @@ export interface GlobalState extends Attributes {
 
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
+		setInputValue: (name: string, val: any) => void
+		setInputEmpty: (name: string, isRemoved: boolean) => void
 		runCode: (code: string) => void
 		terminate: () => void
 
@@ -85,6 +87,26 @@ export const storeCreator = (initalState: Attributes) => {
 							state[k] = modifier[k]
 						})
 					}),
+
+				setInputEmpty: (name: string, isRemoved: boolean) => {
+					set((state) => {
+						state.inputerr = isRemoved ? `Input for ${name} is not available anymore` : `Input for ${name} is not ready`
+						state.hasInputError[name] = true
+					})
+				},
+
+				setInputValue: (name: string, val: any) => {
+					set((state) => {
+						state.inputRecord[name] = val
+						state.inputRevision++
+
+						state.hasInputError[name] = false
+						const hasNoError = Object.values(state.hasInputError).every((b) => !b)
+						if (hasNoError) {
+							state.inputerr = ''
+						}
+					})
+				},
 
 				runCode: (code: string) => {
 					set((state) => {

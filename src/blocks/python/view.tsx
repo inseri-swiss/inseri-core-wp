@@ -33,36 +33,14 @@ export default function View(props: ViewProps) {
 		hasInputError,
 		inputRevision,
 	} = useGlobalState((state: GlobalState) => state)
-	const { updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
+	const { setInputValue, setInputEmpty, updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
 	const prevWorkerStatus = usePrevious(workerStatus)
 
 	useWatch(inputs, {
-		onBlockRemoved: (varName) => {
-			updateState({
-				inputerr: `Input for ${varName} is not available anymore`,
-				hasInputError: { ...hasInputError, [varName]: true },
-			})
-		},
-		onNone: (varName: string) => {
-			updateState({
-				inputerr: `Input for ${varName} is not ready`,
-				hasInputError: { ...hasInputError, [varName]: true },
-			})
-		},
-		onSome: (nucleus: Nucleus<any>, varName: string) => {
-			const newInputError = { ...hasInputError, [varName]: false }
-			const hasNoError = Object.values(newInputError).every((b) => !b)
-
-			const newInputRecord = { ...inputRecord, [varName]: nucleus.value }
-
-			updateState({
-				inputerr: hasNoError ? '' : inputerr,
-				hasInputError: newInputError,
-				inputRecord: newInputRecord,
-				inputRevision: inputRevision + 1,
-			})
-		},
+		onBlockRemoved: (varName) => setInputEmpty(varName, true),
+		onNone: (varName: string) => setInputEmpty(varName, false),
+		onSome: (nucleus: Nucleus<any>, varName: string) => setInputValue(varName, nucleus.value),
 		deps: [inputRevision, hasInputError, inputRecord, inputerr],
 	})
 
