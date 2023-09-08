@@ -5,12 +5,12 @@ For this we have to join a couple of inseri blocks.
 
 ## Step 1: Create a new post
 
-On your inseri instance or in the playground (remember, your changes will not be saved there), add a new post and give it a title.
-In this example, we call the post "Image selection". You can type this at "Add title...".
+On your inseri instance or in the [playground](https://playground.inseri.swiss){:target="\_blank"} (remember, your changes will not be saved there), add a new post and give it a title.
+In this example, we call the post "Data mapping with Python". You can type this at "Add title...".
 
 ## Step 2: Add a Web API block
 
-Add an inseri text editor by clicking the `+` below the title.
+Add an inseri Web API block by clicking the `+` below the title.
 Select "Browse all" and look for "Web API" in the category _inseri_.
 
 Enter the following URL in the corresponding field:
@@ -19,13 +19,23 @@ Enter the following URL in the corresponding field:
 https://raw.githubusercontent.com/inseri-swiss/inseri-core-wp/main/docs/assets/book_metadata.json
 ```
 
-Choose the format "JSON" because that is what will be read by the dropdown that we are going to add later.
+Choose the Content Type "JSON" because that is what will be read by the dropdown that we are going to add later.
 
-Now, give your text editor a meaningful name.
+Now, give your Web API block a meaningful name.
 For this, open the configuration panel on the right and enter "webApi-book" under _block name_.
-Do not check the option "call automatically".
+Do not check the option "call automatically". For testing the request you should click on "Configure the settings", and click on "TRY REQUEST".
 
-Testing the request should give the following content:
+<figure markdown>
+![Web API](/assets/web_api.png)
+  <figcaption>Step 2: Click on "Configure the settings"</figcaption>
+</figure>
+
+<figure markdown>
+![Web API Try Request](/assets/web_api_try_request.png)
+  <figcaption>Step 2: Click on "TRY REQUEST" to test the request of the Web API block</figcaption>
+</figure>
+
+It should give the following content:
 
 ```json
 {
@@ -39,7 +49,7 @@ Testing the request should give the following content:
 }
 ```
 
-## Step 3: Add a python block
+## Step 3: Add a Python block
 
 Add a "Python Code" block the same way you added the web API block.
 
@@ -58,7 +68,7 @@ publisher = data["publisher"]
 
 Obviously, this is not yet complete because `data` is not defined anywhere in the code.
 
-## Step 4: Open the extended view for the python block
+## Step 4: Open the extended view for the Python block
 
 Under "Inputs from Blocks", enter the variable name `data` and accept it with selecting the `+`.
 You can now select `webApi-book: data` to connect this block to the web API block.
@@ -69,22 +79,30 @@ For `title` and `author` set the content type to "Text".
 For `year` use the content type "JSON" as there is no specific type for numbers.
 `publisher` is a complex structure that also gets the "JSON" type.
 
-The extended view of the python block should now look like this:
+The extended view of the Python block should now look like this:
 
-![Extended view of python block](/assets/python-divide.png)
+<figure markdown>
+![Extended view of Python block](/assets/python-divide.png)
+<figcaption>Step 4: Python block in extended view</figcaption>
+</figure>
 
 Make sure that the block is set to execute automatically.
 
+<figure markdown>
+![Execute automatically](/assets/python_execute_automatically.png){width="300"}
+<figcaption>Step 4: Execute automatically setting of the Python block</figcaption>
+</figure>
+
 ## Step 5: Add text viewers
 
-Now, add three text users.
+Now, add four text viewers.
 Set their inputs to `python-divide: author`, `python-divide: year`, `python-divide: title`, `python-divide: publisher`, respectively.
 
 ## Step 6: Save and publish
 
 You can save and publish your post like any WordPress post.
 
-Once published (or in preview), the four text blocks will show their content after you press "Call Web API".
+Once published, the four text blocks will show their content after you press "Call Web API".
 
 If you change the web-API block to execute automatically, the content will appear immediately.
 
