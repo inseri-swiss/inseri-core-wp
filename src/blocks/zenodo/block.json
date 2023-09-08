@@ -18,13 +18,6 @@
 			"type": "string",
 			"default": "Choose a file"
 		},
-		"output": {
-			"type": "object",
-			"default": {
-				"key": "",
-				"contentType": ""
-			}
-		},
 		"doi": {
 			"type": "string",
 			"default": ""
