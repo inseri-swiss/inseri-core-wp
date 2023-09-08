@@ -1,4 +1,4 @@
-import { useControlTower } from '@inseri/lighthouse'
+import { InseriRoot } from '@inseri/lighthouse-next'
 import { IconBooks } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
@@ -8,28 +8,18 @@ import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import { Button, Checkbox, Group, Loader, SetupEditorEnv, Stack, StateProvider, Text, TextInput, useGlobalState } from '../../components'
 import { getFormattedBytes } from '../../utils'
-import { default as config, default as json } from './block.json'
+import config from './block.json'
 import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
 import View from './view'
 
-const baseBeacon = { contentType: '', description: 'file', key: 'file', default: '' }
-
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { output, blockId, blockName, label, isWizardMode, files, isVisible, doi, doiError, isWizardLoading, record, hasWizardError } = useGlobalState(
+	const { blockName, label, isWizardMode, files, isVisible, doi, doiError, isWizardLoading, record, hasWizardError } = useGlobalState(
 		(state: GlobalState) => state
 	)
 	const { updateState, setDoi, loadDoi } = useGlobalState((state: GlobalState) => state.actions)
-
 	const isValueSet = files.length > 0
-	const producersBeacons = useControlTower({ blockId, blockType: config.name, instanceName: blockName }, [baseBeacon])
-
-	useEffect(() => {
-		if (producersBeacons.length > 0 && !output.key) {
-			updateState({ output: producersBeacons[0] })
-		}
-	}, [producersBeacons.length])
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -155,9 +145,11 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'zenodo'}>
-			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
-				<EditComponent {...props} />
-			</StateProvider>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={config.name}>
+				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(config.attributes)} setAttributes={setAttributes} initialState={attributes}>
+					<EditComponent {...props} />
+				</StateProvider>
+			</InseriRoot>
 		</SetupEditorEnv>
 	)
 }

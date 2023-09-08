@@ -4,7 +4,6 @@ import type { BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
 import { SelectItem } from '../../components'
-import { ProducerBeacon } from '../../globalScript'
 import json from './block.json'
 import Edit from './edit'
 
@@ -14,7 +13,6 @@ export interface Attributes {
 	blockId: string
 	blockName: string
 	label: string
-	output: ProducerBeacon
 	doi: string
 	files: SelectItem[]
 	selectedFile: string | null
