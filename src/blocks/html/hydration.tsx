@@ -1,4 +1,4 @@
-import { InseriRoot } from '@inseri/lighthouse-next'
+import { InseriRoot } from '@inseri/lighthouse'
 import domReady from '@wordpress/dom-ready'
 import { createRoot } from '@wordpress/element'
 import { InseriThemeProvider, StateProvider } from '../../components'

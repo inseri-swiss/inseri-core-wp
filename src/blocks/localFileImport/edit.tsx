@@ -1,4 +1,4 @@
-import { InseriRoot } from '@inseri/lighthouse-next'
+import { InseriRoot } from '@inseri/lighthouse'
 import { InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, TextareaControl, ToggleControl } from '@wordpress/components'

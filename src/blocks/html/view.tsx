@@ -1,4 +1,4 @@
-import { useWatch, Nucleus } from '@inseri/lighthouse-next'
+import { useWatch, Nucleus } from '@inseri/lighthouse'
 import { IconCircleOff } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
 import { Box, CodeEditor, Group, Text, createStyles, useGlobalState } from '../../components'

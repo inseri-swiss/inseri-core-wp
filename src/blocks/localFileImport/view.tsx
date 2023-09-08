@@ -1,4 +1,4 @@
-import { usePublish } from '@inseri/lighthouse-next'
+import { usePublish } from '@inseri/lighthouse'
 import { Dropzone } from '@mantine/dropzone'
 import { IconCheck, IconDownload, IconX } from '@tabler/icons-react'
 import { useEffect } from '@wordpress/element'

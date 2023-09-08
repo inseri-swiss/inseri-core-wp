@@ -1,4 +1,4 @@
-import { InseriRoot, useDiscover } from '@inseri/lighthouse-next'
+import { InseriRoot, useDiscover } from '@inseri/lighthouse'
 import { IconBrandPython, IconChevronLeft, IconWindowMaximize } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'

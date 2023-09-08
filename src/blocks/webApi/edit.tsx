@@ -1,4 +1,4 @@
-import { InseriRoot, useDiscover } from '@inseri/lighthouse-next'
+import { InseriRoot, useDiscover } from '@inseri/lighthouse'
 import { useDebouncedValue } from '@mantine/hooks'
 import { IconApi, IconWindowMaximize } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'

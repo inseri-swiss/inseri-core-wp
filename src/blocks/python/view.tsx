@@ -1,4 +1,4 @@
-import { Nucleus, usePublish, useWatch } from '@inseri/lighthouse-next'
+import { Nucleus, usePublish, useWatch } from '@inseri/lighthouse'
 import { usePrevious } from '@mantine/hooks'
 import { useCallback, useEffect } from '@wordpress/element'
 import { Box, CodeEditor, Group, useGlobalState } from '../../components'
