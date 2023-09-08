@@ -3,6 +3,8 @@
 This tutorial will give a simple example how you can split complex data coming from a block (e.g. the web API block) into simpler structures, using the python block.
 For this we have to join a couple of inseri blocks.
 
+If you have no experience with inseri, please start with our [Hello World](./hello-world.md).
+
 ## Step 1: Create a new post
 
 On your inseri instance or in the [playground](https://playground.inseri.swiss){:target="\_blank"} (remember, your changes will not be saved there), add a new post and give it a title.
