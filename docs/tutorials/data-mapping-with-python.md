@@ -88,6 +88,10 @@ The extended view of the Python block should now look like this:
 
 Make sure that the block is set to execute automatically.
 
+!!! note
+
+    You can hide the Python block if you want (the setting is above the execute automatically).
+
 <figure markdown>
 ![Execute automatically](/assets/python_execute_automatically.png){width="300"}
 <figcaption>Step 4: Execute automatically setting of the Python block</figcaption>
@@ -98,6 +102,14 @@ Make sure that the block is set to execute automatically.
 Now, add four text viewers.
 Set their inputs to `python-divide: author`, `python-divide: year`, `python-divide: title`, `python-divide: publisher`, respectively.
 
+!!! note
+
+    You can edit the source of the Text Viewer block by clicking on the edit icon. This can be used for other inseri core blocks as well.
+
+<figure markdown>
+![Edit Source](/assets/text_viewer_edit.png){width="500"}
+<figcaption>Step 5: You can edit the source used by the Text Viewer block</figcaption>
+</figure>
 ## Step 6: Save and publish
 
 You can save and publish your post like any WordPress post.

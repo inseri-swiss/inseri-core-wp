@@ -57,7 +57,9 @@ markdown_extensions:
       color: 4051b5
   - md_in_html
   - attr_list
-
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
 
 plugins:
   - glightbox
