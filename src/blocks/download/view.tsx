@@ -1,4 +1,4 @@
-import { Nucleus, useWatch } from '@inseri/lighthouse-next'
+import { Nucleus, useWatch } from '@inseri/lighthouse'
 import stringify from 'json-stable-stringify'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 import { Button } from '../../components'

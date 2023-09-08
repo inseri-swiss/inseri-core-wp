@@ -1,4 +1,4 @@
-import { InseriRoot } from '@inseri/lighthouse-next'
+import { InseriRoot } from '@inseri/lighthouse'
 import { IconBooks } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'

@@ -1,7 +1,7 @@
+import { InseriRoot } from '@inseri/lighthouse'
 import domReady from '@wordpress/dom-ready'
 import { createRoot } from '@wordpress/element'
 import { InseriThemeProvider, StateProvider } from '../../components'
-import { InseriRoot } from '@inseri/lighthouse-next'
 import config from './block.json'
 import { storeCreator } from './state'
 import View from './view'

@@ -1,4 +1,4 @@
-import { Actions, Nucleus, usePublish, useWatch } from '@inseri/lighthouse-next'
+import { Actions, Nucleus, usePublish, useWatch } from '@inseri/lighthouse'
 import { useState } from '@wordpress/element'
 import cloneDeep from 'lodash.clonedeep'
 import Plot from 'react-plotly.js'

@@ -1,4 +1,4 @@
-import { usePublish } from '@inseri/lighthouse-next'
+import { usePublish } from '@inseri/lighthouse'
 import { forwardRef, useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Box, Group, Image, Loader, Select, Text, useGlobalState } from '../../components'

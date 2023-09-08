@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n'
 import { Box, Select } from '../../components'
 import { Attributes } from './index'
-import { useWatch, usePublish, Nucleus } from '@inseri/lighthouse-next'
+import { useWatch, usePublish, Nucleus } from '@inseri/lighthouse'
 import { isValueValid } from './utils'
 
 interface ViewProps {

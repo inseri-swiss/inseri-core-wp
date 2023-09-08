@@ -1,4 +1,4 @@
-import { Nucleus, useWatch } from '@inseri/lighthouse-next'
+import { Nucleus, useWatch } from '@inseri/lighthouse'
 import { IconEye } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
 import stringify from 'json-stable-stringify'

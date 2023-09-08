@@ -1,4 +1,4 @@
-import { Nucleus, useDiscover, useWatch } from '@inseri/lighthouse-next'
+import { Nucleus, useDiscover, useWatch } from '@inseri/lighthouse'
 import { useHotkeys } from '@mantine/hooks'
 import { IconChevronDown, IconChevronRight, IconChevronUp, IconPlus, IconX } from '@tabler/icons-react'
 import { useRef, useState } from '@wordpress/element'
