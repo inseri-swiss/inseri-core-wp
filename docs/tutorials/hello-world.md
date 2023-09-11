@@ -9,7 +9,7 @@ For the final product, please [click here](https://inseri.swiss/2023/02/hello-wo
 
 ## Step 0: Initialize your inseri instance
 
-Open up an inseri or [playground instance](https://playground.inseri.swiss){:target="\_blank"}.
+Open up [playground](https://playground.inseri.swiss){:target="\_blank"} or your WordPress instance with `inseri-core` installed.
 
 Beware that changes done in the playground will not be saved.
 
@@ -40,7 +40,7 @@ Select "Browse all" and look for "Text Editor" block under the top section _inse
 To chain more inseri blocks in this example (text editor block to dropdown menu block), please choose the format "JSON".
 
 <figure markdown>
-![Select the output format](/assets/select_json.png)
+![Select the output format](/assets/select_json.png){width="500"}
   <figcaption>Step 2: Set the text viewer to "JSON"</figcaption>
 </figure>
 
@@ -80,17 +80,17 @@ Set the block source to the option "dropdown-selectedImage: chosen value".
 
 Give the image box block the name "image".
 
-## Step 6: Save, preview and publish
+## Step 6: Save and publish
 
-For the final step, we must save our post and preview it.
+For the final step, we should save our post and publish it.
 Furthermore, in case of a full instance, you can now publish it.
 
 <figure markdown>
-![Save, preview and publish](/assets/save_preview_publish.png)
-  <figcaption>Step 6: Save, preview and publish</figcaption>
+![Save and publish](/assets/save_publish.png)
+  <figcaption>Step 6: Save and publish</figcaption>
 </figure>
 
-Once published (or in a preview), you will see the text editor with the snippet (step 3) and a dropdown (step 4),
+Once published you will see the text editor with the snippet (step 3) and a dropdown (step 4),
 where the corresponding image will load after its selection (step 5).
 
 ## Overview

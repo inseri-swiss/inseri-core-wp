@@ -23,3 +23,7 @@ You can add an inseri block like any other block through the plus sign on top le
 After accepting a block, it is visible in the content of the post, showing the most important options directly in its body,
 like block of which the output will be imported.
 Through settings panel on the right, more settings are available, generally for naming the output channel, visibility, or just styling.
+
+## Where to start
+
+We recommend you to start with our [Hello World](./tutorials/hello-world.md).
