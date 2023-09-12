@@ -308,7 +308,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 export default function Edit(props: BlockEditProps<Attributes>) {
 	const { attributes } = props
 	return (
-		<SetupEditorEnv {...props} baseBlockName={'webApi'}>
+		<SetupEditorEnv {...props} baseBlockName={'webApi'} addSuffixToInputs={['inputMethodUrl', 'inputQueryParams', 'inputHeadersParams', 'inputBody']}>
 			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name}>
 				<StateProvider
 					stateCreator={datasourceStoreCreator}

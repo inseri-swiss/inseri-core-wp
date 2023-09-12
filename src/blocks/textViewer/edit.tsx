@@ -96,7 +96,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 export default function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes } = props
 	return (
-		<SetupEditorEnv {...props} baseBlockName={'textViewer'}>
+		<SetupEditorEnv {...props} baseBlockName={'textViewer'} addSuffixToInputs={['inputKey']}>
 			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name}>
 				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
 					<EditComponent {...props} />

@@ -1,13 +1,19 @@
+import { generateId, md5 } from '@inseri/utils'
 import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
+import { dispatch, select, useSelect } from '@wordpress/data'
 import { useEffect } from '@wordpress/element'
 import type { PropsWithChildren } from 'react'
-import { generateId, md5 } from '@inseri/utils'
 import { InseriThemeProvider } from './InseriThemeProvider'
-import { select, useSelect, dispatch } from '@wordpress/data'
 
-export function SetupEditorEnv(props: PropsWithChildren<BlockEditProps<any>> & { baseBlockName: string }) {
-	const { setAttributes, attributes, children, baseBlockName, isSelected, clientId } = props
+interface Props extends PropsWithChildren<BlockEditProps<any>> {
+	baseBlockName: string
+	addSuffixToInputs?: string[]
+	addSuffixToInputRecord?: string[]
+}
+
+export function SetupEditorEnv(props: Props) {
+	const { setAttributes, attributes, children, baseBlockName, isSelected, clientId, addSuffixToInputs = [], addSuffixToInputRecord = [] } = props
 	const { blockId } = attributes
 
 	useEffect(() => {
@@ -21,26 +27,48 @@ export function SetupEditorEnv(props: PropsWithChildren<BlockEditProps<any>> & {
 	}, [])
 
 	const blockCount = useSelect((innerSelect: any) => innerSelect('core/block-editor').getGlobalBlockCount(), [])
+	const selectedClientIds: string[] = useSelect((innerSelect: any) => innerSelect('core/block-editor').getMultiSelectedBlockClientIds(), []) ?? []
 
 	useEffect(() => {
 		const wpSelect: any = select('core/block-editor')
 		const wpDispatch: any = dispatch('core/block-editor')
 
-		const selectedClientIds: string[] = wpSelect.getMultiSelectedBlockClientIds()
 		const clientIdsOfSameBlockType: string[] = wpSelect.getClientIdsWithDescendants()
-		const hasDuplicatedBlockId = clientIdsOfSameBlockType.some((_clientId) => {
+		const isBlockIdDuplicated = clientIdsOfSameBlockType.some((_clientId) => {
 			const _blockId = wpSelect.getBlockAttributes(_clientId).blockId
 			return clientId !== _clientId && blockId === _blockId
 		})
 
-		if (hasDuplicatedBlockId && isSelected) {
-			const suffix = generateId(3)
-			wpDispatch.updateBlockAttributes(clientId, { blockId: blockId + suffix })
-		}
+		if (isBlockIdDuplicated && (isSelected || selectedClientIds.includes(clientId))) {
+			const suffix = isSelected ? generateId(3) : md5(selectedClientIds.join('')).substring(0, 3)
+			const attributesObj = wpSelect.getBlockAttributes(clientId)
+			const selectedBlockIds = selectedClientIds.map((id) => wpSelect.getBlockAttributes(id).blockId)
 
-		if (hasDuplicatedBlockId && selectedClientIds.includes(clientId)) {
-			const suffix = md5(selectedClientIds.join('')).substring(0, 3)
-			wpDispatch.updateBlockAttributes(clientId, { blockId: blockId + suffix })
+			const inputEntries = addSuffixToInputs
+				.map((k) => [k, ...attributesObj[k].split('/')])
+				.filter(([_kn, inputBlockId, _fk]) => !!inputBlockId)
+				.filter(([_kn, inputBlockId, _fk]) => selectedBlockIds.includes(inputBlockId) || selectedBlockIds.includes(inputBlockId + suffix))
+				.map(([keyName, inputBlockId, fieldKey]) => [keyName, inputBlockId + suffix + '/' + fieldKey])
+
+			const inputRecordEntries = addSuffixToInputRecord.map((k) => {
+				const entries = Object.entries(attributesObj[k])
+					.map(([name, inputKey]: any) => [name, ...inputKey.split('/')])
+					.filter(([_kn, inputBlockId, _fk]) => !!inputBlockId)
+					.filter(([_kn, inputBlockId, _fk]) => selectedBlockIds.includes(inputBlockId) || selectedBlockIds.includes(inputBlockId + suffix))
+					.map(([keyName, inputBlockId, fieldKey]) => [keyName, inputBlockId + suffix + '/' + fieldKey])
+
+				const newlyUpdatedRecord = { ...attributesObj[k], ...Object.fromEntries(entries) }
+				return [k, newlyUpdatedRecord]
+			})
+
+			const { blockName = '' } = attributesObj
+
+			wpDispatch.updateBlockAttributes(clientId, {
+				...Object.fromEntries(inputEntries),
+				...Object.fromEntries(inputRecordEntries),
+				blockId: blockId + suffix,
+				blockName: blockName + ' (copy)',
+			})
 		}
 	}, [blockCount])
 

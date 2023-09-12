@@ -81,7 +81,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 export default function Edit(props: BlockEditProps<Attributes>) {
 	const { attributes } = props
 	return (
-		<SetupEditorEnv {...props} baseBlockName={'dropdown'}>
+		<SetupEditorEnv {...props} baseBlockName={'dropdown'} addSuffixToInputs={['inputKey']}>
 			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name}>
 				<EditComponent {...props} />
 			</InseriRoot>
