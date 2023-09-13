@@ -1,7 +1,7 @@
 import { generateId, md5 } from '@inseri/utils'
 import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { dispatch, select, useSelect } from '@wordpress/data'
+import { dispatch, select, use, useSelect } from '@wordpress/data'
 import { useEffect } from '@wordpress/element'
 import type { PropsWithChildren } from 'react'
 import { InseriThemeProvider } from './InseriThemeProvider'
@@ -13,7 +13,7 @@ interface Props extends PropsWithChildren<BlockEditProps<any>> {
 }
 
 export function SetupEditorEnv(props: Props) {
-	const { setAttributes, attributes, children, baseBlockName, isSelected, clientId, addSuffixToInputs = [], addSuffixToInputRecord = [] } = props
+	const { setAttributes, attributes, children, baseBlockName, clientId, addSuffixToInputs = [], addSuffixToInputRecord = [] } = props
 	const { blockId } = attributes
 
 	useEffect(() => {
@@ -27,11 +27,12 @@ export function SetupEditorEnv(props: Props) {
 	}, [])
 
 	const blockCount = useSelect((innerSelect: any) => innerSelect('core/block-editor').getGlobalBlockCount(), [])
-	const selectedClientIds: string[] = useSelect((innerSelect: any) => innerSelect('core/block-editor').getMultiSelectedBlockClientIds(), []) ?? []
 
 	useEffect(() => {
 		const wpSelect: any = select('core/block-editor')
 		const wpDispatch: any = dispatch('core/block-editor')
+		// TODO `use` will be deprecated
+		const lastInsertedClientIds: string[] = use(() => {}, {}).stores['core/block-editor'].store.getState()?.lastBlockInserted?.clientIds ?? []
 
 		const clientIdsOfSameBlockType: string[] = wpSelect.getClientIdsWithDescendants()
 		const isBlockIdDuplicated = clientIdsOfSameBlockType.some((_clientId) => {
@@ -39,10 +40,10 @@ export function SetupEditorEnv(props: Props) {
 			return clientId !== _clientId && blockId === _blockId
 		})
 
-		if (isBlockIdDuplicated && (isSelected || selectedClientIds.includes(clientId))) {
-			const suffix = isSelected ? generateId(3) : md5(selectedClientIds.join('')).substring(0, 3)
+		if (isBlockIdDuplicated && lastInsertedClientIds.includes(clientId)) {
+			const suffix = md5(lastInsertedClientIds.join('')).substring(0, 3)
 			const attributesObj = wpSelect.getBlockAttributes(clientId)
-			const selectedBlockIds = selectedClientIds.map((id) => wpSelect.getBlockAttributes(id).blockId)
+			const selectedBlockIds = lastInsertedClientIds.map((id) => wpSelect.getBlockAttributes(id).blockId)
 
 			const inputEntries = addSuffixToInputs
 				.map((k) => [k, ...attributesObj[k].split('/')])
