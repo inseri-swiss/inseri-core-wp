@@ -32,7 +32,9 @@ export function SetupEditorEnv(props: Props) {
 		const wpSelect: any = select('core/block-editor')
 		const wpDispatch: any = dispatch('core/block-editor')
 		// TODO `use` will be deprecated
-		const lastInsertedClientIds: string[] = use(() => {}, {}).stores['core/block-editor'].store.getState()?.lastBlockInserted?.clientIds ?? []
+		let lastInsertedClientIds: string[] = use(() => {}, {}).stores['core/block-editor'].store.getState()?.lastBlockInserted?.clientIds ?? []
+		lastInsertedClientIds.push(...wpSelect.getClientIdsOfDescendants(lastInsertedClientIds))
+		lastInsertedClientIds = [...new Set(lastInsertedClientIds)]
 
 		const clientIdsOfSameBlockType: string[] = wpSelect.getClientIdsWithDescendants()
 		const isBlockIdDuplicated = clientIdsOfSameBlockType.some((_clientId) => {
@@ -43,7 +45,7 @@ export function SetupEditorEnv(props: Props) {
 		if (isBlockIdDuplicated && lastInsertedClientIds.includes(clientId)) {
 			const suffix = md5(lastInsertedClientIds.join('')).substring(0, 3)
 			const attributesObj = wpSelect.getBlockAttributes(clientId)
-			const selectedBlockIds = lastInsertedClientIds.map((id) => wpSelect.getBlockAttributes(id).blockId)
+			const selectedBlockIds = lastInsertedClientIds.map((id) => wpSelect.getBlockAttributes(id)?.blockId).filter((s) => !!s)
 
 			const inputEntries = addSuffixToInputs
 				.map((k) => [k, ...attributesObj[k].split('/')])
