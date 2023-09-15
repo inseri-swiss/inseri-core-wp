@@ -2,7 +2,7 @@ import { generateId, md5 } from '@inseri/utils'
 import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { dispatch, select, use, useSelect } from '@wordpress/data'
-import { useEffect } from '@wordpress/element'
+import { useEffect, useMemo, useState } from '@wordpress/element'
 import type { PropsWithChildren } from 'react'
 import { InseriThemeProvider } from './InseriThemeProvider'
 
@@ -12,9 +12,26 @@ interface Props extends PropsWithChildren<BlockEditProps<any>> {
 	addSuffixToInputRecord?: string[]
 }
 
+const includeChildrendIds = (clientIds: string[], childParentPairs: [string, string][]) => {
+	const result: string[] = [...clientIds]
+
+	clientIds.forEach((id) => {
+		let children: string[] = childParentPairs.filter(([_c, parent]) => parent === id).map((t) => t[0])
+
+		while (children.length > 0) {
+			result.push(...children)
+			children = children.flatMap((pid) => childParentPairs.filter(([_c, parent]) => parent === pid).map((t) => t[0]))
+		}
+	})
+
+	return [...new Set(result)]
+}
+
 export function SetupEditorEnv(props: Props) {
 	const { setAttributes, attributes, children, baseBlockName, clientId, addSuffixToInputs = [], addSuffixToInputRecord = [] } = props
 	const { blockId } = attributes
+
+	const [isCopyingCompleted, setCopyingStatus] = useState(false)
 
 	useEffect(() => {
 		if (!attributes.blockId) {
@@ -28,21 +45,34 @@ export function SetupEditorEnv(props: Props) {
 
 	const blockCount = useSelect((innerSelect: any) => innerSelect('core/block-editor').getGlobalBlockCount(), [])
 
-	useEffect(() => {
+	const isBlockIdDuplicated = useMemo(() => {
 		const wpSelect: any = select('core/block-editor')
-		const wpDispatch: any = dispatch('core/block-editor')
-		// TODO `use` will be deprecated
-		let lastInsertedClientIds: string[] = use(() => {}, {}).stores['core/block-editor'].store.getState()?.lastBlockInserted?.clientIds ?? []
-		lastInsertedClientIds.push(...wpSelect.getClientIdsOfDescendants(lastInsertedClientIds))
-		lastInsertedClientIds = [...new Set(lastInsertedClientIds)]
 
 		const clientIdsOfSameBlockType: string[] = wpSelect.getClientIdsWithDescendants()
-		const isBlockIdDuplicated = clientIdsOfSameBlockType.some((_clientId) => {
+		return clientIdsOfSameBlockType.some((_clientId) => {
 			const _blockId = wpSelect.getBlockAttributes(_clientId).blockId
 			return clientId !== _clientId && blockId === _blockId
 		})
+	}, [blockCount])
 
-		if (isBlockIdDuplicated && lastInsertedClientIds.includes(clientId)) {
+	const lastInsertedClientIds = useMemo(() => {
+		if (isBlockIdDuplicated) {
+			// TODO `use` will be deprecated
+			const editorStore: any = use(() => {}, {}).stores['core/block-editor'].store.getState()
+			const lastInsertedIds: string[] = editorStore?.lastBlockInserted?.clientIds ?? []
+			const parentIdByChildrenId: Map<string, string> = editorStore?.blocks?.parents ?? new Map()
+			return includeChildrendIds(lastInsertedIds, [...parentIdByChildrenId])
+		}
+		return []
+	}, [isBlockIdDuplicated])
+
+	const wasThisBlockInserted = lastInsertedClientIds.includes(clientId)
+
+	useEffect(() => {
+		const wpSelect: any = select('core/block-editor')
+		const wpDispatch: any = dispatch('core/block-editor')
+
+		if (wasThisBlockInserted && !isCopyingCompleted) {
 			const suffix = md5(lastInsertedClientIds.join('')).substring(0, 3)
 			const attributesObj = wpSelect.getBlockAttributes(clientId)
 			const selectedBlockIds = lastInsertedClientIds.map((id) => wpSelect.getBlockAttributes(id)?.blockId).filter((s) => !!s)
@@ -72,8 +102,14 @@ export function SetupEditorEnv(props: Props) {
 				blockId: blockId + suffix,
 				blockName: blockName + ' (copy)',
 			})
-		}
-	}, [blockCount])
 
-	return <div {...useBlockProps()}>{attributes.blockId ? <InseriThemeProvider>{children}</InseriThemeProvider> : null}</div>
+			setCopyingStatus(true)
+		}
+	}, [isCopyingCompleted, lastInsertedClientIds])
+
+	return (
+		<div {...useBlockProps()}>
+			{attributes.blockId && (!wasThisBlockInserted || isCopyingCompleted) ? <InseriThemeProvider>{children}</InseriThemeProvider> : null}
+		</div>
+	)
 }
