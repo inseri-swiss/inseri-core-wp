@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useRef } from '@wordpress/element'
+import { createContext, useContext, useRef } from '@wordpress/element'
 import { setAutoFreeze } from 'immer'
 import type { PropsWithChildren } from 'react'
 import { StateCreator, StoreApi, create, useStore } from 'zustand'
@@ -43,15 +43,6 @@ export function StateProvider<INIT, STATE extends INIT>({ initialState, children
 
 		storeRef.current = create(store)
 	}
-
-	useEffect(() => {
-		storeRef.current?.setState(((s: any) => {
-			const attributes: any = initialState
-			Object.keys(attributes).forEach((k) => {
-				s[k] = attributes[k]
-			})
-		}) as any)
-	}, [(initialState as any).blockId])
 
 	return <StateContext.Provider value={storeRef.current}>{children}</StateContext.Provider>
 }
