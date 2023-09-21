@@ -30,7 +30,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 
 	return (
 		<>
-			<BlockControls>
+			<BlockControls controls={[]}>
 				{isValueSet && (
 					<ToolbarGroup>
 						<ToolbarButton icon={edit} isActive={isWizardMode} onClick={() => setWizardMode(!isWizardMode)} title={__('Edit', 'inseri-core')} />

@@ -29,7 +29,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 
 	return (
 		<>
-			<BlockControls>
+			<BlockControls controls={[]}>
 				{isValueSet && (
 					<ToolbarGroup>
 						<ToolbarButton
@@ -81,6 +81,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					labels={{ title: 'Media Collection' }}
 					icon={<IconFiles style={{ fill: 'none' }} />}
 					onError={(err) => createErrorNotice(err, { type: 'snackbar' })}
+					onHTMLDrop={(_html: string) => {}}
 				></MediaPlaceholder>
 			) : (
 				<View isGutenbergEditor isSelected={isSelected} />
