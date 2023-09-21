@@ -5,6 +5,9 @@ singleQuote: true
 printWidth: 160
 multilineArraysWrapThreshold: 4
 
+plugins:
+  - "prettier-plugin-multiline-arrays"
+
 # PHP settings
 phpVersion: '7.0'
 braceStyle: '1tbs'
