@@ -47,7 +47,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 
 	return (
 		<>
-			<BlockControls>
+			<BlockControls controls={[]}>
 				{isValueSet && (
 					<ToolbarGroup>
 						<ToolbarButton

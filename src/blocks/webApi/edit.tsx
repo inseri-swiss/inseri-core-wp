@@ -184,7 +184,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					</Stack>
 				</Group>
 			</Modal>
-			<BlockControls>
+			<BlockControls controls={[]}>
 				<ToolbarGroup>
 					<ToolbarButton
 						icon={<IconWindowMaximize style={{ fill: 'none' }} />}
