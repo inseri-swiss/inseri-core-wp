@@ -10,7 +10,7 @@ const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
 const nanoid = customAlphabet(alphabet, 21)
 const generateId = (size?: number) => nanoid(size)
 
-const ajv = new Ajv({ allErrors: true })
+const ajv = new Ajv({ allErrors: true, strict: false })
 addFormats(ajv)
 
 function initJsonValidator<T = any>(schema: Schema) {
