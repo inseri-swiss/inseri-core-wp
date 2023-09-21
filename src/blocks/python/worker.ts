@@ -2,7 +2,7 @@ import { loadPyodide, PyodideInterface } from 'pyodide'
 import { Action } from './WorkerActions'
 
 // version must match with npm package version
-const BINARY_URL = 'https://cdn.jsdelivr.net/pyodide/v0.23.0/full/'
+const BINARY_URL = 'https://cdn.jsdelivr.net/pyodide/v0.24.0/full/'
 
 let pyodide: PyodideInterface | null = null
 let inputs: Record<string, any> = {}
@@ -43,7 +43,7 @@ function retrievePyObjects(name: string): [string, any] {
 	let convertedData = data
 
 	try {
-		if (pyodide?.isPyProxy(data)) {
+		if (data instanceof pyodide!.ffi.PyProxy) {
 			convertedData = data.toJs({ dict_converter: Object.fromEntries })
 			data.destroy()
 		}
@@ -52,7 +52,7 @@ function retrievePyObjects(name: string): [string, any] {
 			convertedData = mapSetToArray(convertedData)
 		}
 
-		if (pyodide?.isPyProxy(convertedData)) {
+		if (convertedData instanceof pyodide!.ffi.PyProxy) {
 			stdBuffer.push(name + ' is not JSON serializable')
 			return [name, null]
 		}
