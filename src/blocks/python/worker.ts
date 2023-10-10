@@ -2,7 +2,7 @@ import { loadPyodide, PyodideInterface } from 'pyodide'
 import { Action } from './WorkerActions'
 
 // version must match with npm package version
-const BINARY_URL = 'https://cdn.jsdelivr.net/pyodide/v0.24.0/full/'
+const BINARY_URL = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'
 
 let pyodide: PyodideInterface | null = null
 let inputs: Record<string, any> = {}
