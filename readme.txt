@@ -2,9 +2,9 @@
 Contributors: inseriswiss
 Tags: Gutenberg blocks, WordPress blocks, gutenberg, blocks, inseri
 Requires at least: 5.6
-Tested up to: 6.2
+Tested up to: 6.3.1
 Requires PHP: 5.6
-Stable tag: 0.2.1
+Stable tag: 0.3.0
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -49,13 +49,17 @@ Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inser
 6. Render HTML code
 
 == Changelog ==
-### 0.2.1
+### [0.3.0](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.3.0)
+- BREAKING CHANGE: change underlying block connection protocol
+- New: enable to copy/duplicate the blocks together while preserving the connection
+- Update: pyodide 0.24.1
+- Update: diverse dependencies
+
+### [0.2.1](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.2.1)
 - minor changes
 
-### 0.2.0
-
-#### Breaking changes:
-- renaming block from 'Media Library' to 'Media Collection'
+### [0.2.0](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.2.0)
+- BREAKING CHANGE: renaming block from 'Media Library' to 'Media Collection'
 
 ### 0.1.0 MVP
 added 12 new blocks:
