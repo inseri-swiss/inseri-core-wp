@@ -2,7 +2,7 @@ import { InseriRoot, useDiscover } from '@inseri/lighthouse'
 import { IconZoomInArea } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { PanelBody, PanelRow, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
+import { PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
@@ -22,7 +22,7 @@ const urlSchema = {
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { inputKey, blockName, isWizardMode, actions } = useGlobalState((state: GlobalState) => state)
+	const { inputKey, blockName, isWizardMode, actions, showTitle, showInformationPanel, showBadge } = useGlobalState((state: GlobalState) => state)
 	const isValueSet = !!inputKey
 	const { updateState } = actions
 
@@ -34,6 +34,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 			updateState({ isWizardMode: false })
 		}
 	}, [isSelected])
+
+	const infoPanelHelp = showInformationPanel ? __('The information panel is shown.', 'inseri-core') : __('The information panel is hidden.', 'inseri-core')
 
 	return (
 		<>
@@ -55,6 +57,30 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 				<PanelBody>
 					<PanelRow>
 						<TextControl label="Block Name" value={blockName} onChange={(value) => updateState({ blockName: value })} />
+					</PanelRow>
+					<PanelRow>
+						<ToggleControl
+							label={__('Show Content Title', 'inseri-core')}
+							help={showTitle ? __('The title is displayed.', 'inseri-core') : __('The title is hidden.', 'inseri-core')}
+							checked={showTitle}
+							onChange={() => updateState({ showTitle: !showTitle })}
+						/>
+					</PanelRow>
+					<PanelRow>
+						<ToggleControl
+							label={__('Show Information Panel', 'inseri-core')}
+							help={infoPanelHelp}
+							checked={showInformationPanel}
+							onChange={() => updateState({ showInformationPanel: !showInformationPanel })}
+						/>
+					</PanelRow>
+					<PanelRow>
+						<ToggleControl
+							label={__('Show IIIF Badge', 'inseri-core')}
+							help={showBadge ? __('IIIF Badge Title is displayed.', 'inseri-core') : __('IIIF Badge is hidden.', 'inseri-core')}
+							checked={showBadge}
+							onChange={() => updateState({ showBadge: !showBadge })}
+						/>
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>

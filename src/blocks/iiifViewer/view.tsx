@@ -1,14 +1,17 @@
-import { useWatch, Nucleus } from '@inseri/lighthouse'
+import { Nucleus, useWatch } from '@inseri/lighthouse'
 import { IconCircleOff } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
 import { Group, Text, useGlobalState } from '../../components'
 import { GlobalState } from './state'
 //@ts-ignore
 import Viewer from '@samvera/clover-iiif/viewer' // eslint-disable-line import/no-unresolved
+import { useState } from '@wordpress/element'
+import { useAsync } from 'react-use'
 
 export default function View() {
-	const { inputKey } = useGlobalState((state: GlobalState) => state)
+	const { inputKey, showTitle, showInformationPanel, showBadge } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
+	const [loadsManifest, setLoadsManifest] = useState(true)
 
 	const { isEmpty, altText, value } = useWatch(inputKey, {
 		onBlockRemoved: () => updateState({ inputKey: '', isWizardMode: true }),
@@ -22,7 +25,18 @@ export default function View() {
 		},
 	})
 
-	return isEmpty ? (
+	useAsync(async () => {
+		try {
+			const response = await fetch(value)
+			setLoadsManifest(response.ok)
+		} catch {
+			setLoadsManifest(false)
+		}
+	}, [value])
+
+	const preparedAltText = !loadsManifest ? __('Failed to load IIIF manifest', 'inseri-core') : altText
+
+	return isEmpty || !loadsManifest ? (
 		<Group
 			align="center"
 			position="center"
@@ -34,10 +48,20 @@ export default function View() {
 		>
 			<IconCircleOff size={40} />
 			<Text size="xl" align="center">
-				{altText}
+				{preparedAltText}
 			</Text>
 		</Group>
 	) : (
-		<Viewer iiifContent={value} />
+		<Viewer
+			iiifContent={value}
+			options={{
+				showTitle,
+				showIIIFBadge: showBadge,
+				informationPanel: {
+					open: false,
+					renderToggle: showInformationPanel,
+				},
+			}}
+		/>
 	)
 }

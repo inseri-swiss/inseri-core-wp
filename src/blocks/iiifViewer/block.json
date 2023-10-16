@@ -17,6 +17,18 @@
 		"inputKey": {
 			"type": "string",
 			"default": ""
+		},
+		"showTitle": {
+			"type": "boolean",
+			"default": true
+		},
+		"showBadge": {
+			"type": "boolean",
+			"default": true
+		},
+		"showInformationPanel": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {

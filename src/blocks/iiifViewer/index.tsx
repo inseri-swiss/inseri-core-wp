@@ -12,6 +12,9 @@ export interface Attributes {
 	blockId: string
 	blockName: string
 	inputKey: string
+	showTitle: boolean
+	showBadge: boolean
+	showInformationPanel: boolean
 }
 
 registerBlockType<Attributes>(name, {
