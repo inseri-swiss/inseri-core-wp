@@ -56,7 +56,9 @@
 		}
 	},
 	"supports": {
-		"html": false
+		"html": false,
+		"align": true,
+		"alignWide": true
 	},
 	"textdomain": "inseri-core",
 	"editorScript": "file:./index.js",
