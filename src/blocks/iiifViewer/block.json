@@ -1,0 +1,29 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "inseri-core/iiif-viewer",
+	"title": "IIIF Viewer",
+	"category": "inseri",
+	"description": "Display IIIF content using the other block's data.",
+	"attributes": {
+		"blockId": {
+			"type": "string",
+			"default": ""
+		},
+		"blockName": {
+			"type": "string",
+			"default": ""
+		},
+		"inputKey": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"textdomain": "inseri-core",
+	"editorScript": "file:./index.js",
+	"viewScript": ["file:./hydration.js"],
+	"script": "inseri-core"
+}
