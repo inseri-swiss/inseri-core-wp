@@ -3,4 +3,3 @@ build
 coverage
 node_modules
 
-*.yml
