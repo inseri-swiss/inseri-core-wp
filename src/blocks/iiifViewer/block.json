@@ -29,6 +29,14 @@
 		"showInformationPanel": {
 			"type": "boolean",
 			"default": true
+		},
+		"dynamicHeight": {
+			"type": "boolean",
+			"default": true
+		},
+		"height": {
+			"type": "integer",
+			"default": 200
 		}
 	},
 	"supports": {

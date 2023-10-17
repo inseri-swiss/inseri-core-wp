@@ -18,11 +18,14 @@ const urlSchema = {
 		URL: { type: 'string', format: 'uri', pattern: '^https?://' },
 	},
 }
+const MIN_HEIGHT = 200
 
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { inputKey, blockName, isWizardMode, actions, showTitle, showInformationPanel, showBadge } = useGlobalState((state: GlobalState) => state)
+	const { inputKey, blockName, isWizardMode, actions, showTitle, showInformationPanel, showBadge, dynamicHeight, height } = useGlobalState(
+		(state: GlobalState) => state
+	)
 	const isValueSet = !!inputKey
 	const { updateState } = actions
 
@@ -82,6 +85,32 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 							onChange={() => updateState({ showBadge: !showBadge })}
 						/>
 					</PanelRow>
+					<PanelRow>
+						<ToggleControl
+							label={__('Dynamic Height', 'inseri-core')}
+							help={dynamicHeight ? __('Height is dynamic.', 'inseri-core') : __('Height is fixed.', 'inseri-core')}
+							checked={dynamicHeight}
+							onChange={() => updateState({ dynamicHeight: !dynamicHeight })}
+						/>
+					</PanelRow>
+					{!dynamicHeight && (
+						<PanelRow>
+							<div style={{ width: '100%' }}>
+								<TextControl
+									label={__('height', 'inseri-core')}
+									type="number"
+									min={MIN_HEIGHT}
+									value={height}
+									onChange={(value) => {
+										const newVal = parseInt(value)
+										if (newVal >= MIN_HEIGHT) {
+											updateState({ height: newVal })
+										}
+									}}
+								/>
+							</div>
+						</PanelRow>
+					)}
 				</PanelBody>
 			</InspectorControls>
 			{isWizardMode ? (
