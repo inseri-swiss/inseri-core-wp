@@ -9,7 +9,7 @@ import { useState } from '@wordpress/element'
 import { useAsync } from 'react-use'
 
 export default function View() {
-	const { inputKey, showTitle, showInformationPanel, showBadge } = useGlobalState((state: GlobalState) => state)
+	const { inputKey, showTitle, showInformationPanel, showBadge, dynamicHeight, height } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 	const [loadsManifest, setLoadsManifest] = useState(true)
 
@@ -44,6 +44,7 @@ export default function View() {
 				background: '#F8F9FA',
 				color: '#868E96',
 				padding: '8px',
+				height,
 			}}
 		>
 			<IconCircleOff size={40} />
@@ -57,6 +58,7 @@ export default function View() {
 			options={{
 				showTitle,
 				showIIIFBadge: showBadge,
+				canvasHeight: dynamicHeight ? undefined : height,
 				informationPanel: {
 					open: false,
 					renderToggle: showInformationPanel,

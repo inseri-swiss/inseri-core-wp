@@ -15,6 +15,8 @@ export interface Attributes {
 	showTitle: boolean
 	showBadge: boolean
 	showInformationPanel: boolean
+	dynamicHeight: boolean
+	height: number
 }
 
 registerBlockType<Attributes>(name, {
