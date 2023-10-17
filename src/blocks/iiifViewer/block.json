@@ -4,7 +4,7 @@
 	"name": "inseri-core/iiif-viewer",
 	"title": "IIIF Viewer",
 	"category": "inseri",
-	"description": "Display IIIF content using the other block's data.",
+	"description": "Showcase images with pan/zoom functionality, along with videos and audios consumed by an IIIF API.",
 	"attributes": {
 		"blockId": {
 			"type": "string",
