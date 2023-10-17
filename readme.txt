@@ -4,7 +4,7 @@ Tags: Gutenberg blocks, WordPress blocks, gutenberg, blocks, inseri
 Requires at least: 5.6
 Tested up to: 6.3.1
 Requires PHP: 5.6
-Stable tag: 0.3.0
+Stable tag: 0.3.1
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -20,6 +20,7 @@ As a result, inseri core introduces scientific and interactive Gutenberg blocks 
 - **[Download Block](https://docs.inseri.swiss/blocks/download/)**: It gives guests the possibility to download data from another block.
 - **[Dropdown Block](https://docs.inseri.swiss/blocks/dropdown/)**: It provides guests options to choose from and the selected option can be reused in other blocks.
 - **[HTML Code Block](https://docs.inseri.swiss/blocks/html/)**: It renders HTML code using the other block's data.
+- **IIIF Viewer Block**: It showcases images with pan/zoom functionality, along with videos and audios consumed by an IIIF API.
 - **[Image Box Block](https://docs.inseri.swiss/blocks/image/)**: It displays an image utilizing the data of another block.
 - **[Local File Import Block](https://docs.inseri.swiss/blocks/localFileImport/)**: It allows guests to provide their own data for blocks.
 - **[Media Collection Block](https://docs.inseri.swiss/blocks/mediaCollection/)**: A collection of media files is made available as data for other blocks.
@@ -49,6 +50,9 @@ Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inser
 6. Render HTML code
 
 == Changelog ==
+### [0.3.1](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.3.1)
+- New: IIIF Viewer block
+
 ### [0.3.0](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.3.0)
 - BREAKING CHANGE: change underlying block connection protocol
 - New: enable to copy/duplicate the blocks together while preserving the connection
