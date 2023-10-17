@@ -24,7 +24,7 @@ jobs:
       - uses: ncipollo/release-action@v1
         with:
           draft: true
-          artifacts: "inseri-core.zip"
+          artifacts: 'inseri-core.zip'
 
   deploy:
     name: Deploy to WordPress.org

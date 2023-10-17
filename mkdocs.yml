@@ -2,29 +2,29 @@ site_name: Documentation for inseri core <sup>beta</sub>
 site_url: https://docs.inseri.swiss/
 repo_url: https://github.com/inseri-swiss/inseri-core-wp
 nav:
-  - "Home": "index.md"
-  - "getting-started.md"
-  - "Tutorials":
-    - "tutorials/hello-world.md"
-    - "tutorials/data-mapping-with-python.md"
-  - "Blocks":
-    - "blocks/download.md"
-    - "blocks/dropdown.md"
-    - "blocks/html.md"
-    - "blocks/image.md"
-    - "blocks/localFileImport.md"
-    - "blocks/mediaCollection.md"
-    - "blocks/plotly.md"
-    - "blocks/python.md"
-    - "blocks/textEditor.md"
-    - "blocks/textViewer.md"
-    - "blocks/webApi.md"
-    - "blocks/zenodo.md"
-  - "How to":
-    - "how-to/visualizations.md"
-    - "how-to/workWithFiles.md"
-    - "how-to/packages.md"
-  - "inseri.swiss ↗": https://inseri.swiss/
+  - 'Home': 'index.md'
+  - 'getting-started.md'
+  - 'Tutorials':
+      - 'tutorials/hello-world.md'
+      - 'tutorials/data-mapping-with-python.md'
+  - 'Blocks':
+      - 'blocks/download.md'
+      - 'blocks/dropdown.md'
+      - 'blocks/html.md'
+      - 'blocks/image.md'
+      - 'blocks/localFileImport.md'
+      - 'blocks/mediaCollection.md'
+      - 'blocks/plotly.md'
+      - 'blocks/python.md'
+      - 'blocks/textEditor.md'
+      - 'blocks/textViewer.md'
+      - 'blocks/webApi.md'
+      - 'blocks/zenodo.md'
+  - 'How to':
+      - 'how-to/visualizations.md'
+      - 'how-to/workWithFiles.md'
+      - 'how-to/packages.md'
+  - 'inseri.swiss ↗': https://inseri.swiss/
 
 theme:
   name: material
