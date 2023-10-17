@@ -47,10 +47,10 @@ jobs:
       - name: Sync code changes to tag
         if: ${{inputs.push-tag}}
         run: |
-          rm -rf wp/inseri-core/tags/${ VERSION }/*
-          mkdir -p wp/inseri-core/tags/${ VERSION }
-          cp -a zip-content/* wp/inseri-core/tags/${ VERSION }
-          ls -lA wp/inseri-core/tags/${ VERSION }
+          rm -rf wp/inseri-core/tags/${VERSION}/*
+          mkdir -p wp/inseri-core/tags/${VERSION}
+          cp -a zip-content/* wp/inseri-core/tags/${VERSION}
+          ls -lA wp/inseri-core/tags/${VERSION}
 
       - name: Sync code changes to trunk
         if: ${{inputs.push-trunk}}
