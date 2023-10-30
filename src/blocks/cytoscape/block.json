@@ -1,0 +1,40 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "inseri-core/cytoscape",
+	"title": "Cytoscape",
+	"category": "inseri",
+	"description": "Display network diagram using the data of another block with Cytoscape.",
+	"attributes": {
+		"blockId": {
+			"type": "string",
+			"default": ""
+		},
+		"blockName": {
+			"type": "string",
+			"default": ""
+		},
+		"inputKey": {
+			"type": "string",
+			"default": ""
+		},
+		"height": {
+			"type": "integer",
+			"default": 150
+		},
+		"layout": {
+			"type": "string",
+			"default": "random"
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": true,
+		"alignWide": true
+	},
+	"textdomain": "inseri-core",
+	"editorScript": "file:./index.js",
+	"viewScript": ["file:./hydration.js"],
+	"style": ["file:./index.css"],
+	"script": "inseri-core"
+}
