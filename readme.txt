@@ -20,7 +20,7 @@ As a result, inseri core introduces scientific and interactive Gutenberg blocks 
 - **[Download Block](https://docs.inseri.swiss/blocks/download/)**: It gives guests the possibility to download data from another block.
 - **[Dropdown Block](https://docs.inseri.swiss/blocks/dropdown/)**: It provides guests options to choose from and the selected option can be reused in other blocks.
 - **[HTML Code Block](https://docs.inseri.swiss/blocks/html/)**: It renders HTML code using the other block's data.
-- **IIIF Viewer Block**: It showcases images with pan/zoom functionality, along with videos and audios consumed by an IIIF API.
+- **[IIIF Viewer Block](https://docs.inseri.swiss/blocks/IIIFViewer/)**: It showcases images with pan/zoom functionality, along with videos and audios consumed by an IIIF API.
 - **[Image Box Block](https://docs.inseri.swiss/blocks/image/)**: It displays an image utilizing the data of another block.
 - **[Local File Import Block](https://docs.inseri.swiss/blocks/localFileImport/)**: It allows guests to provide their own data for blocks.
 - **[Media Collection Block](https://docs.inseri.swiss/blocks/mediaCollection/)**: A collection of media files is made available as data for other blocks.
