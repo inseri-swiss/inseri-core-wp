@@ -11,7 +11,7 @@ nav:
       - 'blocks/download.md'
       - 'blocks/dropdown.md'
       - 'blocks/html.md'
-      - 'blocks/IIIFViewer.md'
+      - 'blocks/iiifViewer.md'
       - 'blocks/image.md'
       - 'blocks/localFileImport.md'
       - 'blocks/mediaCollection.md'
