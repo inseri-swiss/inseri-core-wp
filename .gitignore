@@ -28,10 +28,12 @@ venv/
 # dotenv environment variables file
 .env
 
-
 .wp-env.json
 
 # Apple desktop services store
 .DS_store
 
 inseri-core.zip
+
+# pipenv lock file
+Pipfile.lock

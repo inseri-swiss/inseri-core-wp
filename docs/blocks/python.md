@@ -6,6 +6,11 @@ This block allows multiple inputs and outputs. This makes it interesting to tie 
 
 To set the inputs and outputs for the script, select "open extended view" which opens a popup.
 
+## Input
+
+A Python file or the user can directly write the code.
+Moreover in the extended view below it is possible to define input variables.
+
 ## Extended view
 
 Imagine we have the following Python script:

@@ -6,6 +6,10 @@ With the Web API block, you can include data from an external source into your p
 
 For GET requests without additional parameters, it is enough to enter the URL and the response data type.
 
+## Input
+
+Below in the extended configuration one can define inputs for URL, query parameters, headers and body.
+
 ## Extended configuration
 
 ### Static values
