@@ -20,6 +20,7 @@ const layoutOptions = [
 	{ label: 'concentric', value: 'concentric' },
 	{ label: 'breadthfirst', value: 'breadthfirst' },
 	{ label: 'cose', value: 'cose' },
+	{ label: 'dagre', value: 'dagre' },
 ]
 
 function EditComponent(props: BlockEditProps<Attributes>) {
@@ -75,9 +76,11 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					<PanelRow>
 						<div style={{ width: '100%' }}>
 							<SelectControl
-								label={__('Resizing behavior', 'inseri-core')}
+								label={__('Layout', 'inseri-core')}
 								value={layout}
-								onChange={(value) => updateState({ layout: value })}
+								onChange={(value) => {
+									updateState({ layout: value })
+								}}
 								options={layoutOptions}
 							/>
 						</div>

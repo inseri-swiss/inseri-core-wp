@@ -1,6 +1,10 @@
 import { useEffect, useRef } from '@wordpress/element'
 import cytoscape from 'cytoscape'
+//@ts-ignore
+import dagre from 'cytoscape-dagre'
 import { useDeepCompareEffect } from 'react-use'
+
+cytoscape.use(dagre)
 
 const stylesheet = [
 	{
