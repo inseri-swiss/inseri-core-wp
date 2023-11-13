@@ -2,13 +2,58 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState } from 
 import { Schema } from 'ajv'
 import type { PropsWithChildren } from 'react'
 import { useDeepCompareEffect, usePrevious } from 'react-use'
-import { BehaviorSubject, map, pairwise, distinctUntilChanged, combineLatest, Observable } from 'rxjs'
+import { BehaviorSubject, map, pairwise, distinctUntilChanged, combineLatest, Observable, scan } from 'rxjs'
 import { Option, none, some } from './option'
 import { reducer } from './reducer'
 import type { Action, Atom, BlockInfo, Nucleus, Root } from './types'
 import { initJsonValidator } from './utils'
 
-const blockStoreSubject = new BehaviorSubject<Root>({})
+const blockStoreSubject = new BehaviorSubject<Root>({
+	root: {
+		blockName: 'root',
+		blockType: 'inseri-core/root',
+		state: 'ready',
+		atoms: { 'data-flow': { description: 'data-flow', content: some({ contentType: 'application/json', value: [] }) } },
+	},
+})
+
+const edgesSubject = new BehaviorSubject<any>({})
+const edgesObs = edgesSubject.pipe(
+	scan((acc, curr) => {
+		const merged = { ...acc, ...curr }
+		return Object.fromEntries(Object.entries(merged).filter(([_k, v]) => !!v))
+	}),
+	map<any, any>((record) => Object.values(record).map((edge) => ({ data: edge })))
+)
+const blockNodesObs = blockStoreSubject.pipe(
+	map((root) => {
+		return Object.entries(root).map(([blockId, block]) => ({ data: { id: blockId, label: block.blockName } }))
+	})
+)
+const valNodesObs = blockStoreSubject.pipe(
+	map(flattenToRawItem),
+	map((rawItems) => {
+		return rawItems.map((i) => ({ data: { id: i.key, label: i.atomDesc, parent: i.blockId } }))
+	})
+)
+
+combineLatest([blockNodesObs, valNodesObs, edgesObs], (...collected) => collected.flat())
+	.pipe(
+		distinctUntilChanged((prev, current) => {
+			return (
+				prev.length === current.length &&
+				prev
+					.map((item, idx) => {
+						const currentItem = current[idx]
+						return item.data.id === currentItem.data.id && item.data.label === currentItem.data.label
+					})
+					.reduce((a, b) => a && b, true)
+			)
+		})
+	)
+	.forEach((nodes) => {
+		onNext({ type: 'set-value', payload: { blockId: 'root', key: 'data-flow', content: some({ contentType: 'application/json', value: nodes }) } })
+	})
 
 function onNext(action: Action) {
 	const reducedBase = reducer(blockStoreSubject.getValue(), action)
@@ -69,7 +114,7 @@ interface DiscoverJson {
 
 type DiscoverOptions = DiscoverContentType | DiscoverJson
 
-type RawValueItem = Omit<BlockInfo, 'atoms'> & Atom & { key: string; blockId: string; atomKey: string }
+type RawValueItem = Omit<BlockInfo, 'atoms'> & Atom & { key: string; blockId: string; atomKey: string; atomDesc: string }
 
 interface DiscoveredItem {
 	key: string
@@ -82,7 +127,15 @@ function flattenToRawItem(root: Root): RawValueItem[] {
 			.filter(([_, atom]) => !!atom)
 			.map(([atomKey, atom]) => {
 				const { atoms, ...restBlock } = block
-				return { key: blockId + '/' + atomKey, atomKey, blockId, ...restBlock, ...atom, description: block.blockName + ' - ' + atom.description }
+				return {
+					key: blockId + '/' + atomKey,
+					atomKey,
+					blockId,
+					...restBlock,
+					...atom,
+					description: block.blockName + ' - ' + atom.description,
+					atomDesc: atom.description,
+				}
 			})
 	)
 }
@@ -276,6 +329,7 @@ function useWatch<A = any, B = any>(keys: Record<string, string>, ops?: WatchOps
 function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?: WatchOps<A, B>): any {
 	const onBlockRemoved = ops?.onBlockRemoved
 	const isRecord = typeof keys !== 'string'
+	const subscribersBlockId = useContext(BlockIdContext)
 
 	const longKeys = isRecord ? Object.values(keys) : [keys]
 	const names = isRecord ? Object.keys(keys) : ['']
@@ -293,6 +347,10 @@ function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?:
 	}, [...deps])
 
 	useEffect(() => {
+		const idLongKeyPairs = longKeys.map((key) => [subscribersBlockId + '-' + key, key])
+		const edges = Object.fromEntries(idLongKeyPairs.map(([id, key]) => [id, { source: key, target: subscribersBlockId, id }]))
+		edgesSubject.next(edges)
+
 		const onBlockRemovedSubs = splitTheKey(keysByName).map(([name, blockId, atomKey]) =>
 			blockStoreSubject
 				.pipe(
@@ -321,6 +379,9 @@ function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?:
 		return () => {
 			onBlockRemovedSubs.forEach((s) => s.unsubscribe())
 			valueSubscription.unsubscribe()
+
+			const edgesToRemove = Object.fromEntries(idLongKeyPairs.map(([id, _key]) => [id, null]))
+			edgesSubject.next(edgesToRemove)
 		}
 	}, [longKeys.join(), names.join()])
 
