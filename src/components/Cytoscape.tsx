@@ -11,6 +11,24 @@ const stylesheet = [
 		selector: 'node',
 		style: {
 			label: 'data(label)',
+			'background-color': '#11479e',
+			'font-size': '0.3em',
+		},
+	},
+	{
+		selector: 'node:parent',
+		style: {
+			'background-opacity': 0.1,
+		},
+	},
+	{
+		selector: 'edge',
+		style: {
+			width: 4,
+			'target-arrow-shape': 'triangle',
+			'line-color': '#9dbaea',
+			'target-arrow-color': '#9dbaea',
+			'curve-style': 'bezier',
 		},
 	},
 ]

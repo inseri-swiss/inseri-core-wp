@@ -8,22 +8,50 @@ import { reducer } from './reducer'
 import type { Action, Atom, BlockInfo, Nucleus, Root } from './types'
 import { initJsonValidator } from './utils'
 
+const compareNodes = distinctUntilChanged((prev: any, current: any) => {
+	return (
+		prev.length === current.length &&
+		prev
+			.map((item: any, idx: number) => {
+				const currentItem: any = current[idx]
+				return (
+					item.data.id === currentItem.data.id &&
+					item.data.label === currentItem.data.label &&
+					item.data.source === currentItem.data.source &&
+					item.data.target === currentItem.data.target
+				)
+			})
+			.reduce((a: boolean, b: boolean) => a && b, true)
+	)
+})
+
 const blockStoreSubject = new BehaviorSubject<Root>({
 	root: {
 		blockName: 'root',
 		blockType: 'inseri-core/root',
 		state: 'ready',
-		atoms: { 'data-flow': { description: 'data-flow', content: some({ contentType: 'application/json', value: [] }) } },
+		atoms: {
+			'detailed-data-flow': { description: 'detailed data-flow', content: some({ contentType: 'application/json', value: [] }) },
+			'data-flow': { description: 'data-flow', content: some({ contentType: 'application/json', value: [] }) },
+		},
 	},
 })
 
-const edgesSubject = new BehaviorSubject<any>({})
-const edgesObs = edgesSubject.pipe(
-	scan((acc, curr) => {
-		const merged = { ...acc, ...curr }
-		return Object.fromEntries(Object.entries(merged).filter(([_k, v]) => !!v))
-	}),
-	map<any, any>((record) => Object.values(record).map((edge) => ({ data: edge })))
+interface Edge {
+	id: string
+	source: string
+	target: string
+}
+
+const edgesSubject = new BehaviorSubject<Record<string, Edge>>({})
+const edgesToValuesObs = edgesSubject.pipe(
+	scan((acc, curr) => Object.fromEntries(Object.entries({ ...acc, ...curr }).filter(([_k, v]) => !!v))),
+	map((record) => Object.values(record).map((edge) => ({ data: edge })))
+)
+const edgesToBlockObs = edgesSubject.pipe(
+	scan((acc, curr) => Object.fromEntries(Object.entries({ ...acc, ...curr }).filter(([_k, v]) => !!v))),
+	map((record) => Object.fromEntries(Object.entries(record).map(([k, v]) => [k, { ...v, source: v.source.split('/')[0] }]))),
+	map((record) => Object.values(record).map((edge) => ({ data: edge })))
 )
 const blockNodesObs = blockStoreSubject.pipe(
 	map((root) => {
@@ -37,20 +65,14 @@ const valNodesObs = blockStoreSubject.pipe(
 	})
 )
 
-combineLatest([blockNodesObs, valNodesObs, edgesObs], (...collected) => collected.flat())
-	.pipe(
-		distinctUntilChanged((prev, current) => {
-			return (
-				prev.length === current.length &&
-				prev
-					.map((item, idx) => {
-						const currentItem = current[idx]
-						return item.data.id === currentItem.data.id && item.data.label === currentItem.data.label
-					})
-					.reduce((a, b) => a && b, true)
-			)
-		})
-	)
+combineLatest([blockNodesObs, valNodesObs, edgesToValuesObs], (...collected) => collected.flat())
+	.pipe(compareNodes)
+	.forEach((nodes) => {
+		onNext({ type: 'set-value', payload: { blockId: 'root', key: 'detailed-data-flow', content: some({ contentType: 'application/json', value: nodes }) } })
+	})
+
+combineLatest([blockNodesObs, edgesToBlockObs], (...collected) => collected.flat())
+	.pipe(compareNodes)
 	.forEach((nodes) => {
 		onNext({ type: 'set-value', payload: { blockId: 'root', key: 'data-flow', content: some({ contentType: 'application/json', value: nodes }) } })
 	})
@@ -381,7 +403,7 @@ function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?:
 			valueSubscription.unsubscribe()
 
 			const edgesToRemove = Object.fromEntries(idLongKeyPairs.map(([id, _key]) => [id, null]))
-			edgesSubject.next(edgesToRemove)
+			edgesSubject.next(edgesToRemove as any)
 		}
 	}, [longKeys.join(), names.join()])
 
