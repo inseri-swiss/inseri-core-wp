@@ -28,6 +28,13 @@ const initialEntrypoints = {
 			type: 'window',
 		},
 	},
+	'inseri-core-editor': {
+		import: './src/globalScript/editor',
+		library: {
+			name: 'inseriEditor',
+			type: 'window',
+		},
+	},
 }
 
 const blockEntrypoints = fs.readdirSync('./src/blocks').reduce((accumulator, item) => {
