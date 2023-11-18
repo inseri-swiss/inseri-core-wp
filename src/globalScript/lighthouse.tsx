@@ -27,12 +27,13 @@ const compareNodes = distinctUntilChanged((prev: any, current: any) => {
 
 const blockStoreSubject = new BehaviorSubject<Root>({
 	root: {
-		blockName: 'root',
+		blockName: 'inseri',
 		blockType: 'inseri-core/root',
 		state: 'ready',
 		atoms: {
 			'detailed-data-flow': { description: 'detailed data-flow', content: some({ contentType: 'application/json', value: [] }) },
 			'data-flow': { description: 'data-flow', content: some({ contentType: 'application/json', value: [] }) },
+			blocks: { description: 'blocks', content: some({ contentType: 'application/json', value: [] }) },
 		},
 	},
 })
@@ -67,19 +68,36 @@ const valNodesObs = blockStoreSubject.pipe(
 
 combineLatest([blockNodesObs, valNodesObs, edgesToValuesObs], (...collected) => collected.flat())
 	.pipe(compareNodes)
-	.forEach((nodes) => {
-		onNext({ type: 'set-value', payload: { blockId: 'root', key: 'detailed-data-flow', content: some({ contentType: 'application/json', value: nodes }) } })
-	})
+	.forEach((nodes) => onNextRoot('detailed-data-flow', nodes))
 
 combineLatest([blockNodesObs, edgesToBlockObs], (...collected) => collected.flat())
 	.pipe(compareNodes)
-	.forEach((nodes) => {
-		onNext({ type: 'set-value', payload: { blockId: 'root', key: 'data-flow', content: some({ contentType: 'application/json', value: nodes }) } })
-	})
+	.forEach((nodes) => onNextRoot('data-flow', nodes))
+
+blockStoreSubject
+	.pipe(
+		map((root) => Object.entries(root).map(([blockId, { blockName, blockType }]) => ({ id: blockId, blockName, blockType }))),
+		distinctUntilChanged((prev, current) => {
+			return (
+				prev.length === current.length &&
+				prev
+					.map((item, idx) => {
+						const currentItem = current[idx]
+						return item.id === currentItem.id && item.blockName === currentItem.blockName && item.blockType === currentItem.blockType
+					})
+					.reduce((a, b) => a && b, true)
+			)
+		})
+	)
+	.forEach((vals) => onNextRoot('blocks', vals))
 
 function onNext(action: Action) {
 	const reducedBase = reducer(blockStoreSubject.getValue(), action)
 	blockStoreSubject.next(reducedBase)
+}
+
+function onNextRoot(key: string, value: any) {
+	onNext({ type: 'set-value', payload: { blockId: 'root', key, content: some({ contentType: 'application/json', value }) } })
 }
 
 if (process.env.NODE_ENV !== 'production') {
@@ -369,7 +387,7 @@ function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?:
 	}, [...deps])
 
 	useEffect(() => {
-		const idLongKeyPairs = longKeys.map((key) => [subscribersBlockId + '-' + key, key])
+		const idLongKeyPairs = longKeys.filter((k) => !!k).map((key) => [subscribersBlockId + '-' + key, key])
 		const edges = Object.fromEntries(idLongKeyPairs.map(([id, key]) => [id, { source: key, target: subscribersBlockId, id }]))
 		edgesSubject.next(edges)
 

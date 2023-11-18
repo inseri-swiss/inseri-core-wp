@@ -24,7 +24,7 @@
 		},
 		"layout": {
 			"type": "string",
-			"default": "random"
+			"default": "dagre"
 		}
 	},
 	"supports": {

@@ -12,7 +12,6 @@ const stylesheet = [
 		style: {
 			label: 'data(label)',
 			'background-color': '#11479e',
-			'font-size': '0.3em',
 		},
 	},
 	{
@@ -47,7 +46,7 @@ export function CytoscapeComponent(props: Props) {
 	const divContainer = useRef<HTMLDivElement>(null)
 
 	useEffect(() => {
-		cy.current = cytoscape({ style: stylesheet, container: divContainer.current, layout: { name: layoutName as any } })
+		cy.current = cytoscape({ style: stylesheet, container: divContainer.current, layout: { name: layoutName as any }, userZoomingEnabled: false })
 	}, [])
 
 	useEffect(() => {
