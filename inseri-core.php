@@ -40,16 +40,11 @@ require_once plugin_dir_path(__FILE__) . 'includes/utils.php';
 add_action('init', function () {
 	global $wp_scripts;
 
-	$asset_file_inseri = include plugin_dir_path(__FILE__) . 'build/inseri-core.asset.php';
-	wp_register_script('inseri-core', plugins_url('build/inseri-core.js', __FILE__), $asset_file_inseri['dependencies'], $asset_file_inseri['version']);
-
-	$asset_file_worker = include plugin_dir_path(__FILE__) . 'build/blocks/python/worker.asset.php';
-	wp_register_script(
-		'inseri-core-python-worker',
-		plugins_url('build/blocks/python/worker.js', __FILE__),
-		$asset_file_worker['dependencies'],
-		$asset_file_worker['version']
-	);
+	$handle_path_pairs = [['inseri-core', 'inseri-core'], ['inseri-core-editor', 'inseri-core-editor'], ['inseri-core-python-worker', 'blocks/python/worker']];
+	foreach ($handle_path_pairs as [$handle, $path]) {
+		$asset_file = include plugin_dir_path(__FILE__) . "build/{$path}.asset.php";
+		wp_register_script($handle, plugins_url("build/{$path}.js", __FILE__), $asset_file['dependencies'], $asset_file['version']);
+	}
 
 	wp_localize_script('inseri-core', 'inseriApiSettings', [
 		'root' => esc_url_raw(rest_url()),
