@@ -1,32 +1,24 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from '@wordpress/element'
 import { Schema } from 'ajv'
+import isDeepEqualReact from 'fast-deep-equal/react'
 import type { PropsWithChildren } from 'react'
 import { useDeepCompareEffect, usePrevious } from 'react-use'
-import { BehaviorSubject, map, pairwise, distinctUntilChanged, combineLatest, Observable, scan } from 'rxjs'
+import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged, map, pairwise, scan } from 'rxjs'
 import { Option, none, some } from './option'
 import { reducer } from './reducer'
 import type { Action, Atom, BlockInfo, Nucleus, Root } from './types'
 import { initJsonValidator } from './utils'
 
-const compareNodes = distinctUntilChanged((prev: any, current: any) => {
-	return (
-		prev.length === current.length &&
-		prev
-			.map((item: any, idx: number) => {
-				const currentItem: any = current[idx]
-				return (
-					item.data.id === currentItem.data.id &&
-					item.data.label === currentItem.data.label &&
-					item.data.source === currentItem.data.source &&
-					item.data.target === currentItem.data.target
-				)
-			})
-			.reduce((a: boolean, b: boolean) => a && b, true)
-	)
-})
+/*
+ * _root is internal
+ * __sidebar is private
+ */
+
+const FILTER_INTERNAL_PRIVATE = '_'
+const FILTER_PRIVATE = '__'
 
 const blockStoreSubject = new BehaviorSubject<Root>({
-	root: {
+	_root: {
 		blockName: 'inseri',
 		blockType: 'inseri-core/root',
 		state: 'ready',
@@ -56,7 +48,9 @@ const edgesToBlockObs = edgesSubject.pipe(
 )
 const blockNodesObs = blockStoreSubject.pipe(
 	map((root) => {
-		return Object.entries(root).map(([blockId, block]) => ({ data: { id: blockId, label: block.blockName } }))
+		return Object.entries(root)
+			.filter(([blockId]) => !blockId.startsWith(FILTER_PRIVATE))
+			.map(([blockId, block]) => ({ data: { id: blockId, label: block.blockName } }))
 	})
 )
 const valNodesObs = blockStoreSubject.pipe(
@@ -67,27 +61,21 @@ const valNodesObs = blockStoreSubject.pipe(
 )
 
 combineLatest([blockNodesObs, valNodesObs, edgesToValuesObs], (...collected) => collected.flat())
-	.pipe(compareNodes)
+	.pipe(distinctUntilChanged((prev, current) => isDeepEqualReact(prev, current)))
 	.forEach((nodes) => onNextRoot('detailed-data-flow', nodes))
 
 combineLatest([blockNodesObs, edgesToBlockObs], (...collected) => collected.flat())
-	.pipe(compareNodes)
+	.pipe(distinctUntilChanged((prev, current) => isDeepEqualReact(prev, current)))
 	.forEach((nodes) => onNextRoot('data-flow', nodes))
 
 blockStoreSubject
 	.pipe(
-		map((root) => Object.entries(root).map(([blockId, { blockName, blockType }]) => ({ id: blockId, blockName, blockType }))),
-		distinctUntilChanged((prev, current) => {
-			return (
-				prev.length === current.length &&
-				prev
-					.map((item, idx) => {
-						const currentItem = current[idx]
-						return item.id === currentItem.id && item.blockName === currentItem.blockName && item.blockType === currentItem.blockType
-					})
-					.reduce((a, b) => a && b, true)
-			)
-		})
+		map((root) =>
+			Object.entries(root)
+				.filter(([blockId]) => !blockId.startsWith(FILTER_INTERNAL_PRIVATE))
+				.map(([blockId, { blockName, blockType }]) => ({ id: blockId, blockName, blockType }))
+		),
+		distinctUntilChanged((prev, current) => isDeepEqualReact(prev, current))
 	)
 	.forEach((vals) => onNextRoot('blocks', vals))
 
@@ -97,7 +85,7 @@ function onNext(action: Action) {
 }
 
 function onNextRoot(key: string, value: any) {
-	onNext({ type: 'set-value', payload: { blockId: 'root', key, content: some({ contentType: 'application/json', value }) } })
+	onNext({ type: 'set-value', payload: { blockId: '_root', key, content: some({ contentType: 'application/json', value }) } })
 }
 
 if (process.env.NODE_ENV !== 'production') {
@@ -387,7 +375,13 @@ function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?:
 	}, [...deps])
 
 	useEffect(() => {
-		const idLongKeyPairs = longKeys.filter((k) => !!k).map((key) => [subscribersBlockId + '-' + key, key])
+		const idLongKeyPairs = subscribersBlockId.startsWith(FILTER_PRIVATE)
+			? []
+			: longKeys
+					.filter((k) => !!k)
+					.map((key) => {
+						return [subscribersBlockId + '-' + key, key]
+					})
 		const edges = Object.fromEntries(idLongKeyPairs.map(([id, key]) => [id, { source: key, target: subscribersBlockId, id }]))
 		edgesSubject.next(edges)
 
