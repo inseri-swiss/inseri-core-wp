@@ -6,7 +6,7 @@ import { useDeepCompareEffect } from 'react-use'
 
 cytoscape.use(dagre)
 
-const stylesheet = [
+const defaultStylesheet = [
 	{
 		selector: 'node',
 		style: {
@@ -34,13 +34,14 @@ const stylesheet = [
 
 interface Props {
 	layoutName: string
-	height: number
-	elements: { nodes: any[]; edges: any[] }
+	height: number | string
+	elements: any[]
+	stylesheet?: any[]
 	onSelect?: (node: any, type: string) => void
 }
 
 export function CytoscapeComponent(props: Props) {
-	const { layoutName, height, elements, onSelect } = props
+	const { layoutName, height, elements, onSelect, stylesheet = defaultStylesheet } = props
 
 	const cy = useRef<cytoscape.Core>()
 	const divContainer = useRef<HTMLDivElement>(null)
