@@ -9,16 +9,10 @@ import { reducer } from './reducer'
 import type { Action, Atom, BlockInfo, Nucleus, Root } from './types'
 import { initJsonValidator } from './utils'
 
-/*
- * _root is internal
- * __sidebar is private
- */
-
-const FILTER_INTERNAL_PRIVATE = '_'
 const FILTER_PRIVATE = '__'
 
 const blockStoreSubject = new BehaviorSubject<Root>({
-	_root: {
+	__root: {
 		blockName: 'inseri',
 		blockType: 'inseri-core/root',
 		state: 'ready',
@@ -72,7 +66,7 @@ blockStoreSubject
 	.pipe(
 		map((root) =>
 			Object.entries(root)
-				.filter(([blockId]) => !blockId.startsWith(FILTER_INTERNAL_PRIVATE))
+				.filter(([blockId]) => !blockId.startsWith(FILTER_PRIVATE))
 				.map(([blockId, { blockName, blockType }]) => ({ id: blockId, blockName, blockType }))
 		),
 		distinctUntilChanged((prev, current) => isDeepEqualReact(prev, current))
@@ -85,7 +79,7 @@ function onNext(action: Action) {
 }
 
 function onNextRoot(key: string, value: any) {
-	onNext({ type: 'set-value', payload: { blockId: '_root', key, content: some({ contentType: 'application/json', value }) } })
+	onNext({ type: 'set-value', payload: { blockId: '__root', key, content: some({ contentType: 'application/json', value }) } })
 }
 
 if (process.env.NODE_ENV !== 'production') {
@@ -378,7 +372,7 @@ function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?:
 		const idLongKeyPairs = subscribersBlockId.startsWith(FILTER_PRIVATE)
 			? []
 			: longKeys
-					.filter((k) => !!k)
+					.filter((k) => !!k && !k.startsWith(FILTER_PRIVATE))
 					.map((key) => {
 						return [subscribersBlockId + '-' + key, key]
 					})

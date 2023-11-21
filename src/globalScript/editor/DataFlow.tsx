@@ -2,15 +2,19 @@ import { InseriRoot, useWatch } from '@inseri/lighthouse'
 import { IconBuildingLighthouse } from '@tabler/icons-react'
 import { select } from '@wordpress/data'
 import { PluginSidebar } from '@wordpress/edit-post'
-import { useCallback, useState } from '@wordpress/element'
+import { useCallback, useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Accordion, CytoscapeComponent, Group, Stack, Text, UnstyledButton, createStyles } from '../../components'
+import { useHover } from '@mantine/hooks'
+import { useMap } from 'react-use'
 
 const miniStylesheet = [
 	{
 		selector: 'node',
 		style: {
 			'background-color': '#757575',
+			'border-color': '#757575',
+			'border-width': '4px',
 		},
 	},
 	{
@@ -34,6 +38,9 @@ const useStyles = createStyles({
 			border: '1px solid var(--wp-admin-theme-color, #007cba)',
 		},
 	},
+	isHovered: {
+		border: '1px solid var(--wp-admin-theme-color, #007cba)',
+	},
 	activeCard: {
 		padding: '0.25rem 0.25rem',
 		border: '1px solid transparent',
@@ -43,21 +50,56 @@ const useStyles = createStyles({
 	},
 })
 
+interface ListItemProps {
+	block: { id: string; blockName: string; title: string; icon: any }
+	isSelected: boolean
+	selectBlockId: (id: string) => void
+	isHovered: boolean
+	setHovered: (isHovered: boolean) => void
+}
+
+function ListItem({ isSelected, block, selectBlockId, setHovered, isHovered }: ListItemProps) {
+	const { classes, cx } = useStyles()
+	const { hovered, ref } = useHover()
+
+	useEffect(() => {
+		setHovered(hovered)
+	}, [hovered])
+
+	const computedClassName = isSelected ? classes.activeCard : isHovered ? cx(classes.card, classes.isHovered) : classes.card
+
+	return (
+		<UnstyledButton ref={ref as any} className={computedClassName} onClick={() => selectBlockId(block.id)}>
+			<Group>
+				{block.icon}
+				<div>
+					<Text fz="sm" fw={500}>
+						{block.blockName}
+					</Text>
+					<Text fz="xs" c={isSelected ? undefined : 'dimmed'}>
+						{block.title}
+					</Text>
+				</div>
+			</Group>
+		</UnstyledButton>
+	)
+}
+
 function SideBar() {
-	const { classes } = useStyles()
 	const [openItems, setOpenItems] = useState<string[]>(['blocks', 'chart'])
 	const blockHeight = openItems.includes('chart') ? 'calc(50vh - 135px)' : undefined
 
 	const [selectedBlock, setSelectedBlock] = useState<string | null>(null)
+	const [hoveredRecord, { set: setHovered, setAll: setAllHovered }] = useMap<Record<string, boolean>>({})
 	const onSelectGraph = useCallback((event: any, type: string) => {
 		if (type === 'node') {
 			setSelectedBlock(event?.id)
 		}
 	}, [])
 
-	let chartData = useWatch('_root/data-flow', { onNone: () => [], onSome: (nucleus: any) => nucleus.value }) as any[]
+	let chartData = useWatch('__root/data-flow', { onNone: () => [], onSome: (nucleus: any) => nucleus.value }) as any[]
 	const blocks: any[] =
-		useWatch('_root/blocks', {
+		useWatch('__root/blocks', {
 			onNone: () => [],
 			onSome: (nucleus: { value: any[] }) =>
 				nucleus.value.map((item) => {
@@ -66,7 +108,17 @@ function SideBar() {
 				}),
 		}) ?? []
 
-	chartData = chartData.map((item) => (item.data?.id?.match(selectedBlock) ? { ...item, style: { 'background-color': '#007cba' } } : item))
+	chartData = chartData.map((item) => {
+		if (item.data?.id?.match(selectedBlock)) {
+			return { ...item, style: { 'background-color': '#007cba', 'border-color': '#007cba' } }
+		}
+
+		if (hoveredRecord[item.data?.id]) {
+			return { ...item, style: { 'border-color': '#424242' } }
+		}
+
+		return item
+	})
 
 	return (
 		<PluginSidebar name="inseri-core-data-flow" title="inseri Data Flow" isPinnable={true} icon={<IconBuildingLighthouse style={{ fill: 'none' }} />}>
@@ -76,25 +128,14 @@ function SideBar() {
 					<Accordion.Panel style={{ height: blockHeight, overflow: 'auto', padding: 0 }}>
 						<Stack>
 							{blocks.map((b) => (
-								<UnstyledButton
+								<ListItem
 									key={b.id}
-									className={b.id === selectedBlock ? classes.activeCard : classes.card}
-									onClick={() => {
-										setSelectedBlock(b.id)
-									}}
-								>
-									<Group>
-										{b.icon}
-										<div>
-											<Text fz="sm" fw={500}>
-												{b.blockName}
-											</Text>
-											<Text fz="xs" c={b.id !== selectedBlock ? 'dimmed' : undefined}>
-												{b.title}
-											</Text>
-										</div>
-									</Group>
-								</UnstyledButton>
+									block={b}
+									isSelected={b.id === selectedBlock}
+									selectBlockId={setSelectedBlock}
+									setHovered={(isHovered) => setHovered(b.id, isHovered)}
+									isHovered={hoveredRecord[b.id]}
+								/>
 							))}
 						</Stack>
 					</Accordion.Panel>
@@ -108,6 +149,7 @@ function SideBar() {
 							stylesheet={miniStylesheet}
 							layoutName={'dagre'}
 							onSelect={onSelectGraph}
+							onHoverChange={(hoveredDict) => setAllHovered({ ...hoveredRecord, ...hoveredDict })}
 						></CytoscapeComponent>
 					</Accordion.Panel>
 				</Accordion.Item>
