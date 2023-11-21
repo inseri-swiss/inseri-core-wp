@@ -2,7 +2,7 @@ import { useEffect, useRef } from '@wordpress/element'
 import cytoscape from 'cytoscape'
 //@ts-ignore
 import dagre from 'cytoscape-dagre'
-import { useDeepCompareEffect } from 'react-use'
+import { useDeepCompareEffect, useMap } from 'react-use'
 
 cytoscape.use(dagre)
 
@@ -38,17 +38,33 @@ interface Props {
 	elements: any[]
 	stylesheet?: any[]
 	onSelect?: (node: any, type: string) => void
+	onHoverChange?: (record: Record<string, boolean>) => void
 }
 
 export function CytoscapeComponent(props: Props) {
-	const { layoutName, height, elements, onSelect, stylesheet = defaultStylesheet } = props
+	const { layoutName, height, elements, onSelect, stylesheet = defaultStylesheet, onHoverChange } = props
 
 	const cy = useRef<cytoscape.Core>()
 	const divContainer = useRef<HTMLDivElement>(null)
+	const [hoveredRecord, { set: setHovered }] = useMap<Record<string, boolean>>({})
 
 	useEffect(() => {
 		cy.current = cytoscape({ style: stylesheet, container: divContainer.current, layout: { name: layoutName as any }, userZoomingEnabled: false })
+		cy.current.on('mouseover', 'node', (event) => {
+			const id = event.target.data().id
+			setHovered(id, true)
+		})
+		cy.current.on('mouseout', 'node', (event) => {
+			const id = event.target.data().id
+			setHovered(id, false)
+		})
 	}, [])
+
+	useDeepCompareEffect(() => {
+		if (onHoverChange) {
+			onHoverChange(hoveredRecord)
+		}
+	}, [hoveredRecord])
 
 	useEffect(() => {
 		if (cy.current && onSelect) {
