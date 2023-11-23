@@ -18,6 +18,14 @@
 			"type": "string",
 			"default": ""
 		},
+		"styleKey": {
+			"type": "string",
+			"default": ""
+		},
+		"layoutKey": {
+			"type": "string",
+			"default": ""
+		},
 		"height": {
 			"type": "integer",
 			"default": 150

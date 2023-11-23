@@ -12,6 +12,8 @@ export interface Attributes {
 	blockId: string
 	blockName: string
 	inputKey: string
+	styleKey: string
+	layoutKey: string
 	height: number
 	layout: string
 }

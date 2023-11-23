@@ -6,7 +6,7 @@ import { PanelBody, PanelRow, ResizableBox, SelectControl, TextControl, ToolbarB
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Group, Select, SetupEditorEnv, StateProvider, Text, useGlobalState } from '../../components'
+import { Accordion, Button, Group, Select, SetupEditorEnv, Stack, StateProvider, Text, useGlobalState } from '../../components'
 import json from './block.json'
 import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
@@ -26,7 +26,7 @@ const layoutOptions = [
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { inputKey, blockName, isWizardMode, actions, layout } = useGlobalState((state: GlobalState) => state)
+	const { inputKey, blockName, isWizardMode, actions, layout, styleKey, layoutKey } = useGlobalState((state: GlobalState) => state)
 	const isValueSet = !!inputKey
 	const { updateState } = actions
 
@@ -88,8 +88,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 				</PanelBody>
 			</InspectorControls>
 			{isWizardMode ? (
-				<Box p="md" style={{ border: '1px solid #000' }}>
-					<Group mb="md" spacing={0}>
+				<Stack spacing="xs" style={{ border: '1px solid #000' }}>
+					<Group pt="md" px="md" mb="sm" spacing={0}>
 						<IconChartDots3 size={28} />
 						<Text ml="xs" fz={24}>
 							{__('Cytoscape', 'inseri-core')}
@@ -97,12 +97,34 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					</Group>
 
 					<Select
+						px="md"
+						required
+						clearable
 						label={__('Display network diagram by selecting a block source', 'inseri-core')}
 						data={options}
 						value={inputKey}
-						onChange={(key) => updateState({ inputKey: key ?? '', isWizardMode: false })}
+						onChange={(key) => updateState({ inputKey: key ?? '' })}
 					/>
-				</Box>
+
+					<Accordion multiple styles={{ label: { fontSize: '14px' } }}>
+						<Accordion.Item value="style">
+							<Accordion.Control>{__('Provide custom style', 'inseri-core')}</Accordion.Control>
+							<Accordion.Panel>
+								<Select clearable data={options} value={styleKey} searchable onChange={(key) => updateState({ styleKey: key ?? '' })} />
+							</Accordion.Panel>
+						</Accordion.Item>
+						<Accordion.Item value="layout">
+							<Accordion.Control>{__('Provide additional layout config', 'inseri-core')}</Accordion.Control>
+							<Accordion.Panel>
+								<Select clearable data={options} value={layoutKey} searchable onChange={(key) => updateState({ layoutKey: key ?? '' })} />
+							</Accordion.Panel>
+						</Accordion.Item>
+					</Accordion>
+
+					<Button mx="md" mb="md" disabled={!isValueSet} onClick={() => updateState({ isWizardMode: false })}>
+						{__('Display graph', 'inseri-core')}
+					</Button>
+				</Stack>
 			) : (
 				<View renderResizable={renderResizable} />
 			)}
