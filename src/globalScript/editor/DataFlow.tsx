@@ -1,12 +1,12 @@
 import { InseriRoot, useWatch } from '@inseri/lighthouse'
+import { useHover } from '@mantine/hooks'
 import { IconBuildingLighthouse } from '@tabler/icons-react'
-import { select } from '@wordpress/data'
+import { select, useDispatch } from '@wordpress/data'
 import { PluginSidebar } from '@wordpress/edit-post'
 import { useCallback, useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
+import { useMap, usePrevious } from 'react-use'
 import { Accordion, CytoscapeComponent, Group, Stack, Text, UnstyledButton, createStyles } from '../../components'
-import { useHover } from '@mantine/hooks'
-import { useMap } from 'react-use'
 
 const miniStylesheet = [
 	{
@@ -32,18 +32,18 @@ const miniStylesheet = [
 const useStyles = createStyles({
 	card: {
 		padding: '0.25rem 0.25rem',
-		border: '1px solid transparent',
+		border: '2px solid transparent',
 		borderRadius: '3px',
 		'&:hover': {
-			border: '1px solid var(--wp-admin-theme-color, #007cba)',
+			border: '2px solid var(--wp-admin-theme-color, #007cba)',
 		},
 	},
 	isHovered: {
-		border: '1px solid var(--wp-admin-theme-color, #007cba)',
+		border: '2px solid var(--wp-admin-theme-color, #007cba)',
 	},
 	activeCard: {
 		padding: '0.25rem 0.25rem',
-		border: '1px solid transparent',
+		border: '2px solid transparent',
 		borderRadius: '3px',
 		background: 'var(--wp-admin-theme-color, #007cba)',
 		color: '#fff',
@@ -53,23 +53,23 @@ const useStyles = createStyles({
 interface ListItemProps {
 	block: { id: string; blockName: string; title: string; icon: any }
 	isSelected: boolean
-	selectBlockId: (id: string) => void
+	onClick: () => void
 	isHovered: boolean
-	setHovered: (isHovered: boolean) => void
+	onHover: (isHovered: boolean) => void
 }
 
-function ListItem({ isSelected, block, selectBlockId, setHovered, isHovered }: ListItemProps) {
+function ListItem({ isSelected, block, onClick, onHover, isHovered }: ListItemProps) {
 	const { classes, cx } = useStyles()
 	const { hovered, ref } = useHover()
 
 	useEffect(() => {
-		setHovered(hovered)
+		onHover(hovered)
 	}, [hovered])
 
 	const computedClassName = isSelected ? classes.activeCard : isHovered ? cx(classes.card, classes.isHovered) : classes.card
 
 	return (
-		<UnstyledButton ref={ref as any} className={computedClassName} onClick={() => selectBlockId(block.id)}>
+		<UnstyledButton ref={ref as any} className={computedClassName} onClick={onClick}>
 			<Group>
 				{block.icon}
 				<div>
@@ -88,14 +88,28 @@ function ListItem({ isSelected, block, selectBlockId, setHovered, isHovered }: L
 function SideBar() {
 	const [openItems, setOpenItems] = useState<string[]>(['blocks', 'chart'])
 	const blockHeight = openItems.includes('chart') ? 'calc(50vh - 135px)' : undefined
+	const { toggleBlockHighlight } = useDispatch('core/block-editor')
 
-	const [selectedBlock, setSelectedBlock] = useState<string | null>(null)
+	const [selectedBlockId, setSelectedBlockId] = useState('')
+	const prevSelectedBlockId = usePrevious(selectedBlockId) ?? ''
 	const [hoveredRecord, { set: setHovered, setAll: setAllHovered }] = useMap<Record<string, boolean>>({})
-	const onSelectGraph = useCallback((event: any, type: string) => {
-		if (type === 'node') {
-			setSelectedBlock(event?.id)
+
+	const toggleIfBlockSelected = (id: string) => {
+		if (id === selectedBlockId) {
+			setSelectedBlockId('')
+		} else {
+			setSelectedBlockId(id)
 		}
-	}, [])
+	}
+
+	const onSelectGraph = useCallback(
+		(event: any, type: string) => {
+			if (type === 'node' && event.id) {
+				toggleIfBlockSelected(event.id)
+			}
+		},
+		[selectedBlockId]
+	)
 
 	let chartData = useWatch('__root/data-flow', { onNone: () => [], onSome: (nucleus: any) => nucleus.value }) as any[]
 	const blocks: any[] =
@@ -109,7 +123,7 @@ function SideBar() {
 		}) ?? []
 
 	chartData = chartData.map((item) => {
-		if (item.data?.id?.match(selectedBlock)) {
+		if (item.data?.id === selectedBlockId) {
 			return { ...item, style: { 'background-color': '#007cba', 'border-color': '#007cba' } }
 		}
 
@@ -119,6 +133,13 @@ function SideBar() {
 
 		return item
 	})
+
+	useEffect(() => {
+		const found = blocks.find((b) => (!!selectedBlockId ? b.id === selectedBlockId : b.id === prevSelectedBlockId))
+		if (found?.clientId) {
+			toggleBlockHighlight(found.clientId, !!selectedBlockId)
+		}
+	}, [selectedBlockId])
 
 	return (
 		<PluginSidebar name="inseri-core-data-flow" title="inseri Data Flow" isPinnable={true} icon={<IconBuildingLighthouse style={{ fill: 'none' }} />}>
@@ -131,9 +152,9 @@ function SideBar() {
 								<ListItem
 									key={b.id}
 									block={b}
-									isSelected={b.id === selectedBlock}
-									selectBlockId={setSelectedBlock}
-									setHovered={(isHovered) => setHovered(b.id, isHovered)}
+									isSelected={b.id === selectedBlockId}
+									onClick={() => toggleIfBlockSelected(b.id)}
+									onHover={(isHovered) => setHovered(b.id, isHovered)}
 									isHovered={hoveredRecord[b.id]}
 								/>
 							))}
