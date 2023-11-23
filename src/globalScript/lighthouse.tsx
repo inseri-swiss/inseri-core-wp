@@ -50,6 +50,7 @@ const blockNodesObs = blockStoreSubject.pipe(
 )
 const valNodesObs = blockStoreSubject.pipe(
 	map(flattenToRawItem),
+	map((rawItems) => rawItems.filter((i) => !i.blockId.startsWith(FILTER_PRIVATE))),
 	map((rawItems) => {
 		return rawItems.map((i) => ({ data: { id: i.key, label: i.atomDesc, parent: i.blockId } }))
 	})
@@ -418,4 +419,5 @@ function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?:
 	return state
 }
 
-export { Actions, InseriRoot, Nucleus, useDiscover, usePublish, useWatch }
+export type { Actions, Nucleus }
+export { InseriRoot, useDiscover, usePublish, useWatch }
