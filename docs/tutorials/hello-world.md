@@ -18,7 +18,7 @@ Beware that changes done in the playground will not be saved.
 Add a new post with the title "Image Selection", as presented in the figure below.
 
 <figure markdown>
-![Adding a new post in WordPress](/assets/new_post.png)
+![Adding a new post in WordPress](../assets/new_post.png)
   <figcaption>Step 1: Adding a new post in WordPress: (i) hover on mouse pointer over New and next, (ii) click on Post (or click directly on New)</figcaption>
 </figure>
 
@@ -28,19 +28,19 @@ Add an inseri text editor by clicking the `+` below the title.
 Select "Browse all" and look for "Text Editor" block under the top section _inseri_.
 
 <figure markdown>
-![Adding a new block in WordPress](/assets/new_block_browse_all.png)
+![Adding a new block in WordPress](../assets/new_block_browse_all.png)
   <figcaption>Step 2: Adding a new block in WordPress: (i) click on "+" and next, (ii) click on Browse All</figcaption>
 </figure>
 
 <figure markdown>
-![Inseri category](/assets/inseri_category.png)
+![Inseri category](../assets/inseri_category.png)
   <figcaption>Step 2: "Text editor" block category "inseri"</figcaption>
 </figure>
 
 To chain more inseri blocks in this example (text editor block to dropdown menu block), please choose the format "JSON".
 
 <figure markdown>
-![Select the output format](/assets/select_json.png){width="500"}
+![Select the output format](../assets/select_json.png){width="500"}
   <figcaption>Step 2: Set the text viewer to "JSON"</figcaption>
 </figure>
 
@@ -48,7 +48,7 @@ Next, give your text editor a meaningful name.
 For this, open the configuration panel on the right and enter "textEditor-imageOptions" under _block name_.
 
 <figure markdown>
-![Edit the block name](/assets/block_name.png)
+![Edit the block name](../assets/block_name.png)
   <figcaption>Step 2: Edit the block name: (i) open the configuration panel, (ii) enter the desired name under "BLOCK NAME"</figcaption>
 </figure>
 
@@ -86,7 +86,7 @@ For the final step, we should save our post and publish it.
 Furthermore, in case of a full instance, you can now publish it.
 
 <figure markdown>
-![Save and publish](/assets/save_publish.png)
+![Save and publish](../assets/save_publish.png)
   <figcaption>Step 6: Save and publish</figcaption>
 </figure>
 

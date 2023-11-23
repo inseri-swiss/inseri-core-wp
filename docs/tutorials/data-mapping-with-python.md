@@ -28,12 +28,12 @@ For this, open the configuration panel on the right and enter "webApi-book" unde
 Do not check the option "call automatically". For testing the request you should click on "Configure the settings", and click on "TRY REQUEST".
 
 <figure markdown>
-![Web API](/assets/web_api.png)
+![Web API](../assets/web_api.png)
   <figcaption>Step 2: Click on "Configure the settings"</figcaption>
 </figure>
 
 <figure markdown>
-![Web API Try Request](/assets/web_api_try_request.png)
+![Web API Try Request](../assets/web_api_try_request.png)
   <figcaption>Step 2: Click on "TRY REQUEST" to test the request of the Web API block</figcaption>
 </figure>
 
@@ -84,7 +84,7 @@ For `year` use the content type "JSON" as there is no specific type for numbers.
 The extended view of the Python block should now look like this:
 
 <figure markdown>
-![Extended view of Python block](/assets/python-divide.png)
+![Extended view of Python block](../assets/python-divide.png)
 <figcaption>Step 4: Python block in extended view</figcaption>
 </figure>
 
@@ -95,7 +95,7 @@ Make sure that the block is set to execute automatically.
     You can hide the Python block if you want (the setting is above the execute automatically).
 
 <figure markdown>
-![Execute automatically](/assets/python_execute_automatically.png){width="300"}
+![Execute automatically](../assets/python_execute_automatically.png){width="300"}
 <figcaption>Step 4: Execute automatically setting of the Python block</figcaption>
 </figure>
 
@@ -109,7 +109,7 @@ Set their inputs to `python-divide: author`, `python-divide: year`, `python-divi
     You can edit the source of the Text Viewer block by clicking on the edit icon. This can be used for other inseri core blocks as well.
 
 <figure markdown>
-![Edit Source](/assets/text_viewer_edit.png){width="500"}
+![Edit Source](../assets/text_viewer_edit.png){width="500"}
 <figcaption>Step 5: You can edit the source used by the Text Viewer block</figcaption>
 </figure>
 ## Step 6: Save and publish
