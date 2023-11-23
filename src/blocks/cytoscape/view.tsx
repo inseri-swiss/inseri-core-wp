@@ -9,23 +9,31 @@ interface ViewProps {
 }
 
 export default function View({ renderResizable }: ViewProps) {
-	const { inputKey, height, layout } = useGlobalState((state: GlobalState) => state)
+	const { inputKey, height, layout, styleKey, layoutKey } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 
 	const [publish] = usePublish('select', 'node/edge selection')
 	const onSelect = useCallback((event: any, type: string) => publish({ _type: type, ...event }, 'application/json'), [])
 
-	const { isEmpty, altText, value } = useWatch(inputKey, {
-		onBlockRemoved: () => updateState({ inputKey: '', isWizardMode: true }),
-		onNone: () => ({ isEmpty: true, altText: 'No data is set', value: [] }),
-		onSome: (nucleus: Nucleus<string>) => {
-			if (!nucleus.contentType.match('/json')) {
-				return { isEmpty: true, altText: `This content-type ${nucleus.contentType} is not supported`, value: [] }
-			}
+	const watchRecord = useWatch(
+		{ inputKey, styleKey, layoutKey },
+		{
+			onBlockRemoved: (keyName) => {
+				updateState({ [keyName]: '', isWizardMode: true })
+			},
+			onNone: (keyName: string) => ({ isEmpty: keyName === 'inputKey', altText: 'No data is set', value: undefined }),
+			onSome: (nucleus: Nucleus<string>) => {
+				if (!nucleus.contentType.match('/json')) {
+					return { isEmpty: true, altText: `This content-type ${nucleus.contentType} is not supported`, value: undefined }
+				}
 
-			return { isEmpty: false, altText: '', value: nucleus.value }
-		},
-	})
+				return { isEmpty: false, altText: '', value: nucleus.value }
+			},
+		}
+	)
+
+	const found = Object.entries(watchRecord).find(([_k, v]) => v.isEmpty) ?? ['', { isEmpty: false, altText: '' }]
+	const { isEmpty, altText } = found[1]
 
 	const graphElement = isEmpty ? (
 		<Group
@@ -43,7 +51,14 @@ export default function View({ renderResizable }: ViewProps) {
 			</Text>
 		</Group>
 	) : (
-		<CytoscapeComponent elements={value} height={height} layoutName={layout} onSelect={onSelect} />
+		<CytoscapeComponent
+			elements={watchRecord.inputKey.value}
+			stylesheet={watchRecord.styleKey.value}
+			layout={watchRecord.layoutKey.value}
+			height={height}
+			layoutName={layout}
+			onSelect={onSelect}
+		/>
 	)
 
 	return renderResizable ? renderResizable(graphElement) : graphElement

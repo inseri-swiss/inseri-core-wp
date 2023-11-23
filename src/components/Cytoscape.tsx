@@ -37,20 +37,21 @@ interface Props {
 	height: number | string
 	elements: any[]
 	stylesheet?: any[]
+	layout?: {}
 	onSelect?: (node: any, type: string) => void
 	onHoverChange?: (record: Record<string, boolean>) => void
 	userZoomingEnabled?: boolean
 }
 
 export function CytoscapeComponent(props: Props) {
-	const { layoutName, height, elements, onSelect, stylesheet = defaultStylesheet, onHoverChange, userZoomingEnabled = false } = props
+	const { layoutName, height, elements = [], onSelect, stylesheet = defaultStylesheet, layout = {}, onHoverChange, userZoomingEnabled = false } = props
 
 	const cy = useRef<cytoscape.Core>()
 	const divContainer = useRef<HTMLDivElement>(null)
 	const [hoveredRecord, { set: setHovered }] = useMap<Record<string, boolean>>({})
 
 	useEffect(() => {
-		cy.current = cytoscape({ style: stylesheet, container: divContainer.current, layout: { name: layoutName as any }, userZoomingEnabled })
+		cy.current = cytoscape({ style: stylesheet, container: divContainer.current, layout: { name: layoutName as any, ...layout }, userZoomingEnabled })
 		cy.current.on('mouseover', 'node', (event) => {
 			const id = event.target.data().id
 			setHovered(id, true)
@@ -77,9 +78,10 @@ export function CytoscapeComponent(props: Props) {
 		if (cy.current) {
 			cy.current.elements().remove()
 			cy.current.add(elements)
-			cy.current.layout({ name: layoutName as any }).run()
+			cy.current.style(stylesheet)
+			cy.current.layout({ name: layoutName as any, ...layout }).run()
 		}
-	}, [elements, layoutName])
+	}, [elements, layoutName, stylesheet, layout])
 
 	return <div ref={divContainer} style={{ height, width: '100%' }} />
 }
