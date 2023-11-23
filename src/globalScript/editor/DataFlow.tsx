@@ -1,12 +1,25 @@
 import { InseriRoot, useWatch } from '@inseri/lighthouse'
 import { useHover } from '@mantine/hooks'
-import { IconBuildingLighthouse } from '@tabler/icons-react'
+import { IconBuildingLighthouse, IconWindowMaximize } from '@tabler/icons-react'
 import { select, useDispatch } from '@wordpress/data'
 import { PluginSidebar } from '@wordpress/edit-post'
 import { useCallback, useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { useMap, usePrevious } from 'react-use'
-import { Accordion, CytoscapeComponent, Group, Stack, Text, UnstyledButton, createStyles } from '../../components'
+import {
+	Accordion,
+	AccordionControlProps,
+	ActionIcon,
+	Box,
+	CytoscapeComponent,
+	Group,
+	Modal,
+	Stack,
+	Text,
+	UnstyledButton,
+	createStyles,
+} from '../../components'
+import { Z_INDEX_ABOVE_ADMIN } from '../../utils'
 
 const miniStylesheet = [
 	{
@@ -24,6 +37,32 @@ const miniStylesheet = [
 			'target-arrow-shape': 'triangle',
 			'line-color': '#bdbdbd',
 			'target-arrow-color': '#bdbdbd',
+			'curve-style': 'bezier',
+		},
+	},
+]
+
+const largeStylesheet = [
+	{
+		selector: 'node',
+		style: {
+			label: 'data(label)',
+			'background-color': '#11479e',
+		},
+	},
+	{
+		selector: 'node:parent',
+		style: {
+			'background-opacity': 0.1,
+		},
+	},
+	{
+		selector: 'edge',
+		style: {
+			width: 4,
+			'target-arrow-shape': 'triangle',
+			'line-color': '#9dbaea',
+			'target-arrow-color': '#9dbaea',
 			'curve-style': 'bezier',
 		},
 	},
@@ -47,6 +86,10 @@ const useStyles = createStyles({
 		borderRadius: '3px',
 		background: 'var(--wp-admin-theme-color, #007cba)',
 		color: '#fff',
+	},
+	modalContent: {
+		height: '100%',
+		flex: 1,
 	},
 })
 
@@ -85,6 +128,48 @@ function ListItem({ isSelected, block, onClick, onHover, isHovered }: ListItemPr
 	)
 }
 
+function AccordionControl({ onClick, ...rest }: AccordionControlProps & { onClick?: () => void }) {
+	return (
+		<Box sx={{ display: 'flex', alignItems: 'center' }}>
+			{onClick ? (
+				<ActionIcon w={50} onClick={onClick}>
+					<IconWindowMaximize style={{ fill: 'none', color: '#000' }} />
+				</ActionIcon>
+			) : (
+				<Box w={50} />
+			)}
+
+			<Accordion.Control pl="xs" {...rest} />
+		</Box>
+	)
+}
+
+function ExtendedView({ isModalOpen, setModalOpen }: { isModalOpen: boolean; setModalOpen: (b: boolean) => void }) {
+	const { classes } = useStyles()
+	const chartData = useWatch('__root/detailed-data-flow', { onNone: () => [], onSome: (nucleus: any) => nucleus.value }) as any[]
+
+	return (
+		<Modal
+			zIndex={Z_INDEX_ABOVE_ADMIN}
+			overlayProps={{ opacity: 0.7, blur: 3 }}
+			opened={isModalOpen}
+			onClose={() => setModalOpen(false)}
+			classNames={{ content: classes.modalContent }}
+			styles={{
+				body: { height: 'calc(100% - 60px)', boxSizing: 'border-box' },
+				inner: { boxSizing: 'border-box' },
+			}}
+			title={
+				<Text fz="md" fw="bold">
+					Data Flow
+				</Text>
+			}
+		>
+			<CytoscapeComponent elements={chartData} height={'100%'} stylesheet={largeStylesheet} layoutName={'dagre'} userZoomingEnabled />
+		</Modal>
+	)
+}
+
 function SideBar() {
 	const [openItems, setOpenItems] = useState<string[]>(['blocks', 'chart'])
 	const blockHeight = openItems.includes('chart') ? 'calc(50vh - 135px)' : undefined
@@ -93,6 +178,8 @@ function SideBar() {
 	const [selectedBlockId, setSelectedBlockId] = useState('')
 	const prevSelectedBlockId = usePrevious(selectedBlockId) ?? ''
 	const [hoveredRecord, { set: setHovered, setAll: setAllHovered }] = useMap<Record<string, boolean>>({})
+
+	const [isModalOpen, setModalOpen] = useState(false)
 
 	const toggleIfBlockSelected = (id: string) => {
 		if (id === selectedBlockId) {
@@ -142,40 +229,43 @@ function SideBar() {
 	}, [selectedBlockId])
 
 	return (
-		<PluginSidebar name="inseri-core-data-flow" title="inseri Data Flow" isPinnable={true} icon={<IconBuildingLighthouse style={{ fill: 'none' }} />}>
-			<Accordion multiple value={openItems} onChange={setOpenItems}>
-				<Accordion.Item value="blocks">
-					<Accordion.Control>{__('Blocks', 'inseri-core')}</Accordion.Control>
-					<Accordion.Panel style={{ height: blockHeight, overflow: 'auto', padding: 0 }}>
-						<Stack>
-							{blocks.map((b) => (
-								<ListItem
-									key={b.id}
-									block={b}
-									isSelected={b.id === selectedBlockId}
-									onClick={() => toggleIfBlockSelected(b.id)}
-									onHover={(isHovered) => setHovered(b.id, isHovered)}
-									isHovered={hoveredRecord[b.id]}
-								/>
-							))}
-						</Stack>
-					</Accordion.Panel>
-				</Accordion.Item>
-				<Accordion.Item value="chart">
-					<Accordion.Control>{__('Chart', 'inseri-core')}</Accordion.Control>
-					<Accordion.Panel>
-						<CytoscapeComponent
-							elements={chartData}
-							height={'calc(50vh - 135px)'}
-							stylesheet={miniStylesheet}
-							layoutName={'dagre'}
-							onSelect={onSelectGraph}
-							onHoverChange={(hoveredDict) => setAllHovered({ ...hoveredRecord, ...hoveredDict })}
-						></CytoscapeComponent>
-					</Accordion.Panel>
-				</Accordion.Item>
-			</Accordion>
-		</PluginSidebar>
+		<>
+			<ExtendedView isModalOpen={isModalOpen} setModalOpen={setModalOpen} />
+			<PluginSidebar name="inseri-core-data-flow" title="inseri Data Flow" isPinnable={true} icon={<IconBuildingLighthouse style={{ fill: 'none' }} />}>
+				<Accordion chevronPosition="right" multiple value={openItems} onChange={setOpenItems}>
+					<Accordion.Item value="blocks">
+						<AccordionControl>{__('Blocks', 'inseri-core')}</AccordionControl>
+						<Accordion.Panel style={{ height: blockHeight, overflow: 'auto', padding: 0 }}>
+							<Stack>
+								{blocks.map((b) => (
+									<ListItem
+										key={b.id}
+										block={b}
+										isSelected={b.id === selectedBlockId}
+										onClick={() => toggleIfBlockSelected(b.id)}
+										onHover={(isHovered) => setHovered(b.id, isHovered)}
+										isHovered={hoveredRecord[b.id]}
+									/>
+								))}
+							</Stack>
+						</Accordion.Panel>
+					</Accordion.Item>
+					<Accordion.Item value="chart">
+						<AccordionControl onClick={() => setModalOpen(true)}>{__('Chart', 'inseri-core')}</AccordionControl>
+						<Accordion.Panel>
+							<CytoscapeComponent
+								elements={chartData}
+								height={'calc(50vh - 135px)'}
+								stylesheet={miniStylesheet}
+								layoutName={'dagre'}
+								onSelect={onSelectGraph}
+								onHoverChange={(hoveredDict) => setAllHovered({ ...hoveredRecord, ...hoveredDict })}
+							></CytoscapeComponent>
+						</Accordion.Panel>
+					</Accordion.Item>
+				</Accordion>
+			</PluginSidebar>
+		</>
 	)
 }
 
