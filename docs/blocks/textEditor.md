@@ -16,7 +16,7 @@ Text above the editor
 
 ### Show block
 
-The text editor block can be hidden from readers but its content is still available as input for other blocks.
+The block can be hidden from readers but its content is still available as input for other blocks.
 
 ### Publicly editable
 
