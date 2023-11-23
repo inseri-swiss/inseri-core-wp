@@ -26,6 +26,7 @@ export interface Atom<T = any> {
 export interface BlockInfo {
 	readonly blockType: string
 	readonly blockName: string
+	readonly clientId: string
 	readonly state: 'ready' | 'pending' | 'failed'
 	readonly atoms: Record<string, Atom>
 }
@@ -38,6 +39,7 @@ interface UpdateBlockAction {
 		blockId: string
 		blockName: string
 		blockType: string
+		clientId: string
 	}
 }
 interface AddValueInfosAction {

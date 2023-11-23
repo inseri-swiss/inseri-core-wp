@@ -182,10 +182,10 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 }
 
 export default function Edit(props: BlockEditProps<Attributes>) {
-	const { setAttributes, attributes } = props
+	const { setAttributes, attributes, clientId } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'plotly'} addSuffixToInputs={['inputFull', 'inputData', 'inputLayout', 'inputConfig']}>
-			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name}>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name} clientId={clientId}>
 				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
 					<EditComponent {...props} />
 				</StateProvider>

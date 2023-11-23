@@ -142,10 +142,10 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 }
 
 export default function Edit(props: BlockEditProps<Attributes>) {
-	const { setAttributes, attributes } = props
+	const { setAttributes, attributes, clientId } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'zenodo'}>
-			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={config.name}>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={config.name} clientId={clientId}>
 				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(config.attributes)} setAttributes={setAttributes} initialState={attributes}>
 					<EditComponent {...props} />
 				</StateProvider>

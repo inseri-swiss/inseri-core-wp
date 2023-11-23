@@ -11,13 +11,14 @@ export function reducer(base: Root, action: Action) {
 	switch (action.type) {
 		case 'update-block-slice':
 			{
-				const { blockName, blockType } = action.payload
+				const { blockName, blockType, clientId } = action.payload
 
 				if (!blockSlice) {
-					blockSlice = { state: 'ready', atoms: {}, blockName, blockType }
+					blockSlice = { state: 'ready', atoms: {}, blockName, blockType, clientId }
 				}
 
-				blockSlice = { ...blockSlice, blockName, blockType }
+				blockSlice = { ...blockSlice, blockName, blockType, clientId }
+				base[blockId] = blockSlice
 			}
 			break
 
@@ -27,6 +28,7 @@ export function reducer(base: Root, action: Action) {
 				keys.forEach((key, idx) => {
 					blockSlice.atoms[key] = { description: descriptions[idx], content: none }
 				})
+				base[blockId] = blockSlice
 			}
 			break
 		case 'update-value-infos':
@@ -35,6 +37,7 @@ export function reducer(base: Root, action: Action) {
 				keys.forEach((key, idx) => {
 					blockSlice.atoms[key] = { ...blockSlice.atoms[key], description: descriptions[idx] }
 				})
+				base[blockId] = blockSlice
 			}
 			break
 		case 'remove-value-infos':
@@ -42,11 +45,13 @@ export function reducer(base: Root, action: Action) {
 				const { keys } = action.payload
 				const RemainingValueEntries = Object.entries(blockSlice.atoms).filter(([entryKey]) => !keys.includes(entryKey))
 				blockSlice.atoms = Object.fromEntries(RemainingValueEntries)
+				base[blockId] = blockSlice
 			}
 			break
 		case 'remove-all-value-infos':
 			{
-				blockSlice.atoms = {}
+				const { [blockId]: _blockSlice, ...rest } = base
+				base = rest
 			}
 			break
 		case 'set-value':
@@ -54,10 +59,10 @@ export function reducer(base: Root, action: Action) {
 				const { key, content } = action.payload
 				const wrapper = blockSlice.atoms[key]
 				blockSlice.atoms[key] = { description: wrapper.description, content }
+				base[blockId] = blockSlice
 			}
 			break
 	}
 
-	base[blockId] = blockSlice
 	return base
 }

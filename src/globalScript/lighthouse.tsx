@@ -15,6 +15,7 @@ const blockStoreSubject = new BehaviorSubject<Root>({
 	__root: {
 		blockName: 'inseri',
 		blockType: 'inseri-core/root',
+		clientId: '',
 		state: 'ready',
 		atoms: {
 			'detailed-data-flow': { description: 'detailed data-flow', content: some({ contentType: 'application/json', value: [] }) },
@@ -67,7 +68,7 @@ blockStoreSubject
 		map((root) =>
 			Object.entries(root)
 				.filter(([blockId]) => !blockId.startsWith(FILTER_PRIVATE))
-				.map(([blockId, { blockName, blockType }]) => ({ id: blockId, blockName, blockType }))
+				.map(([blockId, { blockName, blockType, clientId }]) => ({ id: blockId, blockName, blockType, clientId }))
 		),
 		distinctUntilChanged((prev, current) => isDeepEqualReact(prev, current))
 	)
@@ -91,12 +92,13 @@ interface RootProps extends PropsWithChildren {
 	blockId: string
 	blockName: string
 	blockType: string
+	clientId?: string
 }
 
 const BlockIdContext = createContext('')
 
 function InseriRoot(props: RootProps) {
-	const { children, blockId, blockName, blockType } = props
+	const { children, blockId, blockName, blockType, clientId = '' } = props
 	const [blockSlice, setBlockSlice] = useState<BlockInfo>()
 	const componentWillUnmount = useRef(false)
 
@@ -106,8 +108,8 @@ function InseriRoot(props: RootProps) {
 	}, [blockId])
 
 	useEffect(() => {
-		onNext({ type: 'update-block-slice', payload: { blockId, blockName, blockType } })
-	}, [blockId, blockName])
+		onNext({ type: 'update-block-slice', payload: { blockId, blockName, blockType, clientId } })
+	}, [blockId, blockName, clientId])
 
 	useEffect(() => {
 		return () => {

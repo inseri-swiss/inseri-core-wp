@@ -82,11 +82,11 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 }
 
 export default function Edit(props: BlockEditProps<Attributes>) {
-	const { attributes } = props
+	const { attributes, clientId } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'download'} addSuffixToInputs={['inputKey']}>
 			<RecoilRoot>
-				<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name}>
+				<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name} clientId={clientId}>
 					<EditComponent {...props} />
 				</InseriRoot>
 			</RecoilRoot>
