@@ -15,6 +15,7 @@ import {
 	Group,
 	Modal,
 	Stack,
+	Switch,
 	Text,
 	UnstyledButton,
 	createStyles,
@@ -146,12 +147,14 @@ function AccordionControl({ onClick, ...rest }: AccordionControlProps & { onClic
 
 function ExtendedView({ isModalOpen, setModalOpen }: { isModalOpen: boolean; setModalOpen: (b: boolean) => void }) {
 	const { classes } = useStyles()
-	const chartData = useWatch('__root/detailed-data-flow', { onNone: () => [], onSome: (nucleus: any) => nucleus.value }) as any[]
+	const [showDetails, setShowDetails] = useState(false)
+
+	const chartData = useWatch({ detail: '__root/detailed-data-flow', mini: '__root/data-flow' }, { onNone: () => [], onSome: (nucleus: any) => nucleus.value })
+	const elements = showDetails ? chartData.detail : chartData.mini
 
 	return (
-		<Modal
+		<Modal.Root
 			zIndex={Z_INDEX_ABOVE_ADMIN}
-			overlayProps={{ opacity: 0.7, blur: 3 }}
 			opened={isModalOpen}
 			onClose={() => setModalOpen(false)}
 			classNames={{ content: classes.modalContent }}
@@ -159,14 +162,23 @@ function ExtendedView({ isModalOpen, setModalOpen }: { isModalOpen: boolean; set
 				body: { height: 'calc(100% - 60px)', boxSizing: 'border-box' },
 				inner: { boxSizing: 'border-box' },
 			}}
-			title={
-				<Text fz="md" fw="bold">
-					Data Flow
-				</Text>
-			}
 		>
-			<CytoscapeComponent elements={chartData} height={'100%'} stylesheet={largeStylesheet} layoutName={'dagre'} userZoomingEnabled />
-		</Modal>
+			<Modal.Overlay opacity={0.7} blur={3} />
+			<Modal.Content>
+				<Modal.Header>
+					<Modal.Title mr={'auto'}>
+						<Text fz="md" fw="bold">
+							Data Flow
+						</Text>
+					</Modal.Title>
+					<Switch mx="md" label="Show Details" checked={showDetails} onChange={(e) => setShowDetails(e.target.checked)} />
+					<Modal.CloseButton ml={0} />
+				</Modal.Header>
+				<Modal.Body>
+					<CytoscapeComponent elements={elements} height={'100%'} stylesheet={largeStylesheet} layoutName={'dagre'} userZoomingEnabled />
+				</Modal.Body>
+			</Modal.Content>
+		</Modal.Root>
 	)
 }
 
