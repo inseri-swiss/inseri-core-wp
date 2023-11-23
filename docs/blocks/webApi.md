@@ -80,7 +80,7 @@ You can change the text in the button to something different than "Call Web API"
 
 ### Show block
 
-You can hide the web API block if you set it to execude automatically.
+The block can be hidden from readers but its content is still available as input for other blocks. You can hide it only if you set it to execute automatically.
 
 ### Call automatically
 

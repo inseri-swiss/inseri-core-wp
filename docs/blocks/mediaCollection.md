@@ -4,6 +4,16 @@ User can select multiple files from media library. Upon selection of a single fi
 
 If you already uploaded your desired file, you can choose it from the _Media Library_, otherwise you can _upload_ it after adding the block.
 
+## Parameters
+
+### Label
+
+Add a description above the block.
+
+### Show block
+
+The block can be hidden from readers but its content is still available as input for other blocks. You can hide it only if you choose one file from the _Media Library_.
+
 ## Extended view
 
 In the Media Library, you can organize your files that will be available for re-use in your posts.

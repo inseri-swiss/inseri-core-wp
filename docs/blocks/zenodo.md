@@ -14,7 +14,7 @@ Change to another label than "Choose a file".
 
 ### Show block
 
-If the source only serves a single file you can hide the block.
+The block can be hidden from readers but its content is still available as input for other blocks. You can hide it only if the source serves a single file.
 
 ## Examples
 

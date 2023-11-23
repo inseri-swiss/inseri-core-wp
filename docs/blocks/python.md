@@ -34,7 +34,7 @@ Add a description above the code block.
 
 ### Show block
 
-Show or hide the code.
+The block can be hidden from readers but its content is still available as input for other blocks. You can hide it only if you set it to execute automatically.
 
 ### Execute automatically
 
