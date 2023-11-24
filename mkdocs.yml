@@ -8,6 +8,7 @@ nav:
       - 'tutorials/hello-world.md'
       - 'tutorials/data-mapping-with-python.md'
   - 'Blocks':
+      - 'blocks/cytoscape.md'
       - 'blocks/download.md'
       - 'blocks/dropdown.md'
       - 'blocks/html.md'
@@ -21,6 +22,8 @@ nav:
       - 'blocks/textViewer.md'
       - 'blocks/webApi.md'
       - 'blocks/zenodo.md'
+  - 'Features':
+      - 'features/DataFlow.md'
   - 'How to':
       - 'how-to/visualizations.md'
       - 'how-to/workWithFiles.md'
