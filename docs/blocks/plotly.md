@@ -57,16 +57,6 @@ The standard format by Plotly
 }
 ```
 
-## Additional
-
-### Height
-
-Size of the block in the post.
-
-### Events
-
-Other blocks can listen to `hover`, `click` events from this block.
-
 ## Extended configuration
 
 ### Override data separately
@@ -105,6 +95,16 @@ Replace `layout` in the input, following the same pattern:
 ### Provide config
 
 Additional [configuration options](https://plotly.com/javascript/configuration-options/) by Plotly.
+
+## Parameters
+
+### Height
+
+Size of the block in the post.
+
+### Events
+
+Other blocks can listen to `hover`, `click` events from this block.
 
 ## Examples
 
