@@ -3,7 +3,7 @@ import { useHover } from '@mantine/hooks'
 import { IconBuildingLighthouse, IconWindowMaximize } from '@tabler/icons-react'
 import { select, useDispatch } from '@wordpress/data'
 import { PluginSidebar } from '@wordpress/edit-post'
-import { useCallback, useEffect, useState } from '@wordpress/element'
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { useMap, usePrevious } from 'react-use'
 import {
@@ -14,8 +14,10 @@ import {
 	CytoscapeComponent,
 	Group,
 	Modal,
+	NumberInput,
+	NumberInputHandlers,
+	SegmentedControl,
 	Stack,
-	Switch,
 	Text,
 	UnstyledButton,
 	createStyles,
@@ -43,11 +45,12 @@ const miniStylesheet = [
 	},
 ]
 
-const largeStylesheet = [
+const largeStylesheet = (fontSize: number) => [
 	{
 		selector: 'node',
 		style: {
 			label: 'data(label)',
+			'font-size': `${fontSize}px`,
 			'background-color': '#11479e',
 		},
 	},
@@ -145,12 +148,39 @@ function AccordionControl({ onClick, ...rest }: AccordionControlProps & { onClic
 	)
 }
 
+function NumberWithControl({ fontSize, setFontSize }: { fontSize: number | ''; setFontSize: (val: number | '') => void }) {
+	const handlers = useRef<NumberInputHandlers>()
+
+	return (
+		<Group spacing={0}>
+			<ActionIcon size={36} variant="transparent" onClick={() => handlers.current?.decrement()}>
+				–
+			</ActionIcon>
+
+			<NumberInput
+				hideControls
+				value={fontSize}
+				onChange={setFontSize}
+				handlersRef={handlers}
+				min={4}
+				styles={{ input: { width: '56px', height: '36px', textAlign: 'center' } }}
+				rightSection={'px'}
+			/>
+
+			<ActionIcon size={36} variant="transparent" onClick={() => handlers.current?.increment()}>
+				+
+			</ActionIcon>
+		</Group>
+	)
+}
+
 function ExtendedView({ isModalOpen, setModalOpen }: { isModalOpen: boolean; setModalOpen: (b: boolean) => void }) {
 	const { classes } = useStyles()
-	const [showDetails, setShowDetails] = useState(false)
+	const [mode, setMode] = useState('Simple')
+	const [fontSize, setFontSize] = useState<number | ''>(12)
 
 	const chartData = useWatch({ detail: '__root/detailed-data-flow', mini: '__root/data-flow' }, { onNone: () => [], onSome: (nucleus: any) => nucleus.value })
-	const elements = showDetails ? chartData.detail : chartData.mini
+	const elements = mode === 'Detailed' ? chartData.detail : chartData.mini
 
 	return (
 		<Modal.Root
@@ -159,23 +189,31 @@ function ExtendedView({ isModalOpen, setModalOpen }: { isModalOpen: boolean; set
 			onClose={() => setModalOpen(false)}
 			classNames={{ content: classes.modalContent }}
 			styles={{
-				body: { height: 'calc(100% - 60px)', boxSizing: 'border-box' },
+				body: { height: 'calc(100% - 80px)', boxSizing: 'border-box' },
 				inner: { boxSizing: 'border-box' },
 			}}
 		>
 			<Modal.Overlay opacity={0.7} blur={3} />
 			<Modal.Content>
-				<Modal.Header>
-					<Modal.Title mr={'auto'}>
+				<Modal.Header style={{ borderBottom: '2px solid #c1c8cd' }}>
+					<Modal.Title>
 						<Text fz="md" fw="bold">
 							Data Flow
 						</Text>
 					</Modal.Title>
-					<Switch mx="md" label="Show Details" checked={showDetails} onChange={(e) => setShowDetails(e.target.checked)} />
+					<Box mr={'auto'} />
+					<NumberWithControl fontSize={fontSize} setFontSize={setFontSize} />
+					<SegmentedControl mx="xl" size="lg" data={['Simple', 'Detailed']} value={mode} onChange={setMode} />
 					<Modal.CloseButton ml={0} />
 				</Modal.Header>
 				<Modal.Body>
-					<CytoscapeComponent elements={elements} height={'100%'} stylesheet={largeStylesheet} layoutName={'dagre'} userZoomingEnabled />
+					<CytoscapeComponent
+						elements={elements}
+						height={'100%'}
+						stylesheet={largeStylesheet(fontSize ? fontSize : 12)}
+						layoutName={'dagre'}
+						userZoomingEnabled
+					/>
 				</Modal.Body>
 			</Modal.Content>
 		</Modal.Root>
