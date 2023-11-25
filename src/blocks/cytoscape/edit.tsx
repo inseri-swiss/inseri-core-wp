@@ -8,8 +8,12 @@ import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import { Accordion, Button, Group, Select, SetupEditorEnv, Stack, StateProvider, Text, useGlobalState } from '../../components'
 import json from './block.json'
+import flatElementSchema from './flatElementSchema.json'
+import groupedElementSchema from './groupedElementSchema.json'
 import { Attributes } from './index'
+import layoutSchema from './layoutSchema.json'
 import { GlobalState, storeCreator } from './state'
+import styleSchema from './styleSchema.json'
 import View from './view'
 
 const layoutOptions = [
@@ -23,6 +27,8 @@ const layoutOptions = [
 	{ label: 'dagre', value: 'dagre' },
 ]
 
+const mapToOptions = (item: { description: string; key: string }) => ({ label: item.description, value: item.key })
+
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
@@ -30,8 +36,9 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const isValueSet = !!inputKey
 	const { updateState } = actions
 
-	const sources = useDiscover({ contentTypeFilter: 'json' })
-	const options = sources.map((item) => ({ label: item.description, value: item.key }))
+	const elementSources = useDiscover({ jsonSchemas: [flatElementSchema, groupedElementSchema] }).map(mapToOptions)
+	const styleSources = useDiscover({ jsonSchemas: [styleSchema] }).map(mapToOptions)
+	const layoutSources = useDiscover({ jsonSchemas: [layoutSchema] }).map(mapToOptions)
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -101,7 +108,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						required
 						clearable
 						label={__('Display network diagram by selecting a block source', 'inseri-core')}
-						data={options}
+						data={elementSources}
 						value={inputKey}
 						onChange={(key) => updateState({ inputKey: key ?? '' })}
 					/>
@@ -110,13 +117,13 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						<Accordion.Item value="style">
 							<Accordion.Control>{__('Provide custom style', 'inseri-core')}</Accordion.Control>
 							<Accordion.Panel>
-								<Select clearable data={options} value={styleKey} searchable onChange={(key) => updateState({ styleKey: key ?? '' })} />
+								<Select clearable data={styleSources} value={styleKey} searchable onChange={(key) => updateState({ styleKey: key ?? '' })} />
 							</Accordion.Panel>
 						</Accordion.Item>
 						<Accordion.Item value="layout">
 							<Accordion.Control>{__('Provide additional layout config', 'inseri-core')}</Accordion.Control>
 							<Accordion.Panel>
-								<Select clearable data={options} value={layoutKey} searchable onChange={(key) => updateState({ layoutKey: key ?? '' })} />
+								<Select clearable data={layoutSources} value={layoutKey} searchable onChange={(key) => updateState({ layoutKey: key ?? '' })} />
 							</Accordion.Panel>
 						</Accordion.Item>
 					</Accordion>

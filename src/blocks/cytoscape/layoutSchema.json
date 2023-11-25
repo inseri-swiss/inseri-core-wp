@@ -1,0 +1,178 @@
+{
+	"type": "object",
+	"description": "Placement of the nodes see https://js.cytoscape.org/#layouts",
+	"additionalProperties": false,
+	"properties": {
+		"name": {
+			"type": "string",
+			"default": "random",
+			"enum": [
+				"null",
+				"random",
+				"preset",
+				"grid",
+				"circle",
+				"concentric",
+				"breadthfirst",
+				"cose",
+				"dagre"
+			],
+			"description": "Type of layout"
+		},
+		"fit": {
+			"type": "boolean",
+			"default": true,
+			"description": "whether to fit to viewport"
+		},
+		"padding": {
+			"type": "number",
+			"default": 30,
+			"description": "fit padding"
+		},
+		"boundingBox": {
+			"type": "object",
+			"description": "constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }"
+		},
+		"animate": {
+			"type": "boolean",
+			"description": "whether to transition the node positions"
+		},
+		"animationDuration": {
+			"type": "number",
+			"description": "duration of animation in ms if enabled",
+			"default": 500
+		},
+		"positions": {
+			"type": "object",
+			"description": "layout = preset, map of (node id) => (position obj); or function(node){ return somPos; }"
+		},
+		"avoidOverlap": {
+			"type": "boolean",
+			"description": "When layout is grid, circle, concentric, breathfirst. prevents node overlap, may overflow boundingBox if not enough space",
+			"default": true
+		},
+		"avoidOverlapPadding": {
+			"type": "number",
+			"description": "When layout is grid. Extra spacing around nodes when avoidOverlap: true",
+			"default": 10
+		},
+		"nodeDimensionsIncludeLabels": {
+			"type": "boolean",
+			"description": "Excludes the label when calculating node bounding boxes for the layout algorithm",
+			"default": false
+		},
+		"spacingFactor": {
+			"type": "number",
+			"description": "When layout is grid, circle, breadthfirst. grid, circle: Applies a multiplicative factor (>0) to expand or compress the overall area that the nodes take up.breathfirst: positive spacing factor, larger => more space between nodes (N.B. n/a if causes overlap)",
+			"default": 1,
+			"minimum": 0
+		},
+		"condense": {
+			"type": "boolean",
+			"description": "When layout is grid. uses all available space on false, uses minimal space on true",
+			"default": false
+		},
+		"rows": {
+			"type": "integer",
+			"description": "When layout is grid. force num of rows in the grid"
+		},
+		"cols": {
+			"type": "integer",
+			"description": "When layout is grid. force num of columns in the grid"
+		},
+		"radius": {
+			"type": "number",
+			"description": "When layout is circle. the radius of the circle"
+		},
+		"startAngle": {
+			"type": "number",
+			"description": "When layout is circle, concentric. where nodes start in radians",
+			"default": 4.712
+		},
+		"sweep": {
+			"type": "number",
+			"description": "When layout is circle, concentric. how many radians should be between the first and last node (defaults to full circle)"
+		},
+		"clockwise": {
+			"type": "boolean",
+			"description": "When layout is circle, concentric. whether the layout should go clockwise (true) or counterclockwise/anticlockwise (false)"
+		},
+		"equidistant": {
+			"type": "boolean",
+			"description": "When layout is concentric. whether levels have an equal radial distance betwen them, may cause bounding box overflow"
+		},
+		"minNodeSpacing": {
+			"type": "number",
+			"description": "When layout is concentric. min spacing between outside of nodes (used for radius adjustment)"
+		},
+		"directed": {
+			"type": "boolean",
+			"description": "When layout is breadthfirst. whether the tree is directed downwards (or edges can point in any direction if false)",
+			"default": false
+		},
+		"circle": {
+			"type": "boolean",
+			"description": "When layout is breadthfirst. put depths in concentric circles if true, put depths top down if false",
+			"default": false
+		},
+		"grid": {
+			"type": "boolean",
+			"description": "When layout is breadthfirst. whether to create an even grid into which the DAG is placed (circle:false only)",
+			"default": false
+		},
+		"roots": {
+			"type": "string",
+			"description": "When layout is breadthfirst. Format of selector, the roots of the trees"
+		},
+		"maximal": {
+			"type": "boolean",
+			"description": "When layout is breadthfirst. whether to shift nodes down their natural BFS depths in order to avoid upwards edges (DAGS only)",
+			"default": false
+		},
+		"randomize": {
+			"type": "boolean",
+			"description": "When layout is cose. Randomize the initial positions of the nodes (true) or use existing positions (false)",
+			"default": false
+		},
+		"componentSpacing": {
+			"type": "number",
+			"description": "When layout is cose. Extra spacing between components in non-compound graphs",
+			"default": 40
+		},
+		"nodeOverlap": {
+			"type": "number",
+			"description": "When layout is cose. Node repulsion (overlapping) multiplier",
+			"default": 4
+		},
+		"nestingFactor": {
+			"type": "number",
+			"description": "When layout is cose. Nesting factor (multiplier) to compute ideal edge length for nested edges",
+			"default": 1.2
+		},
+		"gravity": {
+			"type": "number",
+			"description": "When layout is cose. Gravity force (constant)",
+			"default": 1
+		},
+		"numIter": {
+			"type": "number",
+			"description": "When layout is cose. Maximum number of iterations to perform",
+			"default": 1000
+		},
+		"initialTemp": {
+			"type": "number",
+			"description": "When layout is cose. Initial temperature (maximum node displacement)",
+			"default": 1000
+		},
+		"coolingFactor": {
+			"type": "number",
+			"description": "When layout is cose. Cooling factor (how the temperature is reduced between consecutive iterations)",
+			"default": 0.99
+		},
+		"minTemp": {
+			"type": "number",
+			"description": "When layout is cose. Lower temperature threshold (below this point the layout will end)",
+			"default": 1.0
+		}
+	}
+}
