@@ -1,0 +1,94 @@
+{
+	"type": "array",
+	"description": "see https://js.cytoscape.org/#notation/elements-json",
+	"items": {
+		"type": "object",
+		"required": ["data"],
+		"properties": {
+			"group": {
+				"type": "string",
+				"description": "nodes' for a node, 'edges' for an edge. NB the group field can be automatically inferred for you but specifying it gives you nice debug messages if you mis-init elements",
+				"enum": ["nodes", "edges"]
+			},
+			"data": {
+				"type": "object",
+				"required": ["id"],
+				"description": "element data",
+				"properties": {
+					"id": {
+						"type": "string",
+						"description": "mandatory (string) id for each element, assigned automatically on undefined"
+					},
+					"parent": {
+						"type": "string",
+						"description": "indicates the compound node parent id; not defined => no parent"
+					},
+					"source": {
+						"type": "string",
+						"description": "the source node id (edge comes from this node)"
+					},
+					"target": {
+						"type": "string",
+						"description": "the target node id (edge goes to this node)"
+					}
+				}
+			},
+			"position": {
+				"type": "object",
+				"description": "the model position of the node",
+				"properties": {
+					"x": {
+						"type": "number"
+					},
+					"y": {
+						"type": "number"
+					}
+				}
+			},
+			"renderedPosition": {
+				"type": "object",
+				"description": "can alternatively specify position in rendered on-screen pixels",
+				"properties": {
+					"x": {
+						"type": "number"
+					},
+					"y": {
+						"type": "number"
+					}
+				}
+			},
+			"selected": {
+				"type": "boolean",
+				"description": "",
+				"default": false
+			},
+			"selectable": {
+				"type": "boolean",
+				"description": "whether the selection state is mutable",
+				"default": true
+			},
+			"locked": {
+				"type": "boolean",
+				"description": "when locked a node's position is immutable",
+				"default": false
+			},
+			"grabbable": {
+				"type": "boolean",
+				"description": "whether the node can be grabbed and moved by the user",
+				"default": true
+			},
+			"pannable": {
+				"type": "boolean",
+				"description": "whether dragging the node causes panning instead of grabbing",
+				"default": false
+			},
+			"classes": {
+				"type": "array",
+				"description": "an array of class names that the element has",
+				"items": {
+					"type": "string"
+				}
+			}
+		}
+	}
+}
