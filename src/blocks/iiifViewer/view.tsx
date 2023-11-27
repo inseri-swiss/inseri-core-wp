@@ -63,6 +63,11 @@ export default function View() {
 					open: false,
 					renderToggle: showInformationPanel,
 				},
+				openSeadragon: {
+					gestureSettingsMouse: {
+						scrollToZoom: false,
+					},
+				},
 			}}
 		/>
 	)
