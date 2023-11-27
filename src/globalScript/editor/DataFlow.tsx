@@ -153,10 +153,10 @@ function NumberWithControl({ fontSize, setFontSize }: { fontSize: number | ''; s
 
 	return (
 		<Group spacing={0}>
+			Font Size
 			<ActionIcon size={36} variant="transparent" onClick={() => handlers.current?.decrement()}>
 				–
 			</ActionIcon>
-
 			<NumberInput
 				hideControls
 				value={fontSize}
@@ -166,7 +166,6 @@ function NumberWithControl({ fontSize, setFontSize }: { fontSize: number | ''; s
 				styles={{ input: { width: '56px', height: '36px', textAlign: 'center' } }}
 				rightSection={'px'}
 			/>
-
 			<ActionIcon size={36} variant="transparent" onClick={() => handlers.current?.increment()}>
 				+
 			</ActionIcon>

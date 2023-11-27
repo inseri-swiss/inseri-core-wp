@@ -2,9 +2,12 @@ import { useEffect, useRef } from '@wordpress/element'
 import cytoscape from 'cytoscape'
 //@ts-ignore
 import dagre from 'cytoscape-dagre'
+//@ts-ignore
+import klay from 'cytoscape-klay'
 import { useDeepCompareEffect, useMap } from 'react-use'
 
 cytoscape.use(dagre)
+cytoscape.use(klay)
 
 const defaultStylesheet = [
 	{
