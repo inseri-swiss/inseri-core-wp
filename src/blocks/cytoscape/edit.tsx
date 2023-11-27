@@ -25,6 +25,7 @@ const layoutOptions = [
 	{ label: 'breadthfirst', value: 'breadthfirst' },
 	{ label: 'cose', value: 'cose' },
 	{ label: 'dagre', value: 'dagre' },
+	{ label: 'klay', value: 'klay' },
 ]
 
 const mapToOptions = (item: { description: string; key: string }) => ({ label: item.description, value: item.key })
