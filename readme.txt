@@ -19,7 +19,6 @@ As a result, inseri core introduces scientific and interactive Gutenberg blocks 
 ## Blocks:
 - **[Cytoscape Block](https://docs.inseri.swiss/blocks/cytoscape/)**: It displays network diagram using the data of another block with Cytoscape.
 - **[Download Block](https://docs.inseri.swiss/blocks/download/)**: It gives guests the possibility to download data from another block.
-- **[Download Block](https://docs.inseri.swiss/blocks/download/)**: It gives guests the possibility to download data from another block.
 - **[Dropdown Block](https://docs.inseri.swiss/blocks/dropdown/)**: It provides guests options to choose from and the selected option can be reused in other blocks.
 - **[HTML Code Block](https://docs.inseri.swiss/blocks/html/)**: It renders HTML code using the other block's data.
 - **[IIIF Viewer Block](https://docs.inseri.swiss/blocks/iiifViewer/)**: It showcases images with pan/zoom functionality, along with videos and audios consumed by an IIIF API.
