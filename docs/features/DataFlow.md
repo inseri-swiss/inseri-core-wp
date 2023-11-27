@@ -8,4 +8,4 @@ The Blocks section provides all inseri compatible blocks, and the Charts section
 - by hovering any of the nodes from the **Chart** section, the corresponding block from the Blocks section is highlighted.
 - by selecting any of the nodes from the **Chart** section, the corresponding block from the Blocks section is selected. Moreover, the block is highlighted also in the working area.
 
-By clicking on the icon before Chart, a popup with the DAG is displayed where the name of the blocks is displayed. By using "Show Details" (top right) a more complex diagram is displayed where one see exactly which data from a given block is used.
+By clicking on the icon before Chart, a popup with the DAG is displayed where the name of the blocks is shown. By using "Show Details" (top right) a more complex diagram is displayed where one see exactly which data from a given block is used. You can control the font size (the value in top right is editable) and the position of the nodes.
