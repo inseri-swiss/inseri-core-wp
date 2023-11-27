@@ -17,6 +17,8 @@ The vision of inseri is to enable scholars to design web pages without any prior
 As a result, inseri core introduces scientific and interactive Gutenberg blocks to facilitate open access. The inseri core blocks are not isolated elements but they can receive input from and give output to other blocks. A typical example would start with a Text Editor block containing the configuration for a Dropdown block. By selecting one option in the Dropdown block would provide a Web API block with the parameters to retrieve data from an external source. Using a Python Code block, the web API response could then be transformed into a suitable data format for a Plotly Chart block.
 
 ## Blocks:
+- **[Cytoscape Block](https://docs.inseri.swiss/blocks/cytoscape/)**: It displays network diagram using the data of another block with Cytoscape.
+- **[Download Block](https://docs.inseri.swiss/blocks/download/)**: It gives guests the possibility to download data from another block.
 - **[Download Block](https://docs.inseri.swiss/blocks/download/)**: It gives guests the possibility to download data from another block.
 - **[Dropdown Block](https://docs.inseri.swiss/blocks/dropdown/)**: It provides guests options to choose from and the selected option can be reused in other blocks.
 - **[HTML Code Block](https://docs.inseri.swiss/blocks/html/)**: It renders HTML code using the other block's data.
@@ -50,6 +52,10 @@ Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inser
 6. Render HTML code
 
 == Changelog ==
+### [0.3.2](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.3.2)
+- New: inseri Data Flow which displays block connections
+- New: Cytoscape block
+
 ### [0.3.1](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.3.1)
 - New: IIIF Viewer block
 
