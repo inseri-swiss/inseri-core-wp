@@ -15,7 +15,8 @@
 				"concentric",
 				"breadthfirst",
 				"cose",
-				"dagre"
+				"dagre",
+				"klay"
 			],
 			"description": "Type of layout"
 		},
