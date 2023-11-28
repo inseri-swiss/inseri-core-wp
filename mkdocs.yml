@@ -24,6 +24,8 @@ nav:
       - 'blocks/zenodo.md'
   - 'Features':
       - 'features/DataFlow.md'
+      - 'features/BlockDuplication.md'
+
   - 'How to':
       - 'how-to/visualizations.md'
       - 'how-to/workWithFiles.md'
