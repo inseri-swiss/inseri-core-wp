@@ -1,10 +1,10 @@
 # Cytoscape
 
-Please check out the [Cytoscape.js - Elements JSON](https://js.cytoscape.org/#notation/elements-json).
+It displays graphs using inputs from another blocks using [Cytoscape.js](https://js.cytoscape.org/).
 
 ## Input
 
-A special format where the `nodes` and `edges` elements are merged in one list:
+The input corresponds to the `elements` objects from [Cytoscape.js - Elements JSON](https://js.cytoscape.org/#notation/elements-json). Next we provide the `nodes` and `edges` groups that are automatically inferred:
 
 ```json
 [
