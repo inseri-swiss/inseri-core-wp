@@ -20,4 +20,4 @@ By clicking on the icon before Chart, a popup with the DAG is displayed where th
   <figcaption> Data Flow Popup: click on the icon before Chart. </figcaption>
 </figure>
 
-To reproduce this example please follow [Hello World tutorial](../../tutorials/hello-world/){:target="\_blank"}.
+To reproduce this example please follow [Hello World tutorial](../tutorials/hello-world.md){:target="\_blank"}.
