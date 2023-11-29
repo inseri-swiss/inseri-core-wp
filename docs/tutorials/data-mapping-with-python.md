@@ -24,7 +24,7 @@ https://raw.githubusercontent.com/inseri-swiss/inseri-core-wp/main/docs/assets/b
 Choose the Content Type "JSON" because that is what will be read by the dropdown that we are going to add later.
 
 Now, give your Web API block a meaningful name.
-For this, open the configuration panel on the right and enter "webApi-book" under _block name_.
+For this, open the settings sidebar on the right and enter "webApi-book" under _block name_.
 Do not check the option "call automatically". For testing the request you should click on "Configure the settings", and click on "TRY REQUEST".
 
 <figure markdown>
