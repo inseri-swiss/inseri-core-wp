@@ -45,11 +45,11 @@ To chain more inseri blocks in this example (text editor block to dropdown menu 
 </figure>
 
 Next, give your text editor a meaningful name.
-For this, open the configuration panel on the right and enter "textEditor-imageOptions" under _block name_.
+For this, open the settings sidebar on the right and enter "textEditor-imageOptions" under _block name_.
 
 <figure markdown>
 ![Edit the block name](../assets/block_name.png){width="700"}
-  <figcaption>Step 2: Edit the block name: (i) open the configuration panel, (ii) enter the desired name under "BLOCK NAME"</figcaption>
+  <figcaption>Step 2: Edit the block name: (i) open the settings sidebar, (ii) enter the desired name under "BLOCK NAME"</figcaption>
 </figure>
 
 ## Step 3: Add image information to the text editor
@@ -86,7 +86,7 @@ The [Data Flow](../features/DataFlow.md){:target="\_blank"} provides an overview
 
 <figure markdown>
 ![Data Flow](../assets/data_flow.png){width="700"}
-  <figcaption>Step 6: Data Flow: (i) open the side panel "inseri Data Flow" close to the configuration panel, (ii) select a block name in the Blocks are or a node in the Chart section </figcaption>
+  <figcaption>Step 6: Data Flow: (i) open the sidebar "inseri Data Flow" close to the Settings icon, (ii) select a block name in the Blocks are or a node in the Chart section </figcaption>
 </figure>
 
 ## Step 7: Save and publish
