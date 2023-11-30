@@ -11,7 +11,7 @@ A typical example would start with a text block containing the configuration for
 Selecting one option in the dropdown would provide an API block with the parameters to query data from an external source.
 Using a Python block, the response could then be transformed into a format which a block for graphs can display.
 
-inseri name comes from the Latin _insero_ which means **to insert** but also **to show**.
+inseri name comes from the Latin _insero_ which means **to sow, to plant** but also **to insert**.
 
 Try out our [playground](https://playground.inseri.swiss/){:target="\_blank"}. Be aware that your changes in the playground are temporary and will be gone after a page refresh.
 
