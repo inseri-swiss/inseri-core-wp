@@ -3,7 +3,7 @@ import { Schema } from 'ajv'
 import isDeepEqualReact from 'fast-deep-equal/react'
 import type { PropsWithChildren } from 'react'
 import { useDeepCompareEffect, usePrevious } from 'react-use'
-import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged, map, pairwise, scan } from 'rxjs'
+import { BehaviorSubject, Observable, Subject, combineLatest, distinctUntilChanged, map, of, pairwise, scan, share, shareReplay, startWith, tap } from 'rxjs'
 import { Option, none, some } from './option'
 import { reducer } from './reducer'
 import type { Action, Atom, BlockInfo, Nucleus, Root } from './types'
@@ -11,7 +11,7 @@ import { initJsonValidator } from './utils'
 
 const FILTER_PRIVATE = '__'
 
-const blockStoreSubject = new BehaviorSubject<Root>({
+const initialState: Root = {
 	__root: {
 		blockName: 'inseri',
 		blockType: 'inseri-core/root',
@@ -23,6 +23,19 @@ const blockStoreSubject = new BehaviorSubject<Root>({
 			blocks: { description: 'blocks', content: some({ contentType: 'application/json', value: [] }) },
 		},
 	},
+}
+
+let __blockStoreSubjectValue: Root = {}
+const getLastValue = () => __blockStoreSubjectValue
+const internalBlockStoreSubject = new Subject<Action>()
+
+const blockStoreSubject = internalBlockStoreSubject.pipe(
+	scan<Action, Root>((accumulator, action) => reducer(accumulator, action), initialState),
+	shareReplay(1)
+)
+
+blockStoreSubject.subscribe((val) => {
+	__blockStoreSubjectValue = val
 })
 
 interface Edge {
@@ -76,8 +89,8 @@ blockStoreSubject
 	.forEach((vals) => onNextRoot('blocks', vals))
 
 function onNext(action: Action) {
-	const reducedBase = reducer(blockStoreSubject.getValue(), action)
-	blockStoreSubject.next(reducedBase)
+	console.log('-----' + Date.now() + '>', action)
+	internalBlockStoreSubject.next(action)
 }
 
 function onNextRoot(key: string, value: any) {
@@ -86,7 +99,7 @@ function onNextRoot(key: string, value: any) {
 
 if (process.env.NODE_ENV !== 'production') {
 	// eslint-disable-next-line no-console
-	blockStoreSubject.subscribe((root) => console.log('#lighthouse:', root))
+	blockStoreSubject.subscribe((root) => console.log('#lighthouse' + Date.now() + ':', root))
 }
 
 interface RootProps extends PropsWithChildren {
@@ -254,7 +267,7 @@ const getDescArrayByKeys =
 	}
 
 function useInternalPublish(blockId: string, keys: string[], descriptions: string[]): Record<string, Actions<any>> {
-	const blockStore = blockStoreSubject.getValue()
+	const blockStore = __blockStoreSubjectValue
 	const joinedBlockIds = Object.keys(blockStore).join()
 	const prevKeys = usePrevious(keys) ?? []
 
@@ -340,7 +353,7 @@ const initState =
 	) =>
 	() => {
 		const listOfValues = splitTheKey(keysByName)
-			.map((triple) => transformToOptionTuple<A>(blockStoreSubject.getValue(), triple as [string, string, string]))
+			.map((triple) => transformToOptionTuple<A>(__blockStoreSubjectValue, triple as [string, string, string]))
 			.map(foldValues<A, B>(noneRef, someRef))
 
 		return reduceIfNeeded<B>(isRecord)(listOfValues)
@@ -398,7 +411,7 @@ function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?:
 		const valueObs: Observable<[string, B | null]>[] = splitTheKey(keysByName).map((triple) =>
 			blockStoreSubject.pipe(
 				map((root) => transformToOptionTuple<A>(root, triple as [string, string, string])),
-				distinctUntilChanged(([_, a], [__, b]) => a.equals(b, (i1, i2) => i1.contentType === i2.contentType && i1.value === i2.value)),
+				distinctUntilChanged(([_, a], [__, b]) => isDeepEqualReact(a, b)),
 				map(foldValues<A, B>(noneRef, someRef))
 			)
 		)
