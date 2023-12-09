@@ -28,7 +28,7 @@
 		},
 		"height": {
 			"type": "integer",
-			"default": 150
+			"default": 400
 		},
 		"layout": {
 			"type": "string",

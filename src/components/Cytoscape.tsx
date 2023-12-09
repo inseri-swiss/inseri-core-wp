@@ -81,10 +81,21 @@ export function CytoscapeComponent(props: Props) {
 		if (cy.current) {
 			cy.current.elements().remove()
 			cy.current.add(elements)
+		}
+	}, [elements])
+
+	useDeepCompareEffect(() => {
+		if (cy.current) {
 			cy.current.style(stylesheet)
 			cy.current.layout({ name: layoutName as any, ...layout }).run()
 		}
-	}, [elements, layoutName, stylesheet, layout])
+	}, [
+		elements,
+		layoutName,
+		stylesheet,
+		layout,
+		height,
+	])
 
 	return <div ref={divContainer} style={{ height, width: '100%' }} />
 }
