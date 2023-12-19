@@ -1,0 +1,60 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "inseri-core/slider",
+	"title": "Slider",
+	"category": "inseri",
+	"description": "Allow the guests to choose a value or range within specified boundaries.",
+	"attributes": {
+		"blockId": {
+			"type": "string",
+			"default": ""
+		},
+		"blockName": {
+			"type": "string",
+			"default": ""
+		},
+		"isRange": {
+			"type": "boolean",
+			"default": false
+		},
+		"showField": {
+			"type": "boolean",
+			"default": false
+		},
+		"label": {
+			"type": "string",
+			"default": ""
+		},
+		"color": {
+			"type": "string",
+			"default": ""
+		},
+		"min": {
+			"type": "number",
+			"default": 0
+		},
+		"max": {
+			"type": "number",
+			"default": 100
+		},
+		"step": {
+			"type": "number",
+			"default": 1
+		},
+		"initialValue": {
+			"type": "array",
+			"default": [50]
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": true,
+		"alignWide": true
+	},
+	"textdomain": "inseri-core",
+	"editorScript": ["file:./index.js", "inseri-core-editor"],
+	"viewScript": ["file:./hydration.js"],
+	"style": ["file:./index.css"],
+	"script": "inseri-core"
+}
