@@ -44,7 +44,7 @@
 		},
 		"initialValue": {
 			"type": "array",
-			"default": [50]
+			"default": [50, 50]
 		}
 	},
 	"supports": {
