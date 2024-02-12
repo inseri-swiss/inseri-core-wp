@@ -30,13 +30,13 @@
 			"type": "string",
 			"default": ""
 		},
-		"min": {
-			"type": "number",
-			"default": 0
+		"valueBoundaries": {
+			"type": "array",
+			"default": [0, 100]
 		},
-		"max": {
-			"type": "number",
-			"default": 100
+		"rangeBoundaries": {
+			"type": "array",
+			"default": [1, 10]
 		},
 		"step": {
 			"type": "number",

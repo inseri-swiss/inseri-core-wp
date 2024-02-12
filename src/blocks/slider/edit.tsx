@@ -2,15 +2,17 @@ import { InseriRoot } from '@inseri/lighthouse'
 import { InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow } from '@wordpress/components'
-import { Group, NumberInput, SegmentedControl, SetupEditorEnv, StateProvider, TextInput, useGlobalState } from '../../components'
+import { Group, NumberInput, SegmentedControl, SetupEditorEnv, Stack, StateProvider, TextInput, Title, useGlobalState } from '../../components'
 import config from './block.json'
 import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
 import View from './view'
 
 function EditComponent(_props: BlockEditProps<Attributes>) {
-	const { label, blockName, actions, min, max, step } = useGlobalState((state: GlobalState) => state)
+	const { label, blockName, actions, step, isRange, valueBoundaries, rangeBoundaries } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
+	const [minVal, maxVal] = valueBoundaries
+	const [minRange, maxRange] = rangeBoundaries
 
 	return (
 		<>
@@ -29,6 +31,7 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 							my="md"
 							style={{ width: '100%' }}
 							data={['Slider', 'Range']}
+							value={isRange ? 'Range' : 'Slider'}
 							onChange={(selected) => updateState({ isRange: selected === 'Range' })}
 						/>
 					</PanelRow>
@@ -43,32 +46,81 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 						/>
 					</PanelRow>
 					<PanelRow>
-						<Group>
-							<NumberInput
-								styles={{ root: { flex: 1 } }}
-								label="Min"
-								value={min}
-								onChange={(val) => updateState({ min: val !== '' ? val : min })}
-								hideControls
-							/>
-							<NumberInput
-								styles={{ root: { flex: 1 } }}
-								label="Max"
-								min={min + 1}
-								value={max}
-								onChange={(val) => updateState({ max: val !== '' ? val : max })}
-								hideControls
-							/>
-							<NumberInput
-								styles={{ root: { flex: 1 } }}
-								label="Step"
-								min={1}
-								value={step}
-								onChange={(val) => updateState({ step: val !== '' && max - min >= val ? val : step })}
-								hideControls
-							/>
-						</Group>
+						<Stack mt="md" spacing="xs">
+							<Title fz="md" fw="bold">
+								Value
+							</Title>
+							<Group>
+								<NumberInput
+									styles={{ root: { flex: 1 } }}
+									label="Min"
+									value={minVal}
+									max={maxVal - step}
+									onChange={(val) => {
+										const updatedBoundaries = [...valueBoundaries]
+										updatedBoundaries[0] = val !== '' ? val : minVal
+										updateState({ valueBoundaries: updatedBoundaries })
+									}}
+									hideControls
+								/>
+								<NumberInput
+									styles={{ root: { flex: 1 } }}
+									label="Max"
+									min={minVal + step}
+									value={maxVal}
+									onChange={(val) => {
+										const updatedBoundaries = [...valueBoundaries]
+										updatedBoundaries[1] = val !== '' ? val : maxVal
+										updateState({ valueBoundaries: updatedBoundaries })
+									}}
+									hideControls
+								/>
+								<NumberInput
+									styles={{ root: { flex: 1 } }}
+									label="Step"
+									min={1}
+									value={step}
+									onChange={(val) => updateState({ step: val !== '' && maxVal - minVal >= val ? val : step })}
+									hideControls
+								/>
+							</Group>
+						</Stack>
 					</PanelRow>
+					{isRange && (
+						<PanelRow>
+							<Stack mt="md" spacing="xs">
+								<Title fz="md" fw="bold">
+									Range
+								</Title>
+								<Group>
+									<NumberInput
+										styles={{ root: { flex: 1 } }}
+										label="Min"
+										max={maxRange - 1}
+										value={minRange}
+										onChange={(val) => {
+											const updatedBoundaries = [...rangeBoundaries]
+											updatedBoundaries[0] = val !== '' ? val : minRange
+											updateState({ rangeBoundaries: updatedBoundaries })
+										}}
+										hideControls
+									/>
+									<NumberInput
+										styles={{ root: { flex: 1 } }}
+										label="Max"
+										min={minRange + 1}
+										value={maxRange}
+										onChange={(val) => {
+											const updatedBoundaries = [...rangeBoundaries]
+											updatedBoundaries[1] = val !== '' ? val : maxRange
+											updateState({ rangeBoundaries: updatedBoundaries })
+										}}
+										hideControls
+									/>
+								</Group>
+							</Stack>
+						</PanelRow>
+					)}
 				</PanelBody>
 			</InspectorControls>
 
