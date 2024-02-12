@@ -9,14 +9,17 @@ interface ViewProps {
 }
 
 export default function View(props: ViewProps) {
-	const { isRange, label, min, max, step, initialValue } = useGlobalState((state: GlobalState) => state)
+	const { isRange, label, step, initialValue, valueBoundaries, rangeBoundaries } = useGlobalState((state: GlobalState) => state)
+	const [minVal, maxVal] = valueBoundaries
+	const [minRange, maxRange] = rangeBoundaries
+
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 	const [publishValue, publishEmpty] = usePublish('selected', isRange ? 'range value' : 'slider value')
 
 	const SliderElement = isRange ? (
-		<RangeSlider min={min} max={max} step={step} defaultValue={initialValue as any} />
+		<RangeSlider min={minVal} max={maxVal} step={step} minRange={minRange} maxRange={maxRange} defaultValue={initialValue as any} />
 	) : (
-		<Slider min={min} max={max} step={step} defaultValue={initialValue[0]} />
+		<Slider min={minVal} max={maxVal} step={step} defaultValue={initialValue[0]} />
 	)
 
 	return (

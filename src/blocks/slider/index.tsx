@@ -15,8 +15,8 @@ export interface Attributes {
 	showField: boolean
 	color: string
 	label: string
-	min: number
-	max: number
+	valueBoundaries: number[]
+	rangeBoundaries: number[]
 	step: number
 	initialValue: number[]
 }
