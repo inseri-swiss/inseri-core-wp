@@ -51,102 +51,40 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 						/>
 					</PanelRow>
 					<PanelRow>
-						<Stack mt="md" spacing="xs" style={{ width: '100%' }}>
-							<Title fz="md" fw="bold">
-								{isRange ? 'Initial Range' : 'Initial Value'}
-							</Title>
-							<Group>
-								<NumberInput
-									styles={{ root: { flex: 1 } }}
-									label={isRange ? 'Begin' : 'Value'}
-									value={beginInitial}
-									min={minVal}
-									max={maxVal}
-									onChange={(val) => {
-										const updated = [...initialValue]
-										updated[0] = val !== '' ? val : beginInitial
-										updateState({ initialValue: updated })
-									}}
-									onBlur={() => {
-										if (!(endInitial - maxRange <= beginInitial && beginInitial <= endInitial - minRange)) {
-											const updated = [...initialValue]
-											updated[1] = beginInitial + minRange
-											updateState({ initialValue: updated })
-										}
-									}}
-									hideControls
-								/>
-								{isRange && (
-									<NumberInput
-										styles={{ root: { flex: 1 } }}
-										label="End"
-										value={endInitial}
-										min={minVal}
-										max={maxVal}
-										onChange={(val) => {
-											const updated = [...initialValue]
-											updated[1] = val !== '' ? val : endInitial
-											updateState({ initialValue: updated })
-										}}
-										onBlur={() => {
-											if (!(beginInitial + minRange <= endInitial && endInitial <= beginInitial + maxRange)) {
-												const updated = [...initialValue]
-												updated[0] = beginInitial - minRange
-												updateState({ initialValue: updated })
-											}
-										}}
-										hideControls
-									/>
-								)}
-							</Group>
-						</Stack>
-					</PanelRow>
-					<PanelRow>
 						<Stack mt="md" spacing="xs">
 							<Title fz="md" fw="bold">
 								Value
 							</Title>
-							<Group>
+							<Group align="baseline">
 								<NumberInput
 									styles={{ root: { flex: 1 } }}
 									label="Min"
 									value={minVal}
-									max={maxVal - step}
 									onChange={(val) => {
 										const updatedBoundaries = [...valueBoundaries]
 										updatedBoundaries[0] = val !== '' ? val : minVal
 										updateState({ valueBoundaries: updatedBoundaries })
-									}}
-									onBlur={() => {
-										if (!(minRange <= maxVal - minVal)) {
-											updateState({ rangeBoundaries: [step, (maxVal - minVal) / 2] })
-										}
 									}}
 									hideControls
 								/>
 								<NumberInput
 									styles={{ root: { flex: 1 } }}
 									label="Max"
-									min={minVal + step}
 									value={maxVal}
 									onChange={(val) => {
 										const updatedBoundaries = [...valueBoundaries]
 										updatedBoundaries[1] = val !== '' ? val : maxVal
 										updateState({ valueBoundaries: updatedBoundaries })
 									}}
-									onBlur={() => {
-										if (!(minRange <= maxVal - minVal)) {
-											updateState({ rangeBoundaries: [step, (maxVal - minVal) / 2] })
-										}
-									}}
+									error={!(minVal <= maxVal) && 'max < min'}
 									hideControls
 								/>
 								<NumberInput
 									styles={{ root: { flex: 1 } }}
 									label="Step"
-									min={1}
 									value={step}
-									onChange={(val) => updateState({ step: val !== '' && maxVal - minVal >= val ? val : step })}
+									onChange={(val) => updateState({ step: val !== '' && val > 0 ? val : step })}
+									error={!(step <= maxVal - minVal) && 'too big'}
 									hideControls
 								/>
 							</Group>
@@ -158,7 +96,7 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 								<Title fz="md" fw="bold">
 									Range
 								</Title>
-								<Group>
+								<Group align="baseline">
 									<NumberInput
 										styles={{ root: { flex: 1 } }}
 										label="Min"
@@ -168,11 +106,7 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 											updatedBoundaries[0] = val !== '' && val > 0 ? val : minRange
 											updateState({ rangeBoundaries: updatedBoundaries })
 										}}
-										onBlur={() => {
-											if (!(minRange <= maxRange)) {
-												updateState({ rangeBoundaries: [minRange, minRange] })
-											}
-										}}
+										error={!(minRange <= maxVal - minVal) && 'too big'}
 										hideControls
 									/>
 									<NumberInput
@@ -181,20 +115,56 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 										value={maxRange}
 										onChange={(val) => {
 											const updatedBoundaries = [...rangeBoundaries]
-											updatedBoundaries[1] = val !== '' ? val : maxRange
+											updatedBoundaries[1] = val !== '' && val > 0 ? val : maxRange
 											updateState({ rangeBoundaries: updatedBoundaries })
 										}}
-										onBlur={() => {
-											if (!(minRange <= maxRange)) {
-												updateState({ rangeBoundaries: [maxRange, maxRange] })
-											}
-										}}
+										error={!(minRange <= maxRange) && 'max < min'}
 										hideControls
 									/>
 								</Group>
 							</Stack>
 						</PanelRow>
 					)}
+					<PanelRow>
+						<Stack mt="md" spacing="xs" style={{ width: '100%' }}>
+							<Title fz="md" fw="bold">
+								{isRange ? 'Initial Range' : 'Initial Value'}
+							</Title>
+							<Group align="baseline">
+								<NumberInput
+									styles={{ root: { flex: 1 } }}
+									label={isRange ? 'Begin' : 'Value'}
+									value={beginInitial}
+									onChange={(val) => {
+										const updated = [...initialValue]
+										updated[0] = val !== '' ? val : beginInitial
+										updateState({ initialValue: updated })
+									}}
+									error={(!(minVal <= beginInitial) && 'begin < min') || (!(beginInitial <= maxVal) && 'begin > max')}
+									hideControls
+								/>
+								{isRange && (
+									<NumberInput
+										styles={{ root: { flex: 1 } }}
+										label="End"
+										value={endInitial}
+										onChange={(val) => {
+											const updated = [...initialValue]
+											updated[1] = val !== '' ? val : endInitial
+											updateState({ initialValue: updated })
+										}}
+										error={
+											(!(minVal <= endInitial) && 'end < min') ||
+											(!(endInitial <= maxVal) && 'end > max') ||
+											(!(beginInitial + minRange <= endInitial) && 'too little of range') ||
+											(!(endInitial <= beginInitial + maxRange) && 'too big of range')
+										}
+										hideControls
+									/>
+								)}
+							</Group>
+						</Stack>
+					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
 
