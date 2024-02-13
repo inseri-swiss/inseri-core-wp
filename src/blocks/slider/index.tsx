@@ -19,6 +19,7 @@ export interface Attributes {
 	rangeBoundaries: number[]
 	step: number
 	initialValue: number[]
+	precision: number
 }
 
 registerBlockType<Attributes>(name, {
