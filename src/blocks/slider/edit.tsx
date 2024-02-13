@@ -9,8 +9,8 @@ import { GlobalState, storeCreator } from './state'
 import View from './view'
 
 function EditComponent(_props: BlockEditProps<Attributes>) {
-	const { label, blockName, actions, step, isRange, valueBoundaries, rangeBoundaries, initialValue } = useGlobalState((state: GlobalState) => state)
-	const { updateState } = actions
+	const { label, blockName, step, isRange, valueBoundaries, rangeBoundaries, initialValue, precision } = useGlobalState((state: GlobalState) => state)
+	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 	const [minVal, maxVal] = valueBoundaries
 	const [minRange, maxRange] = rangeBoundaries
 	const [beginInitial, endInitial] = initialValue
@@ -58,6 +58,7 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 							<Group align="baseline">
 								<NumberInput
 									styles={{ root: { flex: 1 } }}
+									precision={precision}
 									label="Min"
 									value={minVal}
 									onChange={(val) => {
@@ -69,6 +70,7 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 								/>
 								<NumberInput
 									styles={{ root: { flex: 1 } }}
+									precision={precision}
 									label="Max"
 									value={maxVal}
 									onChange={(val) => {
@@ -81,6 +83,7 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 								/>
 								<NumberInput
 									styles={{ root: { flex: 1 } }}
+									precision={precision}
 									label="Step"
 									value={step}
 									onChange={(val) => updateState({ step: val !== '' && val > 0 ? val : step })}
@@ -99,6 +102,7 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 								<Group align="baseline">
 									<NumberInput
 										styles={{ root: { flex: 1 } }}
+										precision={precision}
 										label="Min"
 										value={minRange}
 										onChange={(val) => {
@@ -111,6 +115,7 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 									/>
 									<NumberInput
 										styles={{ root: { flex: 1 } }}
+										precision={precision}
 										label="Max"
 										value={maxRange}
 										onChange={(val) => {
@@ -133,6 +138,7 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 							<Group align="baseline">
 								<NumberInput
 									styles={{ root: { flex: 1 } }}
+									precision={precision}
 									label={isRange ? 'Begin' : 'Value'}
 									value={beginInitial}
 									onChange={(val) => {
@@ -146,6 +152,7 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 								{isRange && (
 									<NumberInput
 										styles={{ root: { flex: 1 } }}
+										precision={precision}
 										label="End"
 										value={endInitial}
 										onChange={(val) => {
@@ -164,6 +171,19 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 								)}
 							</Group>
 						</Stack>
+					</PanelRow>
+					<PanelRow>
+						<NumberInput
+							mt="md"
+							styles={{ root: { width: '100%' } }}
+							label="Decimal Places"
+							value={precision}
+							min={0}
+							max={15}
+							onChange={(val) => {
+								updateState({ precision: val !== '' ? val : precision })
+							}}
+						/>
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
