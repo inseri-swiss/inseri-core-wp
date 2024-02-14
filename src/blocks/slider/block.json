@@ -36,7 +36,7 @@
 		},
 		"rangeBoundaries": {
 			"type": "array",
-			"default": [1, 10]
+			"default": [0, 100]
 		},
 		"step": {
 			"type": "number",

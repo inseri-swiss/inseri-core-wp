@@ -107,7 +107,7 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 										value={minRange}
 										onChange={(val) => {
 											const updatedBoundaries = [...rangeBoundaries]
-											updatedBoundaries[0] = val !== '' && val > 0 ? val : minRange
+											updatedBoundaries[0] = val !== '' && val >= 0 ? val : minRange
 											updateState({ rangeBoundaries: updatedBoundaries })
 										}}
 										error={!(minRange <= maxVal - minVal) && 'too big'}
@@ -120,7 +120,7 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 										value={maxRange}
 										onChange={(val) => {
 											const updatedBoundaries = [...rangeBoundaries]
-											updatedBoundaries[1] = val !== '' && val > 0 ? val : maxRange
+											updatedBoundaries[1] = val !== '' && val >= 0 ? val : maxRange
 											updateState({ rangeBoundaries: updatedBoundaries })
 										}}
 										error={!(minRange <= maxRange) && 'max < min'}
