@@ -1,0 +1,35 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "inseri-core/table",
+	"title": "Table",
+	"category": "inseri",
+	"description": "Display table using the other block's data.",
+	"attributes": {
+		"blockId": {
+			"type": "string",
+			"default": ""
+		},
+		"blockName": {
+			"type": "string",
+			"default": ""
+		},
+		"inputColumns": {
+			"type": "string",
+			"default": ""
+		},
+		"inputData": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": true,
+		"alignWide": true
+	},
+	"textdomain": "inseri-core",
+	"editorScript": ["file:./index.js", "inseri-core-editor"],
+	"viewScript": ["file:./hydration.js"],
+	"script": "inseri-core"
+}
