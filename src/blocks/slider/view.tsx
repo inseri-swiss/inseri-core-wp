@@ -1,5 +1,5 @@
 import { usePublish } from '@inseri/lighthouse'
-import { useEffect } from '@wordpress/element'
+import { useEffect, useState } from '@wordpress/element'
 import { Box, RangeSlider, Slider, Text, useGlobalState } from '../../components'
 import { GlobalState } from './state'
 
@@ -8,8 +8,15 @@ export default function View() {
 	const [minVal, maxVal] = valueBoundaries
 	const [minRange, maxRange] = rangeBoundaries
 
+	const [data, setData] = useState<number[]>([])
 	const [publishValue] = usePublish('selected', isRange ? 'range value' : 'slider value')
 	const publish = (data: any) => publishValue(data, 'application/json')
+
+	const updateData = (input: number | number[]) => {
+		const preparedData = Array.isArray(input) ? input : [input]
+		setData(preparedData)
+		publish(input)
+	}
 
 	const SliderElement = isRange ? (
 		<RangeSlider
@@ -19,20 +26,20 @@ export default function View() {
 			precision={precision}
 			minRange={minRange}
 			maxRange={maxRange}
-			defaultValue={initialValue as any}
-			onChange={publish}
+			value={data as any}
+			onChange={updateData}
 		/>
 	) : (
-		<Slider min={minVal} max={maxVal} step={step} precision={precision} defaultValue={initialValue[0]} onChange={publish} />
+		<Slider min={minVal} max={maxVal} step={step} precision={precision} value={data[0]} onChange={updateData} />
 	)
 
 	useEffect(() => {
 		if (isRange) {
-			publish(initialValue)
+			updateData(initialValue)
 		} else {
-			publish(initialValue[0])
+			updateData(initialValue[0])
 		}
-	}, [isRange])
+	}, [isRange, ...initialValue])
 
 	return (
 		<Box py={'md'}>
