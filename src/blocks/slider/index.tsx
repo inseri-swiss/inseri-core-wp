@@ -20,6 +20,7 @@ export interface Attributes {
 	step: number
 	initialValue: number[]
 	precision: number
+	advancedRange: boolean
 }
 
 registerBlockType<Attributes>(name, {

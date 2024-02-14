@@ -49,6 +49,10 @@
 		"precision": {
 			"type": "number",
 			"default": 1
+		},
+		"advancedRange": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {
