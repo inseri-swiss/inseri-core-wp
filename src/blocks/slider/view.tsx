@@ -4,13 +4,13 @@ import { Box, RangeSlider, Slider, Text, useGlobalState } from '../../components
 import { GlobalState } from './state'
 
 export default function View() {
-	const { isRange, label, step, initialValue, valueBoundaries, rangeBoundaries, precision } = useGlobalState((state: GlobalState) => state)
+	const { isRange, label, step, initialValue, valueBoundaries, rangeBoundaries, precision, advancedRange } = useGlobalState((state: GlobalState) => state)
 	const [minVal, maxVal] = valueBoundaries
 	const [minRange, maxRange] = rangeBoundaries
 
 	const [data, setData] = useState<number[]>([])
 	const [publishValue] = usePublish('selected', isRange ? 'range value' : 'slider value')
-	const publish = (data: any) => publishValue(data, 'application/json')
+	const publish = (input: any) => publishValue(input, 'application/json')
 
 	const updateData = (input: number | number[]) => {
 		const preparedData = Array.isArray(input) ? input : [input]
@@ -18,14 +18,17 @@ export default function View() {
 		publish(input)
 	}
 
+	const preparedMinRange = advancedRange ? minRange : 0
+	const preparedMaxRange = advancedRange ? maxRange : undefined
+
 	const SliderElement = isRange ? (
 		<RangeSlider
 			min={minVal}
 			max={maxVal}
 			step={step}
 			precision={precision}
-			minRange={minRange}
-			maxRange={maxRange}
+			minRange={preparedMinRange}
+			maxRange={preparedMaxRange}
 			value={data as any}
 			onChange={updateData}
 		/>

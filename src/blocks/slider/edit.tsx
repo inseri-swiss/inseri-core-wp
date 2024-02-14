@@ -2,14 +2,16 @@ import { InseriRoot } from '@inseri/lighthouse'
 import { InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow } from '@wordpress/components'
-import { Group, NumberInput, SegmentedControl, SetupEditorEnv, Stack, StateProvider, TextInput, Title, useGlobalState } from '../../components'
+import { Box, Group, NumberInput, SegmentedControl, SetupEditorEnv, Stack, StateProvider, Switch, TextInput, Title, useGlobalState } from '../../components'
 import config from './block.json'
 import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
 import View from './view'
 
 function EditComponent(_props: BlockEditProps<Attributes>) {
-	const { label, blockName, step, isRange, valueBoundaries, rangeBoundaries, initialValue, precision } = useGlobalState((state: GlobalState) => state)
+	const { label, blockName, step, isRange, valueBoundaries, rangeBoundaries, initialValue, precision, advancedRange } = useGlobalState(
+		(state: GlobalState) => state
+	)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 	const [minVal, maxVal] = valueBoundaries
 	const [minRange, maxRange] = rangeBoundaries
@@ -51,126 +53,79 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 						/>
 					</PanelRow>
 					<PanelRow>
-						<Stack mt="md" spacing="xs">
-							<Title fz="md" fw="bold">
-								Value
-							</Title>
-							<Group align="baseline">
-								<NumberInput
-									styles={{ root: { flex: 1 } }}
-									precision={precision}
-									label="Min"
-									value={minVal}
-									onChange={(val) => {
-										const updatedBoundaries = [...valueBoundaries]
-										updatedBoundaries[0] = val !== '' ? val : minVal
-										updateState({ valueBoundaries: updatedBoundaries })
-									}}
-									hideControls
-								/>
-								<NumberInput
-									styles={{ root: { flex: 1 } }}
-									precision={precision}
-									label="Max"
-									value={maxVal}
-									onChange={(val) => {
-										const updatedBoundaries = [...valueBoundaries]
-										updatedBoundaries[1] = val !== '' ? val : maxVal
-										updateState({ valueBoundaries: updatedBoundaries })
-									}}
-									error={!(minVal <= maxVal) && 'max < min'}
-									hideControls
-								/>
-								<NumberInput
-									styles={{ root: { flex: 1 } }}
-									precision={precision}
-									label="Step"
-									value={step}
-									onChange={(val) => updateState({ step: val !== '' && val > 0 ? val : step })}
-									error={!(step <= maxVal - minVal) && 'too big'}
-									hideControls
-								/>
-							</Group>
-						</Stack>
+						<Group align="baseline" mt="md">
+							<NumberInput
+								styles={{ root: { flex: 1 } }}
+								precision={precision}
+								label="Min"
+								value={minVal}
+								onChange={(val) => {
+									const updatedBoundaries = [...valueBoundaries]
+									updatedBoundaries[0] = val !== '' ? val : minVal
+									updateState({ valueBoundaries: updatedBoundaries })
+								}}
+								hideControls
+							/>
+							<NumberInput
+								styles={{ root: { flex: 1 } }}
+								precision={precision}
+								label="Max"
+								value={maxVal}
+								onChange={(val) => {
+									const updatedBoundaries = [...valueBoundaries]
+									updatedBoundaries[1] = val !== '' ? val : maxVal
+									updateState({ valueBoundaries: updatedBoundaries })
+								}}
+								error={!(minVal <= maxVal) && 'max < min'}
+								hideControls
+							/>
+							<NumberInput
+								styles={{ root: { flex: 1 } }}
+								precision={precision}
+								label="Step"
+								value={step}
+								onChange={(val) => updateState({ step: val !== '' && val > 0 ? val : step })}
+								error={!(step <= maxVal - minVal) && 'too big'}
+								hideControls
+							/>
+						</Group>
 					</PanelRow>
-					{isRange && (
-						<PanelRow>
-							<Stack mt="md" spacing="xs">
-								<Title fz="md" fw="bold">
-									Range
-								</Title>
-								<Group align="baseline">
-									<NumberInput
-										styles={{ root: { flex: 1 } }}
-										precision={precision}
-										label="Min"
-										value={minRange}
-										onChange={(val) => {
-											const updatedBoundaries = [...rangeBoundaries]
-											updatedBoundaries[0] = val !== '' && val >= 0 ? val : minRange
-											updateState({ rangeBoundaries: updatedBoundaries })
-										}}
-										error={!(minRange <= maxVal - minVal) && 'too big'}
-										hideControls
-									/>
-									<NumberInput
-										styles={{ root: { flex: 1 } }}
-										precision={precision}
-										label="Max"
-										value={maxRange}
-										onChange={(val) => {
-											const updatedBoundaries = [...rangeBoundaries]
-											updatedBoundaries[1] = val !== '' && val >= 0 ? val : maxRange
-											updateState({ rangeBoundaries: updatedBoundaries })
-										}}
-										error={!(minRange <= maxRange) && 'max < min'}
-										hideControls
-									/>
-								</Group>
-							</Stack>
-						</PanelRow>
-					)}
 					<PanelRow>
-						<Stack mt="md" spacing="xs" style={{ width: '100%' }}>
-							<Title fz="md" fw="bold">
-								{isRange ? 'Initial Range' : 'Initial Value'}
-							</Title>
-							<Group align="baseline">
+						<Group align="baseline" mt="md" style={{ width: '100%' }}>
+							<NumberInput
+								styles={{ root: { flex: 1 } }}
+								precision={precision}
+								label={isRange ? 'Initial Begin' : 'Initial Value'}
+								value={beginInitial}
+								onChange={(val) => {
+									const updated = [...initialValue]
+									updated[0] = val !== '' ? val : beginInitial
+									updateState({ initialValue: updated })
+								}}
+								error={(!(minVal <= beginInitial) && 'begin < min') || (!(beginInitial <= maxVal) && 'begin > max')}
+								hideControls
+							/>
+							{isRange && (
 								<NumberInput
 									styles={{ root: { flex: 1 } }}
 									precision={precision}
-									label={isRange ? 'Begin' : 'Value'}
-									value={beginInitial}
+									label="Initial End"
+									value={endInitial}
 									onChange={(val) => {
 										const updated = [...initialValue]
-										updated[0] = val !== '' ? val : beginInitial
+										updated[1] = val !== '' ? val : endInitial
 										updateState({ initialValue: updated })
 									}}
-									error={(!(minVal <= beginInitial) && 'begin < min') || (!(beginInitial <= maxVal) && 'begin > max')}
+									error={
+										(!(minVal <= endInitial) && 'end < min') ||
+										(!(endInitial <= maxVal) && 'end > max') ||
+										(!(beginInitial + minRange <= endInitial) && 'too little of range') ||
+										(!(endInitial <= beginInitial + maxRange) && 'too big of range')
+									}
 									hideControls
 								/>
-								{isRange && (
-									<NumberInput
-										styles={{ root: { flex: 1 } }}
-										precision={precision}
-										label="End"
-										value={endInitial}
-										onChange={(val) => {
-											const updated = [...initialValue]
-											updated[1] = val !== '' ? val : endInitial
-											updateState({ initialValue: updated })
-										}}
-										error={
-											(!(minVal <= endInitial) && 'end < min') ||
-											(!(endInitial <= maxVal) && 'end > max') ||
-											(!(beginInitial + minRange <= endInitial) && 'too little of range') ||
-											(!(endInitial <= beginInitial + maxRange) && 'too big of range')
-										}
-										hideControls
-									/>
-								)}
-							</Group>
-						</Stack>
+							)}
+						</Group>
 					</PanelRow>
 					<PanelRow>
 						<NumberInput
@@ -185,6 +140,48 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 							}}
 						/>
 					</PanelRow>
+					{isRange && (
+						<PanelRow>
+							<Stack mt="md" spacing="xs" style={{ width: '100%' }}>
+								<Switch
+									styles={{ labelWrapper: { flex: 1 } }}
+									label="Advanced Range"
+									checked={advancedRange}
+									onChange={(event) => updateState({ advancedRange: event.currentTarget.checked })}
+								/>
+								{advancedRange && (
+									<Box style={{ display: 'flex', gap: '1rem' }}>
+										<NumberInput
+											styles={{ root: { flex: 1 } }}
+											precision={precision}
+											label="Range Min"
+											value={minRange}
+											onChange={(val) => {
+												const updatedBoundaries = [...rangeBoundaries]
+												updatedBoundaries[0] = val !== '' && val >= 0 ? val : minRange
+												updateState({ rangeBoundaries: updatedBoundaries })
+											}}
+											error={!(minRange <= maxVal - minVal) && 'too big'}
+											hideControls
+										/>
+										<NumberInput
+											styles={{ root: { flex: 1 } }}
+											precision={precision}
+											label="Range Max"
+											value={maxRange}
+											onChange={(val) => {
+												const updatedBoundaries = [...rangeBoundaries]
+												updatedBoundaries[1] = val !== '' && val >= 0 ? val : maxRange
+												updateState({ rangeBoundaries: updatedBoundaries })
+											}}
+											error={!(minRange <= maxRange) && 'max < min'}
+											hideControls
+										/>
+									</Box>
+								)}
+							</Stack>
+						</PanelRow>
+					)}
 				</PanelBody>
 			</InspectorControls>
 
