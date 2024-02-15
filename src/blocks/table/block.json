@@ -21,6 +21,22 @@
 		"inputData": {
 			"type": "string",
 			"default": ""
+		},
+		"options": {
+			"type": "object",
+			"default": {
+				"enableTopToolbar": true,
+				"enableBottomToolbar": true,
+				"enableColumnActions": true,
+				"enableSorting": true,
+				"enableColumnOrdering": false,
+				"enableGlobalFilter": true,
+				"enableColumnFilters": true,
+				"enableHiding": true,
+				"enableDensityToggle": true,
+				"enableFullScreenToggle": true,
+				"enablePagination": true
+			}
 		}
 	},
 	"supports": {

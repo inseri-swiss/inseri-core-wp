@@ -6,21 +6,37 @@ import { PanelBody, PanelRow, ToolbarButton, ToolbarGroup } from '@wordpress/com
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Group, Select, SetupEditorEnv, Stack, StateProvider, Text, TextInput, useGlobalState } from '../../components'
+import { Button, Group, Select, SetupEditorEnv, Stack, StateProvider, Switch, Text, TextInput, useGlobalState } from '../../components'
 import json from './block.json'
 import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
 import View from './view'
 
+const generalOptions = [
+	['enableTopToolbar', 'Top Toolbar'],
+	['enableBottomToolbar', 'Bottom Toolbar'],
+	['enableColumnActions', 'Column Actions'],
+	['enableSorting', 'Sorting'],
+	['enableColumnOrdering', 'Column Ordering'],
+]
+const toolbarOptions = [
+	['enableGlobalFilter', 'Search'],
+	['enableColumnFilters', 'Column Filters'],
+	['enableHiding', 'Column Hiding'],
+	['enableDensityToggle', 'Density'],
+	['enableFullScreenToggle', 'Fullscreen'],
+	['enablePagination', 'Pagination'],
+]
+
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { inputColumns, inputData, blockName, isWizardMode, actions } = useGlobalState((state: GlobalState) => state)
+	const { inputColumns, inputData, blockName, isWizardMode, actions, options } = useGlobalState((state: GlobalState) => state)
 	const isValueSet = !!inputColumns && !!inputData
 	const { updateState } = actions
 
 	const sources = useDiscover({ contentTypeFilter: 'application/json' })
-	const options = sources.map((item) => ({ label: item.description, value: item.key }))
+	const sourceOptions = sources.map((item) => ({ label: item.description, value: item.key }))
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -54,6 +70,34 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 							onChange={(event) => updateState({ blockName: event.target.value })}
 						/>
 					</PanelRow>
+					<PanelRow>
+						<Stack style={{ width: '100%' }} my="md">
+							{generalOptions.map((tableOpt) => (
+								<Switch
+									key={tableOpt[0]}
+									styles={{ labelWrapper: { width: '100%' } }}
+									label={tableOpt[1]}
+									checked={options[tableOpt[0]]}
+									onChange={(event) => updateState({ options: { ...options, [tableOpt[0]]: event.target.checked } })}
+								/>
+							))}
+						</Stack>
+					</PanelRow>
+				</PanelBody>
+				<PanelBody title="Toolbar Settings">
+					<PanelRow>
+						<Stack style={{ width: '100%' }} my="md">
+							{toolbarOptions.map((opt) => (
+								<Switch
+									key={opt[0]}
+									styles={{ labelWrapper: { width: '100%' } }}
+									label={opt[1]}
+									checked={options[opt[0]]}
+									onChange={(event) => updateState({ options: { ...options, [opt[0]]: event.target.checked } })}
+								/>
+							))}
+						</Stack>
+					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
 			{isWizardMode ? (
@@ -66,18 +110,23 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					</Group>
 					<Select
 						label={__('Choose column config', 'inseri-core')}
-						data={options}
+						data={sourceOptions}
 						value={inputColumns}
-						onChange={(key) => updateState({ inputColumns: key ?? '', isWizardMode: !key || !inputData })}
+						onChange={(key) => updateState({ inputColumns: key ?? '' })}
 						clearable
 					/>
 					<Select
 						label={__('Choose table records', 'inseri-core')}
-						data={options}
+						data={sourceOptions}
 						value={inputData}
-						onChange={(key) => updateState({ inputData: key ?? '', isWizardMode: !inputColumns || !key })}
+						onChange={(key) => updateState({ inputData: key ?? '' })}
 						clearable
 					/>
+					<Group position="right">
+						<Button disabled={!isValueSet} variant="filled" onClick={() => updateState({ isWizardMode: false })}>
+							{__('Finish', 'inseri-core')}
+						</Button>
+					</Group>
 				</Stack>
 			) : (
 				<View />
