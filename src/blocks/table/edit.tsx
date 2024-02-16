@@ -71,7 +71,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						/>
 					</PanelRow>
 					<PanelRow>
-						<Stack style={{ width: '100%' }} my="md">
+						<Stack style={{ width: '100%' }} mt="md">
 							{generalOptions.map((tableOpt) => (
 								<Switch
 									key={tableOpt[0]}
@@ -86,7 +86,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 				</PanelBody>
 				<PanelBody title="Toolbar Settings">
 					<PanelRow>
-						<Stack style={{ width: '100%' }} my="md">
+						<Stack style={{ width: '100%' }}>
 							{toolbarOptions.map((opt) => (
 								<Switch
 									key={opt[0]}

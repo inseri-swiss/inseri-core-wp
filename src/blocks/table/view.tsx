@@ -1,4 +1,4 @@
-import { useWatch } from '@inseri/lighthouse'
+import { usePublish, useWatch } from '@inseri/lighthouse'
 import { useState } from '@wordpress/element'
 import { MantineReactTable, useMantineReactTable } from 'mantine-react-table'
 import { Box, useGlobalState } from '../../components'
@@ -10,6 +10,9 @@ export default function View() {
 
 	const [columns, setColumns] = useState([])
 	const [data, setData] = useState([])
+
+	const [publishRow] = usePublish('row', 'selected row')
+	const [publishCell] = usePublish('cell', 'selected cell')
 
 	useWatch(
 		{ inputColumns, inputData },
@@ -44,6 +47,17 @@ export default function View() {
 		columns,
 		data,
 		...options,
+
+		mantineTableBodyRowProps: ({ row }) => ({
+			onClick: (_event) => publishRow(row.original, 'application/json'),
+			sx: { cursor: 'pointer' },
+		}),
+		mantineTableBodyCellProps: ({ cell, row }) => ({
+			onDoubleClick: (_event) => {
+				const accessorKey = cell.column.columnDef.accessorKey ?? cell.column.id
+				publishCell({ accessorKey, row: row.original, cell: row.original[accessorKey] }, 'application/json')
+			},
+		}),
 	})
 
 	return (
