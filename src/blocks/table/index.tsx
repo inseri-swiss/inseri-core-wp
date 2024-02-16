@@ -13,7 +13,7 @@ export interface Attributes {
 	blockName: string
 	inputColumns: string
 	inputData: string
-	options: Record<string, boolean>
+	options: Record<string, any>
 }
 
 registerBlockType<Attributes>(name, {
