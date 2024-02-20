@@ -3,7 +3,7 @@ import { IconTable } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ToolbarButton, ToolbarGroup } from '@wordpress/components'
-import { useEffect } from '@wordpress/element'
+import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import { Button, Group, Select, SetupEditorEnv, Stack, StateProvider, Switch, Text, TextInput, useGlobalState } from '../../components'
@@ -19,6 +19,7 @@ const generalOptions = [
 	['enableColumnActions', 'Column Actions'],
 	['enableSorting', 'Sorting'],
 	['enableColumnOrdering', 'Column Ordering'],
+	['enableRowVirtualization', 'Row Virtualization'],
 ]
 const toolbarOptions = [
 	['enableGlobalFilter', 'Search'],
@@ -38,6 +39,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const isValueSet = !!inputColumns && !!inputData
 	const { updateState } = actions
 
+	const [hasRowVirtualChanged, setRowVirtualChanged] = useState(false)
 	const configOptions = useDiscover({ jsonSchemas: [configSchema] }).map(mapToOptions)
 	const recordOptions = useDiscover({ contentTypeFilter: 'application/json' }).map(mapToOptions)
 
@@ -46,6 +48,10 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 			updateState({ isWizardMode: false })
 		}
 	}, [isSelected])
+
+	useEffect(() => {
+		setRowVirtualChanged(false)
+	}, [hasRowVirtualChanged])
 
 	return (
 		<>
@@ -81,7 +87,12 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 									styles={{ labelWrapper: { width: '100%' } }}
 									label={tableOpt[1]}
 									checked={options[tableOpt[0]]}
-									onChange={(event) => updateState({ options: { ...options, [tableOpt[0]]: event.target.checked } })}
+									onChange={(event) => {
+										updateState({ options: { ...options, [tableOpt[0]]: event.target.checked } })
+										if (tableOpt[0] === 'enableRowVirtualization') {
+											setRowVirtualChanged(true)
+										}
+									}}
 								/>
 							))}
 						</Stack>
@@ -103,7 +114,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
-			{isWizardMode ? (
+			{isWizardMode || hasRowVirtualChanged ? (
 				<Stack p="md" style={{ border: '1px solid #000' }} spacing="sm">
 					<Group mb="md" spacing={0}>
 						<IconTable size={28} />
