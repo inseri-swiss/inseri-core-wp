@@ -30,6 +30,7 @@
 				"enableColumnActions": true,
 				"enableSorting": true,
 				"enableColumnOrdering": false,
+				"enableRowVirtualization": false,
 				"enableGlobalFilter": true,
 				"enableColumnFilters": true,
 				"enableHiding": true,
