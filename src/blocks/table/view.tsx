@@ -55,7 +55,8 @@ export default function View() {
 		mantineTableBodyCellProps: ({ cell, row }) => ({
 			onDoubleClick: (_event) => {
 				const accessorKey = cell.column.columnDef.accessorKey ?? cell.column.id
-				publishCell({ accessorKey, row: row.original, cell: row.original[accessorKey] }, 'application/json')
+				const cellContent = accessorKey.split('.').reduce((a, b) => a[b], row.original as any)
+				publishCell({ accessorKey, row: row.original, cell: cellContent }, 'application/json')
 			},
 		}),
 	})
