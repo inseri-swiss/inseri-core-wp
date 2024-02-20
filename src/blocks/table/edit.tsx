@@ -119,7 +119,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					<Group mb="md" spacing={0}>
 						<IconTable size={28} />
 						<Text ml="xs" fz={24}>
-							{__('Table', 'inseri-core')}
+							{__('Data Table', 'inseri-core')}
 						</Text>
 					</Group>
 					<Select
@@ -152,7 +152,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 export default function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes, clientId } = props
 	return (
-		<SetupEditorEnv {...props} baseBlockName={'table'} addSuffixToInputs={['inputKey']}>
+		<SetupEditorEnv {...props} baseBlockName={'dataTable'} addSuffixToInputs={['inputColumns', 'inputData']}>
 			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name} clientId={clientId}>
 				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
 					<EditComponent {...props} />
