@@ -3,6 +3,7 @@ import { useState } from '@wordpress/element'
 import { MantineReactTable, useMantineReactTable } from 'mantine-react-table'
 import { Box, useGlobalState } from '../../components'
 import { GlobalState } from './state'
+import { isValueValid } from './utils'
 
 export default function View() {
 	const { inputColumns, inputData, options } = useGlobalState((state: GlobalState) => state)
@@ -37,6 +38,7 @@ export default function View() {
 					setData(preparedData)
 				}
 				if (key === 'inputColumns') {
+					preparedData = isValueValid(preparedData) ? preparedData : []
 					setColumns(preparedData)
 				}
 			},

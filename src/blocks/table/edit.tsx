@@ -11,6 +11,7 @@ import json from './block.json'
 import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
 import View from './view'
+import { configSchema } from './utils'
 
 const generalOptions = [
 	['enableTopToolbar', 'Top Toolbar'],
@@ -28,6 +29,8 @@ const toolbarOptions = [
 	['enablePagination', 'Pagination'],
 ]
 
+const mapToOptions = (item: { description: string; key: string }) => ({ label: item.description, value: item.key })
+
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
@@ -35,8 +38,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const isValueSet = !!inputColumns && !!inputData
 	const { updateState } = actions
 
-	const sources = useDiscover({ contentTypeFilter: 'application/json' })
-	const sourceOptions = sources.map((item) => ({ label: item.description, value: item.key }))
+	const configOptions = useDiscover({ jsonSchemas: [configSchema] }).map(mapToOptions)
+	const recordOptions = useDiscover({ contentTypeFilter: 'application/json' }).map(mapToOptions)
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -110,14 +113,14 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					</Group>
 					<Select
 						label={__('Choose column config', 'inseri-core')}
-						data={sourceOptions}
+						data={configOptions}
 						value={inputColumns}
 						onChange={(key) => updateState({ inputColumns: key ?? '' })}
 						clearable
 					/>
 					<Select
 						label={__('Choose table records', 'inseri-core')}
-						data={sourceOptions}
+						data={recordOptions}
 						value={inputData}
 						onChange={(key) => updateState({ inputData: key ?? '' })}
 						clearable
