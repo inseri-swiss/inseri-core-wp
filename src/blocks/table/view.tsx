@@ -1,5 +1,6 @@
 import { usePublish, useWatch } from '@inseri/lighthouse'
 import { useState } from '@wordpress/element'
+import cloneDeep from 'lodash.clonedeep'
 import type { MRT_ColumnFiltersState as ColumnFiltersState, MRT_SortingState as SortingState } from 'mantine-react-table'
 import { MantineReactTable, useMantineReactTable } from 'mantine-react-table'
 import { useDeepCompareEffect } from 'react-use'
@@ -81,8 +82,16 @@ export default function View() {
 		mantineEditTextInputProps: enableEditing
 			? ({ cell }) => ({
 					onBlur: (event) => {
-						const updatedRecord = { ...data[cell.row.index], [cell.column.id]: event.target.value }
-						const updatedData = data.toSpliced(cell.row.index, 1, updatedRecord)
+						const updatedRecord = cloneDeep(data[cell.row.index])
+						let nestedField = updatedRecord
+
+						const splittedKeys = cell.column.id.split('.')
+						const lastKey = splittedKeys.splice(-1, 1)[0]
+
+						nestedField = splittedKeys.reduce((a, b) => a[b], nestedField)
+						nestedField[lastKey] = event.target.value
+
+						const updatedData = data.map((val, idx) => (idx === cell.row.index ? updatedRecord : val))
 						setData(updatedData)
 					},
 			  })
