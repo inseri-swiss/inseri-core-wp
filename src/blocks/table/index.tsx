@@ -13,7 +13,8 @@ export interface Attributes {
 	blockName: string
 	inputColumns: string
 	inputData: string
-	options: Record<string, any>
+	options: Record<string, any> //options from MRT library
+	extraOptions: Record<string, any> //custom options
 }
 
 registerBlockType<Attributes>(name, {

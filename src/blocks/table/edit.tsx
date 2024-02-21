@@ -30,12 +30,18 @@ const toolbarOptions = [
 	['enablePagination', 'Pagination'],
 ]
 
+const extraOptionsWithLabel = [
+	['enableRowClick', 'Emit row on click'],
+	['enableCellClick', 'Emit cell on double-click'],
+	['enableEditing', 'Cell editing on double-click'],
+]
+
 const mapToOptions = (item: { description: string; key: string }) => ({ label: item.description, value: item.key })
 
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { inputColumns, inputData, blockName, isWizardMode, actions, options } = useGlobalState((state: GlobalState) => state)
+	const { inputColumns, inputData, blockName, isWizardMode, actions, options, extraOptions } = useGlobalState((state: GlobalState) => state)
 	const isValueSet = !!inputColumns && !!inputData
 	const { updateState } = actions
 
@@ -108,6 +114,32 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 									label={opt[1]}
 									checked={options[opt[0]]}
 									onChange={(event) => updateState({ options: { ...options, [opt[0]]: event.target.checked } })}
+								/>
+							))}
+						</Stack>
+					</PanelRow>
+				</PanelBody>
+				<PanelBody title="Extra Settings">
+					<PanelRow>
+						<Stack style={{ width: '100%' }}>
+							{extraOptionsWithLabel.map((opt) => (
+								<Switch
+									key={opt[0]}
+									styles={{ labelWrapper: { width: '100%' } }}
+									label={opt[1]}
+									checked={extraOptions[opt[0]]}
+									onChange={(event) => {
+										const updater = { [opt[0]]: event.target.checked }
+
+										if (opt[0] === 'enableCellClick' && event.target.checked) {
+											updater.enableEditing = false
+										}
+										if (opt[0] === 'enableEditing' && event.target.checked) {
+											updater.enableCellClick = false
+										}
+
+										updateState({ extraOptions: { ...extraOptions, ...updater } })
+									}}
 								/>
 							))}
 						</Stack>
