@@ -38,6 +38,14 @@
 				"enableFullScreenToggle": true,
 				"enablePagination": true
 			}
+		},
+		"extraOptions": {
+			"type": "object",
+			"default": {
+				"enableRowClick": true,
+				"enableCellClick": true,
+				"enableEditing": false
+			}
 		}
 	},
 	"supports": {

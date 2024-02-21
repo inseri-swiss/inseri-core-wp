@@ -1,18 +1,19 @@
 import { usePublish, useWatch } from '@inseri/lighthouse'
 import { useState } from '@wordpress/element'
-import { MantineReactTable, useMantineReactTable } from 'mantine-react-table'
 import type { MRT_ColumnFiltersState as ColumnFiltersState, MRT_SortingState as SortingState } from 'mantine-react-table'
+import { MantineReactTable, useMantineReactTable } from 'mantine-react-table'
 import { useDeepCompareEffect } from 'react-use'
 import { Box, useGlobalState } from '../../components'
 import { GlobalState } from './state'
 import { isValueValid } from './utils'
 
 export default function View() {
-	const { inputColumns, inputData, options } = useGlobalState((state: GlobalState) => state)
+	const { inputColumns, inputData, options, extraOptions } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
+	const { enableRowClick, enableCellClick, enableEditing } = extraOptions
 
 	const [columns, setColumns] = useState([])
-	const [data, setData] = useState([])
+	const [data, setData] = useState<any[]>([])
 
 	const [publishRow] = usePublish('row', 'selected row')
 	const [publishCell] = usePublish('cell', 'selected cell')
@@ -57,17 +58,35 @@ export default function View() {
 		data,
 		...options,
 
-		mantineTableBodyRowProps: ({ row }) => ({
-			onClick: (_event) => publishRow(row.original, 'application/json'),
-			sx: { cursor: 'pointer' },
-		}),
-		mantineTableBodyCellProps: ({ cell, row }) => ({
-			onDoubleClick: (_event) => {
-				const accessorKey = cell.column.columnDef.accessorKey ?? cell.column.id
-				const cellContent = accessorKey.split('.').reduce((a, b) => a[b], row.original as any)
-				publishCell({ accessorKey, row: row.original, cell: cellContent }, 'application/json')
-			},
-		}),
+		mantineTableBodyRowProps: enableRowClick
+			? ({ row }) => ({
+					onClick: (_event) => publishRow(row.original, 'application/json'),
+					sx: { cursor: 'pointer' },
+			  })
+			: undefined,
+
+		mantineTableBodyCellProps: enableCellClick
+			? ({ cell, row }) => ({
+					onDoubleClick: (_event) => {
+						const accessorKey = cell.column.id
+						const cellContent = accessorKey.split('.').reduce((a, b) => a[b], row.original as any)
+						publishCell({ accessorKey, row: row.original, cell: cellContent }, 'application/json')
+					},
+					sx: { cursor: 'pointer' },
+			  })
+			: undefined,
+
+		enableEditing,
+		editDisplayMode: 'cell',
+		mantineEditTextInputProps: enableEditing
+			? ({ cell }) => ({
+					onBlur: (event) => {
+						const updatedRecord = { ...data[cell.row.index], [cell.column.id]: event.target.value }
+						const updatedData = data.toSpliced(cell.row.index, 1, updatedRecord)
+						setData(updatedData)
+					},
+			  })
+			: undefined,
 
 		state: {
 			sorting,
@@ -82,7 +101,7 @@ export default function View() {
 	useDeepCompareEffect(() => {
 		const tableRows = table.getRowModel().rows.map((r) => r.original)
 		publishTable(tableRows, 'application/json')
-	}, [sorting, globalFilter, columnFilters])
+	}, [sorting, globalFilter, columnFilters, data])
 
 	return (
 		<Box>
