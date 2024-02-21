@@ -1,6 +1,7 @@
 import { usePublish, useWatch } from '@inseri/lighthouse'
 import { useState } from '@wordpress/element'
-import { MantineReactTable, useMantineReactTable } from 'mantine-react-table'
+import { MRT_ColumnFiltersState, MRT_SortingState, MantineReactTable, useMantineReactTable } from 'mantine-react-table'
+import { useDeepCompareEffect } from 'react-use'
 import { Box, useGlobalState } from '../../components'
 import { GlobalState } from './state'
 import { isValueValid } from './utils'
@@ -14,6 +15,11 @@ export default function View() {
 
 	const [publishRow] = usePublish('row', 'selected row')
 	const [publishCell] = usePublish('cell', 'selected cell')
+	const [publishTable] = usePublish('table', 'filtered and sorted table')
+
+	const [sorting, setSorting] = useState<MRT_SortingState>([])
+	const [globalFilter, setGlobalFilter] = useState('')
+	const [columnFilters, setColumnFilters] = useState<MRT_ColumnFiltersState>([])
 
 	useWatch(
 		{ inputColumns, inputData },
@@ -45,7 +51,7 @@ export default function View() {
 		}
 	)
 
-	const table = useMantineReactTable({
+	const table = useMantineReactTable<any>({
 		columns,
 		data,
 		...options,
@@ -61,7 +67,21 @@ export default function View() {
 				publishCell({ accessorKey, row: row.original, cell: cellContent }, 'application/json')
 			},
 		}),
+
+		state: {
+			sorting,
+			globalFilter,
+			columnFilters,
+		},
+		onSortingChange: setSorting,
+		onGlobalFilterChange: setGlobalFilter,
+		onColumnFiltersChange: setColumnFilters,
 	})
+
+	useDeepCompareEffect(() => {
+		const tableRows = table.getRowModel().rows.map((r) => r.original)
+		publishTable(tableRows, 'application/json')
+	}, [sorting, globalFilter, columnFilters])
 
 	return (
 		<Box>
