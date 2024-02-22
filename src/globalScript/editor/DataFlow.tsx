@@ -1,4 +1,4 @@
-import { InseriRoot, useWatch } from '@inseri/lighthouse'
+import { InseriRoot, usePublish, useWatch } from '@inseri/lighthouse'
 import { useHover } from '@mantine/hooks'
 import { IconBuildingLighthouse, IconWindowMaximize } from '@tabler/icons-react'
 import { select, useDispatch } from '@wordpress/data'
@@ -18,6 +18,7 @@ import {
 	NumberInputHandlers,
 	SegmentedControl,
 	Stack,
+	Switch,
 	Text,
 	UnstyledButton,
 	createStyles,
@@ -247,6 +248,9 @@ function SideBar() {
 		[selectedBlockId]
 	)
 
+	const isHidden = useWatch('__root/is-hidden', { onNone: () => false, onSome: (nucleus) => nucleus.value })
+	const [publishHidden] = usePublish('is-hidden', 'are blocks hidden')
+
 	let chartData = useWatch('__root/data-flow', { onNone: () => [], onSome: (nucleus: any) => nucleus.value }) as any[]
 	const blocks: any[] =
 		useWatch('__root/blocks', {
@@ -281,6 +285,10 @@ function SideBar() {
 		<>
 			<ExtendedView isModalOpen={isModalOpen} setModalOpen={setModalOpen} />
 			<PluginSidebar name="inseri-core-data-flow" title="inseri Data Flow" isPinnable={true} icon={<IconBuildingLighthouse style={{ fill: 'none' }} />}>
+				<Box p="md" style={{ border: '0.0625rem solid #dee2e6' }}>
+					<Switch label="Hide the invisible blocks" value={isHidden} onChange={(event) => publishHidden(event.currentTarget.checked, 'application/json')} />
+				</Box>
+
 				<Accordion chevronPosition="right" multiple value={openItems} onChange={setOpenItems}>
 					<Accordion.Item value="blocks">
 						<AccordionControl>{__('Blocks', 'inseri-core')}</AccordionControl>
@@ -320,7 +328,7 @@ function SideBar() {
 
 export function DataFlow() {
 	return (
-		<InseriRoot blockId="__sidebar" blockName="sidebar" blockType="inseri-core/sidebar">
+		<InseriRoot blockId="__root" blockName="inseri" blockType="inseri-core/root">
 			<SideBar />
 		</InseriRoot>
 	)

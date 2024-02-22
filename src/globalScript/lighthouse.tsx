@@ -21,6 +21,7 @@ const blockStoreSubject = new BehaviorSubject<Root>({
 			'detailed-data-flow': { description: 'detailed data-flow', content: some({ contentType: 'application/json', value: [] }) },
 			'data-flow': { description: 'data-flow', content: some({ contentType: 'application/json', value: [] }) },
 			blocks: { description: 'blocks', content: some({ contentType: 'application/json', value: [] }) },
+			'is-hidden': { description: 'are blocks hidden', content: some({ contentType: 'application/json', value: false }) },
 		},
 	},
 })
