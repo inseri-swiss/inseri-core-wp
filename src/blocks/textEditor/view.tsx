@@ -1,9 +1,9 @@
 import { usePublish } from '@inseri/lighthouse'
 import { useDebouncedValue } from '@mantine/hooks'
-import { IconEye, IconPencil } from '@tabler/icons-react'
+import { IconEyeOff, IconEye, IconPencil } from '@tabler/icons-react'
 import { useEffect, useMemo, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Box, Button, CodeEditor, Group, Text, Tooltip, useGlobalState } from '../../components'
+import { Box, Button, CodeEditor, Group, Overlay, Text, Tooltip, useGlobalState } from '../../components'
 import { formatCode, getBodyTypeByContenType, isBeautifyType } from '../../utils'
 import { GlobalState } from './state'
 
@@ -78,7 +78,9 @@ export default function View(props: ViewProps) {
 		}
 	}
 
-	return isVisible || isSelected ? (
+	const showOverlay = isGutenbergEditor && !isVisible && !isSelected
+
+	return isVisible || isGutenbergEditor ? (
 		<Box p="md">
 			<Group spacing="xs" mb={4}>
 				{label.trim() && <Text fz={14}>{label}</Text>}
@@ -108,19 +110,11 @@ export default function View(props: ViewProps) {
 					{__('It has syntax error!', 'inseri-core')}
 				</Text>
 			)}
-		</Box>
-	) : isGutenbergEditor ? (
-		<Box
-			style={{
-				height: height + 36 /* button */ + 32 /* padding */ + 4 /* marginBottom of button*/,
-				border: '1px dashed currentcolor',
-				borderRadius: '2px',
-			}}
-		>
-			<Box />
-			<svg width="100%" height="100%">
-				<line strokeDasharray="3" x1="0" y1="0" x2="100%" y2="100%" style={{ stroke: 'currentColor' }} />
-			</svg>
+			{showOverlay && (
+				<Overlay color="#000" opacity={0.07} center>
+					<IconEyeOff size="3rem" />
+				</Overlay>
+			)}
 		</Box>
 	) : (
 		<div />
