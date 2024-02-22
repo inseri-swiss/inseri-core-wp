@@ -1,4 +1,4 @@
-import { usePublish } from '@inseri/lighthouse'
+import { usePublish, useWatch } from '@inseri/lighthouse'
 import { useDebouncedValue } from '@mantine/hooks'
 import { IconEyeOff, IconEye, IconPencil } from '@tabler/icons-react'
 import { useEffect, useMemo, useState } from '@wordpress/element'
@@ -20,6 +20,7 @@ export default function View(props: ViewProps) {
 
 	const [publishValue, publishEmpty] = usePublish('content', 'content')
 	const isEditable = editable || isGutenbergEditor
+	const isGloballyHidden = useWatch('__root/is-hidden', { onNone: () => false, onSome: (nucleus) => nucleus.value })
 
 	const codeType = useMemo(() => {
 		return getBodyTypeByContenType(contentType) ?? 'text'
@@ -80,7 +81,7 @@ export default function View(props: ViewProps) {
 
 	const showOverlay = isGutenbergEditor && !isVisible && !isSelected
 
-	return isVisible || isGutenbergEditor ? (
+	return !isGloballyHidden && (isVisible || isGutenbergEditor) ? (
 		<Box p="md">
 			<Group spacing="xs" mb={4}>
 				{label.trim() && <Text fz={14}>{label}</Text>}
