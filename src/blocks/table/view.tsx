@@ -1,5 +1,5 @@
 import { usePublish, useWatch } from '@inseri/lighthouse'
-import { useState } from '@wordpress/element'
+import { useMemo, useState } from '@wordpress/element'
 import cloneDeep from 'lodash.clonedeep'
 import type { MRT_ColumnFiltersState as ColumnFiltersState, MRT_SortingState as SortingState } from 'mantine-react-table'
 import { MantineReactTable, useMantineReactTable } from 'mantine-react-table'
@@ -15,6 +15,13 @@ export default function View() {
 
 	const [columns, setColumns] = useState([])
 	const [data, setData] = useState<any[]>([])
+
+	const alternativeColumns = useMemo(() => {
+		const first = data[0] ?? []
+		return Object.entries(first)
+			.filter(([_, val]) => typeof val !== 'object')
+			.map(([key]) => ({ accessorKey: key, header: key }))
+	}, [data[0]])
 
 	const [publishRow] = usePublish('row', 'selected row')
 	const [publishCell] = usePublish('cell', 'selected cell')
@@ -55,7 +62,7 @@ export default function View() {
 	)
 
 	const table = useMantineReactTable<any>({
-		columns,
+		columns: columns.length > 0 ? columns : alternativeColumns,
 		data,
 		...options,
 

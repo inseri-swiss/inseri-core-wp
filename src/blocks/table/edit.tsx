@@ -42,7 +42,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
 	const { inputColumns, inputData, blockName, isWizardMode, actions, options, extraOptions } = useGlobalState((state: GlobalState) => state)
-	const isValueSet = !!inputColumns && !!inputData
+	const isValueSet = !!inputData
 	const { updateState } = actions
 
 	const [hasRowVirtualChanged, setRowVirtualChanged] = useState(false)
@@ -155,17 +155,18 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						</Text>
 					</Group>
 					<Select
-						label={__('Choose column config', 'inseri-core')}
-						data={configOptions}
-						value={inputColumns}
-						onChange={(key) => updateState({ inputColumns: key ?? '' })}
-						clearable
-					/>
-					<Select
 						label={__('Choose table records', 'inseri-core')}
 						data={recordOptions}
 						value={inputData}
 						onChange={(key) => updateState({ inputData: key ?? '' })}
+						clearable
+						required
+					/>
+					<Select
+						label={__('Choose column config', 'inseri-core')}
+						data={configOptions}
+						value={inputColumns}
+						onChange={(key) => updateState({ inputColumns: key ?? '' })}
 						clearable
 					/>
 					<Group position="right">
