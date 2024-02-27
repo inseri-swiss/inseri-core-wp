@@ -284,7 +284,7 @@ function SideBar() {
 	return (
 		<>
 			<ExtendedView isModalOpen={isModalOpen} setModalOpen={setModalOpen} />
-			<PluginSidebar name="inseri-core-data-flow" title="inseri Data Flow" isPinnable={true} icon={<IconBuildingLighthouse style={{ fill: 'none' }} />}>
+			<PluginSidebar name="inseri-core-sidebar" title="inseri" isPinnable={true} icon={<IconBuildingLighthouse style={{ fill: 'none' }} />}>
 				<Box p="md" style={{ border: '0.0625rem solid #dee2e6' }}>
 					<Switch
 						label="Hide the invisible blocks"
@@ -297,7 +297,7 @@ function SideBar() {
 
 				<Accordion chevronPosition="right" multiple value={openItems} onChange={setOpenItems}>
 					<Accordion.Item value="blocks">
-						<AccordionControl>{__('Blocks', 'inseri-core')}</AccordionControl>
+						<AccordionControl>{__('inseri Blocks', 'inseri-core')}</AccordionControl>
 						<Accordion.Panel style={{ height: blockHeight, overflow: 'auto', padding: 0 }}>
 							<Stack>
 								{blocks.map((b) => (
@@ -314,7 +314,7 @@ function SideBar() {
 						</Accordion.Panel>
 					</Accordion.Item>
 					<Accordion.Item value="chart">
-						<AccordionControl onClick={() => setModalOpen(true)}>{__('Chart', 'inseri-core')}</AccordionControl>
+						<AccordionControl onClick={() => setModalOpen(true)}>{__('Data Flow Chart', 'inseri-core')}</AccordionControl>
 						<Accordion.Panel>
 							<CytoscapeComponent
 								elements={chartData}
@@ -332,7 +332,7 @@ function SideBar() {
 	)
 }
 
-export function DataFlow() {
+export function InseriSidebar() {
 	return (
 		<InseriRoot blockId="__root" blockName="inseri" blockType="inseri-core/root">
 			<SideBar />
