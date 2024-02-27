@@ -5,11 +5,10 @@ import { Box, Loader, Select, useGlobalState } from '../../components'
 import { GlobalState } from './state'
 
 interface ViewProps {
-	isSelected?: boolean
-	isGutenbergEditor?: boolean
+	renderHiding?: (BlockComponent: JSX.Element) => JSX.Element
 }
 
-export default function View({ isGutenbergEditor, isSelected }: ViewProps) {
+export default function View({ renderHiding }: ViewProps) {
 	const { label, selectedFile, files, isLoading, hasError, fileContent, mime, isVisible } = useGlobalState((state: GlobalState) => state)
 	const { chooseFile, loadFile } = useGlobalState((state: GlobalState) => state.actions)
 	const [publish, setEmpty] = usePublish('file', 'file')
@@ -29,7 +28,7 @@ export default function View({ isGutenbergEditor, isSelected }: ViewProps) {
 		}, 100)
 	}, [isLoading, hasError, fileContent, mime])
 
-	return isVisible || isSelected ? (
+	const blockElement = (
 		<Box p="md">
 			<Select
 				clearable
@@ -42,20 +41,11 @@ export default function View({ isGutenbergEditor, isSelected }: ViewProps) {
 				error={hasError ? __('An error has occurred.', 'inseri-core') : null}
 			/>
 		</Box>
-	) : isGutenbergEditor ? (
-		<Box
-			style={{
-				height: '68px',
-				border: '1px dashed currentcolor',
-				borderRadius: '2px',
-			}}
-		>
-			<Box />
-			<svg width="100%" height="100%">
-				<line strokeDasharray="3" x1="0" y1="0" x2="100%" y2="100%" style={{ stroke: 'currentColor' }} />
-			</svg>
-		</Box>
-	) : (
-		<div />
 	)
+
+	if (renderHiding) {
+		return renderHiding(blockElement)
+	}
+
+	return isVisible ? blockElement : <div />
 }

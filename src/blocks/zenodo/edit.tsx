@@ -7,7 +7,7 @@ import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import { Button, Checkbox, Group, Loader, SetupEditorEnv, Stack, StateProvider, Text, TextInput, useGlobalState } from '../../components'
-import { getFormattedBytes } from '../../utils'
+import { HidingWrapper, getFormattedBytes } from '../../utils'
 import config from './block.json'
 import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
@@ -30,6 +30,12 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	useEffect(() => {
 		loadDoi()
 	}, [])
+
+	const renderHiding = (children: JSX.Element) => (
+		<HidingWrapper isSelected={isSelected} isVisible={isVisible}>
+			{children}
+		</HidingWrapper>
+	)
 
 	return (
 		<>
@@ -135,7 +141,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					)}
 				</Stack>
 			) : (
-				<View isGutenbergEditor isSelected={isSelected} />
+				<View renderHiding={renderHiding} />
 			)}
 		</>
 	)
