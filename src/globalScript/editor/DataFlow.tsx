@@ -286,7 +286,13 @@ function SideBar() {
 			<ExtendedView isModalOpen={isModalOpen} setModalOpen={setModalOpen} />
 			<PluginSidebar name="inseri-core-data-flow" title="inseri Data Flow" isPinnable={true} icon={<IconBuildingLighthouse style={{ fill: 'none' }} />}>
 				<Box p="md" style={{ border: '0.0625rem solid #dee2e6' }}>
-					<Switch label="Hide the invisible blocks" value={isHidden} onChange={(event) => publishHidden(event.currentTarget.checked, 'application/json')} />
+					<Switch
+						label="Hide the invisible blocks"
+						value={isHidden}
+						onChange={(event) => {
+							publishHidden(event.currentTarget.checked, 'application/json')
+						}}
+					/>
 				</Box>
 
 				<Accordion chevronPosition="right" multiple value={openItems} onChange={setOpenItems}>

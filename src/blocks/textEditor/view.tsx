@@ -1,26 +1,25 @@
-import { usePublish, useWatch } from '@inseri/lighthouse'
+import { usePublish } from '@inseri/lighthouse'
 import { useDebouncedValue } from '@mantine/hooks'
-import { IconEyeOff, IconEye, IconPencil } from '@tabler/icons-react'
+import { IconEye, IconPencil } from '@tabler/icons-react'
 import { useEffect, useMemo, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Box, Button, CodeEditor, Group, Overlay, Text, Tooltip, useGlobalState } from '../../components'
+import { Box, Button, CodeEditor, Group, Text, Tooltip, useGlobalState } from '../../components'
 import { formatCode, getBodyTypeByContenType, isBeautifyType } from '../../utils'
 import { GlobalState } from './state'
 
 interface ViewProps {
 	isGutenbergEditor?: boolean
-	isSelected?: boolean
 	renderResizable?: (EditorComponent: JSX.Element) => JSX.Element
+	renderHiding?: (BlockComponent: JSX.Element) => JSX.Element
 }
 
 export default function View(props: ViewProps) {
-	const { isGutenbergEditor, isSelected, renderResizable } = props
+	const { isGutenbergEditor, renderResizable, renderHiding } = props
 	const { height, editable, contentType, label, content, isVisible } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 
 	const [publishValue, publishEmpty] = usePublish('content', 'content')
 	const isEditable = editable || isGutenbergEditor
-	const isGloballyHidden = useWatch('__root/is-hidden', { onNone: () => false, onSome: (nucleus) => nucleus.value })
 
 	const codeType = useMemo(() => {
 		return getBodyTypeByContenType(contentType) ?? 'text'
@@ -79,9 +78,7 @@ export default function View(props: ViewProps) {
 		}
 	}
 
-	const showOverlay = isGutenbergEditor && !isVisible && !isSelected
-
-	return !isGloballyHidden && (isVisible || isGutenbergEditor) ? (
+	const blockElement = (
 		<Box p="md">
 			<Group spacing="xs" mb={4}>
 				{label.trim() && <Text fz={14}>{label}</Text>}
@@ -111,13 +108,12 @@ export default function View(props: ViewProps) {
 					{__('It has syntax error!', 'inseri-core')}
 				</Text>
 			)}
-			{showOverlay && (
-				<Overlay color="#000" opacity={0.07} center>
-					<IconEyeOff size="3rem" />
-				</Overlay>
-			)}
 		</Box>
-	) : (
-		<div />
 	)
+
+	if (renderHiding) {
+		return renderHiding(blockElement)
+	}
+
+	return isVisible ? blockElement : <div />
 }
