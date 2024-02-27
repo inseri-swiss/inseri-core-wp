@@ -1,6 +1,10 @@
+import { useWatch } from '@inseri/lighthouse'
+import { IconEyeOff } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
+import type { PropsWithChildren } from 'react'
 import xmlFormatter from 'xml-formatter'
 import { StateCreator } from 'zustand'
+import { Overlay } from './components'
 import { ParamItem } from './components/ParamsTable'
 
 const htmlEscapesMap: Record<string, string> = {
@@ -386,4 +390,27 @@ export const getFormattedBytes = (size: number) => {
 	}
 
 	return n.toFixed(n < 10 && l > 0 ? 1 : 0) + ' ' + units[l]
+}
+
+interface HidingWrapperProps {
+	isSelected: boolean
+	isVisible: boolean
+}
+
+export function HidingWrapper({ isSelected, isVisible, children }: PropsWithChildren<HidingWrapperProps>) {
+	const isGloballyHidden = useWatch('__root/is-hidden', { onNone: () => false, onSome: (nucleus) => nucleus.value })
+	const showOverlay = !isVisible && !isSelected
+
+	return isGloballyHidden && !isVisible ? (
+		<div />
+	) : (
+		<>
+			{children}
+			{showOverlay && (
+				<Overlay color="#000" opacity={0.07} center>
+					<IconEyeOff size="3rem" />
+				</Overlay>
+			)}
+		</>
+	)
 }
