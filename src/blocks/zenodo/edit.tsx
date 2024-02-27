@@ -105,23 +105,23 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 
 							<Stack style={{ maxHeight: 400, overflow: 'auto', paddingRight: 16, paddingBottom: 10 }}>
 								{record.files.map((f) => (
-									<Group position="apart" key={f.filename}>
+									<Group position="apart" key={f.key}>
 										<Checkbox
-											label={f.filename}
-											checked={!!files.find((i) => i.label === f.filename)}
+											label={f.key}
+											checked={!!files.find((i) => i.label === f.key)}
 											onChange={(event) => {
 												let newFiles = []
 
 												if (event.currentTarget.checked) {
-													newFiles = [...files, { label: f.filename, value: f.links.download }]
+													newFiles = [...files, { label: f.key, value: f.links.self }]
 												} else {
-													newFiles = files.filter((i) => i.label !== f.filename)
+													newFiles = files.filter((i) => i.label !== f.key)
 												}
 
 												updateState({ files: newFiles, selectedFile: newFiles.length === 1 ? newFiles[0].value : null })
 											}}
 										/>
-										<Text fz={12}>{getFormattedBytes(f.filesize)}</Text>
+										<Text fz={12}>{getFormattedBytes(f.size ?? 0)}</Text>
 									</Group>
 								))}
 							</Stack>
