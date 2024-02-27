@@ -23,7 +23,7 @@ import {
 	useGlobalState,
 } from '../../components'
 import { DetailViewBody } from '../../components/DetailViewBody'
-import { COMMON_CONTENT_TYPES, PERSISTENT_IDS, Z_INDEX_ABOVE_ADMIN } from '../../utils'
+import { COMMON_CONTENT_TYPES, HidingWrapper, PERSISTENT_IDS, Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import { DatasourceState, datasourceStoreCreator } from './AdminState'
 import json from './block.json'
 import { Attributes } from './index'
@@ -103,6 +103,12 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 			updateState({ parameters: { urlError: __('invalid URL', 'inseri-core') } })
 		}
 	}, [debouncedUrl])
+
+	const renderHiding = (children: JSX.Element) => (
+		<HidingWrapper isSelected={isSelected} isVisible={isVisible}>
+			{children}
+		</HidingWrapper>
+	)
 
 	return (
 		<>
@@ -299,7 +305,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					</Group>
 				</Stack>
 			) : (
-				<View isSelected={isSelected} isGutenbergEditor />
+				<View renderHiding={renderHiding} />
 			)}
 		</>
 	)

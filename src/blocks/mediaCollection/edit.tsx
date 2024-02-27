@@ -8,6 +8,7 @@ import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import { SetupEditorEnv, StateProvider, useGlobalState } from '../../components'
+import { HidingWrapper } from '../../utils'
 import config from './block.json'
 import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
@@ -26,6 +27,12 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 			updateState({ isWizardMode: false })
 		}
 	}, [isSelected])
+
+	const renderHiding = (children: JSX.Element) => (
+		<HidingWrapper isSelected={isSelected} isVisible={isVisible}>
+			{children}
+		</HidingWrapper>
+	)
 
 	return (
 		<>
@@ -84,7 +91,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					onHTMLDrop={(_html: string) => {}}
 				></MediaPlaceholder>
 			) : (
-				<View isGutenbergEditor isSelected={isSelected} />
+				<View renderHiding={renderHiding} />
 			)}
 		</>
 	)
