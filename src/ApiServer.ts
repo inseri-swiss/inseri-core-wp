@@ -141,9 +141,9 @@ const RECORD_ROUTE = 'https://zenodo.org/api/records/'
 // it contains more properties
 // but only properties of interest are added here
 interface ZenodoFile {
-	filename: string
-	links: { download: string }
-	filesize: number
+	key: string
+	links: { self: string }
+	size: number
 }
 
 export interface ZenodoRecord {

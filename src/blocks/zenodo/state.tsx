@@ -56,7 +56,7 @@ export const storeCreator = (initalState: Attributes) => {
 					state.record = data
 
 					if (!isInitialLoad) {
-						const downloadLinks = data.files.map((f) => ({ label: f.filename, value: f.links.download }))
+						const downloadLinks = data.files.map((f) => ({ label: f.key, value: f.links.self }))
 						state.files = downloadLinks
 
 						if (downloadLinks.length === 1) {
@@ -74,7 +74,7 @@ export const storeCreator = (initalState: Attributes) => {
 
 	const loadFile = async (set: Set, url: string) => {
 		const fileSplitted = url.split('.')
-		const fileExt = fileSplitted[fileSplitted.length - 1]
+		const fileExt = fileSplitted[fileSplitted.length - 1].split('/')[0]
 		const contentType = guessContentTypeByExtension(fileExt) ?? ''
 
 		set((state) => {
@@ -116,6 +116,8 @@ export const storeCreator = (initalState: Attributes) => {
 				}),
 
 			setDoi: async (doi: string) => {
+				const preparedDoi = doi.trim()
+
 				set((state) => {
 					state.doi = doi
 				})
@@ -123,19 +125,19 @@ export const storeCreator = (initalState: Attributes) => {
 				clearTimeout(doiCallback)
 				doiCallback = setTimeout(async () => {
 					set((state) => {
-						if (doi && !doi.startsWith(ZENODO_PREFIX)) {
+						if (preparedDoi && !preparedDoi.startsWith(ZENODO_PREFIX)) {
 							state.doiError = __('It is not an Zenodo DOI.', 'inseri-core')
 						} else {
 							state.doiError = ''
 						}
 					})
 
-					loadZenodoRecord(set, doi)
+					loadZenodoRecord(set, preparedDoi)
 				}, 500)
 			},
 
 			loadDoi: async () => {
-				loadZenodoRecord(set, get().doi, true)
+				loadZenodoRecord(set, get().doi.trim(), true)
 			},
 
 			chooseFile: async (url: string | null) => {
