@@ -10,12 +10,12 @@ import { GlobalState } from './state'
 interface ViewProps {
 	attributes: Readonly<Attributes>
 	isGutenbergEditor?: boolean
-	isSelected?: boolean
 	renderResizable?: (EditorComponent: JSX.Element) => JSX.Element
+	renderHiding?: (BlockComponent: JSX.Element) => JSX.Element
 }
 
 export default function View(props: ViewProps) {
-	const { isGutenbergEditor, isSelected, renderResizable } = props
+	const { isGutenbergEditor, renderResizable, renderHiding } = props
 	const {
 		inputerr,
 		height,
@@ -117,27 +117,18 @@ export default function View(props: ViewProps) {
 		/>
 	)
 
-	return isVisible || isSelected ? (
+	const blockElement = (
 		<Box p="md">
 			<Group position="apart" mb={4} pl="sm" spacing="xs">
 				<TopBar code={code} />
 			</Group>
 			{renderResizable ? renderResizable(editorElement) : editorElement}
 		</Box>
-	) : isGutenbergEditor ? (
-		<Box
-			style={{
-				height: height + 36 /* button */ + 32 /* padding */ + 4 /* marginBottom of button*/,
-				border: '1px dashed currentcolor',
-				borderRadius: '2px',
-			}}
-		>
-			<Box />
-			<svg width="100%" height="100%">
-				<line strokeDasharray="3" x1="0" y1="0" x2="100%" y2="100%" style={{ stroke: 'currentColor' }} />
-			</svg>
-		</Box>
-	) : (
-		<div />
 	)
+
+	if (renderHiding) {
+		return renderHiding(blockElement)
+	}
+
+	return isVisible ? blockElement : <div />
 }

@@ -5,11 +5,10 @@ import { Box, Button, Text, useGlobalState } from '../../components'
 import { DatasourceState } from './AdminState'
 
 interface ViewProps {
-	isSelected?: boolean
-	isGutenbergEditor?: boolean
+	renderHiding?: (BlockComponent: JSX.Element) => JSX.Element
 }
 
-export default function View({ isSelected, isGutenbergEditor }: ViewProps) {
+export default function View({ renderHiding }: ViewProps) {
 	const { inputMethodUrl, inputQueryParams, inputHeadersParams, inputBody, outputContenType, label, isVisible, autoTrigger, parameters, inputRevision } =
 		useGlobalState((state: DatasourceState) => state)
 	const { overrideMethodUrl, overrideQueryParams, overrideHeaderParams, overrideBody, fireRequest, updateState } = useGlobalState(
@@ -92,7 +91,7 @@ export default function View({ isSelected, isGutenbergEditor }: ViewProps) {
 		isCallReady,
 	])
 
-	return isVisible || isSelected ? (
+	const blockElement = (
 		<Box p="md">
 			<Button variant="filled" disabled={!isCallReady} onClick={triggerRequest}>
 				{label}
@@ -113,20 +112,11 @@ export default function View({ isSelected, isGutenbergEditor }: ViewProps) {
 				</Text>
 			)}
 		</Box>
-	) : isGutenbergEditor ? (
-		<Box
-			style={{
-				height: '68px',
-				border: '1px dashed currentcolor',
-				borderRadius: '2px',
-			}}
-		>
-			<Box />
-			<svg width="100%" height="100%">
-				<line strokeDasharray="3" x1="0" y1="0" x2="100%" y2="100%" style={{ stroke: 'currentColor' }} />
-			</svg>
-		</Box>
-	) : (
-		<div />
 	)
+
+	if (renderHiding) {
+		return renderHiding(blockElement)
+	}
+
+	return isVisible ? blockElement : <div />
 }

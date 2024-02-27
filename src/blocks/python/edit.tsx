@@ -7,6 +7,7 @@ import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import { Box, Button, Group, Select, SetupEditorEnv, StateProvider, Text, useGlobalState } from '../../components'
+import { HidingWrapper } from '../../utils'
 import { ExtendedView } from './ExtendedView'
 import json from './block.json'
 import { Attributes } from './index'
@@ -42,6 +43,12 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 		>
 			{children}
 		</ResizableBox>
+	)
+
+	const renderHiding = (children: JSX.Element) => (
+		<HidingWrapper isSelected={isSelected} isVisible={isVisible}>
+			{children}
+		</HidingWrapper>
 	)
 
 	return (
@@ -170,7 +177,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					)}
 				</Box>
 			) : (
-				<View {...props} isGutenbergEditor renderResizable={renderResizable} isSelected={isSelected} />
+				<View {...props} isGutenbergEditor renderResizable={renderResizable} renderHiding={renderHiding} />
 			)}
 		</>
 	)
