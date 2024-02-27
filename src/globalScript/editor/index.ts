@@ -1,6 +1,6 @@
-import { DataFlow } from './DataFlow'
+import { InseriSidebar } from './Sidebar'
 import { registerPlugin } from '@wordpress/plugins'
 
 if ((window as any).wp?.plugins) {
-	registerPlugin('inseri-core-data-flow', { render: DataFlow })
+	registerPlugin('inseri-core-sidebar', { render: InseriSidebar })
 }
