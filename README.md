@@ -11,7 +11,6 @@
 <a href="https://docs.inseri.swiss/"><img src="https://img.shields.io/badge/read-documentation-blue" alt="Documentation"></a>
 <a href="https://github.com/inseri-swiss/inseri-swiss/issues"><img src="https://img.shields.io/github/issues-raw/inseri-swiss/inseri-swiss?color=blue" alt="issues"></a>
 <a href="https://github.com/orgs/inseri-swiss/projects/2"><img src="https://img.shields.io/badge/view-roadmap-blue" alt="roadmap"></a>
-<a href="https://github.com/inseri-swiss/inseri-core-wp/blob/main/LICENSE"><img src="https://img.shields.io/badge/%20%20license-GPL--3.0--or--later-blue" alt="License"></a>
 </p>
 
 ## Development

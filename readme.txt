@@ -2,9 +2,9 @@
 Contributors: inseriswiss
 Tags: Gutenberg blocks, WordPress blocks, gutenberg, blocks, inseri
 Requires at least: 5.6
-Tested up to: 6.4.1
+Tested up to: 6.4.3
 Requires PHP: 5.6
-Stable tag: 0.3.2
+Stable tag: 0.3.3
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -53,6 +53,12 @@ Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inser
 6. Render HTML code
 
 == Changelog ==
+### [0.3.3](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.3.3)
+- New: Slider block
+- New: Data Table block
+- Fix: Zenodo api has changed
+- Update: Improved hiding behavior for Text Editor, Media Collection, Python Code, Web API and Zenodo Repository
+
 ### [0.3.2](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.3.2)
 - New: inseri Data Flow which displays block connections
 - New: Cytoscape block
