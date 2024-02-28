@@ -23,7 +23,7 @@ const generalOptions = [
 ]
 const toolbarOptions = [
 	['enableGlobalFilter', 'Search'],
-	['enableColumnFilters', 'Column Filters'],
+	// ['enableColumnFilters', 'Column Filters'],
 	['enableHiding', 'Column Hiding'],
 	['enableDensityToggle', 'Density'],
 	['enableFullScreenToggle', 'Fullscreen'],

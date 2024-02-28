@@ -32,7 +32,7 @@
 				"enableColumnOrdering": false,
 				"enableRowVirtualization": false,
 				"enableGlobalFilter": true,
-				"enableColumnFilters": true,
+				"enableColumnFilters": false,
 				"enableHiding": true,
 				"enableDensityToggle": true,
 				"enableFullScreenToggle": true,
