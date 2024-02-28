@@ -9,6 +9,7 @@ nav:
       - 'tutorials/data-mapping-with-python.md'
   - 'Blocks':
       - 'blocks/cytoscape.md'
+      - 'blocks/dataTable.md'
       - 'blocks/download.md'
       - 'blocks/dropdown.md'
       - 'blocks/html.md'
@@ -18,6 +19,7 @@ nav:
       - 'blocks/mediaCollection.md'
       - 'blocks/plotly.md'
       - 'blocks/python.md'
+      - 'blocks/slider.md'
       - 'blocks/textEditor.md'
       - 'blocks/textViewer.md'
       - 'blocks/webApi.md'
@@ -25,7 +27,6 @@ nav:
   - 'Features':
       - 'features/DataFlow.md'
       - 'features/BlockDuplication.md'
-
   - 'How to':
       - 'how-to/visualizations.md'
       - 'how-to/workWithFiles.md'
