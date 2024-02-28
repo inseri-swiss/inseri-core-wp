@@ -5,6 +5,7 @@ import type { MRT_ColumnFiltersState as ColumnFiltersState, MRT_SortingState as 
 import { MantineReactTable, useMantineReactTable } from 'mantine-react-table'
 import { useDeepCompareEffect } from 'react-use'
 import { Box, useGlobalState } from '../../components'
+import { Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import { GlobalState } from './state'
 import { isValueValid } from './utils'
 
@@ -112,6 +113,7 @@ export default function View() {
 		onSortingChange: setSorting,
 		onGlobalFilterChange: setGlobalFilter,
 		onColumnFiltersChange: setColumnFilters,
+		mantinePaperProps: { style: { zIndex: Z_INDEX_ABOVE_ADMIN } },
 	})
 
 	useDeepCompareEffect(() => {
