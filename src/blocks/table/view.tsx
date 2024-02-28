@@ -4,7 +4,7 @@ import cloneDeep from 'lodash.clonedeep'
 import type { MRT_ColumnFiltersState as ColumnFiltersState, MRT_SortingState as SortingState } from 'mantine-react-table'
 import { MantineReactTable, useMantineReactTable } from 'mantine-react-table'
 import { useDeepCompareEffect } from 'react-use'
-import { Box, useGlobalState } from '../../components'
+import { Box, OptionalPortal, useGlobalState } from '../../components'
 import { Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import { GlobalState } from './state'
 import { isValueValid } from './utils'
@@ -31,6 +31,7 @@ export default function View() {
 	const [sorting, setSorting] = useState<SortingState>([])
 	const [globalFilter, setGlobalFilter] = useState('')
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+	const [isFullScreen, setIsFullScreen] = useState(false)
 
 	useWatch(
 		{ inputColumns, inputData },
@@ -109,11 +110,13 @@ export default function View() {
 			sorting,
 			globalFilter,
 			columnFilters,
+			isFullScreen,
 		},
 		onSortingChange: setSorting,
 		onGlobalFilterChange: setGlobalFilter,
 		onColumnFiltersChange: setColumnFilters,
-		mantinePaperProps: { style: { zIndex: Z_INDEX_ABOVE_ADMIN } },
+		onIsFullScreenChange: setIsFullScreen,
+		mantinePaperProps: isFullScreen ? { style: { zIndex: Z_INDEX_ABOVE_ADMIN } } : undefined,
 	})
 
 	useDeepCompareEffect(() => {
@@ -123,7 +126,9 @@ export default function View() {
 
 	return (
 		<Box>
-			<MantineReactTable table={table} />
+			<OptionalPortal withinPortal={isFullScreen}>
+				<MantineReactTable table={table} />
+			</OptionalPortal>
 		</Box>
 	)
 }
