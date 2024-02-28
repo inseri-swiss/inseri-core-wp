@@ -37,3 +37,6 @@ inseri-core.zip
 
 # pipenv lock file
 Pipfile.lock
+
+# mkdocs
+site/
