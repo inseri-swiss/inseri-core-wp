@@ -18,6 +18,7 @@ As a result, inseri core introduces scientific and interactive Gutenberg blocks 
 
 ## Blocks:
 - **[Cytoscape Block](https://docs.inseri.swiss/blocks/cytoscape/)**: It displays network diagram using the data of another block with Cytoscape.
+- **[Data Table Block](https://docs.inseri.swiss/blocks/dataTable/)**: It displays tabular data of another block and gives guests the option to explore it.
 - **[Download Block](https://docs.inseri.swiss/blocks/download/)**: It gives guests the possibility to download data from another block.
 - **[Dropdown Block](https://docs.inseri.swiss/blocks/dropdown/)**: It provides guests options to choose from and the selected option can be reused in other blocks.
 - **[HTML Code Block](https://docs.inseri.swiss/blocks/html/)**: It renders HTML code using the other block's data.
@@ -27,6 +28,7 @@ As a result, inseri core introduces scientific and interactive Gutenberg blocks 
 - **[Media Collection Block](https://docs.inseri.swiss/blocks/mediaCollection/)**: A collection of media files is made available as data for other blocks.
 - **[Plotly Chart Block](https://docs.inseri.swiss/blocks/plotly/)**: It visualizes the data of another block using Plotly.
 - **[Python Code Block](https://docs.inseri.swiss/blocks/python/)**: Guests can run Python code with data from other blocks with the use of Pyodide and the result of the execution is made available to other blocks.
+- **[Slider Block](https://docs.inseri.swiss/blocks/slider/)**: It gives guests the possibility to choose a value or a range within a specified boundaries.
 - **[Text Editor Block](https://docs.inseri.swiss/blocks/textEditor/)**: It allows to share text content like JSON or XML with other blocks.
 - **[Text Viewer Block](https://docs.inseri.swiss/blocks/textViewer/)**: It displays text content like JSON or XML from other block.
 - **[Web API Block](https://docs.inseri.swiss/blocks/webApi/)**: It enables to call a web API and to share this data with other blocks.
