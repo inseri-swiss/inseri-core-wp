@@ -53,6 +53,9 @@ Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inser
 6. Render HTML code
 
 == Changelog ==
+### [0.3.4](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.3.4)
+- Fix: Data Table block
+
 ### [0.3.3](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.3.3)
 - New: Slider block
 - New: Data Table block
