@@ -8,6 +8,7 @@ nav:
       - 'tutorials/hello-world.md'
       - 'tutorials/data-mapping-with-python.md'
   - 'Blocks':
+      - 'blocks/overview.md'
       - 'blocks/cytoscape.md'
       - 'blocks/dataTable.md'
       - 'blocks/download.md'
