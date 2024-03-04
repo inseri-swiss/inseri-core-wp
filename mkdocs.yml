@@ -26,6 +26,8 @@ nav:
       - 'blocks/webApi.md'
       - 'blocks/zenodo.md'
   - 'Features':
+      - 'features/sidebar.md'
+      - 'features/hideInvisibleBlocks.md'
       - 'features/dataFlow.md'
       - 'features/blockDuplication.md'
   - 'How to':

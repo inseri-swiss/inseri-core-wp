@@ -52,6 +52,10 @@ For this, open the settings sidebar on the right and enter "textEditor-imageOpti
   <figcaption>Step 2: Edit the block name: (i) open the settings sidebar, (ii) enter the desired name under "BLOCK NAME"</figcaption>
 </figure>
 
+!!! note
+
+    You can hide the text editor block if you want (the setting is below the "BLOCK NAME, and is called "Show block" that by default is enabled).
+
 ## Step 3: Add image information to the text editor
 
 Now, copy the following snippet into the text editor.
@@ -86,7 +90,7 @@ The [Data Flow](../features/dataFlow.md){:target="\_blank"} provides an overview
 
 <figure markdown>
 ![Data Flow](../assets/data_flow.png){width="700"}
-  <figcaption>Step 6: Data Flow: (i) open the sidebar "inseri Data Flow" close to the Settings icon, (ii) select a block name in the Blocks are or a node in the Chart section </figcaption>
+  <figcaption>Step 6: Data Flow: (i) select "inseri" close to the Settings icon, (ii) select a block name in the "inseri Blocks" section or a node in the "Data Flow Chart" section. </figcaption>
 </figure>
 
 ## Step 7: Save and publish
