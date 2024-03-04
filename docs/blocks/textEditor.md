@@ -2,7 +2,7 @@
 
 The Text Editor can be used to define values of a couple of text-based formats that can be chosen from the dropdown. This selection will be used for validation of the content and for controlling the type of data shared between blocks.
 
-Editor's output will be user-entered content.
+The output is the content of the block.
 
 ## Formats
 
