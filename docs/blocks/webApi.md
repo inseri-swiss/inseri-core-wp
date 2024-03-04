@@ -2,6 +2,8 @@
 
 With the Web API block, you can include data from an external source into your post.
 
+The output corresponds to the Web API response.
+
 ## Quick configuration
 
 For GET requests without additional parameters, it is enough to enter the URL and the response data type.
