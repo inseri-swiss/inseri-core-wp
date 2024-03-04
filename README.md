@@ -10,7 +10,7 @@
 <a href="https://inseri.swiss/playground/"><img src="https://img.shields.io/badge/wp-playground-blue" alt="playground"></a>
 <a href="https://docs.inseri.swiss/"><img src="https://img.shields.io/badge/read-documentation-blue" alt="Documentation"></a>
 <a href="https://github.com/inseri-swiss/inseri-swiss/issues"><img src="https://img.shields.io/github/issues-raw/inseri-swiss/inseri-swiss?color=blue" alt="issues"></a>
-<a href="https://github.com/orgs/inseri-swiss/projects/2"><img src="https://img.shields.io/badge/view-roadmap-blue" alt="roadmap"></a>
+<a href="https://inseri.swiss/about/#roadmap"><img src="https://img.shields.io/badge/view-roadmap-blue" alt="roadmap"></a>
 </p>
 
 ## Development
