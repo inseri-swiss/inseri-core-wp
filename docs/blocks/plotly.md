@@ -1,6 +1,8 @@
 # Plotly Chart
 
-Please check out the [Plotly JSON chart schema](https://plotly.com/chart-studio-help/json-chart-schema/).
+It allows to visualize the data of another block using [Plotly.js](https://plotly.com/javascript/){:target="\_blank"}, where the data should follow [Plotly JSON chart schema](https://plotly.com/chart-studio-help/json-chart-schema/){:target="\_blank"}.
+
+For examples of charts in this format, please see [Chart Studio Community Feed](https://chart-studio.plotly.com/feed/#/){:target="\_blank"} and open the desired file in Viewer, select the tab "Python & R" or export it directly as Data ".json" format.
 
 ## Input
 
