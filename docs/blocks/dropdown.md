@@ -1,6 +1,8 @@
 # Dropdown
 
-The dropdown block can be used to make the content on your page dynamic by allowing to switch between different parameters.
+The dropdown block can be used to make the content on your page dynamic by allowing to switch between different items.
+
+The output corresponds to the selected item (the value itself or a corresponding JSON object that can be defined).
 
 ## Input
 
