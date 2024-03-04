@@ -82,7 +82,7 @@ Give the image box block the name "image".
 
 ## Step 6: Data Flow
 
-The [Data Flow](../features/DataFlow.md){:target="\_blank"} provides an overview of the inseri blocks and the dependency between them.
+The [Data Flow](../features/dataFlow.md){:target="\_blank"} provides an overview of the inseri blocks and the dependency between them.
 
 <figure markdown>
 ![Data Flow](../assets/data_flow.png){width="700"}

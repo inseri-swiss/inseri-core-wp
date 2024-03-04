@@ -26,8 +26,8 @@ nav:
       - 'blocks/webApi.md'
       - 'blocks/zenodo.md'
   - 'Features':
-      - 'features/DataFlow.md'
-      - 'features/BlockDuplication.md'
+      - 'features/dataFlow.md'
+      - 'features/blockDuplication.md'
   - 'How to':
       - 'how-to/visualizations.md'
       - 'how-to/workWithFiles.md'
