@@ -1,6 +1,8 @@
 # Local File Import
 
-Upload data from your computer for input in other blocks
+Upload data from your computer for input in other blocks.
+
+The output corresponds to the input file selected by the user.
 
 ## Parameters
 
