@@ -1,10 +1,10 @@
 # Data Flow
 
-**inseri Data Flow** is available in the [inseri Sidebar Plugin](../features/sidebar.md){:target="\_blank"} and provides an overview of the used inseri blocks and their dependencies via a corresponding directed acyclic graph (DAG).
+**inseri Data Flow** is available in the [inseri Sidebar](../features/sidebar.md){:target="\_blank"} and provides an overview of the used inseri blocks and their dependencies via a corresponding directed acyclic graph (DAG).
 
 <figure markdown>
 ![Data Flow](../assets/data_flow.png){width="700"}
-  <figcaption> Data Flow: (i) select "inseri" close to the Settings icon, (ii) select a block name in the "inseri Blocks" section or a node in the "Data Flow Chart" section </figcaption>
+  <figcaption> Data Flow: (i) select "inseri" icon close to the Settings icon, (ii) select a block name in the "inseri Blocks" section or a node in the "Data Flow Chart" section </figcaption>
 </figure>
 
 The **inseri Blocks** section provides all inseri compatible blocks, and the **Data Flow Chart** section provides an overview as a directed acyclic graph (DAG) where the inseri blocks are represented as nodes and the edges correspond to the data. There are several actions that the user can perform:
