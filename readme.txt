@@ -38,6 +38,8 @@ More information about the project can be found at [inseri.swiss](https://inseri
 
 Detailed documentation is available at [docs.inseri.swiss](https://docs.inseri.swiss/).
 
+For ideas and questions please use [GitHub Discussions](https://github.com/inseri-swiss/inseri-swiss/discussions).
+
 The development takes place on [GitHub](https://github.com/inseri-swiss/inseri-core-wp).
 
 Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inseri-swiss/issues).
