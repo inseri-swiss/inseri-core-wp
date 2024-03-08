@@ -9,7 +9,7 @@ For the final product, please [click here](https://inseri.swiss/2023/02/hello-wo
 
 ## Step 0: Initialize your inseri instance
 
-Open up [playground](https://playground.inseri.swiss){:target="\_blank"} or your WordPress instance with `inseri-core` installed.
+Open up [inseri Playground](https://playground.inseri.swiss){:target="\_blank"} or your WordPress instance with [`inseri-core`](https://wordpress.org/plugins/inseri-core/){:target="\_blank"} plugin installed.
 
 Beware that changes done in the playground will not be saved.
 
@@ -22,33 +22,19 @@ Add a new post with the title "Image Selection", as presented in the figure belo
   <figcaption>Step 1: Adding a new post in WordPress: (i) hover on mouse pointer over New and next, (ii) click on Post (or click directly on New)</figcaption>
 </figure>
 
-## Step 2: Add an inseri text editor block
-
-Add an inseri text editor by clicking the `+` below the title.
-Select "Browse all" and look for "Text Editor" block under the top section _inseri_.
+## Step 2: Add the Text Editor block
 
 <figure markdown>
-![Adding a new block in WordPress](../assets/new_block_browse_all.png){width="700"}
-  <figcaption>Step 2: Adding a new block in WordPress: (i) click on "+" and next, (ii) click on Browse All</figcaption>
+![Adding a new block in WordPress](../assets/choose_a_block.png){width="700"}
+<figcaption>Step 2: Adding a new block in WordPress by typing "/" and the block name (see the left side) or using the "+" symbol and searching using the block name (see the right side). </figcaption>
 </figure>
 
-<figure markdown>
-![Inseri category](../assets/inseri_category.png){width="700"}
-  <figcaption>Step 2: "Text editor" block category "inseri"</figcaption>
-</figure>
-
-To chain more inseri blocks in this example (text editor block to dropdown menu block), please choose the format "JSON".
+1. Add the Text Editor block by typing "/text editor" in the area "Type / to choose a block". Alternatively, you can click the `+` below the title, and type "text editor" in the Search area.
+2. Choose the format "JSON".
+3. Next, give your Text Editor block a meaningful name. For this, open the settings sidebar on the right and enter simply "textEditor" under _block name_.
 
 <figure markdown>
-![Select the output format](../assets/select_json.png){width="500"}
-  <figcaption>Step 2: Set the text viewer to "JSON"</figcaption>
-</figure>
-
-Next, give your text editor a meaningful name.
-For this, open the settings sidebar on the right and enter "textEditor-imageOptions" under _block name_.
-
-<figure markdown>
-![Edit the block name](../assets/block_name.png){width="700"}
+![Edit the block name](../assets/block_name.png){width="900"}
   <figcaption>Step 2: Edit the block name: (i) open the settings sidebar, (ii) enter the desired name under "BLOCK NAME"</figcaption>
 </figure>
 
@@ -56,10 +42,9 @@ For this, open the settings sidebar on the right and enter "textEditor-imageOpti
 
     You can hide the text editor block if you want (the setting is below the "BLOCK NAME, and is called "Show block" that by default is enabled).
 
-## Step 3: Add image information to the text editor
+## Step 3: Add dropdown and image information to the text editor
 
-Now, copy the following snippet into the text editor.
-This will add to image options (UZH logo and acronym) with a label.
+1. Now, copy the following snippet into the text editor. This will add two options ("UZH Acronym" and "UZH Logos") to the dropdown (see the "label" values below). Moreover the "value" values will be used to fetch the image and display it in Step 5.
 
 ```json
 [
@@ -68,25 +53,31 @@ This will add to image options (UZH logo and acronym) with a label.
 ]
 ```
 
-## Step 4: Add a dropdown
+## Step 4: Add the Dropdown block
 
-Add a "Dropdown" from the category _inseri_ , as shown previously (step 2).
+1. Add the "Dropdown" block (like in Step 2.1.).
+2. Select the block source with the name "textEditor - content".
+3. Give the Dropdown block a simple name "dropdown" (like in Step 2.3.).
+4. Choose a value (e.g., "UZH Logos").
 
-In the dropdown block you can now select the block source with the name "textEditor-imageOptions: content".
+!!! note
 
-Similarly to the step 2 of the text editor, give the dropdown block a more meaningful name "dropdown-selectedImage".
+    You can edit the text "Choose an item" by using the "LABEL" area below the "BLOCK NAME".
 
-## Step 5: Add an image viewer
+## Step 5: Add the Image Box block
 
-To create a selection menu, add the block "Image Box" from the _inseri_ section.
+1.  Add the "Image Box" block (like in Step 2.1.).
+2.  Select the block source with the name "dropdown - chosen value".
 
-Set the block source to the option "dropdown-selectedImage: chosen value".
+    !!! warning
 
-Give the image box block the name "image".
+        If you cannot see the block source, make sure that you did Step 4.4.
+
+3.  Give the Image Box block the name (like in Step 2.3.).
 
 ## Step 6: Data Flow
 
-The [Data Flow](../features/dataFlow.md){:target="\_blank"} provides an overview of the inseri blocks and the dependency between them.
+The [Data Flow](../features/dataFlow.md){:target="\_blank"} provides an overview of the inseri blocks and the dependency between them. The data flow corresponding to this tutorial should be similar to the one below.
 
 <figure markdown>
 ![Data Flow](../assets/data_flow.png){width="700"}
@@ -95,29 +86,11 @@ The [Data Flow](../features/dataFlow.md){:target="\_blank"} provides an overview
 
 ## Step 7: Save and publish
 
-For the final step, we should save our post and publish it.
-Furthermore, in case of a full instance, you can now publish it.
+For the final step, you should save your post and publish it (The "Save draft" and "Publish" buttons are in the top right close to the Settings icon).
 
-<figure markdown>
-![Save and publish](../assets/save_publish.png){width="700"}
-  <figcaption>Step 7: Save and publish</figcaption>
-</figure>
-
-Once published you will see the text editor with the snippet (step 3) and a dropdown (step 4),
-where the corresponding image will load after its selection (step 5).
+Once published, you can view the post and you will see the text editor with the snippet (step 3) and a dropdown (step 4),
+where the corresponding image will load after the selection.
 
 ## Overview
 
-The following graph shows how the blocks are connected:
-
-```dot
-digraph G {
-    textEditor_imageOptions -> dropdown_selectedImage [label="textEditor-imageOptions: \n content"];
-    dropdown_selectedImage -> imageViewer_unnamed [label="drowdown-selectedImage: \n chosen value"];
-
-    textEditor_imageOptions [shape=rect; label="Text Editor: \n textEditor-imageOptions"];
-    dropdown_selectedImage [shape=rect; label="Dropdown: \n dropdown-selectedImage"];
-    imageViewer_unnamed [shape=rect; label="Image Box: \n image"];
-  }
-
-```
+The Data Flow Chart (see Step 6) provides a nice overview. You can see it also at the bottom of the [Hello World](https://inseri.swiss/2023/02/hello-world/){:target="\_blank"}.
