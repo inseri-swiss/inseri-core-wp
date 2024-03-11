@@ -19,10 +19,12 @@ The further documentation will always assume that you already have a post or pag
 ## Adding inseri blocks to a post
 
 On a WordPress instance with the inseri blocks installed, the list of available blocks will include a collection with the name "inseri".
-You can add an inseri block like any other block through the plus sign on top left or inside a post.
+You can add an inseri block like any other block through the "+" icon (called [Block inserter](https://wordpress.org/documentation/article/adding-a-new-block/#what-is-the-inserter){:target="\_blank"}) on top left or inside a post. Alternatively you can use the [slash command](https://wordpress.org/documentation/article/adding-a-new-block/#slash-command){:target="\_blank"} for a quicker workflow.
 After accepting a block, it is visible in the content of the post, showing the most important options directly in its body,
-like block of which the output will be imported.
-Through settings sidebar on the right, more settings are available, generally for naming the output channel, visibility, or just styling.
+like selecting the block source of which the output will be imported.
+Through settings sidebar on the right, more settings are available, generally for naming the block, visibility, or just styling.
+
+Please follow the documentation about [Adding a new block](https://wordpress.org/documentation/article/adding-a-new-block/#what-is-the-inserter){:target="\_blank"} for more details.
 
 ## Where to start
 
