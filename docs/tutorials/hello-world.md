@@ -26,10 +26,10 @@ Add a new post with the title "Image Selection", as presented in the figure belo
 
 <figure markdown>
 ![Adding a new block in WordPress](../assets/choose_a_block.png){width="700"}
-<figcaption>Step 2: Adding a new block in WordPress by typing "/" and the block name (see the left side) or using the "+" symbol and searching using the block name (see the right side). </figcaption>
+<figcaption>Step 2: Adding a new block in WordPress by typing the forward-slash "/" and the block name (see the left side) or using the "+" icon and searching the block name (see the right side). </figcaption>
 </figure>
 
-1. Add the Text Editor block by typing "/text editor" in the area "Type / to choose a block". Alternatively, you can click the `+` below the title, and type "text editor" in the Search area.
+1. Add the Text Editor block by using the [slash command](https://wordpress.org/documentation/article/adding-a-new-block/#slash-command){:target="\_blank"}, i.e., typing "/text editor" in the area "Type / to choose a block". Alternatively, you can use the [Block inserter](https://wordpress.org/documentation/article/adding-a-new-block/#what-is-the-inserter){:target="\_blank"}, i.e., the "+" icon below the title, and type "text editor" in the Search area.
 2. Choose the format "JSON".
 3. Next, give your Text Editor block a meaningful name. For this, open the settings sidebar on the right and enter simply "textEditor" under _block name_.
 
