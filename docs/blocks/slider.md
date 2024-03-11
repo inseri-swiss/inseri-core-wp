@@ -2,6 +2,10 @@
 
 The slider block can be used to allow guests to choose a value or a range within a specified boundaries.
 
+## Output
+
+The selected value or range as JSON.
+
 ## Parameters
 
 ### Type

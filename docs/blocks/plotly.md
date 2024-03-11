@@ -4,6 +4,10 @@ It allows to visualize the data of another block using [Plotly.js](https://plotl
 
 For examples of charts in this format, please see [Chart Studio Community Feed](https://chart-studio.plotly.com/feed/#/){:target="\_blank"} and open the desired file in Viewer, select the tab "Python & R" or export it directly as Data ".json" format.
 
+## Output
+
+The clicked or hovered element (only if enabled) as a JSON.
+
 ## Input
 
 The standard format by Plotly

@@ -2,6 +2,10 @@
 
 Fetch data from Zenodo by a DOI and re-use data in your inseri post.
 
+## Output
+
+The selected file.
+
 ## Input
 
 A valid DOI starting with `10.5281/zenodo.`

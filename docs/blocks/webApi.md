@@ -2,7 +2,9 @@
 
 With the Web API block, you can include data from an external source into your post.
 
-The output corresponds to the Web API response.
+## Output
+
+The Web API response.
 
 ## Quick configuration
 

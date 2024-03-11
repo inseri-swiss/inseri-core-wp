@@ -2,6 +2,10 @@
 
 Download the output from another block into a file.
 
+## Output
+
+No output.
+
 ## Input
 
 Output from any other block in the same post.
