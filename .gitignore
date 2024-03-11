@@ -33,6 +33,9 @@ venv/
 # Apple desktop services store
 .DS_store
 
+# VS Code
+.vscode
+
 inseri-core.zip
 
 # pipenv lock file
