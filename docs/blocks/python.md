@@ -26,6 +26,10 @@ On the top right you can set the inputs. Enter the variable name `a` and accept 
 Outputs can be defined on the bottom left. Enter `sum` into the text field and accept ith with `+`. Now, choose a content type. For simple values as arrays or numbers, `JSON` is the best option.
 Like inputs, output variables can be deleted with `x`.
 
+!!! warning
+
+    After adding the outputs please "Save Draft" in top right, "View Preview" in bottom left, and "Edit Post" in the top toolbar to continue editing. This is needed to have access to all outputs of the Python Code block. Otherwise the last output will not be available.
+
 ## Parameters
 
 ### Label
