@@ -1,4 +1,4 @@
-# Hello world
+# Hello World
 
 This tutorial allows you to chain multiple inseri blocks, with the specific example focusing on:
 
@@ -31,7 +31,7 @@ Add a new post with the title "Image Selection", as presented in the figure belo
 
 1. Add the Text Editor block by using the [slash command](https://wordpress.org/documentation/article/adding-a-new-block/#slash-command){:target="\_blank"}, i.e., typing "/text editor" in the area "Type / to choose a block". Alternatively, you can use the [Block inserter](https://wordpress.org/documentation/article/adding-a-new-block/#what-is-the-inserter){:target="\_blank"}, i.e., the "+" icon below the title, and type "text editor" in the Search area.
 2. Choose the format "JSON".
-3. Next, give your Text Editor block a meaningful name. For this, open the settings sidebar on the right and enter simply "textEditor" under _block name_.
+3. Next, rename your Text Editor block. For this, open the settings sidebar on the right and enter simply "textEditor" under "BLOCK NAME".
 
 <figure markdown>
 ![Edit the block name](../assets/block_name.png){width="900"}
