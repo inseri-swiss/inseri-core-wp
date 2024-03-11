@@ -2,6 +2,10 @@
 
 The IIIF Viewer block can be fed with a IIIF Manifest. It relies on [Clover](https://samvera-labs.github.io/clover-iiif/) viewer and allows the usage of the API Manifest to view images and audio/visual content.
 
+## Output
+
+No output.
+
 ## Input
 
 The block expects a valid IIIF manifest as text from any block as input.

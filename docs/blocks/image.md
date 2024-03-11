@@ -2,6 +2,10 @@
 
 The image box can show images from a remote source.
 
+## Output
+
+No output.
+
 ## Input
 
 It expects an image URL as input through a channel in the post (e.g. from a text editor or a Python block).

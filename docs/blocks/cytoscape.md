@@ -2,6 +2,10 @@
 
 It displays graphs using inputs from another blocks using [Cytoscape.js](https://js.cytoscape.org/).
 
+## Output
+
+Selected node or edge as JSON.
+
 ## Input
 
 The input corresponds to the `elements` objects from [Cytoscape.js - Elements JSON](https://js.cytoscape.org/#notation/elements-json). Next we provide the `nodes` and `edges` groups that are automatically inferred:

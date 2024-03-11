@@ -4,7 +4,9 @@ User can select multiple files from media library. Upon selection of a single fi
 
 If you already uploaded your desired file, you can choose it from the _Media Library_, otherwise you can _upload_ it after adding the block.
 
-The output corresponds to the selected file.
+## Output
+
+The selected file.
 
 ## Parameters
 

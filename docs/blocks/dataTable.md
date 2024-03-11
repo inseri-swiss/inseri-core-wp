@@ -4,6 +4,10 @@ The data table block displays tabular data of another block and gives guests the
 
 It allows as output the selected row and the selected cell.
 
+## Output
+
+The filtered and sorted table, selected row (via a click on a cell), and selected cell (via a double-click on a cell if enabled) as a JSON.
+
 ## Input
 
 The expected input is a JSON array with row-oriented data, where each row is an object with named attributes (known also as JSON records).

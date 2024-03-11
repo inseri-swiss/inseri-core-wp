@@ -2,6 +2,10 @@
 
 The Text Viewer block can be fed with text from the output from any block in the post. If the data changes, the viewer will be updated.
 
+## Output
+
+No output.
+
 ## Input
 
 Only the following contentType are considered as viewer's input:
