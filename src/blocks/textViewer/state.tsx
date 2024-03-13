@@ -28,7 +28,7 @@ export const storeCreator = (initalState: Attributes) => {
 
 			chooseInput: (key: string) =>
 				set((state) => {
-					state.isWizardMode = false
+					state.isWizardMode = !key
 					state.inputKey = key
 				}),
 		},
