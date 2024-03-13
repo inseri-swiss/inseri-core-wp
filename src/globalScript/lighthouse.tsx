@@ -1,3 +1,4 @@
+import { select } from '@wordpress/data'
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from '@wordpress/element'
 import { Schema } from 'ajv'
 import isDeepEqualReact from 'fast-deep-equal/react'
@@ -8,12 +9,13 @@ import { Option, none, some } from './option'
 import { reducer } from './reducer'
 import type { Action, Atom, BlockInfo, Nucleus, Root } from './types'
 import { initJsonValidator } from './utils'
+import { IconBuildingLighthouse } from '@tabler/icons-react'
 
 const FILTER_PRIVATE = '__'
 
 const blockStoreSubject = new BehaviorSubject<Root>({
 	__root: {
-		blockName: 'inseri',
+		blockName: 'core',
 		blockType: 'inseri-core/root',
 		clientId: '',
 		state: 'ready',
@@ -53,7 +55,7 @@ const valNodesObs = blockStoreSubject.pipe(
 	map(flattenToRawItem),
 	map((rawItems) => rawItems.filter((i) => !i.blockId.startsWith(FILTER_PRIVATE))),
 	map((rawItems) => {
-		return rawItems.map((i) => ({ data: { id: i.key, label: i.atomDesc, parent: i.blockId } }))
+		return rawItems.map((i) => ({ data: { id: i.key, label: i.description, parent: i.blockId } }))
 	})
 )
 
@@ -138,13 +140,22 @@ interface DiscoverJson {
 	jsonSchemas: Schema[]
 }
 
-type DiscoverOptions = DiscoverContentType | DiscoverJson
+type DiscoverOptions = DiscoverContentType | DiscoverJson | {}
 
-type RawValueItem = Omit<BlockInfo, 'atoms'> & Atom & { key: string; blockId: string; atomKey: string; atomDesc: string }
+type RawValueItem = Omit<BlockInfo, 'atoms'> & Atom & { key: string; blockId: string; atomKey: string; contentType: string }
 
-interface DiscoveredItem {
-	key: string
+export interface DiscoveredItem {
+	value: string
+	label: string
+	blockName: string
+	contentType: string
+	blockType: string
+	blockTitle: string
+	icon: React.ReactNode
+
+	//TODO remove
 	description: string
+	key: string
 }
 
 function flattenToRawItem(root: Root): RawValueItem[] {
@@ -159,15 +170,32 @@ function flattenToRawItem(root: Root): RawValueItem[] {
 					blockId,
 					...restBlock,
 					...atom,
-					description: block.blockName + ' - ' + atom.description,
-					atomDesc: atom.description,
+					contentType: atom.content.isDefined() ? atom.content.get().contentType : '-',
 				}
 			})
 	)
 }
 
 function mapToDiscoveredItem(rawItems: RawValueItem[]): DiscoveredItem[] {
-	return rawItems.map(({ key, description }) => ({ key, description }))
+	return rawItems
+		.map(({ key, blockName, description, contentType, blockType }) => ({
+			value: key,
+			label: description,
+			blockName,
+			contentType,
+			blockType,
+			// TODO remove
+			description,
+			key,
+		}))
+		.map((item) => {
+			if (item.blockType === 'inseri-core/root') {
+				return { ...item, blockTitle: 'inseri', icon: <IconBuildingLighthouse style={{ fill: 'none' }} /> }
+			}
+
+			const block = select('core/blocks').getBlockType(item.blockType)
+			return { ...item, blockTitle: block?.title, icon: block?.icon?.src }
+		})
 }
 
 function distinctRawItems(rawItems: RawValueItem[]): RawValueItem[] {
@@ -213,8 +241,9 @@ function useDiscover(ops: DiscoverOptions): DiscoveredItem[] {
 			.pipe(
 				map(flattenToRawItem),
 				map((rawItems) => rawItems.filter((i) => i.blockId !== blockId)),
-				map((rawItems) => filters.flatMap((filterFn) => filterFn(rawItems))),
+				map((rawItems) => (filters.length > 0 ? filters.flatMap((filterFn) => filterFn(rawItems)) : rawItems)),
 				map(distinctRawItems),
+				map((rawItems) => [...rawItems].reverse()),
 				map(mapToDiscoveredItem)
 			)
 			.subscribe(setState)
@@ -420,5 +449,5 @@ function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?:
 	return state
 }
 
-export type { Actions, Nucleus }
 export { InseriRoot, useDiscover, usePublish, useWatch }
+export type { Actions, Nucleus }

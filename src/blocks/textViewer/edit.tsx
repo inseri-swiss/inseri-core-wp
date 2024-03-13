@@ -1,13 +1,13 @@
-import { InseriRoot, useDiscover } from '@inseri/lighthouse'
+import { DiscoveredItem, InseriRoot, useDiscover } from '@inseri/lighthouse'
 import { IconFileTypography } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
-import { useEffect } from '@wordpress/element'
+import { forwardRef, useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import { Box, Group, Select, SetupEditorEnv, StateProvider, Text, useGlobalState } from '../../components'
-import { TEXTUAL_CONTENT_TYPES } from '../../utils'
+import { COMMON_CONTENT_TYPES, TEXTUAL_CONTENT_TYPES } from '../../utils'
 import json from './block.json'
 import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
@@ -16,6 +16,34 @@ import View from './view'
 const textualContentTypes = TEXTUAL_CONTENT_TYPES.map((t) => t.value)
 const contentTypeFilter = (c: string) => textualContentTypes.includes(c) || c.startsWith('text/')
 
+type ItemProps = DiscoveredItem & React.ComponentPropsWithoutRef<'div'>
+
+const SelectItem = forwardRef<HTMLDivElement, ItemProps>((props: ItemProps, ref) => {
+	const { value, label, blockName, contentType, blockType: _bt, blockTitle, icon, ...others } = props
+	const contentTypeDescription = COMMON_CONTENT_TYPES.find((c) => c.value === contentType)?.label ?? contentType
+
+	return (
+		<div ref={ref} {...others}>
+			<Group noWrap>
+				{icon}
+				<div style={{ width: '100%' }}>
+					<Group position="apart">
+						<Text size="md" fw={600}>
+							{label}
+						</Text>
+						<Text size="md" mr="sm">
+							{contentTypeDescription}
+						</Text>
+					</Group>
+					<Text size="sm">
+						{blockTitle}: {blockName}
+					</Text>
+				</div>
+			</Group>
+		</div>
+	)
+})
+
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
@@ -23,8 +51,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const isValueSet = !!inputKey
 	const { updateState, chooseInput } = actions
 
-	const sources = useDiscover({ contentTypeFilter })
-	const selectData = sources.map((item) => ({ label: item.description, value: item.key }))
+	const sources = useDiscover({})
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -81,8 +108,11 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					</Group>
 					<Select
 						label={__('Display code by selecting a block source', 'inseri-core')}
-						data={selectData}
+						data={sources}
 						value={inputKey}
+						itemComponent={SelectItem}
+						clearable
+						searchable
 						onChange={(key) => chooseInput(key ?? '')}
 					/>
 				</Box>

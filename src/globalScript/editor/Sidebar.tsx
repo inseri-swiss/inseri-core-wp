@@ -334,7 +334,7 @@ function SideBar() {
 
 export function InseriSidebar() {
 	return (
-		<InseriRoot blockId="__root" blockName="inseri" blockType="inseri-core/root">
+		<InseriRoot blockId="__root" blockName="core" blockType="inseri-core/root">
 			<SideBar />
 		</InseriRoot>
 	)
