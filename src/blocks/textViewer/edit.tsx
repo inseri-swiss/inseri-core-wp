@@ -15,6 +15,7 @@ import View from './view'
 
 const textualContentTypes = TEXTUAL_CONTENT_TYPES.map((t) => t.value)
 const contentTypeFilter = (c: string) => textualContentTypes.includes(c) || c.startsWith('text/')
+//1px solid #e0e0e0
 
 type ItemProps = DiscoveredItem & React.ComponentPropsWithoutRef<'div'>
 
@@ -24,14 +25,14 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>((props: ItemProps, ref)
 
 	return (
 		<div ref={ref} {...others}>
-			<Group noWrap>
+			<Group noWrap mx="md">
 				{icon}
 				<div style={{ width: '100%' }}>
 					<Group position="apart">
-						<Text size="md" fw={600}>
+						<Text size="sm" fw={'bold'}>
 							{label}
 						</Text>
-						<Text size="md" mr="sm">
+						<Text size="sm" mr="sm">
 							{contentTypeDescription}
 						</Text>
 					</Group>
@@ -114,6 +115,28 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						clearable
 						searchable
 						onChange={(key) => chooseInput(key ?? '')}
+						initiallyOpened
+						placeholder="Search for blocks, content type, ..."
+						styles={{
+							itemsWrapper: { gap: 0, padding: 0 },
+							item: {
+								padding: '1.25rem 0.25rem',
+								border: '0',
+								borderBottom: '1px solid #e0e0e0',
+							},
+						}}
+						filter={(value, item) => {
+							const { label = '', blockName = '', contentType = '', blockTitle = '' } = item
+							const contentTypeDescription = COMMON_CONTENT_TYPES.find((c) => c.value === contentType)?.label ?? contentType
+							const searchValue = value.trim()
+
+							return (
+								label.toLowerCase().includes(searchValue) ||
+								blockName.toLowerCase().includes(searchValue) ||
+								contentTypeDescription.toLowerCase().includes(searchValue) ||
+								blockTitle.toLowerCase().includes(searchValue)
+							)
+						}}
 					/>
 				</Box>
 			) : (
