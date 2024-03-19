@@ -3,10 +3,10 @@ import { IconBrandPython, IconChevronLeft, IconWindowMaximize } from '@tabler/ic
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarButton, ToolbarGroup, Button as WPButton } from '@wordpress/components'
-import { useEffect } from '@wordpress/element'
+import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Button, Group, Select, SetupEditorEnv, StateProvider, Text, useGlobalState } from '../../components'
+import { Box, Button, Group, SetupEditorEnv, SourceSelect, StateProvider, Text, useGlobalState } from '../../components'
 import { HidingWrapper } from '../../utils'
 import { ExtendedView } from './ExtendedView'
 import json from './block.json'
@@ -23,8 +23,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 	const isValueSet = mode === 'editor' || (!!mode && !!inputCode)
 
-	const sources = useDiscover({ contentTypeFilter: 'python' })
-	const options = sources.map((item) => ({ label: item.description, value: item.key }))
+	const [activeTab, setActiveTab] = useState<string | null>('All')
+	const sources = useDiscover({ contentTypeFilter: activeTab === 'Python' ? 'python' : undefined })
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -157,12 +157,16 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					)}
 					{selectedMode === 'viewer' && wizardStep === 1 && (
 						<>
-							<Select
-								label={__('Display code by selecting a block source', 'inseri-core')}
-								data={options}
-								value={inputCode}
-								onChange={(key) => updateState({ inputCode: key ?? '', isWizardMode: false, mode: 'viewer' })}
+							<SourceSelect
 								mb="lg"
+								label={__('Display code by selecting a block source', 'inseri-core')}
+								data={sources}
+								selectValue={inputCode}
+								tabs={['All', 'Python']}
+								activeTab={activeTab}
+								onSelectChange={(key) => updateState({ inputCode: key ?? '', isWizardMode: !key, mode: 'viewer' })}
+								setActiveTab={setActiveTab}
+								withAsterisk
 							/>
 							<Button
 								color="gray"
