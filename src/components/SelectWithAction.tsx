@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n'
-import { ActionIcon, createStyles, Group, Select, SelectProps, getStylesRef } from '.'
+import { ActionIcon, createStyles, Group, Select, SelectProps, getStylesRef, SourceSelectItem } from '.'
+import { COMMON_CONTENT_TYPES } from '../utils'
 
 const useStyles = createStyles((theme) => ({
 	midSizeField: {
@@ -35,10 +36,46 @@ const useStyles = createStyles((theme) => ({
 		paddingTop: `calc(${theme.spacing.sm} / 2)`,
 		zIndex: 1,
 	},
+	item: {
+		padding: '1rem 0.25rem',
+		border: '0',
+		borderBottom: '1px solid #e0e0e0',
+	},
 }))
 
 interface Props extends SelectProps {
 	onClick: () => void
+}
+
+export function SourceSelectWithAction(props: Props) {
+	const classes = useStyles().classes
+	const { title, icon, onClick, ...selectProps } = props
+
+	return (
+		<Group spacing={0} align={'flex-end'}>
+			<Select
+				classNames={{ root: classes.midSizeField, wrapper: classes.ctInputWrapper, label: classes.label, item: classes.item }}
+				itemComponent={SourceSelectItem}
+				searchable
+				filter={(value, item) => {
+					const { label = '', blockName = '', contentType = '', blockTitle = '' } = item
+					const contentTypeDescription = COMMON_CONTENT_TYPES.find((c) => c.value === contentType)?.label ?? contentType
+					const searchValue = value.trim()
+
+					return (
+						label.toLowerCase().includes(searchValue) ||
+						blockName.toLowerCase().includes(searchValue) ||
+						contentTypeDescription.toLowerCase().includes(searchValue) ||
+						blockTitle.toLowerCase().includes(searchValue)
+					)
+				}}
+				{...selectProps}
+			/>
+			<ActionIcon onClick={onClick} title={title} className={classes.iconWrapper}>
+				{icon}
+			</ActionIcon>
+		</Group>
+	)
 }
 
 export function SelectWithAction(props: Props) {

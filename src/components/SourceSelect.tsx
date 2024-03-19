@@ -20,15 +20,29 @@ const useStyles = createStyles(() => ({
 			boxShadow: 'unset',
 		},
 	},
+	item: {
+		padding: '1.25rem 0.25rem',
+		border: 0,
+		borderBottom: '1px solid #e0e0e0',
+
+		[`& > .${getStylesRef('innerItem')}`]: {
+			margin: '0 1rem',
+		},
+	},
+
+	innerItem: {
+		ref: getStylesRef('innerItem'),
+	},
 }))
 
-const SelectItem = forwardRef<HTMLDivElement, ItemProps>((props: ItemProps, ref) => {
+export const SourceSelectItem = forwardRef<HTMLDivElement, ItemProps>((props: ItemProps, ref) => {
 	const { value, label, blockName, contentType, blockType: _bt, blockTitle, icon, ...others } = props
 	const contentTypeDescription = COMMON_CONTENT_TYPES.find((c) => c.value === contentType)?.label ?? contentType
+	const { classes } = useStyles()
 
 	return (
 		<div ref={ref} {...others}>
-			<Group noWrap mx="md">
+			<Group noWrap className={classes.innerItem}>
 				{icon}
 				<div style={{ width: '100%' }}>
 					<Group position="apart">
@@ -68,19 +82,12 @@ export function SourceSelect(props: Props) {
 			ref={ref}
 			data={data}
 			value={selectValue}
-			itemComponent={SelectItem}
+			itemComponent={SourceSelectItem}
 			clearable
 			searchable
 			onChange={onSelectChange}
 			placeholder="Search for blocks, content type, ..."
-			classNames={{ wrapper: classes.inputWrapper }}
-			styles={{
-				item: {
-					padding: '1.25rem 0.25rem',
-					border: '0',
-					borderBottom: '1px solid #e0e0e0',
-				},
-			}}
+			classNames={{ wrapper: classes.inputWrapper, item: classes.item }}
 			filter={(value, item) => {
 				const { label = '', blockName = '', contentType = '', blockTitle = '' } = item
 				const contentTypeDescription = COMMON_CONTENT_TYPES.find((c) => c.value === contentType)?.label ?? contentType
