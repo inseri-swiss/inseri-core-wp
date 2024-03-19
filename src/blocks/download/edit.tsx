@@ -3,11 +3,11 @@ import { IconFileDownload } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
-import { useEffect } from '@wordpress/element'
+import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
 import { RecoilRoot, useRecoilState } from 'recoil'
-import { Box, Group, Select, SetupEditorEnv, Text } from '../../components'
+import { Box, Group, SetupEditorEnv, SourceSelect, Text } from '../../components'
 import json from './block.json'
 import { Attributes } from './index'
 import { wizardState } from './state'
@@ -30,8 +30,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 		}
 	}, [isSelected])
 
+	const [activeTab, setActiveTab] = useState<string | null>('All')
 	const sources = useDiscover({ contentTypeFilter: '' })
-	const options = sources.map((item) => ({ label: item.description, value: item.key }))
 
 	return (
 		<>
@@ -63,15 +63,18 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 							{__('Download', 'inseri-core')}
 						</Text>
 					</Group>
-					<Select
+					<SourceSelect
 						label={__('Let visitor download data by selecting a block source', 'inseri-core')}
-						data={options}
-						value={inputKey}
-						searchable
-						onChange={(key) => {
+						data={sources}
+						selectValue={inputKey}
+						tabs={['All']}
+						activeTab={activeTab}
+						onSelectChange={(key) => {
 							setAttributes({ inputKey: key ?? '' })
-							setWizardMode(false)
+							setWizardMode(!key)
 						}}
+						setActiveTab={setActiveTab}
+						withAsterisk
 					/>
 				</Box>
 			) : (

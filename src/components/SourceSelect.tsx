@@ -1,5 +1,6 @@
 import { DiscoveredItem } from '@inseri/lighthouse'
-import { Box, Group, Select, SelectProps, Tabs, Text, createStyles, getStylesRef } from '@mantine/core'
+import type { SelectProps } from '@mantine/core'
+import { Box, Group, Select, Tabs, Text, createStyles, getStylesRef } from '@mantine/core'
 import { useFocusWithin } from '@mantine/hooks'
 import { forwardRef } from '@wordpress/element'
 import { COMMON_CONTENT_TYPES } from '../utils'
@@ -97,7 +98,9 @@ export function SourceSelect(props: Props) {
 					<Tabs value={activeTab} onTabChange={setActiveTab} styles={{ tab: { borderWidth: '4px' } }}>
 						<Tabs.List>
 							{tabs.map((t) => (
-								<Tabs.Tab value={t.replaceAll(' ', '-')}>{t}</Tabs.Tab>
+								<Tabs.Tab key={t} value={t.replaceAll(' ', '-')}>
+									{t}
+								</Tabs.Tab>
 							))}
 						</Tabs.List>
 						{children}

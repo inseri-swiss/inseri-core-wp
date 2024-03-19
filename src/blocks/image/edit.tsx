@@ -3,10 +3,10 @@ import { IconPhoto } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, SelectControl, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
-import { useEffect, useRef } from '@wordpress/element'
+import { useEffect, useRef, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Group, Select, SetupEditorEnv, StateProvider, Text, useGlobalState } from '../../components'
+import { Box, Group, SetupEditorEnv, SourceSelect, StateProvider, Text, useGlobalState } from '../../components'
 import json from './block.json'
 import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
@@ -48,8 +48,11 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 		}
 	}, [isSelected])
 
-	const sources = useDiscover({ jsonSchemas: [urlSchema], contentTypeFilter: 'image/' })
-	const options = sources.map((item) => ({ label: item.description, value: item.key }))
+	const [activeTab, setActiveTab] = useState<string | null>('All')
+	const sources = useDiscover({
+		jsonSchemas: activeTab === 'Valid-URL' ? [urlSchema] : undefined,
+		contentTypeFilter: activeTab === 'Image' ? 'image/' : undefined,
+	})
 
 	const resizerHeight = height ?? imageRef.current?.height ?? 'auto'
 
@@ -129,12 +132,15 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 							{__('Image Box', 'inseri-core')}
 						</Text>
 					</Group>
-					<Select
+					<SourceSelect
 						label={__('Display image by selecting a block source', 'inseri-core')}
-						data={options}
-						value={inputKey}
-						searchable
-						onChange={(key) => updateState({ inputKey: key ?? '', isWizardMode: false })}
+						data={sources}
+						selectValue={inputKey}
+						tabs={['All', 'Valid URL', 'Image']}
+						activeTab={activeTab}
+						onSelectChange={(key) => updateState({ inputKey: key ?? '', isWizardMode: !key })}
+						setActiveTab={setActiveTab}
+						withAsterisk
 					/>
 				</Box>
 			) : (

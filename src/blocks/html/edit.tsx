@@ -3,10 +3,10 @@ import { IconHtml } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
-import { useEffect } from '@wordpress/element'
+import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Group, Select, SetupEditorEnv, StateProvider, Text, useGlobalState } from '../../components'
+import { Box, Group, SetupEditorEnv, SourceSelect, StateProvider, Text, useGlobalState } from '../../components'
 import json from './block.json'
 import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
@@ -19,8 +19,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const isValueSet = !!inputKey
 	const { updateState } = actions
 
-	const sources = useDiscover({ contentTypeFilter: 'html' })
-	const options = sources.map((item) => ({ label: item.description, value: item.key }))
+	const [activeTab, setActiveTab] = useState<string | null>('All')
+	const sources = useDiscover({ contentTypeFilter: activeTab === 'HTML' ? 'html' : undefined })
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -69,12 +69,15 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 							{__('HTML Code', 'inseri-core')}
 						</Text>
 					</Group>
-
-					<Select
+					<SourceSelect
 						label={__('Render HTML by selecting a block source', 'inseri-core')}
-						data={options}
-						value={inputKey}
-						onChange={(key) => updateState({ inputKey: key ?? '', isWizardMode: false })}
+						data={sources}
+						selectValue={inputKey}
+						tabs={['All', 'HTML']}
+						activeTab={activeTab}
+						onSelectChange={(key) => updateState({ inputKey: key ?? '', isWizardMode: !key })}
+						setActiveTab={setActiveTab}
+						withAsterisk
 					/>
 				</Box>
 			) : (
