@@ -230,10 +230,10 @@ function useDiscover(ops: DiscoverOptions): DiscoveredItem[] {
 	useDeepCompareEffect(() => {
 		const filters: Array<(d: RawValueItem[]) => RawValueItem[]> = []
 
-		if ('contentTypeFilter' in ops) {
+		if ('contentTypeFilter' in ops && ops.contentTypeFilter) {
 			filters.push(filterByContentType(ops.contentTypeFilter))
 		}
-		if ('jsonSchemas' in ops) {
+		if ('jsonSchemas' in ops && ops.jsonSchemas) {
 			filters.push(filterByJsonSchemas(ops.jsonSchemas))
 		}
 
