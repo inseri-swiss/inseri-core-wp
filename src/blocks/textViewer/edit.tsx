@@ -87,6 +87,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						activeTab={activeTab}
 						onSelectChange={(key) => chooseInput(key ?? '')}
 						setActiveTab={setActiveTab}
+						withAsterisk
 					/>
 				</Box>
 			) : (
