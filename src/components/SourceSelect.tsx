@@ -1,5 +1,5 @@
 import { DiscoveredItem } from '@inseri/lighthouse'
-import { Box, Group, Select, Tabs, Text, createStyles, getStylesRef } from '@mantine/core'
+import { Box, Group, Select, SelectProps, Tabs, Text, createStyles, getStylesRef } from '@mantine/core'
 import { useFocusWithin } from '@mantine/hooks'
 import { forwardRef } from '@wordpress/element'
 import { COMMON_CONTENT_TYPES } from '../utils'
@@ -47,64 +47,63 @@ const SelectItem = forwardRef<HTMLDivElement, ItemProps>((props: ItemProps, ref)
 	)
 })
 
-interface Props {
-	label?: string
+interface Props extends SelectProps {
 	data: DiscoveredItem[]
 	selectValue: string | null
 	activeTab: string | null
 	tabs: string[]
 	onSelectChange(value: string | null): void
 	setActiveTab(value: string | null): void
-	style?: React.CSSProperties
 }
 
-export function SourceSelect({ label, data, selectValue, activeTab, tabs, onSelectChange, setActiveTab, style }: Props) {
+export function SourceSelect(props: Props) {
 	const { classes } = useStyles()
 	const { ref, focused } = useFocusWithin()
+	const { data, selectValue, activeTab, tabs, onSelectChange, setActiveTab, ...rest } = props
 
 	return (
-		<div style={style}>
-			{label && <Text fz="sm">{label}</Text>}
-			<Box style={{ border: focused ? '1px solid #1971c2' : '1px solid #8c8f94', borderRadius: '4px' }}>
-				<Tabs value={activeTab} onTabChange={setActiveTab} styles={{ tab: { borderWidth: '4px' } }}>
-					<Tabs.List>
-						{tabs.map((t) => (
-							<Tabs.Tab value={t.replaceAll(' ', '-')}>{t}</Tabs.Tab>
-						))}
-					</Tabs.List>
+		<Select
+			{...rest}
+			ref={ref}
+			data={data}
+			value={selectValue}
+			itemComponent={SelectItem}
+			clearable
+			searchable
+			onChange={onSelectChange}
+			placeholder="Search for blocks, content type, ..."
+			classNames={{ wrapper: classes.inputWrapper }}
+			styles={{
+				item: {
+					padding: '1.25rem 0.25rem',
+					border: '0',
+					borderBottom: '1px solid #e0e0e0',
+				},
+			}}
+			filter={(value, item) => {
+				const { label = '', blockName = '', contentType = '', blockTitle = '' } = item
+				const contentTypeDescription = COMMON_CONTENT_TYPES.find((c) => c.value === contentType)?.label ?? contentType
+				const searchValue = value.trim()
 
-					<Select
-						ref={ref}
-						data={data}
-						value={selectValue}
-						itemComponent={SelectItem}
-						clearable
-						searchable
-						onChange={onSelectChange}
-						placeholder="Search for blocks, content type, ..."
-						classNames={{ wrapper: classes.inputWrapper }}
-						styles={{
-							item: {
-								padding: '1.25rem 0.25rem',
-								border: '0',
-								borderBottom: '1px solid #e0e0e0',
-							},
-						}}
-						filter={(value, item) => {
-							const { label = '', blockName = '', contentType = '', blockTitle = '' } = item
-							const contentTypeDescription = COMMON_CONTENT_TYPES.find((c) => c.value === contentType)?.label ?? contentType
-							const searchValue = value.trim()
-
-							return (
-								label.toLowerCase().includes(searchValue) ||
-								blockName.toLowerCase().includes(searchValue) ||
-								contentTypeDescription.toLowerCase().includes(searchValue) ||
-								blockTitle.toLowerCase().includes(searchValue)
-							)
-						}}
-					/>
-				</Tabs>
-			</Box>
-		</div>
+				return (
+					label.toLowerCase().includes(searchValue) ||
+					blockName.toLowerCase().includes(searchValue) ||
+					contentTypeDescription.toLowerCase().includes(searchValue) ||
+					blockTitle.toLowerCase().includes(searchValue)
+				)
+			}}
+			inputContainer={(children) => (
+				<Box style={{ border: focused ? '1px solid #1971c2' : '1px solid #8c8f94', borderRadius: '4px' }}>
+					<Tabs value={activeTab} onTabChange={setActiveTab} styles={{ tab: { borderWidth: '4px' } }}>
+						<Tabs.List>
+							{tabs.map((t) => (
+								<Tabs.Tab value={t.replaceAll(' ', '-')}>{t}</Tabs.Tab>
+							))}
+						</Tabs.List>
+						{children}
+					</Tabs>
+				</Box>
+			)}
+		/>
 	)
 }
