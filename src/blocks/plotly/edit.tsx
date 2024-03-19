@@ -6,7 +6,8 @@ import { PanelBody, PanelRow, ResizableBox, TextControl, ToolbarButton, ToolbarG
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Accordion, ActionIcon, Box, Button, Group, Select, SetupEditorEnv, Stack, StateProvider, Text, useGlobalState } from '../../components'
+import { useMap } from 'react-use'
+import { Accordion, ActionIcon, Box, Button, Group, Select, SetupEditorEnv, SourceSelect, Stack, StateProvider, Text, useGlobalState } from '../../components'
 import json from './block.json'
 import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
@@ -33,8 +34,10 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 		}
 	}, [isSelected])
 
-	const sources = useDiscover({ contentTypeFilter: 'json' })
-	const options = sources.map((item) => ({ label: item.description, value: item.key }))
+	const [tabMap, tabAction] = useMap<Record<string, string | null>>({ inputFull: 'All', inputData: 'All', inputLayout: 'All', inputConfig: 'All' })
+	const sources = useDiscover({})
+	const jsonSources = sources.filter((s) => s.contentType.includes('json'))
+
 	const resizerHeight = height ? height : 'auto'
 
 	const renderResizable = (children: JSX.Element) => (
@@ -138,34 +141,56 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						</Box>
 					</Group>
 
-					<Select
+					<SourceSelect
 						px="md"
-						required
-						clearable
 						label={__('Provide full JSON description', 'inseri-core')}
-						data={options}
-						value={inputFull}
-						searchable
-						onChange={(key) => updateState({ inputFull: key ?? '' })}
+						data={tabMap.inputFull === 'JSON' ? jsonSources : sources}
+						selectValue={inputFull}
+						tabs={['All', 'JSON']}
+						activeTab={tabMap.inputFull}
+						onSelectChange={(key) => updateState({ inputFull: key ?? '' })}
+						setActiveTab={(val) => tabAction.set('inputFull', val)}
+						withAsterisk
 					/>
 
 					<Accordion multiple value={openItems} onChange={setOpenItems} styles={{ label: { fontSize: '14px' } }}>
 						<Accordion.Item value="data">
 							<Accordion.Control>{__('Override data separately', 'inseri-core')}</Accordion.Control>
 							<Accordion.Panel>
-								<Select clearable data={options} value={inputData} searchable onChange={(key) => updateState({ inputData: key ?? '' })} />
+								<SourceSelect
+									data={tabMap.inputData === 'JSON' ? jsonSources : sources}
+									selectValue={inputData}
+									tabs={['All', 'JSON']}
+									activeTab={tabMap.inputData}
+									onSelectChange={(key) => updateState({ inputData: key ?? '' })}
+									setActiveTab={(val) => tabAction.set('inputData', val)}
+								/>
 							</Accordion.Panel>
 						</Accordion.Item>
 						<Accordion.Item value="layout">
 							<Accordion.Control>{__('Override layout separately', 'inseri-core')}</Accordion.Control>
 							<Accordion.Panel>
-								<Select clearable data={options} value={inputLayout} searchable onChange={(key) => updateState({ inputLayout: key ?? '' })} />
+								<SourceSelect
+									data={tabMap.inputLayout === 'JSON' ? jsonSources : sources}
+									selectValue={inputLayout}
+									tabs={['All', 'JSON']}
+									activeTab={tabMap.inputLayout}
+									onSelectChange={(key) => updateState({ inputLayout: key ?? '' })}
+									setActiveTab={(val) => tabAction.set('inputLayout', val)}
+								/>
 							</Accordion.Panel>
 						</Accordion.Item>
 						<Accordion.Item value="config">
 							<Accordion.Control>{__('Provide config', 'inseri-core')}</Accordion.Control>
 							<Accordion.Panel>
-								<Select clearable data={options} value={inputConfig} searchable onChange={(key) => updateState({ inputConfig: key ?? '' })} />
+								<SourceSelect
+									data={tabMap.inputConfig === 'JSON' ? jsonSources : sources}
+									selectValue={inputConfig}
+									tabs={['All', 'JSON']}
+									activeTab={tabMap.inputConfig}
+									onSelectChange={(key) => updateState({ inputConfig: key ?? '' })}
+									setActiveTab={(val) => tabAction.set('inputConfig', val)}
+								/>
 							</Accordion.Panel>
 						</Accordion.Item>
 					</Accordion>

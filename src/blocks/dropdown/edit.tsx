@@ -6,11 +6,11 @@ import { PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, Toolbar
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Group, Select, SetupEditorEnv, Text } from '../../components'
+import { Box, Group, SetupEditorEnv, SourceSelect, Text } from '../../components'
 import json from './block.json'
 import { Attributes } from './index'
-import View from './view'
 import { objectSchema, stringSchema } from './utils'
+import View from './view'
 
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes, isSelected } = props
@@ -19,8 +19,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const [isWizardMode, setWizardMode] = useState(!inputKey)
 	const isValueSet = !!inputKey
 
-	const sources = useDiscover({ jsonSchemas: [objectSchema, stringSchema] })
-	const options = sources.map((item) => ({ label: item.description, value: item.key }))
+	const [activeTab, setActiveTab] = useState<string | null>('All')
+	const sources = useDiscover({ jsonSchemas: activeTab === 'Valid-Config' ? [objectSchema, stringSchema] : undefined })
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -61,15 +61,19 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 							{__('Dropdown', 'inseri-core')}
 						</Text>
 					</Group>
-					<Select
+					<SourceSelect
 						label={__('Provide options by selecting a block source', 'inseri-core')}
-						data={options}
-						value={inputKey}
-						onChange={(key) => {
+						data={sources}
+						selectValue={inputKey}
+						tabs={['All', 'Valid Config']}
+						activeTab={activeTab}
+						onSelectChange={(key) => {
 							setAttributes({ inputKey: key ?? '' })
-							setWizardMode(false)
+							setWizardMode(!key)
 						}}
-					></Select>
+						setActiveTab={setActiveTab}
+						withAsterisk
+					/>
 				</Box>
 			) : (
 				<View {...props} setWizardMode={setWizardMode} />
