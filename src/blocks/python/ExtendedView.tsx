@@ -5,7 +5,21 @@ import { useRef, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import type { AllotmentHandle } from 'allotment'
 import { Allotment } from 'allotment'
-import { ActionIcon, Box, Button, CodeEditor, Group, Modal, SelectWithAction, Stack, Text, TextInput, createStyles, useGlobalState } from '../../components'
+import {
+	ActionIcon,
+	Box,
+	Button,
+	CodeEditor,
+	Group,
+	Modal,
+	SelectWithAction,
+	SourceSelectWithAction,
+	Stack,
+	Text,
+	TextInput,
+	createStyles,
+	useGlobalState,
+} from '../../components'
 import { COMMON_CONTENT_TYPES, Z_INDEX_ABOVE_ADMIN, isVariableValid } from '../../utils'
 import { TopBar } from './TopBar'
 import { GlobalState } from './state'
@@ -49,11 +63,8 @@ export function ExtendedView() {
 	)
 
 	const { modalInner } = useStyles().classes
-
 	const isViewerMode = mode === 'viewer'
-
-	const sources = useDiscover({ contentTypeFilter: '' })
-	const options = sources.map((item) => ({ label: item.description, value: item.key }))
+	const sources = useDiscover({})
 
 	const watchedCode = useWatch(inputCode, {
 		onNone: () => '',
@@ -152,7 +163,7 @@ export function ExtendedView() {
 									<div style={{ overflow: 'auto', height: '100%' }}>
 										<Stack p="sm">
 											{Object.keys(inputs).map((varName) => (
-												<SelectWithAction
+												<SourceSelectWithAction
 													key={varName}
 													label={varName}
 													placeholder="Choose a block source"
@@ -161,7 +172,7 @@ export function ExtendedView() {
 													onChange={(key) => chooseInput(varName, key ?? '')}
 													onClick={() => removeInput(varName)}
 													icon={<IconX size={16} />}
-													data={options}
+													data={sources}
 													maxDropdownHeight={150}
 												/>
 											))}
