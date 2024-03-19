@@ -23,8 +23,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const isValueSet = !!inputKey
 	const { updateState, chooseInput } = actions
 
-	const [activeTab, setActiveTab] = useState<string | null>('all')
-	const sources = useDiscover({ contentTypeFilter: activeTab === 'textual' ? contentTypeFilter : undefined })
+	const [activeTab, setActiveTab] = useState<string | null>('All')
+	const sources = useDiscover({ contentTypeFilter: activeTab === 'Textual' ? contentTypeFilter : undefined })
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -79,10 +79,11 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 							{__('Text Viewer', 'inseri-core')}
 						</Text>
 					</Group>
-					<Text fz="sm">Display code by selecting a block source</Text>
 					<SourceSelect
+						label="Display code by selecting a block source"
 						data={sources}
 						selectValue={inputKey}
+						tabs={['All', 'Textual']}
 						activeTab={activeTab}
 						onSelectChange={(key) => chooseInput(key ?? '')}
 						setActiveTab={setActiveTab}

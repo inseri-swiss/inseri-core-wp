@@ -3,10 +3,10 @@ import { IconChartDots3 } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, SelectControl, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
-import { useEffect } from '@wordpress/element'
+import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Accordion, Button, Group, Select, SetupEditorEnv, Stack, StateProvider, Text, useGlobalState } from '../../components'
+import { Accordion, Button, Group, SetupEditorEnv, SourceSelect, Stack, StateProvider, Text, useGlobalState } from '../../components'
 import json from './block.json'
 import flatElementSchema from './flatElementSchema.json'
 import groupedElementSchema from './groupedElementSchema.json'
@@ -28,8 +28,6 @@ const layoutOptions = [
 	{ label: 'klay', value: 'klay' },
 ]
 
-const mapToOptions = (item: { description: string; key: string }) => ({ label: item.description, value: item.key })
-
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
@@ -37,9 +35,13 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const isValueSet = !!inputKey
 	const { updateState } = actions
 
-	const elementSources = useDiscover({ jsonSchemas: [flatElementSchema, groupedElementSchema] }).map(mapToOptions)
-	const styleSources = useDiscover({ jsonSchemas: [styleSchema] }).map(mapToOptions)
-	const layoutSources = useDiscover({ jsonSchemas: [layoutSchema] }).map(mapToOptions)
+	const [elementTab, setElementTab] = useState<string | null>('All')
+	const [styleTab, setStyleTab] = useState<string | null>('All')
+	const [layoutTab, setLayoutTab] = useState<string | null>('All')
+
+	const elementSources = useDiscover({ jsonSchemas: elementTab === 'Valid-Config' ? [flatElementSchema, groupedElementSchema] : undefined })
+	const styleSources = useDiscover({ jsonSchemas: styleTab === 'Valid-Config' ? [styleSchema] : undefined })
+	const layoutSources = useDiscover({ jsonSchemas: layoutTab === 'Valid-Config' ? [layoutSchema] : undefined })
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -104,27 +106,42 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						</Text>
 					</Group>
 
-					<Select
-						px="md"
-						required
-						clearable
+					<SourceSelect
+						style={{ padding: '0 1rem' }}
 						label={__('Display network diagram by selecting a block source', 'inseri-core')}
 						data={elementSources}
-						value={inputKey}
-						onChange={(key) => updateState({ inputKey: key ?? '' })}
+						selectValue={inputKey}
+						activeTab={elementTab}
+						tabs={['All', 'Valid Config']}
+						onSelectChange={(key) => updateState({ inputKey: key ?? '' })}
+						setActiveTab={setElementTab}
 					/>
 
 					<Accordion multiple styles={{ label: { fontSize: '14px' } }}>
 						<Accordion.Item value="style">
 							<Accordion.Control>{__('Provide custom style', 'inseri-core')}</Accordion.Control>
 							<Accordion.Panel>
-								<Select clearable data={styleSources} value={styleKey} searchable onChange={(key) => updateState({ styleKey: key ?? '' })} />
+								<SourceSelect
+									data={styleSources}
+									selectValue={styleKey}
+									activeTab={styleTab}
+									tabs={['All', 'Valid Config']}
+									onSelectChange={(key) => updateState({ styleKey: key ?? '' })}
+									setActiveTab={setStyleTab}
+								/>
 							</Accordion.Panel>
 						</Accordion.Item>
 						<Accordion.Item value="layout">
 							<Accordion.Control>{__('Provide additional layout config', 'inseri-core')}</Accordion.Control>
 							<Accordion.Panel>
-								<Select clearable data={layoutSources} value={layoutKey} searchable onChange={(key) => updateState({ layoutKey: key ?? '' })} />
+								<SourceSelect
+									data={layoutSources}
+									selectValue={layoutKey}
+									activeTab={layoutTab}
+									tabs={['All', 'Valid Config']}
+									onSelectChange={(key) => updateState({ layoutKey: key ?? '' })}
+									setActiveTab={setLayoutTab}
+								/>
 							</Accordion.Panel>
 						</Accordion.Item>
 					</Accordion>
