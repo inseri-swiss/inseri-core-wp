@@ -1,0 +1,103 @@
+import { DiscoveredItem } from '@inseri/lighthouse'
+import { Box, Group, Select, Tabs, Text, createStyles, getStylesRef } from '@mantine/core'
+import { useFocusWithin } from '@mantine/hooks'
+import { forwardRef } from '@wordpress/element'
+import { COMMON_CONTENT_TYPES } from '../utils'
+
+type ItemProps = DiscoveredItem & React.ComponentPropsWithoutRef<'div'>
+
+const useStyles = createStyles(() => ({
+	inputWrapper: {
+		gap: 0,
+		padding: 0,
+
+		[`& > .${getStylesRef('input')}`]: {
+			border: 0,
+			margin: '1px 0',
+		},
+		[`& > .${getStylesRef('input')}:focus`]: {
+			boxShadow: 'unset',
+		},
+	},
+}))
+
+const SelectItem = forwardRef<HTMLDivElement, ItemProps>((props: ItemProps, ref) => {
+	const { value, label, blockName, contentType, blockType: _bt, blockTitle, icon, ...others } = props
+	const contentTypeDescription = COMMON_CONTENT_TYPES.find((c) => c.value === contentType)?.label ?? contentType
+
+	return (
+		<div ref={ref} {...others}>
+			<Group noWrap mx="md">
+				{icon}
+				<div style={{ width: '100%' }}>
+					<Group position="apart">
+						<Text size="sm" fw={'bold'}>
+							{label}
+						</Text>
+						<Text size="sm" mr="sm">
+							{contentTypeDescription}
+						</Text>
+					</Group>
+					<Text size="sm">
+						{blockTitle}: {blockName}
+					</Text>
+				</div>
+			</Group>
+		</div>
+	)
+})
+
+interface Props {
+	data: DiscoveredItem[]
+	selectValue: string | null
+	activeTab: string | null
+	onSelectChange(value: string | null): void
+	setActiveTab(value: string | null): void
+}
+
+export function SourceSelect({ data, selectValue, activeTab, onSelectChange, setActiveTab }: Props) {
+	const { classes } = useStyles()
+	const { ref, focused } = useFocusWithin()
+
+	return (
+		<Box style={{ border: focused ? '1px solid #1971c2' : '1px solid #8c8f94', borderRadius: '4px' }}>
+			<Tabs value={activeTab} onTabChange={setActiveTab} styles={{ tab: { borderWidth: '4px' } }}>
+				<Tabs.List>
+					<Tabs.Tab value="all">All</Tabs.Tab>
+					<Tabs.Tab value="textual">Textual</Tabs.Tab>
+				</Tabs.List>
+
+				<Select
+					ref={ref}
+					data={data}
+					value={selectValue}
+					itemComponent={SelectItem}
+					clearable
+					searchable
+					onChange={onSelectChange}
+					placeholder="Search for blocks, content type, ..."
+					classNames={{ wrapper: classes.inputWrapper }}
+					styles={{
+						item: {
+							padding: '1.25rem 0.25rem',
+							border: '0',
+							borderBottom: '1px solid #e0e0e0',
+						},
+					}}
+					filter={(value, item) => {
+						const { label = '', blockName = '', contentType = '', blockTitle = '' } = item
+						const contentTypeDescription = COMMON_CONTENT_TYPES.find((c) => c.value === contentType)?.label ?? contentType
+						const searchValue = value.trim()
+
+						return (
+							label.toLowerCase().includes(searchValue) ||
+							blockName.toLowerCase().includes(searchValue) ||
+							contentTypeDescription.toLowerCase().includes(searchValue) ||
+							blockTitle.toLowerCase().includes(searchValue)
+						)
+					}}
+				/>
+			</Tabs>
+		</Box>
+	)
+}

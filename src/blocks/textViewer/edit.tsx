@@ -1,13 +1,13 @@
-import { DiscoveredItem, InseriRoot, useDiscover } from '@inseri/lighthouse'
+import { InseriRoot, useDiscover } from '@inseri/lighthouse'
 import { IconFileTypography } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
-import { forwardRef, useEffect } from '@wordpress/element'
+import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Group, Select, SetupEditorEnv, StateProvider, Text, useGlobalState } from '../../components'
-import { COMMON_CONTENT_TYPES, TEXTUAL_CONTENT_TYPES } from '../../utils'
+import { Box, Group, SetupEditorEnv, SourceSelect, StateProvider, Text, useGlobalState } from '../../components'
+import { TEXTUAL_CONTENT_TYPES } from '../../utils'
 import json from './block.json'
 import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
@@ -15,35 +15,6 @@ import View from './view'
 
 const textualContentTypes = TEXTUAL_CONTENT_TYPES.map((t) => t.value)
 const contentTypeFilter = (c: string) => textualContentTypes.includes(c) || c.startsWith('text/')
-//1px solid #e0e0e0
-
-type ItemProps = DiscoveredItem & React.ComponentPropsWithoutRef<'div'>
-
-const SelectItem = forwardRef<HTMLDivElement, ItemProps>((props: ItemProps, ref) => {
-	const { value, label, blockName, contentType, blockType: _bt, blockTitle, icon, ...others } = props
-	const contentTypeDescription = COMMON_CONTENT_TYPES.find((c) => c.value === contentType)?.label ?? contentType
-
-	return (
-		<div ref={ref} {...others}>
-			<Group noWrap mx="md">
-				{icon}
-				<div style={{ width: '100%' }}>
-					<Group position="apart">
-						<Text size="sm" fw={'bold'}>
-							{label}
-						</Text>
-						<Text size="sm" mr="sm">
-							{contentTypeDescription}
-						</Text>
-					</Group>
-					<Text size="sm">
-						{blockTitle}: {blockName}
-					</Text>
-				</div>
-			</Group>
-		</div>
-	)
-})
 
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
@@ -52,7 +23,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const isValueSet = !!inputKey
 	const { updateState, chooseInput } = actions
 
-	const sources = useDiscover({})
+	const [activeTab, setActiveTab] = useState<string | null>('all')
+	const sources = useDiscover({ contentTypeFilter: activeTab === 'textual' ? contentTypeFilter : undefined })
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -107,36 +79,13 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 							{__('Text Viewer', 'inseri-core')}
 						</Text>
 					</Group>
-					<Select
-						label={__('Display code by selecting a block source', 'inseri-core')}
+					<Text fz="sm">Display code by selecting a block source</Text>
+					<SourceSelect
 						data={sources}
-						value={inputKey}
-						itemComponent={SelectItem}
-						clearable
-						searchable
-						onChange={(key) => chooseInput(key ?? '')}
-						initiallyOpened
-						placeholder="Search for blocks, content type, ..."
-						styles={{
-							itemsWrapper: { gap: 0, padding: 0 },
-							item: {
-								padding: '1.25rem 0.25rem',
-								border: '0',
-								borderBottom: '1px solid #e0e0e0',
-							},
-						}}
-						filter={(value, item) => {
-							const { label = '', blockName = '', contentType = '', blockTitle = '' } = item
-							const contentTypeDescription = COMMON_CONTENT_TYPES.find((c) => c.value === contentType)?.label ?? contentType
-							const searchValue = value.trim()
-
-							return (
-								label.toLowerCase().includes(searchValue) ||
-								blockName.toLowerCase().includes(searchValue) ||
-								contentTypeDescription.toLowerCase().includes(searchValue) ||
-								blockTitle.toLowerCase().includes(searchValue)
-							)
-						}}
+						selectValue={inputKey}
+						activeTab={activeTab}
+						onSelectChange={(key) => chooseInput(key ?? '')}
+						setActiveTab={setActiveTab}
 					/>
 				</Box>
 			) : (
