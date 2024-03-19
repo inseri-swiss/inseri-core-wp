@@ -6,12 +6,12 @@ import { PanelBody, PanelRow, ToolbarButton, ToolbarGroup } from '@wordpress/com
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Button, Group, Select, SetupEditorEnv, Stack, StateProvider, Switch, Text, TextInput, useGlobalState } from '../../components'
+import { Button, Group, SetupEditorEnv, SourceSelect, Stack, StateProvider, Switch, Text, TextInput, useGlobalState } from '../../components'
 import json from './block.json'
 import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
-import View from './view'
 import { configSchema } from './utils'
+import View from './view'
 
 const generalOptions = [
 	['enableTopToolbar', 'Top Toolbar'],
@@ -36,8 +36,6 @@ const extraOptionsWithLabel = [
 	['enableEditing', 'Cell editing on double-click'],
 ]
 
-const mapToOptions = (item: { description: string; key: string }) => ({ label: item.description, value: item.key })
-
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
@@ -45,9 +43,12 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const isValueSet = !!inputData
 	const { updateState } = actions
 
+	const [recordTab, setRecordTab] = useState<string | null>('All')
+	const [configTab, setConfigTab] = useState<string | null>('All')
+
 	const [hasRowVirtualChanged, setRowVirtualChanged] = useState(false)
-	const configOptions = useDiscover({ jsonSchemas: [configSchema] }).map(mapToOptions)
-	const recordOptions = useDiscover({ contentTypeFilter: 'application/json' }).map(mapToOptions)
+	const recordOptions = useDiscover({ contentTypeFilter: recordTab === 'Valid-Config' ? 'application/json' : undefined })
+	const configOptions = useDiscover({ jsonSchemas: configTab === 'Valid-Config' ? [configSchema] : undefined })
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -154,20 +155,24 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 							{__('Data Table', 'inseri-core')}
 						</Text>
 					</Group>
-					<Select
+					<SourceSelect
 						label={__('Choose table records', 'inseri-core')}
 						data={recordOptions}
-						value={inputData}
-						onChange={(key) => updateState({ inputData: key ?? '' })}
-						clearable
-						required
+						selectValue={inputData}
+						tabs={['All', 'Valid Config']}
+						activeTab={recordTab}
+						onSelectChange={(key) => updateState({ inputData: key ?? '' })}
+						setActiveTab={setRecordTab}
+						withAsterisk
 					/>
-					<Select
+					<SourceSelect
 						label={__('Choose column config', 'inseri-core')}
 						data={configOptions}
-						value={inputColumns}
-						onChange={(key) => updateState({ inputColumns: key ?? '' })}
-						clearable
+						selectValue={inputColumns}
+						tabs={['All', 'Valid Config']}
+						activeTab={configTab}
+						onSelectChange={(key) => updateState({ inputColumns: key ?? '' })}
+						setActiveTab={setConfigTab}
 					/>
 					<Group position="right">
 						<Button disabled={!isValueSet} variant="filled" onClick={() => updateState({ isWizardMode: false })}>

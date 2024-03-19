@@ -107,7 +107,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					</Group>
 
 					<SourceSelect
-						style={{ padding: '0 1rem' }}
+						px="md"
 						label={__('Display network diagram by selecting a block source', 'inseri-core')}
 						data={elementSources}
 						selectValue={inputKey}
@@ -115,6 +115,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						tabs={['All', 'Valid Config']}
 						onSelectChange={(key) => updateState({ inputKey: key ?? '' })}
 						setActiveTab={setElementTab}
+						withAsterisk
 					/>
 
 					<Accordion multiple styles={{ label: { fontSize: '14px' } }}>
