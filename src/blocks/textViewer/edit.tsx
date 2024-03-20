@@ -23,7 +23,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const isValueSet = !!inputKey
 	const { updateState, chooseInput } = actions
 
-	const [activeTab, setActiveTab] = useState<string | null>('All')
+	const [activeTab, setActiveTab] = useState<string | null>('Textual')
 	const sources = useDiscover({ contentTypeFilter: activeTab === 'Textual' ? contentTypeFilter : undefined })
 
 	useEffect(() => {
@@ -83,7 +83,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						label="Display code by selecting a block source"
 						data={sources}
 						selectValue={inputKey}
-						tabs={['All', 'Textual']}
+						tabs={['Textual', 'All']}
 						activeTab={activeTab}
 						onSelectChange={(key) => chooseInput(key ?? '')}
 						setActiveTab={setActiveTab}
