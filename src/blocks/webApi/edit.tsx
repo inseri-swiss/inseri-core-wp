@@ -6,6 +6,7 @@ import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, ToolbarGroup, Button as WPButton } from '@wordpress/components'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
+import { useMap } from 'react-use'
 import {
 	Box,
 	Button,
@@ -14,6 +15,7 @@ import {
 	Modal,
 	Select,
 	SetupEditorEnv,
+	SourceSelect,
 	Stack,
 	StateProvider,
 	Text,
@@ -49,19 +51,38 @@ const stringSchema = {
 	type: 'string',
 }
 
+const urlSchema = {
+	$ref: '#/definitions/URL',
+	definitions: {
+		URL: { type: 'string', format: 'uri', pattern: '^https?://' },
+	},
+}
+
 const methodUrlSchema = {
 	properties: {
 		method: { type: 'string' },
-		url: { type: 'string' },
+		url: { $ref: '#/definitions/URL' },
 	},
 	required: ['method', 'url'],
 	additionalProperties: true,
+	definitions: {
+		URL: { type: 'string', format: 'uri', pattern: '^https?://' },
+	},
 }
 
 const recordSchema = {
 	type: 'object',
 	additionalProperties: {
 		type: 'string',
+	},
+}
+
+const customSelectStyle: any = {
+	label: { fontWeight: 'normal' },
+	item: {
+		[`& > .${getStylesRef('innerItem')}`]: {
+			margin: '0 !important',
+		},
 	},
 }
 
@@ -89,9 +110,17 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 
 	const { pidLeftInputWrapper, pidRightInputWrapper } = useStyles().classes
 
-	const methodUrlOptions = useDiscover({ jsonSchemas: [stringSchema, methodUrlSchema] }).map((item) => ({ label: item.description, value: item.key }))
-	const recordOptions = useDiscover({ jsonSchemas: [recordSchema] }).map((item) => ({ label: item.description, value: item.key }))
-	const bodyOptions = useDiscover({ jsonSchemas: [stringSchema] }).map((item) => ({ label: item.description, value: item.key }))
+	const [tabMap, tabAction] = useMap<Record<string, string | null>>({
+		methodUrl: 'Valid-Config',
+		queryParams: 'Attributes',
+		headersParams: 'Attributes',
+		body: 'Text',
+	})
+
+	const allOptions = useDiscover({})
+	const methodUrlOptions = useDiscover({ jsonSchemas: [urlSchema, methodUrlSchema] })
+	const recordOptions = useDiscover({ jsonSchemas: [recordSchema] })
+	const bodyOptions = useDiscover({ jsonSchemas: [stringSchema] })
 
 	const [debouncedUrl] = useDebouncedValue(url, 500)
 	useEffect(() => {
@@ -155,37 +184,45 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 							/>
 						</Group>
 
-						<Select
-							styles={{ label: { fontWeight: 'normal' } }}
+						<SourceSelect
+							styles={customSelectStyle}
 							label={__('Override method and URL', 'inseri-core')}
-							clearable
-							data={methodUrlOptions}
-							value={inputMethodUrl}
-							onChange={(key) => updateState({ inputMethodUrl: key ?? '' })}
+							data={tabMap.methodUrl === 'Valid-Config' ? methodUrlOptions : allOptions}
+							selectValue={inputMethodUrl}
+							tabs={['Valid Config', 'All']}
+							activeTab={tabMap.methodUrl}
+							onSelectChange={(key) => updateState({ inputMethodUrl: key ?? '' })}
+							setActiveTab={(key) => tabAction.set('methodUrl', key)}
 						/>
-						<Select
-							styles={{ label: { fontWeight: 'normal' } }}
+						<SourceSelect
+							styles={customSelectStyle}
 							label={__('Extend query params', 'inseri-core')}
-							clearable
-							data={recordOptions}
-							value={inputQueryParams}
-							onChange={(key) => updateState({ inputQueryParams: key ?? '' })}
+							data={tabMap.queryParams === 'Attributes' ? recordOptions : allOptions}
+							selectValue={inputQueryParams}
+							tabs={['Attributes', 'All']}
+							activeTab={tabMap.queryParams}
+							onSelectChange={(key) => updateState({ inputQueryParams: key ?? '' })}
+							setActiveTab={(key) => tabAction.set('queryParams', key)}
 						/>
-						<Select
-							styles={{ label: { fontWeight: 'normal' } }}
-							label={__('Extend headers', 'inseri-core')}
-							clearable
-							data={recordOptions}
-							value={inputHeadersParams}
-							onChange={(key) => updateState({ inputHeadersParams: key ?? '' })}
+						<SourceSelect
+							styles={customSelectStyle}
+							label={__('Extend query params', 'inseri-core')}
+							data={tabMap.headersParams === 'Attributes' ? recordOptions : allOptions}
+							selectValue={inputHeadersParams}
+							tabs={['Attributes', 'All']}
+							activeTab={tabMap.headersParams}
+							onSelectChange={(key) => updateState({ inputHeadersParams: key ?? '' })}
+							setActiveTab={(key) => tabAction.set('headersParams', key)}
 						/>
-						<Select
-							styles={{ label: { fontWeight: 'normal' } }}
+						<SourceSelect
+							styles={customSelectStyle}
 							label={__('Override body', 'inseri-core')}
-							clearable
-							data={bodyOptions}
-							value={inputBody}
-							onChange={(key) => updateState({ inputBody: key ?? '' })}
+							data={tabMap.body === 'Text' ? bodyOptions : allOptions}
+							selectValue={inputBody}
+							tabs={['Text', 'All']}
+							activeTab={tabMap.body}
+							onSelectChange={(key) => updateState({ inputBody: key ?? '' })}
+							setActiveTab={(key) => tabAction.set('body', key)}
 						/>
 					</Stack>
 				</Group>
