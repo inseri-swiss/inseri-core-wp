@@ -19,7 +19,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const [isWizardMode, setWizardMode] = useState(!inputKey)
 	const isValueSet = !!inputKey
 
-	const [activeTab, setActiveTab] = useState<string | null>('All')
+	const [activeTab, setActiveTab] = useState<string | null>('Valid-Config')
 	const sources = useDiscover({ jsonSchemas: activeTab === 'Valid-Config' ? [objectSchema, stringSchema] : undefined })
 
 	useEffect(() => {
@@ -65,7 +65,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						label={__('Provide options by selecting a block source', 'inseri-core')}
 						data={sources}
 						selectValue={inputKey}
-						tabs={['All', 'Valid Config']}
+						tabs={['Valid Config', 'All']}
 						activeTab={activeTab}
 						onSelectChange={(key) => {
 							setAttributes({ inputKey: key ?? '' })

@@ -43,8 +43,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const isValueSet = !!inputData
 	const { updateState } = actions
 
-	const [recordTab, setRecordTab] = useState<string | null>('All')
-	const [configTab, setConfigTab] = useState<string | null>('All')
+	const [recordTab, setRecordTab] = useState<string | null>('Valid-Config')
+	const [configTab, setConfigTab] = useState<string | null>('Valid-Config')
 
 	const [hasRowVirtualChanged, setRowVirtualChanged] = useState(false)
 	const recordOptions = useDiscover({ contentTypeFilter: recordTab === 'Valid-Config' ? 'application/json' : undefined })
@@ -159,7 +159,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						label={__('Choose table records', 'inseri-core')}
 						data={recordOptions}
 						selectValue={inputData}
-						tabs={['All', 'Valid Config']}
+						tabs={['Valid Config', 'All']}
 						activeTab={recordTab}
 						onSelectChange={(key) => updateState({ inputData: key ?? '' })}
 						setActiveTab={setRecordTab}
@@ -169,7 +169,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						label={__('Choose column config', 'inseri-core')}
 						data={configOptions}
 						selectValue={inputColumns}
-						tabs={['All', 'Valid Config']}
+						tabs={['Valid Config', 'All']}
 						activeTab={configTab}
 						onSelectChange={(key) => updateState({ inputColumns: key ?? '' })}
 						setActiveTab={setConfigTab}

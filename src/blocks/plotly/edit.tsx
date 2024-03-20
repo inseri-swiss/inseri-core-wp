@@ -34,7 +34,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 		}
 	}, [isSelected])
 
-	const [tabMap, tabAction] = useMap<Record<string, string | null>>({ inputFull: 'All', inputData: 'All', inputLayout: 'All', inputConfig: 'All' })
+	const [tabMap, tabAction] = useMap<Record<string, string | null>>({ inputFull: 'JSON', inputData: 'JSON', inputLayout: 'JSON', inputConfig: 'JSON' })
 	const sources = useDiscover({})
 	const jsonSources = sources.filter((s) => s.contentType.includes('json'))
 
@@ -146,7 +146,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						label={__('Provide full JSON description', 'inseri-core')}
 						data={tabMap.inputFull === 'JSON' ? jsonSources : sources}
 						selectValue={inputFull}
-						tabs={['All', 'JSON']}
+						tabs={['JSON', 'All']}
 						activeTab={tabMap.inputFull}
 						onSelectChange={(key) => updateState({ inputFull: key ?? '' })}
 						setActiveTab={(val) => tabAction.set('inputFull', val)}
@@ -160,7 +160,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 								<SourceSelect
 									data={tabMap.inputData === 'JSON' ? jsonSources : sources}
 									selectValue={inputData}
-									tabs={['All', 'JSON']}
+									tabs={['JSON', 'All']}
 									activeTab={tabMap.inputData}
 									onSelectChange={(key) => updateState({ inputData: key ?? '' })}
 									setActiveTab={(val) => tabAction.set('inputData', val)}
@@ -173,7 +173,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 								<SourceSelect
 									data={tabMap.inputLayout === 'JSON' ? jsonSources : sources}
 									selectValue={inputLayout}
-									tabs={['All', 'JSON']}
+									tabs={['JSON', 'All']}
 									activeTab={tabMap.inputLayout}
 									onSelectChange={(key) => updateState({ inputLayout: key ?? '' })}
 									setActiveTab={(val) => tabAction.set('inputLayout', val)}
@@ -186,7 +186,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 								<SourceSelect
 									data={tabMap.inputConfig === 'JSON' ? jsonSources : sources}
 									selectValue={inputConfig}
-									tabs={['All', 'JSON']}
+									tabs={['JSON', 'All']}
 									activeTab={tabMap.inputConfig}
 									onSelectChange={(key) => updateState({ inputConfig: key ?? '' })}
 									setActiveTab={(val) => tabAction.set('inputConfig', val)}

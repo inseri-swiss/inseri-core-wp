@@ -29,8 +29,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const isValueSet = !!inputKey
 	const { updateState } = actions
 
-	const [activeTab, setActiveTab] = useState<string | null>('All')
-	const sources = useDiscover({ jsonSchemas: activeTab === 'Valid-URL' ? [urlSchema] : undefined })
+	const [activeTab, setActiveTab] = useState<string | null>('URL')
+	const sources = useDiscover({ jsonSchemas: activeTab === 'URL' ? [urlSchema] : undefined })
 
 	useEffect(() => {
 		if (isValueSet && !isSelected && isWizardMode) {
@@ -125,7 +125,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						label={__('Display IIIF content by selecting a block source', 'inseri-core')}
 						data={sources}
 						selectValue={inputKey}
-						tabs={['All', 'Valid URL']}
+						tabs={['URL', 'All']}
 						activeTab={activeTab}
 						onSelectChange={(key) => updateState({ inputKey: key ?? '', isWizardMode: !key })}
 						setActiveTab={setActiveTab}
