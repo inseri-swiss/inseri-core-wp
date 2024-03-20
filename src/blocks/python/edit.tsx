@@ -23,7 +23,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 	const isValueSet = mode === 'editor' || (!!mode && !!inputCode)
 
-	const [activeTab, setActiveTab] = useState<string | null>('All')
+	const [activeTab, setActiveTab] = useState<string | null>('Python')
 	const sources = useDiscover({ contentTypeFilter: activeTab === 'Python' ? 'python' : undefined })
 
 	useEffect(() => {
@@ -162,7 +162,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 								label={__('Display code by selecting a block source', 'inseri-core')}
 								data={sources}
 								selectValue={inputCode}
-								tabs={['All', 'Python']}
+								tabs={['Python', 'All']}
 								activeTab={activeTab}
 								onSelectChange={(key) => updateState({ inputCode: key ?? '', isWizardMode: !key, mode: 'viewer' })}
 								setActiveTab={setActiveTab}

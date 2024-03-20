@@ -19,7 +19,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const isValueSet = !!inputKey
 	const { updateState } = actions
 
-	const [activeTab, setActiveTab] = useState<string | null>('All')
+	const [activeTab, setActiveTab] = useState<string | null>('HTML')
 	const sources = useDiscover({ contentTypeFilter: activeTab === 'HTML' ? 'html' : undefined })
 
 	useEffect(() => {
@@ -73,7 +73,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						label={__('Render HTML by selecting a block source', 'inseri-core')}
 						data={sources}
 						selectValue={inputKey}
-						tabs={['All', 'HTML']}
+						tabs={['HTML', 'All']}
 						activeTab={activeTab}
 						onSelectChange={(key) => updateState({ inputKey: key ?? '', isWizardMode: !key })}
 						setActiveTab={setActiveTab}

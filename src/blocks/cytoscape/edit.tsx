@@ -35,9 +35,9 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const isValueSet = !!inputKey
 	const { updateState } = actions
 
-	const [elementTab, setElementTab] = useState<string | null>('All')
-	const [styleTab, setStyleTab] = useState<string | null>('All')
-	const [layoutTab, setLayoutTab] = useState<string | null>('All')
+	const [elementTab, setElementTab] = useState<string | null>('Valid-Config')
+	const [styleTab, setStyleTab] = useState<string | null>('Valid-Config')
+	const [layoutTab, setLayoutTab] = useState<string | null>('Valid-Config')
 
 	const elementSources = useDiscover({ jsonSchemas: elementTab === 'Valid-Config' ? [flatElementSchema, groupedElementSchema] : undefined })
 	const styleSources = useDiscover({ jsonSchemas: styleTab === 'Valid-Config' ? [styleSchema] : undefined })
@@ -112,7 +112,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						data={elementSources}
 						selectValue={inputKey}
 						activeTab={elementTab}
-						tabs={['All', 'Valid Config']}
+						tabs={['Valid Config', 'All']}
 						onSelectChange={(key) => updateState({ inputKey: key ?? '' })}
 						setActiveTab={setElementTab}
 						withAsterisk
@@ -126,7 +126,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 									data={styleSources}
 									selectValue={styleKey}
 									activeTab={styleTab}
-									tabs={['All', 'Valid Config']}
+									tabs={['Valid Config', 'All']}
 									onSelectChange={(key) => updateState({ styleKey: key ?? '' })}
 									setActiveTab={setStyleTab}
 								/>
@@ -139,7 +139,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 									data={layoutSources}
 									selectValue={layoutKey}
 									activeTab={layoutTab}
-									tabs={['All', 'Valid Config']}
+									tabs={['Valid Config', 'All']}
 									onSelectChange={(key) => updateState({ layoutKey: key ?? '' })}
 									setActiveTab={setLayoutTab}
 								/>
