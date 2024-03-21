@@ -48,10 +48,10 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 		}
 	}, [isSelected])
 
-	const [activeTab, setActiveTab] = useState<string | null>('All-Images')
+	const [activeTab, setActiveTab] = useState<string | null>('URL-and-Image')
 	const sources = useDiscover({
-		jsonSchemas: activeTab === 'All-Images' || activeTab === 'Image-URL' ? [urlSchema] : undefined,
-		contentTypeFilter: activeTab === 'All-Images' || activeTab === 'Image-Resource' ? 'image/' : undefined,
+		jsonSchemas: activeTab === 'URL-and-Image' || activeTab === 'URL' ? [urlSchema] : undefined,
+		contentTypeFilter: activeTab === 'URL-and-Image' || activeTab === 'Image' ? 'image/' : undefined,
 	})
 
 	const resizerHeight = height ?? imageRef.current?.height ?? 'auto'
@@ -136,7 +136,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						label={__('Display image by selecting a block source', 'inseri-core')}
 						data={sources}
 						selectValue={inputKey}
-						tabs={['All Images', 'Image URL', 'Image Resource', 'All']}
+						tabs={['URL and Image', 'URL', 'Image', 'All']}
 						activeTab={activeTab}
 						onSelectChange={(key) => updateState({ inputKey: key ?? '', isWizardMode: !key })}
 						setActiveTab={setActiveTab}

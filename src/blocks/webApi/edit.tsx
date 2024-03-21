@@ -206,7 +206,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						/>
 						<SourceSelect
 							styles={customSelectStyle}
-							label={__('Extend query params', 'inseri-core')}
+							label={__('Extend headers', 'inseri-core')}
 							data={tabMap.headersParams === 'Attributes' ? recordOptions : allOptions}
 							selectValue={inputHeadersParams}
 							tabs={['Attributes', 'All']}

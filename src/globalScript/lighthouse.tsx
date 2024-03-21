@@ -152,10 +152,6 @@ export interface DiscoveredItem {
 	blockType: string
 	blockTitle: string
 	icon: React.ReactNode
-
-	//TODO remove
-	description: string
-	key: string
 }
 
 function flattenToRawItem(root: Root): RawValueItem[] {
@@ -184,9 +180,6 @@ function mapToDiscoveredItem(rawItems: RawValueItem[]): DiscoveredItem[] {
 			blockName,
 			contentType,
 			blockType,
-			// TODO remove
-			description,
-			key,
 		}))
 		.map((item) => {
 			if (item.blockType === 'inseri-core/root') {
