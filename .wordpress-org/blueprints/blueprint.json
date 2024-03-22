@@ -1,0 +1,32 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"preferredVersions": { "php": "8.2", "wp": "6.4" },
+	"steps": [
+		{ "step": "login", "username": "admin", "password": "password" },
+		{
+			"step": "runPHP",
+			"code": "<?php include 'wordpress/wp-load.php'; wp_delete_post(1,true); ?>"
+		},
+		{
+			"step": "installPlugin",
+			"pluginZipFile": {
+				"resource": "wordpress.org/plugins",
+				"slug": "inseri-core"
+			}
+		},
+		{
+			"step": "installTheme",
+			"themeZipFile": {
+				"resource": "wordpress.org/themes",
+				"slug": "twentytwentythree"
+			}
+		},
+		{
+			"step": "importFile",
+			"file": {
+				"resource": "url",
+				"url": "https://raw.githubusercontent.com/inseri-swiss/inseri-playground/main/inseriswiss.WordPress.xml"
+			}
+		}
+	]
+}
