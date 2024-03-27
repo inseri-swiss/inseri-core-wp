@@ -40,7 +40,12 @@ require_once plugin_dir_path(__FILE__) . 'includes/utils.php';
 add_action('init', function () {
 	global $wp_scripts;
 
-	$handle_path_pairs = [['inseri-core', 'inseri-core'], ['inseri-core-editor', 'inseri-core-editor'], ['inseri-core-python-worker', 'blocks/python/worker']];
+	$handle_path_pairs = [
+		['inseri-core', 'inseri-core'],
+		['inseri-core-editor', 'inseri-core-editor'],
+		['inseri-core-python-worker', 'blocks/python/worker'],
+		['inseri-core-javascript-worker', 'blocks/javascript/worker'],
+	];
 	foreach ($handle_path_pairs as [$handle, $path]) {
 		$asset_file = include plugin_dir_path(__FILE__) . "build/{$path}.asset.php";
 		wp_register_script($handle, plugins_url("build/{$path}.js", __FILE__), $asset_file['dependencies'], $asset_file['version']);
@@ -49,7 +54,8 @@ add_action('init', function () {
 	wp_localize_script('inseri-core', 'inseriApiSettings', [
 		'root' => esc_url_raw(rest_url()),
 		'nonce' => wp_create_nonce('wp_rest'),
-		'worker' => $wp_scripts->registered['inseri-core-python-worker']->src,
+		'pyWorker' => $wp_scripts->registered['inseri-core-python-worker']->src,
+		'jsWorker' => $wp_scripts->registered['inseri-core-javascript-worker']->src,
 	]);
 });
 

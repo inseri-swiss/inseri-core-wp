@@ -40,7 +40,7 @@ export interface GlobalState extends Attributes {
 }
 
 const createWorker = (set: (nextStateOrUpdater: (state: Draft<GlobalState>) => void) => void) => {
-	const worker = new Worker(new URL(inseriApiSettings.pyWorker))
+	const worker = new Worker(new URL(inseriApiSettings.jsWorker))
 
 	worker.addEventListener('message', ({ data }: MessageEvent<Action>) => {
 		set((state) => {
