@@ -4,7 +4,8 @@ let inputs: Record<string, any> = {}
 let outputs: string[] = []
 const stdBuffer: string[] = []
 
-let areInputsInitiated = false
+watchConsole()
+postMessage({ type: 'STATUS', payload: 'ready' })
 
 onmessage = ({ data }: MessageEvent<Action>) => {
 	if (data.type === 'RUN_CODE') {
@@ -13,12 +14,6 @@ onmessage = ({ data }: MessageEvent<Action>) => {
 
 	if (data.type === 'SET_INPUTS') {
 		inputs = data.payload
-
-		if (!areInputsInitiated) {
-			areInputsInitiated = true
-
-			postMessage({ type: 'STATUS', payload: 'ready' })
-		}
 	}
 
 	if (data.type === 'SET_OUTPUTS') {
@@ -31,10 +26,10 @@ async function runCode(code: string) {
 		stdBuffer.splice(0, stdBuffer.length)
 		postMessage({ type: 'STATUS', payload: 'in-progress' })
 
-		// TODO run code
-		console.log(code)
+		const initVariables = Object.keys(inputs).reduce((acc, key) => acc + `var ${key} = inputs['${key}'] ;\n`, '')
+		const settingResults = 'return { ' + outputs.reduce((acc, key) => acc + ` ${key},`, '') + ' }'
 
-		const results = {}
+		const results = Function('inputs', initVariables + code + '\n' + settingResults)(inputs)
 
 		postMessage({ type: 'SET_RESULTS', payload: results })
 	} catch (error) {
@@ -44,4 +39,23 @@ async function runCode(code: string) {
 		postMessage({ type: 'SET_STD_STREAM', payload: stdBuffer.filter(Boolean).join('\n') })
 		postMessage({ type: 'STATUS', payload: 'ready' })
 	}
+}
+
+function watchConsole() {
+	const _backupConsole: any = { ...console }
+	const levels = [
+		'error',
+		'info',
+		'log',
+		'trace',
+		'warn',
+	]
+	levels.forEach((lvl) => {
+		//@ts-ignore
+		//eslint-disable-next-line
+		console[lvl] = function (...args) {
+			stdBuffer.push(...args)
+			_backupConsole[lvl](...args)
+		}
+	})
 }
