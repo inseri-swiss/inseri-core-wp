@@ -90,7 +90,7 @@ export function ExtendedView() {
 			}}
 			title={
 				<Text fz="md" fw="bold">
-					{`Python Code${blockName ? ': ' + blockName : ''}`}
+					{`JavaScript Code${blockName ? ': ' + blockName : ''}`}
 				</Text>
 			}
 		>
@@ -104,7 +104,7 @@ export function ExtendedView() {
 								</Group>
 								<CodeEditor
 									withBorder={false}
-									type={'python'}
+									type={'javascript'}
 									value={code}
 									onChange={(val) => {
 										if (mode === 'editor') {
