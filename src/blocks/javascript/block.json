@@ -1,0 +1,68 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "inseri-core/javascript",
+	"title": "JavaScript Code",
+	"category": "inseri",
+	"description": "Let guests run JavaScript code with data from other blocks and the result is made available to other blocks.",
+	"attributes": {
+		"blockId": {
+			"type": "string",
+			"default": ""
+		},
+		"inputCode": {
+			"type": "string",
+			"default": ""
+		},
+		"inputs": {
+			"type": "object",
+			"default": {}
+		},
+		"outputs": {
+			"type": "array",
+			"default": []
+		},
+		"blockName": {
+			"type": "string",
+			"default": ""
+		},
+		"mode": {
+			"type": "string",
+			"default": ""
+		},
+		"height": {
+			"type": "integer",
+			"default": 150
+		},
+		"editable": {
+			"type": "boolean",
+			"default": false
+		},
+		"content": {
+			"type": "string",
+			"default": ""
+		},
+		"label": {
+			"type": "string",
+			"default": ""
+		},
+		"isVisible": {
+			"type": "boolean",
+			"default": true
+		},
+		"autoTrigger": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": true,
+		"alignWide": true
+	},
+	"textdomain": "inseri-core",
+	"editorScript": ["file:./index.js", "inseri-core-editor"],
+	"viewScript": ["file:./hydration.js"],
+	"style": ["file:./index.css", "file:./style-index.css"],
+	"script": "inseri-core"
+}

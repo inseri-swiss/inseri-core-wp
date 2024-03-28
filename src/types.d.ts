@@ -11,7 +11,8 @@ declare module '*.svg' {
 declare const inseriApiSettings: {
 	root: string
 	nonce: string
-	worker: string
+	pyWorker: string
+	jsWorker: string
 }
 
 type RecursivePartial<T> = {
