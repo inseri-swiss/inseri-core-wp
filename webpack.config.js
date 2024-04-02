@@ -11,7 +11,7 @@ const configOverwrite = isProduction
 				noUnusedLocals: false,
 				noUnusedParameters: false,
 			},
-	  }
+		}
 
 const tsChecker = new ForkTsCheckerWebpackPlugin({
 	typescript: {
