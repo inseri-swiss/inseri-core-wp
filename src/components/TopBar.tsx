@@ -1,16 +1,15 @@
 import { useDisclosure } from '@mantine/hooks'
 import { IconEye, IconPencil, IconPlayerPlay, IconX } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
-import { Button, Group, Kbd, Loader, Popover, Text, Tooltip, useGlobalState } from '../../components'
-import { GlobalState } from './state'
+import { Button, CommonCodeState, Group, Kbd, Loader, Popover, Text, Tooltip, useGlobalState } from '../components'
 
 interface Props {
 	code: string
 	showPopover?: boolean
 }
 
-export function TopBar({ code, showPopover }: Props) {
-	const { label, actions, workerStatus, hasInputError, inputerr, outputs, editable, mode } = useGlobalState((state: GlobalState) => state)
+export function TopBar<T extends CommonCodeState>({ code, showPopover }: Props) {
+	const { label, actions, workerStatus, hasInputError, inputerr, outputs, editable, mode } = useGlobalState((state: T) => state)
 	const { runCode, terminate } = actions
 	const [isPopoverOpen, { close: closePopover, open: openPopover }] = useDisclosure(false)
 

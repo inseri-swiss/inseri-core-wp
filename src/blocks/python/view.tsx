@@ -1,9 +1,7 @@
 import { Nucleus, usePublish, useWatch } from '@inseri/lighthouse'
 import { usePrevious } from '@mantine/hooks'
 import { useCallback, useEffect } from '@wordpress/element'
-import { Box, CodeEditor, Group, useGlobalState } from '../../components'
-import { TopBar } from './TopBar'
-import { Action } from './WorkerActions'
+import { Action, Box, CodeEditor, Group, TopBar, useGlobalState } from '../../components'
 import { Attributes } from './index'
 import { GlobalState } from './state'
 
@@ -25,7 +23,7 @@ export default function View(props: ViewProps) {
 		inputRecord,
 		content,
 		inputs,
-		pyWorker,
+		worker,
 		outputs,
 		isVisible,
 		autoTrigger,
@@ -50,14 +48,14 @@ export default function View(props: ViewProps) {
 
 	useEffect(() => {
 		if (areInputsReady) {
-			pyWorker.postMessage({ type: 'SET_INPUTS', payload: inputRecord })
+			worker.postMessage({ type: 'SET_INPUTS', payload: inputRecord })
 		}
 	}, [inputRevision])
 
 	const outputKeys = outputs.map((o) => o[0])
 
 	useEffect(() => {
-		pyWorker.postMessage({ type: 'SET_OUTPUTS', payload: outputKeys })
+		worker.postMessage({ type: 'SET_OUTPUTS', payload: outputKeys })
 	}, [outputKeys.join()])
 
 	const pyDispatcher = useCallback(
@@ -79,8 +77,8 @@ export default function View(props: ViewProps) {
 	)
 
 	useEffect(() => {
-		pyWorker.addEventListener('message', pyDispatcher)
-		return () => pyWorker.removeEventListener('message', pyDispatcher)
+		worker.addEventListener('message', pyDispatcher)
+		return () => worker.removeEventListener('message', pyDispatcher)
 	}, [pyDispatcher])
 
 	const watchedCode = useWatch(inputCode, {
