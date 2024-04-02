@@ -53,9 +53,7 @@ export const SourceSelectItem = forwardRef<HTMLDivElement, ItemProps>((props: It
 							{contentTypeDescription}
 						</Text>
 					</Group>
-					<Text size="sm">
-						{blockTitle}: {blockName}
-					</Text>
+					<Text size="sm">{blockTitle}</Text>
 				</div>
 			</Group>
 		</div>
@@ -89,13 +87,12 @@ export function SourceSelect(props: Props) {
 			placeholder="Search for blocks, content type, ..."
 			classNames={{ wrapper: classes.inputWrapper, item: classes.item }}
 			filter={(value, item) => {
-				const { label = '', blockName = '', contentType = '', blockTitle = '' } = item
+				const { label = '', contentType = '', blockTitle = '' } = item
 				const contentTypeDescription = COMMON_CONTENT_TYPES.find((c) => c.value === contentType)?.label ?? contentType
 				const searchValue = value.trim()
 
 				return (
 					label.toLowerCase().includes(searchValue) ||
-					blockName.toLowerCase().includes(searchValue) ||
 					contentTypeDescription.toLowerCase().includes(searchValue) ||
 					blockTitle.toLowerCase().includes(searchValue)
 				)

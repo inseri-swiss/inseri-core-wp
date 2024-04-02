@@ -176,7 +176,7 @@ function mapToDiscoveredItem(rawItems: RawValueItem[]): DiscoveredItem[] {
 	return rawItems
 		.map(({ key, blockName, description, contentType, blockType }) => ({
 			value: key,
-			label: description,
+			label: `${blockName} - ${description}`,
 			blockName,
 			contentType,
 			blockType,
