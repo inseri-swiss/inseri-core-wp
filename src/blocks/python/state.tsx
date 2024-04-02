@@ -1,43 +1,9 @@
 import type { Draft } from 'immer'
 import { immer } from 'zustand/middleware/immer'
+import { Action, CommonCodeState } from '../../components'
 import { Attributes } from './index'
-import { Action } from './WorkerActions'
 
-export interface GlobalState extends Attributes {
-	[i: string]: any
-
-	pyWorker: Worker
-	workerStatus: 'initial' | 'ready' | 'in-progress'
-	stdStream: string
-	inputerr: string
-	hasInputError: Record<string, boolean>
-	inputRecord: Record<string, any>
-	inputRevision: number
-
-	isModalOpen: boolean
-	isWizardMode: boolean
-	selectedMode: 'editor' | 'viewer'
-	wizardStep: number
-
-	newInputVarName: string
-	newOutputVarName: string
-
-	actions: {
-		updateState: (modifier: Partial<GlobalState>) => void
-		setInputValue: (name: string, val: any) => void
-		setInputEmpty: (name: string, isRemoved: boolean) => void
-		runCode: (code: string) => void
-		terminate: () => void
-
-		addNewInput: () => void
-		chooseInput: (variable: string, key: string) => void
-		removeInput: (variable: string) => void
-
-		addNewOutput: () => void
-		chooseContentType: (variable: string, contentType: string) => void
-		removeOutput: (variable: string) => void
-	}
-}
+export interface GlobalState extends Attributes, CommonCodeState {}
 
 const createWorker = (set: (nextStateOrUpdater: (state: Draft<GlobalState>) => void) => void) => {
 	const worker = new Worker(new URL(inseriApiSettings.pyWorker))
@@ -63,7 +29,7 @@ export const storeCreator = (initalState: Attributes) => {
 		return {
 			...initalState,
 
-			pyWorker: createWorker(set),
+			worker: createWorker(set),
 			workerStatus: 'initial',
 			stdStream: '',
 			inputerr: '',
@@ -113,15 +79,15 @@ export const storeCreator = (initalState: Attributes) => {
 						state.stdStream = ''
 					})
 
-					const { pyWorker } = get()
-					pyWorker.postMessage({ type: 'RUN_CODE', payload: code })
+					const { worker } = get()
+					worker.postMessage({ type: 'RUN_CODE', payload: code })
 				},
 
 				terminate: () => {
-					get().pyWorker.terminate()
+					get().worker.terminate()
 					set((state) => {
 						state.workerStatus = 'initial'
-						state.pyWorker = createWorker(set)
+						state.worker = createWorker(set)
 					})
 				},
 

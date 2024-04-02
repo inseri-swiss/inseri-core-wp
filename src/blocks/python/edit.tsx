@@ -6,9 +6,8 @@ import { PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarB
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Box, Button, Group, SetupEditorEnv, SourceSelect, StateProvider, Text, useGlobalState } from '../../components'
+import { Box, Button, ExtendedView, Group, SetupEditorEnv, SourceSelect, StateProvider, Text, useGlobalState } from '../../components'
 import { HidingWrapper } from '../../utils'
-import { ExtendedView } from './ExtendedView'
 import json from './block.json'
 import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
@@ -53,7 +52,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 
 	return (
 		<>
-			<ExtendedView />
+			<ExtendedView type="python" />
 			<BlockControls controls={[]}>
 				{isValueSet && (
 					<ToolbarGroup>

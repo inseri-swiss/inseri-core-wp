@@ -19,10 +19,46 @@ import {
 	TextInput,
 	createStyles,
 	useGlobalState,
-} from '../../components'
-import { COMMON_CONTENT_TYPES, Z_INDEX_ABOVE_ADMIN, isVariableValid } from '../../utils'
+} from './'
+import { COMMON_CONTENT_TYPES, Z_INDEX_ABOVE_ADMIN, isVariableValid } from '../utils'
 import { TopBar } from './TopBar'
-import { GlobalState } from './state'
+
+export interface CommonCodeState {
+	[i: string]: any
+	outputs: [string /* key */, string /* contentType */][]
+
+	worker: Worker
+	workerStatus: 'initial' | 'ready' | 'in-progress'
+	stdStream: string
+	inputerr: string
+	hasInputError: Record<string, boolean>
+	inputRecord: Record<string, any>
+	inputRevision: number
+
+	isModalOpen: boolean
+	isWizardMode: boolean
+	selectedMode: 'editor' | 'viewer'
+	wizardStep: number
+
+	newInputVarName: string
+	newOutputVarName: string
+
+	actions: {
+		updateState: (modifier: Partial<CommonCodeState>) => void
+		setInputValue: (name: string, val: any) => void
+		setInputEmpty: (name: string, isRemoved: boolean) => void
+		runCode: (code: string) => void
+		terminate: () => void
+
+		addNewInput: () => void
+		chooseInput: (variable: string, key: string) => void
+		removeInput: (variable: string) => void
+
+		addNewOutput: () => void
+		chooseContentType: (variable: string, contentType: string) => void
+		removeOutput: (variable: string) => void
+	}
+}
 
 const isReadyForCreate = (varName: string, keys: string[]): boolean => {
 	const nameIsNotUsed = !keys.includes(varName)
@@ -36,7 +72,7 @@ const useStyles = createStyles(() => ({
 	},
 }))
 
-export function ExtendedView() {
+export function ExtendedView<T extends CommonCodeState>({ type }: { type: 'python' | 'javascript' }) {
 	const {
 		blockName,
 		actions: stateActions,
@@ -49,7 +85,7 @@ export function ExtendedView() {
 		outputs,
 		inputCode,
 		mode,
-	} = useGlobalState((state: GlobalState) => state)
+	} = useGlobalState((state: T) => state)
 	const { updateState, runCode, addNewInput, chooseInput, removeInput, addNewOutput, chooseContentType, removeOutput } = stateActions
 	const [isEditorVisible, setEditorVisible] = useState(true)
 	const [isInputsVisible, setInputsVisible] = useState(true)
@@ -68,7 +104,7 @@ export function ExtendedView() {
 
 	const watchedCode = useWatch(inputCode, {
 		onNone: () => '',
-		onSome: ({ value, contentType }: Nucleus<any>) => (contentType.includes('python') ? value : ''),
+		onSome: ({ value, contentType }: Nucleus<any>) => (contentType.includes(type) ? value : ''),
 	})
 	const code = isViewerMode ? watchedCode : content
 
@@ -90,7 +126,7 @@ export function ExtendedView() {
 			}}
 			title={
 				<Text fz="md" fw="bold">
-					{`Python Code${blockName ? ': ' + blockName : ''}`}
+					{`${type === 'python' ? 'Python' : 'JavaScript'} Code${blockName ? ': ' + blockName : ''}`}
 				</Text>
 			}
 		>
@@ -104,7 +140,7 @@ export function ExtendedView() {
 								</Group>
 								<CodeEditor
 									withBorder={false}
-									type={'python'}
+									type={type}
 									value={code}
 									onChange={(val) => {
 										if (mode === 'editor') {

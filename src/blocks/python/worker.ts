@@ -1,5 +1,5 @@
 import { loadPyodide, PyodideInterface } from 'pyodide'
-import { Action } from './WorkerActions'
+import { Action } from '../../components'
 
 // version must match with npm package version
 const BINARY_URL = 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'

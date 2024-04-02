@@ -7,7 +7,7 @@ import { storeCreator } from './state'
 import View from './view'
 
 function initReactComponents() {
-	const items = document.querySelectorAll('.wp-block-inseri-core-python')
+	const items = document.querySelectorAll('.wp-block-inseri-core-javascript')
 	if (items) {
 		Array.from(items).forEach((item: any) => {
 			const attributes = JSON.parse(item.dataset.attributes)
