@@ -16,6 +16,7 @@ nav:
       - 'blocks/html.md'
       - 'blocks/iiifViewer.md'
       - 'blocks/image.md'
+      - 'blocks/javascript.md'
       - 'blocks/localFileImport.md'
       - 'blocks/mediaCollection.md'
       - 'blocks/plotly.md'
