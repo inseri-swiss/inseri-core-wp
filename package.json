@@ -35,7 +35,7 @@
 		"fork-ts-checker-webpack-plugin": "^9.0.2",
 		"prettier": "^3.2.5",
 		"prettier-plugin-multiline-arrays": "^3.0.4",
-		"typescript": "^5.4.3"
+		"typescript": "^5.2.2"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.11.4",

@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const webpack = require('webpack')
 const defaultConfig = require('@wordpress/scripts/config/webpack.config')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
