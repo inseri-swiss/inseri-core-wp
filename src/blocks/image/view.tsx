@@ -60,7 +60,7 @@ export default function View({ renderResizable, imageRef, isSelected }: ViewProp
 					 repeating-linear-gradient(45deg, #808080 25%, #ffffff 25%, #ffffff 75%, #808080 75%, #808080)`,
 				backgroundPosition: '0 0, 10px 10px',
 				backgroundSize: '20px 20px',
-		  }
+			}
 		: {}
 
 	let errorText = __('Failed to load', 'inser-core')

@@ -187,7 +187,7 @@ function mapToDiscoveredItem(rawItems: RawValueItem[]): DiscoveredItem[] {
 			}
 
 			const block = select('core/blocks').getBlockType(item.blockType)
-			return { ...item, blockTitle: block?.title, icon: block?.icon?.src }
+			return { ...item, blockTitle: block?.title ?? '', icon: block?.icon?.src }
 		})
 }
 
@@ -300,18 +300,21 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 
 	return useMemo(() => {
 		if (blockId?.trim() && blockStore[blockId]) {
-			const callbackMap = keys.reduce((acc, key) => {
-				const publish = (value: any, contentType: string) => {
-					onNext({ type: 'set-value', payload: { blockId, key, content: some({ contentType, value }) } })
-				}
-				const setEmpty = () => {
-					onNext({ type: 'set-value', payload: { blockId, key, content: none } })
-				}
+			const callbackMap = keys.reduce(
+				(acc, key) => {
+					const publish = (value: any, contentType: string) => {
+						onNext({ type: 'set-value', payload: { blockId, key, content: some({ contentType, value }) } })
+					}
+					const setEmpty = () => {
+						onNext({ type: 'set-value', payload: { blockId, key, content: none } })
+					}
 
-				acc[key] = [publish, setEmpty]
+					acc[key] = [publish, setEmpty]
 
-				return acc
-			}, {} as Record<string, Actions<any>>)
+					return acc
+				},
+				{} as Record<string, Actions<any>>
+			)
 
 			return callbackMap
 		}

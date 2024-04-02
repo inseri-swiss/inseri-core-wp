@@ -72,7 +72,7 @@ export default function View() {
 			? ({ row }) => ({
 					onClick: (_event) => publishRow(row.original, 'application/json'),
 					sx: { cursor: 'pointer' },
-			  })
+				})
 			: undefined,
 
 		mantineTableBodyCellProps: enableCellClick
@@ -83,7 +83,7 @@ export default function View() {
 						publishCell({ accessorKey, row: row.original, cell: cellContent }, 'application/json')
 					},
 					sx: { cursor: 'pointer' },
-			  })
+				})
 			: undefined,
 
 		enableEditing,
@@ -103,7 +103,7 @@ export default function View() {
 						const updatedData = data.map((val, idx) => (idx === cell.row.index ? updatedRecord : val))
 						setData(updatedData)
 					},
-			  })
+				})
 			: undefined,
 
 		state: {

@@ -258,7 +258,7 @@ function SideBar() {
 			onSome: (nucleus: { value: any[] }) =>
 				nucleus.value.map((item) => {
 					const block = select('core/blocks').getBlockType(item.blockType)
-					return { ...item, title: block.title, icon: block.icon.src }
+					return { ...item, title: block?.title ?? '', icon: block?.icon?.src }
 				}),
 		}) ?? []
 
