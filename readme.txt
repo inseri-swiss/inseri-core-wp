@@ -24,6 +24,7 @@ As a result, inseri core introduces scientific and interactive Gutenberg blocks 
 - **[HTML Code Block](https://docs.inseri.swiss/blocks/html/)**: It renders HTML code using the other block's data.
 - **[IIIF Viewer Block](https://docs.inseri.swiss/blocks/iiifViewer/)**: It showcases images with pan/zoom functionality, along with videos and audios consumed by an IIIF API.
 - **[Image Box Block](https://docs.inseri.swiss/blocks/image/)**: It displays an image utilizing the data of another block.
+- **[JavaScript Code Block](https://docs.inseri.swiss/blocks/javascript/)**: Guests can run JavaScript code with data from other blocks and the result of the execution is made available to other blocks.
 - **[Local File Import Block](https://docs.inseri.swiss/blocks/localFileImport/)**: It allows guests to provide their own data for blocks.
 - **[Media Collection Block](https://docs.inseri.swiss/blocks/mediaCollection/)**: A collection of media files is made available as data for other blocks.
 - **[Plotly Chart Block](https://docs.inseri.swiss/blocks/plotly/)**: It visualizes the data of another block using Plotly.
@@ -55,6 +56,12 @@ Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inser
 6. Render HTML code
 
 == Changelog ==
+### [0.3.5](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.3.5)
+- New: JavaScript Code block
+- Update: pyodide 0.25.1
+- Update: diverse dependencies
+- Update: Improved source selection
+
 ### [0.3.4](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.3.4)
 - Fix: Data Table block
 
