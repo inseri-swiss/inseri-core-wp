@@ -7,6 +7,8 @@ import { StateCreator } from 'zustand'
 import { Overlay } from './components'
 import { ParamItem } from './components/ParamsTable'
 
+export const generateQuerySelector = (name: string) => '.wp-block-' + name.replaceAll('/', '-')
+
 const htmlEscapesMap: Record<string, string> = {
 	'&': '&amp;',
 	'<': '&lt;',
