@@ -1,3 +1,4 @@
+const webpack = require('webpack')
 const defaultConfig = require('@wordpress/scripts/config/webpack.config')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const fs = require('fs')
@@ -54,6 +55,9 @@ module.exports = {
 	plugins: [
 		...defaultConfig.plugins,
 		tsChecker,
+		//https://iamakulov.com/notes/webpack-contextreplacementplugin/ explains why
+		//node_modules/pyodide/pyodide.mjs has dynamic imports
+		new webpack.ContextReplacementPlugin(/(q.pathToFileURL\(t\).href|t)/),
 	],
 	externals: [
 		{ '@inseri/lighthouse': 'window.inseri.lighthouse' },
