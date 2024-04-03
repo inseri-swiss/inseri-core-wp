@@ -25,7 +25,7 @@ jobs:
           npm run build
           npm run plugin-zip
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ready-zip
           path: inseri-core.zip
