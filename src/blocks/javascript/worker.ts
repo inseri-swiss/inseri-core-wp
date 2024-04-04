@@ -3,6 +3,7 @@ import { Action } from '../../components'
 let inputs: Record<string, any> = {}
 let outputs: string[] = []
 const stdBuffer: string[] = []
+const AsyncFunction = async function () {}.constructor
 
 watchConsole()
 postMessage({ type: 'STATUS', payload: 'ready' })
@@ -29,7 +30,7 @@ async function runCode(code: string) {
 		const initVariables = Object.keys(inputs).reduce((acc, key) => acc + `var ${key} = inputs['${key}'] ;\n`, '')
 		const settingResults = 'return { ' + outputs.reduce((acc, key) => acc + ` ${key},`, '') + ' }'
 
-		const results = Function('inputs', initVariables + code + '\n' + settingResults)(inputs)
+		const results = await AsyncFunction('inputs', initVariables + code + '\n' + settingResults)(inputs)
 
 		postMessage({ type: 'SET_RESULTS', payload: results })
 	} catch (error) {
