@@ -1,6 +1,6 @@
 === Scientific and Interactive Blocks - inseri core ===
 Contributors: inseriswiss
-Tags: Gutenberg blocks, WordPress blocks, gutenberg, blocks, inseri
+Tags: Gutenberg blocks, WordPress blocks, gutenberg, blocks, inseri, interactive, data, table, download, dropdown, HTML, image, JS, JavaScript, import, Plotly, Python, slider, editor, text, text editor, viewer, Web API, Zenodo
 Requires at least: 5.6
 Tested up to: 6.5
 Requires PHP: 5.6
