@@ -8,6 +8,14 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
+    ignore:
+      - dependency-name: '*'
+        update-types: ['version-update:semver-major']
+
+        # special cases
+      - dependency-name: '@samvera/clover-iiif'
+        update-types: ['version-update:semver-major', 'version-update:semver-minor']
+
     groups:
       production-dependencies:
         dependency-type: 'production'
