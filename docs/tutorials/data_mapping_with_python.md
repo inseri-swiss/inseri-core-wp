@@ -3,7 +3,7 @@
 This tutorial will give a simple example how you can split complex data coming from a block (e.g. the Web API block) into simpler structures, using the Python Code block.
 For this we have to join a couple of inseri blocks.
 
-If you have no experience with inseri, please start with our [Hello World](./hello-world.md).
+If you have no experience with inseri, please start with our [Hello World](./hello_world.md).
 
 For the final experience, please [click here](https://inseri.swiss/2023/03/data-mapping-with-python/){:target="\_blank"}.
 
@@ -14,14 +14,14 @@ In this example, we call the post "Data Mapping with Python". You can type this 
 
 ## Step 2: Add the Web API block
 
-1. Add the "Web API" block (like in the Step 2.1. from [Hello World](./hello-world.md)).
+1. Add the "Web API" block (like in the Step 2.1. from [Hello World](./hello_world.md)).
 2. Enter the following URL in the corresponding field.
    ```
    https://raw.githubusercontent.com/inseri-swiss/inseri-core-wp/main/docs/assets/book_metadata.json
    ```
 3. Choose "JSON" as Content Type because the Web API will fetch a JSON file.
 4. Click "Finish".
-5. Give the web API block the simple name "webApi" (like in Step 2.3. from [Hello World](./hello-world.md)).
+5. Give the web API block the simple name "webApi" (like in Step 2.3. from [Hello World](./hello_world.md)).
 6. Disable Call automatically (the setting is the below "BLOCK NAME"). In order to fetch the data, you have to click on the button "Call Web API".
 7. For testing the request you should click on "Configure the settings" (in the sidebar above the "BLOCK NAME" above), and click on "TRY REQUEST" (see the picture below).
 8. Close the view.

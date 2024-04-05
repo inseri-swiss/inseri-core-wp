@@ -53,6 +53,11 @@ The script will run automatically on load and any input change. If set to false,
 Python Code block can be set to publicly editable. This may be interesting if you want to show calculations depending on certain parameters.
 After a page reload the changes in the code will be lost.
 
+## How To
+
+- [Python Packages](../how-to/python_packages.md)
+- [Visualizations](../how-to/visualizations.md)
+
 ## Examples
 
 [Python Code Block using Pyodide](https://inseri.swiss/2023/02/python-code-block-using-pyodide/) on inseri.swiss.
