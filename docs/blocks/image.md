@@ -8,7 +8,7 @@ No output.
 
 ## Input
 
-It expects an image URL as input through a channel in the post (e.g. from a text editor or a Python block).
+It expects an image URL or an image object.
 
 ## Parameters:
 
