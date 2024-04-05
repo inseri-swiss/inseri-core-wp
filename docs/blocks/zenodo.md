@@ -2,6 +2,8 @@
 
 Fetch data from Zenodo by a DOI and re-use data in your inseri post.
 
+When a top-level DOI is used as input (called also Concept DOI), it is resolved to the latest version DOI which is kept constant and not dynamically updated.
+
 ## Output
 
 The selected file.
