@@ -3,10 +3,10 @@ site_url: https://docs.inseri.swiss/
 repo_url: https://github.com/inseri-swiss/inseri-core-wp
 nav:
   - 'Home': 'index.md'
-  - 'getting-started.md'
+  - 'getting_started.md'
   - 'Tutorials':
-      - 'tutorials/hello-world.md'
-      - 'tutorials/data-mapping-with-python.md'
+      - 'tutorials/hello_world.md'
+      - 'tutorials/data_mapping_with_python.md'
   - 'Blocks':
       - 'blocks/overview.md'
       - 'blocks/cytoscape.md'
@@ -28,14 +28,14 @@ nav:
       - 'blocks/zenodo.md'
   - 'Features':
       - 'features/sidebar.md'
-      - 'features/hideInvisibleBlocks.md'
-      - 'features/dataFlow.md'
-      - 'features/blockDuplication.md'
+      - 'features/hide_invisible_blocks.md'
+      - 'features/data_flow.md'
+      - 'features/block_duplication.md'
   - 'How to':
       - 'how-to/playground.md'
       - 'how-to/visualizations.md'
-      - 'how-to/workWithFiles.md'
-      - 'how-to/packages.md'
+      - 'how-to/work_with_files.md'
+      - 'how-to/python_packages.md'
   - 'inseri.swiss ↗': https://inseri.swiss/
 
 theme:
@@ -78,3 +78,14 @@ markdown_extensions:
 plugins:
   - glightbox
   - search
+  - redirects:
+      redirect_maps:
+        'how-to/packages.md': 'how-to/python_packages.md'
+        'how-to/workWithFiles.md': 'how-to/work_with_files.md'
+        'features/dataflow.md': 'features/data_flow.md'
+        'features/dataFlow.md': 'features/data_flow.md'
+        'features/hideInvisibleBlocks.md': 'features/hide_invisible_blocks.md'
+        'features/blockDuplication.md': 'features/block_duplication.md'
+        'tutorials/data-mapping-with-python.md': 'tutorials/data_mapping_with_python.md'
+        'tutorials/hello-world.md': 'tutorials/hello_world.md'
+        'getting-started.md': 'getting_started.md'

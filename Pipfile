@@ -8,6 +8,7 @@ mkdocs = "*"
 mkdocs-material = "*"
 mkdocs-graphviz = "*"
 mkdocs-glightbox = "*"
+mkdocs-redirects = "*"
 
 [dev-packages]
 

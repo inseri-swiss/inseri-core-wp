@@ -28,4 +28,4 @@ Please follow the documentation about [Adding a new block](https://wordpress.org
 
 ## Where to start
 
-We recommend you to start with our [Hello World](./tutorials/hello-world.md).
+We recommend you to start with our [Hello World](./tutorials/hello_world.md).

@@ -77,7 +77,7 @@ Add a new post with the title "Image Selection", as presented in the figure belo
 
 ## Step 6: Data Flow
 
-The [Data Flow](../features/dataFlow.md){:target="\_blank"} provides an overview of the inseri blocks and the dependency between them. The data flow corresponding to this tutorial should be similar to the one below.
+The [Data Flow](../features/data_flow.md){:target="\_blank"} provides an overview of the inseri blocks and the dependency between them. The data flow corresponding to this tutorial should be similar to the one below.
 
 <figure markdown>
 ![Data Flow](../assets/data_flow.png){width="700"}

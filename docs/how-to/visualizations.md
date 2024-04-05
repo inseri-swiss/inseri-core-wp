@@ -4,7 +4,7 @@
 
 If you already have your Plotly chart in a JSON format, you can easily add it using inseri core plugin:
 
-1. add a [Text Editor Block](../blocks/textEditor.md){:target="\_blank"} (JSON format) and paste your JSON. Use a sensible block name and if you want to hide it disable "Show block". If you are new to inseri consider [Hello World tutorial](../tutorials/hello-world.md){:target="\_blank"}.
+1. add a [Text Editor Block](../blocks/textEditor.md){:target="\_blank"} (JSON format) and paste your JSON. Use a sensible block name and if you want to hide it disable "Show block". If you are new to inseri consider [Hello World tutorial](../tutorials/hello_world.md){:target="\_blank"}.
 
 2. add a [Plotly Chart Block](../blocks/plotly.md) and pick the previous block as input for the full JSON description and click Display. You are done.
 
