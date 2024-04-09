@@ -18,11 +18,11 @@ Moreover in the extended view below it is possible to define input variables.
 
 ## Extended view
 
-Imagine we have the following Python script:
+Imagine we have the following JavaScript script:
 
-```python
-sum = a + b
-product = a * b
+```javascript
+let sum = a + b
+let product = a * b
 ```
 
 You can see that `a` and `b` are not defined in this script.
