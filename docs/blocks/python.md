@@ -1,6 +1,6 @@
 # Python Code
 
-The Python Code block can be used with its own code or code loaded from another source as a text editor with the type `Python`.
+It allows to run Python code in the browser.
 
 This block allows multiple inputs and outputs. This makes it interesting to tie the behaviors of different blocks together.
 
