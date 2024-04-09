@@ -56,6 +56,9 @@ Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inser
 6. Render HTML code
 
 == Changelog ==
+### [0.3.6](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.3.6)
+- Update: JavaScript Code block supports async
+
 ### [0.3.5](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.3.5)
 - New: JavaScript Code block
 - Update: pyodide 0.25.1
