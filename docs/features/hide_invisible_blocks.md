@@ -4,6 +4,7 @@ This feature is available in the [inseri Sidebar](../features/sidebar.md){:targe
 
 inseri core provides the following blocks that can be hidden:
 
+- [JavaScript Code block](../blocks/javascript.md){:target="\_blank"}
 - [Media Collection block](../blocks/mediaCollection.md){:target="\_blank"} when only one file is desired
 - [Python Code block](../blocks/python.md){:target="\_blank"}
 - [Text Editor block](../blocks/textEditor.md){:target="\_blank"}
