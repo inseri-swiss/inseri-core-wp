@@ -1,6 +1,6 @@
 # JavaScript Code
 
-It allows to run JavaScript code in the browser.
+It allows to run JavaScript code in a separate  web worker. It is therefore ideal for performing heavy computations in the background.
 
 This block allows multiple inputs and outputs. This makes it interesting to tie the behaviors of different blocks together.
 
