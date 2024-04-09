@@ -15,7 +15,8 @@
 		"packages-update": "wp-scripts packages-update",
 		"plugin-zip": "wp-scripts plugin-zip",
 		"start": "wp-scripts start",
-		"start:hot": "wp-scripts start --hot"
+		"start:hot": "wp-scripts start --hot",
+		"bump": "node bump-version"
 	},
 	"devDependencies": {
 		"@prettier/plugin-php": "^0.22.2",
