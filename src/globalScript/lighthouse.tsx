@@ -151,7 +151,7 @@ export interface DiscoveredItem {
 	contentType: string
 	blockType: string
 	blockTitle: string
-	icon: React.ReactNode
+	icon?: React.ReactNode
 }
 
 function flattenToRawItem(root: Root): RawValueItem[] {
@@ -187,7 +187,7 @@ function mapToDiscoveredItem(rawItems: RawValueItem[]): DiscoveredItem[] {
 			}
 
 			const block = select('core/blocks').getBlockType(item.blockType)
-			return { ...item, blockTitle: block?.title ?? '', icon: block?.icon?.src }
+			return { ...item, blockTitle: block?.title ?? '', icon: block?.icon?.src as React.ReactElement }
 		})
 }
 
