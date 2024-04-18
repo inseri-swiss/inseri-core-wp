@@ -84,6 +84,7 @@ plugins:
         'how-to/workWithFiles.md': 'how-to/work_with_files.md'
         'features/dataflow.md': 'features/data_flow.md'
         'features/dataFlow.md': 'features/data_flow.md'
+        'features/DataFlow.md': 'features/data_flow.md'
         'features/hideInvisibleBlocks.md': 'features/hide_invisible_blocks.md'
         'features/blockDuplication.md': 'features/block_duplication.md'
         'tutorials/data-mapping-with-python.md': 'tutorials/data_mapping_with_python.md'
