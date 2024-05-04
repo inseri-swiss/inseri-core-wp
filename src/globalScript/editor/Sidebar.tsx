@@ -2,7 +2,9 @@ import { InseriRoot, usePublish, useWatch } from '@inseri/lighthouse'
 import { useHover } from '@mantine/hooks'
 import { IconBuildingLighthouse, IconWindowMaximize } from '@tabler/icons-react'
 import { select, useDispatch } from '@wordpress/data'
-import { PluginSidebar } from '@wordpress/edit-post'
+import { PluginSidebar as PostSidebar } from '@wordpress/edit-post'
+//@ts-ignore
+import { PluginSidebar as SiteSidebar } from '@wordpress/edit-site'
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { useMap, usePrevious } from 'react-use'
@@ -281,53 +283,62 @@ function SideBar() {
 		}
 	}, [selectedBlockId])
 
+	const Sidebar = (
+		<>
+			<Box p="md" style={{ border: '0.0625rem solid #dee2e6' }}>
+				<Switch
+					label="Hide the invisible blocks"
+					value={isHidden}
+					onChange={(event) => {
+						publishHidden(event.currentTarget.checked, 'application/json')
+					}}
+				/>
+			</Box>
+
+			<Accordion chevronPosition="right" multiple value={openItems} onChange={setOpenItems}>
+				<Accordion.Item value="blocks">
+					<AccordionControl>{__('inseri Blocks', 'inseri-core')}</AccordionControl>
+					<Accordion.Panel style={{ height: blockHeight, overflow: 'auto', padding: 0 }}>
+						<Stack>
+							{blocks.map((b) => (
+								<ListItem
+									key={b.id}
+									block={b}
+									isSelected={b.id === selectedBlockId}
+									onClick={() => toggleIfBlockSelected(b.id)}
+									onHover={(isHovered) => setHovered(b.id, isHovered)}
+									isHovered={hoveredRecord[b.id]}
+								/>
+							))}
+						</Stack>
+					</Accordion.Panel>
+				</Accordion.Item>
+				<Accordion.Item value="chart">
+					<AccordionControl onClick={() => setModalOpen(true)}>{__('Data Flow Chart', 'inseri-core')}</AccordionControl>
+					<Accordion.Panel>
+						<CytoscapeComponent
+							elements={chartData}
+							height={'calc(50vh - 135px)'}
+							stylesheet={miniStylesheet}
+							layoutName={'dagre'}
+							onSelect={onSelectGraph}
+							onHoverChange={(hoveredDict) => setAllHovered({ ...hoveredRecord, ...hoveredDict })}
+						></CytoscapeComponent>
+					</Accordion.Panel>
+				</Accordion.Item>
+			</Accordion>
+		</>
+	)
+
 	return (
 		<>
 			<ExtendedView isModalOpen={isModalOpen} setModalOpen={setModalOpen} />
-			<PluginSidebar name="inseri-core-sidebar" title="inseri" isPinnable={true} icon={<IconBuildingLighthouse style={{ fill: 'none' }} />}>
-				<Box p="md" style={{ border: '0.0625rem solid #dee2e6' }}>
-					<Switch
-						label="Hide the invisible blocks"
-						value={isHidden}
-						onChange={(event) => {
-							publishHidden(event.currentTarget.checked, 'application/json')
-						}}
-					/>
-				</Box>
-
-				<Accordion chevronPosition="right" multiple value={openItems} onChange={setOpenItems}>
-					<Accordion.Item value="blocks">
-						<AccordionControl>{__('inseri Blocks', 'inseri-core')}</AccordionControl>
-						<Accordion.Panel style={{ height: blockHeight, overflow: 'auto', padding: 0 }}>
-							<Stack>
-								{blocks.map((b) => (
-									<ListItem
-										key={b.id}
-										block={b}
-										isSelected={b.id === selectedBlockId}
-										onClick={() => toggleIfBlockSelected(b.id)}
-										onHover={(isHovered) => setHovered(b.id, isHovered)}
-										isHovered={hoveredRecord[b.id]}
-									/>
-								))}
-							</Stack>
-						</Accordion.Panel>
-					</Accordion.Item>
-					<Accordion.Item value="chart">
-						<AccordionControl onClick={() => setModalOpen(true)}>{__('Data Flow Chart', 'inseri-core')}</AccordionControl>
-						<Accordion.Panel>
-							<CytoscapeComponent
-								elements={chartData}
-								height={'calc(50vh - 135px)'}
-								stylesheet={miniStylesheet}
-								layoutName={'dagre'}
-								onSelect={onSelectGraph}
-								onHoverChange={(hoveredDict) => setAllHovered({ ...hoveredRecord, ...hoveredDict })}
-							></CytoscapeComponent>
-						</Accordion.Panel>
-					</Accordion.Item>
-				</Accordion>
-			</PluginSidebar>
+			<SiteSidebar name="inseri-core-sidebar" title="inseri" isPinnable={true} icon={<IconBuildingLighthouse style={{ fill: 'none' }} />}>
+				{Sidebar}
+			</SiteSidebar>
+			<PostSidebar name="inseri-core-sidebar" title="inseri" isPinnable={true} icon={<IconBuildingLighthouse style={{ fill: 'none' }} />}>
+				{Sidebar}
+			</PostSidebar>
 		</>
 	)
 }
