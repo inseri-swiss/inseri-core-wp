@@ -1,5 +1,6 @@
-import { createStyles, MantineProvider, getStylesRef } from '@mantine/core'
 import type { MantineThemeOverride } from '@mantine/core'
+import { MantineProvider, createEmotionCache, createStyles, getStylesRef } from '@mantine/core'
+import { useEffect, useState } from '@wordpress/element'
 import type { PropsWithChildren } from 'react'
 
 const useStyles = createStyles((theme) => ({
@@ -48,6 +49,15 @@ export function InseriThemeProvider({ children }: PropsWithChildren<{}>) {
 	const { classes } = useStyles()
 	const { inputWrapper, input, buttonRoot, checkboxInner, modalInner } = classes
 
+	const [containerRef, setContainerRef] = useState<HTMLElement | undefined>()
+	const mantineCache = createEmotionCache({ key: 'inseri-mantine', prepend: true, container: containerRef })
+
+	useEffect(() => {
+		const maybeIframe: HTMLIFrameElement | null = document.querySelector('.edit-site-visual-editor__editor-canvas')
+		const maybeHead = maybeIframe?.contentDocument?.querySelector('head') ?? undefined
+		setContainerRef(maybeHead)
+	}, [])
+
 	const themeOverride: MantineThemeOverride = {
 		defaultRadius: 3,
 		primaryShade: 8,
@@ -71,5 +81,9 @@ export function InseriThemeProvider({ children }: PropsWithChildren<{}>) {
 		},
 	}
 
-	return <MantineProvider theme={themeOverride}>{children}</MantineProvider>
+	return (
+		<MantineProvider theme={themeOverride} emotionCache={mantineCache}>
+			{children}
+		</MantineProvider>
+	)
 }
