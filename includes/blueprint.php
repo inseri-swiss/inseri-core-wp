@@ -34,21 +34,9 @@ class Builder {
 		$this->add_login_step();
 		$this->add_theme_installations_steps();
 		$this->add_plugins_installations_steps();
-		// $this->add_wxr_step();
-		// $this->add_option_steps();
+		$this->add_option_steps();
 
-		$this->write();
-
-		return wp_json_encode($this->blueprint);
-	}
-
-	public function write() {
-		$filename = 'blueprint.json';
-		global $wp_filesystem;
-
-		require_once ABSPATH . '/wp-admin/includes/file.php';
-		WP_Filesystem();
-		$wp_filesystem->put_contents(trailingslashit(WP_CONTENT_DIR) . $filename, wp_json_encode($this->blueprint, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+		return $this->blueprint;
 	}
 
 	protected function add_login_step() {
@@ -58,18 +46,6 @@ class Builder {
 			'password' => 'password',
 		];
 	}
-
-	// protected function add_wxr_step() {
-	// 	$wxr_url = site_url('wp-json/inseri-core/v1/wxr.xml');
-
-	// 	$this->blueprint['steps'][] = [
-	// 		'step' => 'importFile',
-	// 		'file' => [
-	// 			'resource' => 'url',
-	// 			'url' => $wxr_url,
-	// 		],
-	// 	];
-	// }
 
 	protected function add_theme_installations_steps() {
 		$active_theme = $this->get_active_theme();
@@ -116,8 +92,7 @@ class Builder {
 		$return_plugins = [];
 
 		foreach ($plugins as $plugin) {
-			$plugin_data = get_plugin_data(WP_PLUGIN_DIR . '/' . $plugin);
-			$plugin_version = $plugin_data['Version'];
+			$plugin_version = get_file_data(WP_PLUGIN_DIR . '/' . $plugin, ['Version'], 'plugin')[0];
 			$slug = explode('/', $plugin)[0];
 
 			$data = \plugins_api('plugin_information', [
