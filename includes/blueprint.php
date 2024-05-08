@@ -130,7 +130,7 @@ class Builder {
 				],
 			]);
 
-			if ($data instanceof \WP_Error) {
+			if ($data instanceof \WP_Error || !isset($data->versions[$plugin_version])) {
 				continue;
 			}
 
