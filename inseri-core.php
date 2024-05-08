@@ -32,7 +32,12 @@ if (!defined('ABSPATH')) {
 	exit();
 }
 
+require_once plugin_dir_path(__FILE__) . 'includes/blueprint.php';
+require_once plugin_dir_path(__FILE__) . 'includes/rest_api.php';
 require_once plugin_dir_path(__FILE__) . 'includes/utils.php';
+
+$inseri_core_blueprint_builder = new inseri_core\Builder();
+$inseri_core_rest_api = new inseri_core\RestApi($inseri_core_blueprint_builder);
 
 /**
  * main script
@@ -91,3 +96,8 @@ function inseri_core_block_init() {
  */
 add_filter('upload_mimes', 'inseri_core\extend_upload_mimes');
 add_filter('wp_check_filetype_and_ext', 'inseri_core\wp_check_filetype_and_ext', 10, 4);
+
+/**
+ * REST API
+ */
+add_action('rest_api_init', [$inseri_core_rest_api, 'register_routes']);
