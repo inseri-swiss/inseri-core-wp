@@ -6,6 +6,10 @@ if (!function_exists('\plugins_api')) {
 	require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
 }
 
+if (!function_exists('themes_api')) {
+	require_once ABSPATH . 'wp-admin/includes/theme.php';
+}
+
 class Builder {
 	public $blueprint = [
 		'$schema' => 'https://playground.wordpress.net/blueprint-schema.json',
@@ -21,7 +25,7 @@ class Builder {
 		'steps' => [],
 	];
 
-	public function generate() {
+	public function generate($steps) {
 		$php_version = explode('.', phpversion());
 		$this->blueprint['preferredVersions']['php'] = $php_version[0] . '.' . $php_version[1];
 
@@ -31,10 +35,18 @@ class Builder {
 			$this->blueprint['preferredVersions']['wp'] = 'nightly';
 		}
 
-		$this->add_login_step();
-		$this->add_theme_installations_steps();
-		$this->add_plugins_installations_steps();
-		$this->add_option_steps();
+		if ($steps['login'] ?? true) {
+			$this->add_login_step();
+		}
+		if ($steps['theme'] ?? true) {
+			$this->add_theme_installations_steps();
+		}
+		if ($steps['plugins'] ?? true) {
+			$this->add_plugins_installations_steps();
+		}
+		if ($steps['options'] ?? true) {
+			$this->add_option_steps();
+		}
 
 		return $this->blueprint;
 	}
@@ -48,28 +60,34 @@ class Builder {
 	}
 
 	protected function add_theme_installations_steps() {
-		$active_theme = $this->get_active_theme();
+		$theme_object = wp_get_theme();
+		$version = $theme_object->get('Version');
+		$slug = $theme_object->get_template();
 
-		// Workaround for bug in Playground
-		if ($active_theme === 'twentytwentyfour') {
+		$data = \themes_api('theme_information', [
+			'slug' => $slug,
+			'fields' => [
+				'rating' => false,
+				'tags' => false,
+				'sections' => false,
+				'versions' => true,
+			],
+		]);
+
+		if ($data instanceof \WP_Error || !isset($data->versions[$version])) {
 			return;
 		}
 
 		$this->blueprint['steps'][] = [
 			'step' => 'installTheme',
 			'themeZipFile' => [
-				'resource' => 'wordpress.org/themes',
-				'slug' => $this->get_active_theme(),
+				'resource' => 'url',
+				'url' => $data->versions[$version],
 			],
 			'options' => [
 				'activate' => true,
 			],
 		];
-	}
-
-	private function get_active_theme() {
-		// child themes not supported
-		return get_template();
 	}
 
 	protected function add_plugins_installations_steps() {
@@ -102,6 +120,7 @@ class Builder {
 					'tags' => false,
 					'sections' => false,
 					'contributors' => false,
+					'versions' => true,
 				],
 			]);
 

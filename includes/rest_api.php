@@ -21,8 +21,10 @@ class RestApi {
 		]);
 	}
 
-	public function get_blueprint_json() {
-		$data = $this->builder->generate();
+	public function get_blueprint_json($request) {
+		$params = $request->get_query_params();
+		$data = $this->builder->generate($params);
+
 		$response = new \WP_REST_Response($data, 200, [
 			'Content-Type' => 'application/json',
 			'Access-Control-Allow-Origin' => '*',
