@@ -4,12 +4,18 @@ import JsZip from 'jszip'
 import { useState } from '@wordpress/element'
 
 async function loadAsset(url: string): Promise<[string, Blob]> {
-	const splits = url.split('/')
-	const filename = splits[splits.length - 1]
+	const filename = url.split('/').splice(3).join('/')
 
 	const response = await fetch(url)
 	const blob = await response.blob()
 	return [filename, blob]
+}
+
+function removeHost(src: string) {
+	const splits = src.split('/')
+	const last = encodeURIComponent(splits.pop() ?? '')
+	const newSrc = [...splits.splice(3), last].join('/')
+	return newSrc
 }
 
 const forEachArray = (attribute: string, assets: any[]) => (element: Element) => {
@@ -18,10 +24,7 @@ const forEachArray = (attribute: string, assets: any[]) => (element: Element) =>
 
 	if (src && src.startsWith(host)) {
 		assets.push(src)
-
-		const splits = src.split('/')
-		const newSrc = `assets/${encodeURIComponent(splits[splits.length - 1])}`
-		element.setAttribute(attribute, newSrc)
+		element.setAttribute(attribute, removeHost(src))
 	}
 }
 
@@ -34,12 +37,13 @@ const make = (setCallback: (url: string) => void) => async () => {
 
 	const parser = new DOMParser()
 	const doc = parser.parseFromString(bodyText, 'text/html')
+	doc.querySelector('#wpadminbar')?.remove()
+	doc.querySelector('#admin-bar-inline-css')?.remove()
 
 	let assets: string[] = []
 	doc.querySelectorAll('script').forEach(forEachArray('src', assets))
 	doc.querySelectorAll('img').forEach(forEachArray('src', assets))
 	doc.querySelectorAll('link[rel="stylesheet"]').forEach(forEachArray('href', assets))
-	doc.querySelectorAll('link[rel="modulepreload"]').forEach(forEachArray('href', assets))
 
 	doc.querySelectorAll('img').forEach((element) => {
 		const srcSet =
@@ -58,8 +62,7 @@ const make = (setCallback: (url: string) => void) => async () => {
 			const newSrcSet = srcSet
 				.map(([url, density]) => {
 					if (url.startsWith(host)) {
-						const splits = url.split('/')
-						const newUrl = `assets/${encodeURIComponent(splits[splits.length - 1])}`
+						const newUrl = removeHost(url)
 						return newUrl + ' ' + density
 					}
 					return url + ' ' + density
@@ -73,18 +76,21 @@ const make = (setCallback: (url: string) => void) => async () => {
 	doc.querySelectorAll('style').forEach((element) => {
 		if (element.textContent?.match(/url\((["'])(.*?[^\\])\1\)/)) {
 			const replacedContent = element.textContent.replaceAll(/url\((["'])(.*?[^\\])\1\)/g, (_match, _capture1, url) => {
-				assets.push(url)
+				if (url.startsWith(host)) {
+					assets.push(url)
 
-				const splits = url.split('/')
-				const newUrl = `url('assets/${encodeURIComponent(splits[splits.length - 1])}')`
-				return newUrl
+					const newUrl = `url('${removeHost(url)}')`
+					return newUrl
+				}
+
+				return `url('${url}')`
 			})
 
 			element.innerHTML = replacedContent
 		}
 	})
 
-	const htmlText = new XMLSerializer().serializeToString(doc)
+	const htmlText = new XMLSerializer().serializeToString(doc.doctype!) + doc.getElementsByTagName('html')[0].outerHTML
 	const htmlBlob = new Blob([htmlText])
 
 	const loadedBlobs = await Promise.all(assets.map(loadAsset))
@@ -94,8 +100,7 @@ const make = (setCallback: (url: string) => void) => async () => {
 	zip.file('index.html', htmlBlob)
 
 	loadedBlobs.forEach(([filename, blob]) => {
-		// TODO preserve directory structure
-		zip.file('assets/' + filename, blob)
+		zip.file(filename, blob)
 	})
 
 	const resultingZip = await zip.generateAsync({ type: 'blob' })
