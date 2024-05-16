@@ -39,6 +39,7 @@ const make = (setCallback: (url: string) => void) => async () => {
 	doc.querySelectorAll('script').forEach(forEachArray('src', assets))
 	doc.querySelectorAll('img').forEach(forEachArray('src', assets))
 	doc.querySelectorAll('link[rel="stylesheet"]').forEach(forEachArray('href', assets))
+	doc.querySelectorAll('link[rel="modulepreload"]').forEach(forEachArray('href', assets))
 
 	doc.querySelectorAll('img').forEach((element) => {
 		const srcSet =
@@ -66,6 +67,20 @@ const make = (setCallback: (url: string) => void) => async () => {
 				.join(', ')
 
 			element.setAttribute('srcset', newSrcSet)
+		}
+	})
+
+	doc.querySelectorAll('style').forEach((element) => {
+		if (element.textContent?.match(/url\((["'])(.*?[^\\])\1\)/)) {
+			const replacedContent = element.textContent.replaceAll(/url\((["'])(.*?[^\\])\1\)/g, (_match, _capture1, url) => {
+				assets.push(url)
+
+				const splits = url.split('/')
+				const newUrl = `url('assets/${encodeURIComponent(splits[splits.length - 1])}')`
+				return newUrl
+			})
+
+			element.innerHTML = replacedContent
 		}
 	})
 
