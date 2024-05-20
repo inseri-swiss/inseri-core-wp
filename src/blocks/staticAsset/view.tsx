@@ -4,16 +4,30 @@ import JsZip from 'jszip'
 import { useState } from '@wordpress/element'
 
 async function loadAsset(url: string): Promise<[string, Blob]> {
-	const filename = url.split('/').splice(3).join('/')
+	const splits = url.split('/').splice(3)
+	const last = embedVersionInFileName(splits.pop() ?? '')
+	const filename = [...splits, last].join('/')
 
 	const response = await fetch(url)
 	const blob = await response.blob()
 	return [filename, blob]
 }
 
+function embedVersionInFileName(file: string) {
+	if (file.includes('?')) {
+		const [fileWithExt, versionTail] = file.split('?')
+		const [_, version] = versionTail.split('=')
+		const [filename, ext] = fileWithExt.split('.')
+
+		return `${filename}.${version}.${ext}`
+	}
+	return file
+}
+
 function removeHost(src: string) {
 	const splits = src.split('/')
-	const last = encodeURIComponent(splits.pop() ?? '')
+	const last = embedVersionInFileName(splits.pop() ?? '')
+
 	const newSrc = [...splits.splice(3), last].join('/')
 	return newSrc
 }
