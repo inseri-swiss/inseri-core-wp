@@ -104,6 +104,16 @@ const make = (setCallback: (url: string) => void) => async () => {
 		}
 	})
 
+	const inseriApiSettings = doc.querySelector('#inseri-core-js-extra')
+	if (doc.querySelector('.wp-block-inseri-core-python') && inseriApiSettings) {
+		const content = inseriApiSettings.textContent ?? ''
+		const newContent = content.replace(/"pyWorker":"(.*?)"/, (_match, url) => {
+			assets.push(url.replaceAll('\\', ''))
+			return `"pyWorker":"${removeHost(url)}"`
+		})
+		inseriApiSettings.innerHTML = newContent
+	}
+
 	const htmlText = new XMLSerializer().serializeToString(doc.doctype!) + doc.getElementsByTagName('html')[0].outerHTML
 	const htmlBlob = new Blob([htmlText])
 
