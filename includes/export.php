@@ -52,7 +52,7 @@ define( 'WXR_VERSION', '1.2' );
  *                              'trash'. Default false (all statuses except 'auto-draft').
  * }
  */
-function export_wp( $args = array() ) {
+function inseri_core_export_wp( $args = array() ) {
 	global $wpdb, $post;
 
 	$defaults = array(
@@ -140,7 +140,11 @@ function export_wp( $args = array() ) {
 	}
 
 	// Grab a snapshot of post IDs, just in case it changes during the export.
-	$post_ids = $wpdb->get_col( "SELECT ID FROM {$wpdb->posts} $join WHERE $where" );
+	$post_ids = [];
+
+	if(!empty($args['post_id'])){
+		$post_ids = [$args['post_id']];
+	}
 
 	// Get IDs for the attachments of each post, unless all content is already being exported.
 	if ( ! in_array( $args['content'], array( 'all', 'attachment' ), true ) ) {

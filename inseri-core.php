@@ -101,3 +101,4 @@ add_filter('wp_check_filetype_and_ext', 'inseri_core\wp_check_filetype_and_ext',
  * REST API
  */
 add_action('rest_api_init', [$inseri_core_rest_api, 'register_routes']);
+add_filter('rest_pre_serve_request', 'inseri_core\RestApi::xml_rest_pre_serve_request', 10, 4);
