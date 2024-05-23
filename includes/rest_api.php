@@ -4,11 +4,13 @@ namespace inseri_core;
 
 require_once plugin_dir_path(__FILE__) . 'export.php';
 
+const OPTION_KEY = 'inseri-core-export-enabled';
+
 class RestApi {
 	private $builder;
 
 	public static function xml_rest_pre_serve_request($served, $result, $request, $server) {
-		if ('/inseri-core/v1/wxr' !== $request->get_route()) {
+		if ('/inseri-core/v1/wxr' !== $request->get_route() || 401 === $result->get_status()) {
 			return $served;
 		}
 
@@ -28,6 +30,16 @@ class RestApi {
 		add_action('rest_api_init', [$this, 'register_routes']);
 	}
 
+	public function can_publish() {
+		return current_user_can('publish_posts');
+	}
+
+	public function can_export($request) {
+		$params = $request->get_query_params();
+		$data = get_option(OPTION_KEY, []);
+		return in_array($params['post_id'], $data);
+	}
+
 	public function register_routes() {
 		register_rest_route('inseri-core/v1', '/blueprint/', [
 			'methods' => 'GET',
@@ -38,8 +50,40 @@ class RestApi {
 		register_rest_route('inseri-core/v1', '/wxr/', [
 			'methods' => 'GET',
 			'callback' => [$this, 'get_wxr'],
-			'permission_callback' => '__return_true', // Allows public access
+			'permission_callback' => [$this, 'can_export'],
 		]);
+
+		register_rest_route('inseri-core/v1', '/export-enabled/(?P<id>\d+)', [
+			'methods' => 'POST',
+			'callback' => [$this, 'add_post_id'],
+			'permission_callback' => [$this, 'can_publish'],
+		]);
+
+		register_rest_route('inseri-core/v1', '/export-enabled/(?P<id>\d+)', [
+			'methods' => 'DELETE',
+			'callback' => [$this, 'remove_post_id'],
+			'permission_callback' => [$this, 'can_publish'],
+		]);
+	}
+
+	public function add_post_id($request) {
+		$params = $request->get_url_params();
+
+		$data = get_option(OPTION_KEY, []);
+		array_push($data, $params['id']);
+		update_option(OPTION_KEY, $data);
+
+		return new \WP_REST_Response(null, 201);
+	}
+
+	public function remove_post_id($request) {
+		$params = $request->get_url_params();
+
+		$data = get_option(OPTION_KEY, []);
+		$data = array_diff($data, [$params['id']]);
+		update_option(OPTION_KEY, $data);
+
+		return new \WP_REST_Response(null, 200);
 	}
 
 	public function get_blueprint_json($request) {
@@ -47,7 +91,6 @@ class RestApi {
 		$data = $this->builder->generate($params);
 
 		$response = new \WP_REST_Response($data, 200, [
-			'Content-Type' => 'application/json',
 			'Access-Control-Allow-Origin' => '*',
 		]);
 		return $response;
