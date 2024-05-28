@@ -160,3 +160,14 @@ export const getZenodoRecord = async (recordId: string): Promise<[string?, Zenod
 	const action = () => axios.get<ZenodoRecord>(RECORD_ROUTE + recordId)
 	return handleRequest(action)
 }
+
+const EXPORT_ENABLED_ROUTE = 'inseri-core/v1/export-enabled/'
+
+export const enablePostExport = async (postId: string): Promise<[string?, string?]> => {
+	const action = () => axios.post(inseriApiSettings.root + EXPORT_ENABLED_ROUTE + postId, undefined, { headers: { 'X-WP-Nonce': inseriApiSettings.nonce } })
+	return handleRequest(action)
+}
+export const disablePostExport = async (postId: string): Promise<[string?, string?]> => {
+	const action = () => axios.delete(inseriApiSettings.root + EXPORT_ENABLED_ROUTE + postId, { headers: { 'X-WP-Nonce': inseriApiSettings.nonce } })
+	return handleRequest(action)
+}
