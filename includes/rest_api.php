@@ -10,7 +10,7 @@ class RestApi {
 	private $builder;
 
 	public static function xml_rest_pre_serve_request($served, $result, $request, $server) {
-		if ('/inseri-core/v1/wxr' !== $request->get_route() || 401 === $result->get_status()) {
+		if (substr($request->get_route(), 0, 19) !== '/inseri-core/v1/wxr' || 401 === $result->get_status()) {
 			return $served;
 		}
 
@@ -35,7 +35,7 @@ class RestApi {
 	}
 
 	public function can_export($request) {
-		$params = $request->get_query_params();
+		$params = $request->get_params();
 		$data = get_option(OPTION_KEY, []);
 		return in_array($params['post_id'], $data);
 	}
@@ -47,7 +47,7 @@ class RestApi {
 			'permission_callback' => '__return_true', // Allows public access
 		]);
 
-		register_rest_route('inseri-core/v1', '/wxr/', [
+		register_rest_route('inseri-core/v1', '/wxr/(?P<post_id>\d+)', [
 			'methods' => 'GET',
 			'callback' => [$this, 'get_wxr'],
 			'permission_callback' => [$this, 'can_export'],
@@ -67,17 +67,19 @@ class RestApi {
 	}
 
 	public function add_post_id($request) {
-		$params = $request->get_url_params();
-
+		$params = $request->get_params();
 		$data = get_option(OPTION_KEY, []);
-		array_push($data, $params['id']);
-		update_option(OPTION_KEY, $data);
+
+		if (!in_array($params['id'], $data)) {
+			array_push($data, $params['id']);
+			update_option(OPTION_KEY, $data);
+		}
 
 		return new \WP_REST_Response(null, 201);
 	}
 
 	public function remove_post_id($request) {
-		$params = $request->get_url_params();
+		$params = $request->get_params();
 
 		$data = get_option(OPTION_KEY, []);
 		$data = array_diff($data, [$params['id']]);
@@ -87,7 +89,7 @@ class RestApi {
 	}
 
 	public function get_blueprint_json($request) {
-		$params = $request->get_query_params();
+		$params = $request->get_params();
 		$data = $this->builder->generate($params);
 
 		$response = new \WP_REST_Response($data, 200, [
@@ -97,7 +99,7 @@ class RestApi {
 	}
 
 	public function get_wxr($request) {
-		$params = $request->get_query_params();
+		$params = $request->get_params();
 
 		ob_start();
 		inseri_core_export_wp($params);
