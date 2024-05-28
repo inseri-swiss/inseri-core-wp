@@ -11,6 +11,7 @@ const { name, ...settings } = json as any
 export interface Attributes {
 	blockId: string
 	blockName: string
+	postId: number
 }
 
 registerBlockType<Attributes>(name, {

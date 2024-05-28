@@ -18,6 +18,7 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 	useEffect(() => {
 		const postId = select('core/editor').getCurrentPostId()
 		enablePostExport(postId)
+		updateState({ postId })
 
 		return () => {
 			const count = select('core/block-editor').getGlobalBlockCount(config.name)
