@@ -11,7 +11,7 @@
  *
  * @since 2.5.0
  */
-define( 'WXR_VERSION', '1.2' );
+define( 'INSERI_CORE_WXR_VERSION', '1.2' );
 
 /**
  * Generates the WXR export file for download.
@@ -512,11 +512,11 @@ function inseri_core_export_wp( $args = array() ) {
 
 	<?php the_generator( 'export' ); ?>
 <rss version="2.0"
-	xmlns:excerpt="http://wordpress.org/export/<?php echo WXR_VERSION; ?>/excerpt/"
+	xmlns:excerpt="http://wordpress.org/export/<?php echo INSERI_CORE_WXR_VERSION; ?>/excerpt/"
 	xmlns:content="http://purl.org/rss/1.0/modules/content/"
 	xmlns:wfw="http://wellformedweb.org/CommentAPI/"
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
-	xmlns:wp="http://wordpress.org/export/<?php echo WXR_VERSION; ?>/"
+	xmlns:wp="http://wordpress.org/export/<?php echo INSERI_CORE_WXR_VERSION; ?>/"
 >
 
 <channel>
@@ -525,7 +525,7 @@ function inseri_core_export_wp( $args = array() ) {
 	<description><?php bloginfo_rss( 'description' ); ?></description>
 	<pubDate><?php echo gmdate( 'D, d M Y H:i:s +0000' ); ?></pubDate>
 	<language><?php bloginfo_rss( 'language' ); ?></language>
-	<wp:wxr_version><?php echo WXR_VERSION; ?></wp:wxr_version>
+	<wp:wxr_version><?php echo INSERI_CORE_WXR_VERSION; ?></wp:wxr_version>
 	<wp:base_site_url><?php echo wxr_site_url(); ?></wp:base_site_url>
 	<wp:base_blog_url><?php bloginfo_rss( 'url' ); ?></wp:base_blog_url>
 
