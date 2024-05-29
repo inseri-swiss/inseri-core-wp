@@ -8,7 +8,7 @@ export default function View() {
 	const { postId } = useGlobalState((state: GlobalState) => state)
 	const [blobUrl, setBlobUrl] = useState<string>('')
 	const [isLoading, setIsLoading] = useState(false)
-	const [hasError, setHasError] = useState(true)
+	const [hasError, setHasError] = useState(false)
 
 	const load = async () => {
 		setIsLoading(true)
@@ -41,11 +41,11 @@ export default function View() {
 				</Text>
 			)}
 			{!blobUrl ? (
-				<Button onClick={load} loading={isLoading}>
+				<Button style={{ color: '#fff' }} onClick={load} loading={isLoading}>
 					Create Archive
 				</Button>
 			) : (
-				<Button component="a" href={blobUrl} download={'archive.zip'}>
+				<Button style={{ color: '#fff' }} component="a" href={blobUrl} download={'archive.zip'}>
 					Download Archive
 				</Button>
 			)}
