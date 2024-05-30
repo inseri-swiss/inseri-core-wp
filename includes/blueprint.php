@@ -44,9 +44,6 @@ class Builder {
 		if ($steps['plugins'] ?? true) {
 			$this->add_plugins_installations_steps();
 		}
-		if ($steps['options'] ?? true) {
-			$this->add_option_steps();
-		}
 
 		return $this->blueprint;
 	}
@@ -135,68 +132,5 @@ class Builder {
 		}
 
 		return $return_plugins;
-	}
-
-	protected function add_option_steps() {
-		$options = wp_load_alloptions();
-
-		// Prevent some special cases.
-		foreach (
-			[
-				'active_plugins',
-				'auth_key',
-				'auth_salt',
-				'cron',
-				'home',
-				'https_detection_errors',
-				'initial_db_version',
-				'logged_in_key',
-				'logged_in_salt',
-				'mailserver_url',
-				'mailserver_login',
-				'mailserver_pass',
-				'mailserver_port',
-				'new_admin_email',
-				'recently_activated',
-				'recovery_keys',
-				'rewrite_rules',
-				'siteurl',
-				'site_icon',
-				'site_logo',
-				'theme_switched',
-			]
-			as $key
-		) {
-			unset($options[$key]);
-		}
-
-		foreach ($options as $key => $option) {
-			if (strpos($key, '_transient') === 0 || strpos($key, '_site_transient') === 0) {
-				unset($options[$key]);
-				continue;
-			}
-
-			if ($option === '' || $option === []) {
-				unset($options[$key]);
-			}
-		}
-
-		$i = 1;
-		$j = 1;
-		foreach ($options as $key => $option) {
-			$options_chunks[$j][$key] = $option;
-			++$i;
-			if ($i > 10) {
-				++$j;
-				$i = 1;
-			}
-		}
-
-		foreach ($options_chunks as $chunk) {
-			$this->blueprint['steps'][] = [
-				'step' => 'setSiteOptions',
-				'options' => $chunk,
-			];
-		}
 	}
 }
