@@ -22,7 +22,23 @@ class Builder {
 		],
 		'phpExtensionBundles' => ['kitchen-sink'],
 		'landingPage' => '/wp-admin/',
-		'steps' => [],
+		'login' => true,
+		'steps' => [
+			[
+				'step' => 'runPHP',
+				'code' => "<?php include 'wordpress/wp-load.php'; wp_delete_post(1,true); ?>",
+			],
+			[
+				'step' => 'installPlugin',
+				'pluginZipFile' => [
+					'resource' => 'wordpress.org/plugins',
+					'slug' => 'wordpress-importer',
+				],
+				'options' => [
+					'activate' => true,
+				],
+			],
+		],
 	];
 
 	public function generate($steps) {
@@ -35,9 +51,6 @@ class Builder {
 			$this->blueprint['preferredVersions']['wp'] = 'nightly';
 		}
 
-		if ($steps['login'] ?? true) {
-			$this->add_login_step();
-		}
 		if ($steps['theme'] ?? true) {
 			$this->add_theme_installations_steps();
 		}
@@ -46,14 +59,6 @@ class Builder {
 		}
 
 		return $this->blueprint;
-	}
-
-	protected function add_login_step() {
-		$this->blueprint['steps'][] = [
-			'step' => 'login',
-			'username' => 'admin',
-			'password' => 'password',
-		];
 	}
 
 	protected function add_theme_installations_steps() {
