@@ -162,8 +162,6 @@ export const getZenodoRecord = async (recordId: string): Promise<[string?, Zenod
 }
 
 const EXPORT_ENABLED_ROUTE = 'inseri-core/v1/export-enabled/'
-const BLUEPRINT_ROUTE = 'inseri-core/v1/blueprint/'
-const WXR_ROUTE = 'inseri-core/v1/wxr/'
 
 export const enablePostExport = async (postId: number): Promise<[string?, string?]> => {
 	const action = () => axios.post(inseriApiSettings.root + EXPORT_ENABLED_ROUTE + postId, undefined, { headers: { 'X-WP-Nonce': inseriApiSettings.nonce } })
@@ -171,15 +169,5 @@ export const enablePostExport = async (postId: number): Promise<[string?, string
 }
 export const disablePostExport = async (postId: number): Promise<[string?, string?]> => {
 	const action = () => axios.delete(inseriApiSettings.root + EXPORT_ENABLED_ROUTE + postId, { headers: { 'X-WP-Nonce': inseriApiSettings.nonce } })
-	return handleRequest(action)
-}
-
-export const getBlueprint = async (): Promise<[string?, Blob?]> => {
-	const action = () => axios.get(inseriApiSettings.root + BLUEPRINT_ROUTE, { responseType: 'blob' })
-	return handleRequest(action)
-}
-
-export const getWXR = async (postId: number): Promise<[string?, Blob?]> => {
-	const action = () => axios.get(inseriApiSettings.root + WXR_ROUTE + postId, { responseType: 'blob' })
 	return handleRequest(action)
 }
