@@ -9,19 +9,6 @@ const OPTION_KEY = 'inseri-core-export-enabled';
 class RestApi {
 	private $builder;
 
-	public static function xml_rest_pre_serve_request($served, $result, $request, $server) {
-		if (substr($request->get_route(), 0, 19) !== '/inseri-core/v1/wxr' || 401 === $result->get_status()) {
-			return $served;
-		}
-
-		$server->send_header('Content-Type', 'text/xml');
-
-		echo $result->get_data();
-		$served = true;
-
-		return $served;
-	}
-
 	public function __construct($builder) {
 		$this->builder = $builder;
 	}
@@ -41,15 +28,9 @@ class RestApi {
 	}
 
 	public function register_routes() {
-		register_rest_route('inseri-core/v1', '/blueprint/', [
+		register_rest_route('inseri-core/v1', '/archive/(?P<post_id>\d+)', [
 			'methods' => 'GET',
-			'callback' => [$this, 'get_blueprint_json'],
-			'permission_callback' => '__return_true', // Allows public access
-		]);
-
-		register_rest_route('inseri-core/v1', '/wxr/(?P<post_id>\d+)', [
-			'methods' => 'GET',
-			'callback' => [$this, 'get_wxr'],
+			'callback' => [$this, 'make_zip'],
 			'permission_callback' => [$this, 'can_export'],
 		]);
 
@@ -88,24 +69,45 @@ class RestApi {
 		return new \WP_REST_Response(null, 200);
 	}
 
-	public function get_blueprint_json($request) {
-		$params = $request->get_params();
-		$data = $this->builder->generate($params);
-
-		$response = new \WP_REST_Response($data, 200, [
-			'Access-Control-Allow-Origin' => '*',
-		]);
-		return $response;
+	private function get_blueprint_json($params) {
+		return wp_json_encode($this->builder->generate($params), JSON_PRETTY_PRINT);
 	}
 
-	public function get_wxr($request) {
-		$params = $request->get_params();
-
+	private function get_wxr($params) {
 		ob_start();
 		inseri_core_export_wp($params);
 		$contents = ob_get_contents();
 		ob_end_clean();
 
 		return $contents;
+	}
+
+	public function make_zip($request) {
+		$params = $request->get_params();
+
+		$upload_dir = wp_upload_dir();
+		$unique_name = wp_unique_filename($upload_dir['basedir'], 'archive.zip');
+
+		$file = path_join($upload_dir['basedir'], $unique_name);
+		$zip = new \ZipArchive();
+
+		if ($zip->open($file, \ZipArchive::CREATE) !== true) {
+			return new \WP_Error('inseri_core_failed_zip', 'server cannot open zip file');
+		}
+
+		$zip->addFromString('post.xml', $this->get_wxr($params));
+		$zip->addFromString('blueprint.json', $this->get_blueprint_json($params));
+		$zip->close();
+
+		header('Content-Disposition: attachment; filename=archive.zip;');
+		header('Content-Type: application/zip');
+		header('Content-Description: File Transfer');
+		header('Content-Transfer-Encoding: binary');
+		header('Content-Length: ' . filesize($file));
+
+		echo file_get_contents($file);
+
+		unlink($file);
+		exit();
 	}
 }
