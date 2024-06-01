@@ -3,6 +3,7 @@
 namespace inseri_core;
 
 require_once plugin_dir_path(__FILE__) . 'export.php';
+require_once plugin_dir_path(__FILE__) . 'readme.php';
 
 const OPTION_KEY = 'inseri-core-export-enabled';
 
@@ -69,8 +70,8 @@ class RestApi {
 		return new \WP_REST_Response(null, 200);
 	}
 
-	private function get_blueprint_json($params) {
-		return wp_json_encode($this->builder->generate($params), JSON_PRETTY_PRINT);
+	private function get_blueprint($params) {
+		return $this->builder->generate($params);
 	}
 
 	private function get_wxr($params) {
@@ -82,8 +83,18 @@ class RestApi {
 		return $contents;
 	}
 
+	private function get_readme($params, $blueprint) {
+		ob_start();
+		inseri_core_make_readme($params['post_id'], $blueprint);
+		$contents = ob_get_contents();
+		ob_end_clean();
+
+		return $contents;
+	}
+
 	public function make_zip($request) {
 		$params = $request->get_params();
+		$blueprint = $this->get_blueprint($params);
 
 		$upload_dir = wp_upload_dir();
 		$unique_name = wp_unique_filename($upload_dir['basedir'], 'archive.zip');
@@ -96,7 +107,8 @@ class RestApi {
 		}
 
 		$zip->addFromString('post.xml', $this->get_wxr($params));
-		$zip->addFromString('blueprint.json', $this->get_blueprint_json($params));
+		$zip->addFromString('blueprint.json', wp_json_encode($blueprint, JSON_PRETTY_PRINT));
+		$zip->addFromString('readme.md', $this->get_readme($params, wp_json_encode($blueprint)));
 		$zip->close();
 
 		header('Content-Disposition: attachment; filename=archive.zip;');
