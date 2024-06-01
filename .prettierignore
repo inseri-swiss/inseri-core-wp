@@ -5,3 +5,4 @@ node_modules
 
 # ignore the following file for better diffs
 includes/export.php
+includes/readme.php
