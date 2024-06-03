@@ -75,7 +75,7 @@
 		"nanoid": "^5.0.7",
 		"plotly.js": "^2.33.0",
 		"prismjs": "^1.29.0",
-		"pyodide": "^0.26.0",
+		"pyodide": "^0.25.1",
 		"react-plotly.js": "^2.6.0",
 		"react-simple-code-editor": "^0.13.1",
 		"react-use": "^17.5.0",
