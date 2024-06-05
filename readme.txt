@@ -21,6 +21,7 @@ As a result, inseri core introduces scientific and interactive Gutenberg blocks 
 - **[Data Table Block](https://docs.inseri.swiss/blocks/dataTable/)**: It displays tabular data of another block and gives guests the option to explore it.
 - **[Download Block](https://docs.inseri.swiss/blocks/download/)**: It gives guests the possibility to download data from another block.
 - **[Dropdown Block](https://docs.inseri.swiss/blocks/dropdown/)**: It provides guests options to choose from and the selected option can be reused in other blocks.
+- **[Export Block](https://docs.inseri.swiss/blocks/export/)**: It makes the post or page content open access by allowing the visitors to download the corresponding [blueprint.json](https://wordpress.github.io/wordpress-playground/blueprints-api/using-blueprints/) and WXR file.
 - **[HTML Code Block](https://docs.inseri.swiss/blocks/html/)**: It renders HTML code using the other block's data.
 - **[IIIF Viewer Block](https://docs.inseri.swiss/blocks/iiifViewer/)**: It showcases images with pan/zoom functionality, along with videos and audios consumed by an IIIF API.
 - **[Image Box Block](https://docs.inseri.swiss/blocks/image/)**: It displays an image utilizing the data of another block.
@@ -56,6 +57,11 @@ Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inser
 6. Render HTML code
 
 == Changelog ==
+### [0.3.7](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.3.7)
+- New: Export block
+- Update: blocks are now supported in the site editor
+- Update: diverse dependencies
+
 ### [0.3.6](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.3.6)
 - Update: JavaScript Code block supports async
 
