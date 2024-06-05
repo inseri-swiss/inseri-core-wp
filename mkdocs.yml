@@ -13,6 +13,7 @@ nav:
       - 'blocks/dataTable.md'
       - 'blocks/download.md'
       - 'blocks/dropdown.md'
+      - 'blocks/export.md'
       - 'blocks/html.md'
       - 'blocks/iiifViewer.md'
       - 'blocks/image.md'
