@@ -4,7 +4,7 @@ Tags: gutenberg, interactive, JavaScript, Plotly, Python
 Requires at least: 5.6
 Tested up to: 6.5
 Requires PHP: 5.6
-Stable tag: 0.3.6
+Stable tag: 0.3.7
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
