@@ -28,6 +28,7 @@ nav:
       - 'blocks/webApi.md'
       - 'blocks/zenodo.md'
   - 'Features':
+      - 'features/open_citable.md'
       - 'features/sidebar.md'
       - 'features/hide_invisible_blocks.md'
       - 'features/data_flow.md'
