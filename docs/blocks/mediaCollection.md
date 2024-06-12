@@ -4,6 +4,10 @@ User can select multiple files from media library. Upon selection of a single fi
 
 If you already uploaded your desired file, you can choose it from the _Media Library_, otherwise you can _upload_ it after adding the block.
 
+!!! warning
+
+    Not compatible with the [Export Block](export.md).
+
 ## Output
 
 The selected file.
