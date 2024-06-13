@@ -60,6 +60,10 @@ module.exports = {
 		//node_modules/pyodide/pyodide.mjs has dynamic imports
 		new webpack.ContextReplacementPlugin(/(q.pathToFileURL\(t\).href|t)/),
 	],
+	externalsPresets: {
+		...defaultConfig.externalsPresets,
+		node: true, // ignore built-in node modules like path, fs, etc.
+	},
 	externals: [
 		{ '@inseri/lighthouse': 'window.inseri.lighthouse' },
 		{ '@inseri/utils': 'window.inseri.utils' },
