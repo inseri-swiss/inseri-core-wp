@@ -1,8 +1,11 @@
-import { loadPyodide, PyodideInterface } from 'pyodide'
+import { PyodideInterface } from 'pyodide'
 import { Action } from '../../components'
 
 // version must match with npm package version
 const BINARY_URL = 'https://cdn.jsdelivr.net/pyodide/v0.26.1/full/'
+
+importScripts(BINARY_URL + 'pyodide.js')
+declare function loadPyodide(opt: any): Promise<PyodideInterface>
 
 let pyodide: PyodideInterface | null = null
 let inputs: Record<string, any> = {}
@@ -68,8 +71,8 @@ function retrievePyObjects(name: string): [string, any] {
 async function init() {
 	pyodide = await loadPyodide({
 		indexURL: BINARY_URL,
-		stdout: (msg) => stdBuffer.push(msg),
-		stderr: (msg) => stdBuffer.push(msg),
+		stdout: (msg: string) => stdBuffer.push(msg),
+		stderr: (msg: string) => stdBuffer.push(msg),
 	})
 
 	if (areInputsInitiated) {
