@@ -1,5 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
-const webpack = require('webpack')
 const defaultConfig = require('@wordpress/scripts/config/webpack.config')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const fs = require('fs')
@@ -56,14 +54,7 @@ module.exports = {
 	plugins: [
 		...defaultConfig.plugins,
 		tsChecker,
-		//https://iamakulov.com/notes/webpack-contextreplacementplugin/ explains why
-		//node_modules/pyodide/pyodide.mjs has dynamic imports
-		new webpack.ContextReplacementPlugin(/(q.pathToFileURL\(t\).href|t)/),
 	],
-	externalsPresets: {
-		...defaultConfig.externalsPresets,
-		node: true, // ignore built-in node modules like path, fs, etc.
-	},
 	externals: [
 		{ '@inseri/lighthouse': 'window.inseri.lighthouse' },
 		{ '@inseri/utils': 'window.inseri.utils' },
