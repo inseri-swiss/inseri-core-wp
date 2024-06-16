@@ -53,22 +53,24 @@ export default function View() {
 			</Text>
 		</Group>
 	) : (
-		<Viewer
-			iiifContent={value}
-			options={{
-				showTitle,
-				showIIIFBadge: showBadge,
-				canvasHeight: dynamicHeight ? undefined : height,
-				informationPanel: {
-					open: false,
-					renderToggle: showInformationPanel,
-				},
-				openSeadragon: {
-					gestureSettingsMouse: {
-						scrollToZoom: false,
+		<div style={{ position: 'relative', height: dynamicHeight ? '60vh' : undefined }}>
+			<Viewer
+				iiifContent={value}
+				options={{
+					showTitle,
+					showIIIFBadge: showBadge,
+					canvasHeight: dynamicHeight ? '100%' : height + 'px',
+					informationPanel: {
+						open: showInformationPanel,
+						renderToggle: showInformationPanel,
 					},
-				},
-			}}
-		/>
+					openSeadragon: {
+						gestureSettingsMouse: {
+							scrollToZoom: false,
+						},
+					},
+				}}
+			/>
+		</div>
 	)
 }
