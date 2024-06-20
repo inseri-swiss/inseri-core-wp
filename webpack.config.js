@@ -1,6 +1,7 @@
 const defaultConfig = require('@wordpress/scripts/config/webpack.config')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const fs = require('fs')
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 const isProduction = process.env.NODE_ENV === 'production'
 const configOverwrite = isProduction
@@ -54,6 +55,7 @@ module.exports = {
 	plugins: [
 		...defaultConfig.plugins,
 		tsChecker,
+		new BundleAnalyzerPlugin({ analyzerMode: process.env.STATS || 'disabled' }),
 	],
 	externals: [
 		{ '@inseri/lighthouse': 'window.inseri.lighthouse' },
