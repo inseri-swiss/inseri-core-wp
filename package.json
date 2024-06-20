@@ -16,7 +16,8 @@
 		"plugin-zip": "wp-scripts plugin-zip",
 		"start": "wp-scripts start",
 		"start:hot": "wp-scripts start --hot",
-		"bump": "node bump-version"
+		"bump": "node bump-version",
+		"analyze": "STATS=static npx webpack --profile"
 	},
 	"devDependencies": {
 		"@prettier/plugin-php": "^0.22.2",
@@ -36,7 +37,8 @@
 		"fork-ts-checker-webpack-plugin": "^9.0.2",
 		"prettier": "^3.3.1",
 		"prettier-plugin-multiline-arrays": "^3.0.6",
-		"typescript": "^5.4.5"
+		"typescript": "^5.4.5",
+		"webpack-bundle-analyzer": "^4.10.2"
 	},
 	"dependencies": {
 		"@emotion/react": "^11.11.4",
