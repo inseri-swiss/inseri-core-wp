@@ -1,5 +1,7 @@
 # Playground
 
+[inseri Playground](https://playground.inseri.swiss/){:target="\_blank"} relies on [WordPress Playground](https://wordpress.github.io/wordpress-playground/){:target="\_blank"} to provide a playground where you can try out our [inseri core](https://wordpress.org/plugins/inseri-core/){:target="\_blank"} plugin and explore (inspect and even edit) all our [showcases](https://inseri.swiss/showcase/){:target="\_blank"}.
+
 Be aware that your changes in the playground are temporary and will be gone after a page refresh.
 
 ## How to use inseri Playground
