@@ -38,6 +38,7 @@ nav:
       - 'how-to/visualizations.md'
       - 'how-to/work_with_files.md'
       - 'how-to/python_packages.md'
+      - 'how-to/deposit_content.md'
   - 'inseri.swiss ↗': https://inseri.swiss/
 
 theme:
