@@ -9,7 +9,7 @@ For the final product, please [click here](https://inseri.swiss/2023/02/hello-wo
 
 ## Step 0: Initialize your inseri instance
 
-Open up [inseri Playground](https://playground.inseri.swiss){:target="\_blank"} or your WordPress instance with [`inseri-core`](https://wordpress.org/plugins/inseri-core/){:target="\_blank"} plugin installed.
+Start [inseri Playground](https://playground.inseri.swiss){:target="\_blank"} or your WordPress instance. In your WordPress instance make sure [`inseri-core`](https://wordpress.org/plugins/inseri-core/){:target="\_blank"} plugin is installed (it is already instsalled in the inseri playground).
 
 Beware that changes done in the playground will not be saved.
 
