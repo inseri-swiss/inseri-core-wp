@@ -6,7 +6,10 @@ import { Attributes } from './index'
 export interface GlobalState extends Attributes, CommonCodeState {}
 
 const createWorker = (set: (nextStateOrUpdater: (state: Draft<GlobalState>) => void) => void) => {
-	const worker = new Worker(new URL(inseriApiSettings.pyWorker))
+	const base = location.origin.startsWith('file://') ? location.href : location.origin
+	let a = new URL(inseriApiSettings.pyWorker, base)
+	console.log('----------->', a.toString())
+	const worker = new Worker(new URL(inseriApiSettings.pyWorker, base).toString())
 
 	worker.addEventListener('message', ({ data }: MessageEvent<Action>) => {
 		set((state) => {
