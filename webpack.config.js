@@ -21,22 +21,18 @@ const tsChecker = new ForkTsCheckerWebpackPlugin({
 	},
 })
 
-const initialEntrypoints = {
-	'inseri-core': {
-		import: './src/lighthouse',
-		library: {
-			name: 'inseri',
-			type: 'window',
+const bundleEntrypoints = fs.readdirSync('./src/bundles').reduce((accumulator, item) => {
+	return {
+		...accumulator,
+		[item]: {
+			import: `./src/bundles/${item}`,
+			library: {
+				name: ['inseri', item],
+				type: 'window',
+			},
 		},
-	},
-	'inseri-core-editor': {
-		import: './src/lighthouseEditor',
-		library: {
-			name: 'inseriEditor',
-			type: 'window',
-		},
-	},
-}
+	}
+}, {})
 
 const blockEntrypoints = fs.readdirSync('./src/blocks').reduce((accumulator, item) => {
 	const worker = fs.existsSync(`./src/blocks/${item}/worker.ts`) ? { [`blocks/${item}/worker`]: `./src/blocks/${item}/worker` } : {}
@@ -47,17 +43,15 @@ const blockEntrypoints = fs.readdirSync('./src/blocks').reduce((accumulator, ite
 		[`blocks/${item}/hydration`]: `./src/blocks/${item}/hydration`,
 		...worker,
 	}
-}, initialEntrypoints)
+}, {})
 
 module.exports = {
 	...defaultConfig,
-	entry: { ...blockEntrypoints },
+	entry: { ...bundleEntrypoints, ...blockEntrypoints },
 	plugins: [
 		...defaultConfig.plugins,
 		tsChecker,
 		new BundleAnalyzerPlugin({ analyzerMode: process.env.STATS || 'disabled' }),
 	],
-	externals: [
-		{ '@inseri/lighthouse': 'window.inseri' },
-	],
+	externals: { '@inseri/lighthouse': 'window?.inseri?.lighthouse' },
 }

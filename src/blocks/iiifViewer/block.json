@@ -45,7 +45,7 @@
 		"alignWide": true
 	},
 	"textdomain": "inseri-core",
-	"editorScript": ["file:./index.js", "inseri-core-editor"],
+	"editorScript": ["file:./index.js", "inseri-core-lighthouse-editor"],
 	"viewScript": ["file:./hydration.js"],
-	"script": "inseri-core"
+	"script": "inseri-core-lighthouse"
 }

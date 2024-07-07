@@ -1,6 +1,12 @@
 <?php
 namespace inseri_core;
 
+function camelToKebab($camelCase) {
+	$pattern = '/(?<=\\w)(?=[A-Z])|(?<=[a-z])(?=[0-9])/';
+	$kebabCase = preg_replace($pattern, '-', $camelCase);
+	return strtolower($kebabCase);
+}
+
 function extend_upload_mimes($mimes) {
 	$mimes['py'] = 'text/x-python';
 	$mimes['r'] = 'text/x-r';
@@ -20,6 +26,23 @@ function wp_check_filetype_and_ext($data, $file, $filename, $mimes) {
 		'type' => $filetype['type'],
 		'proper_filename' => $data['proper_filename'],
 	];
+}
+
+function get_asset_files() {
+	$path = plugin_dir_path(__FILE__) . '../build/';
+	$dir_items = scandir($path);
+	$files = array_filter($dir_items, function ($f) use ($path) {
+		$suffix = '.asset.php';
+		$is_asset_file = substr($f, -strlen($suffix)) === $suffix;
+
+		return $f !== '.' && $f !== '..' && $is_asset_file;
+	});
+
+	$files = array_map(function ($f) {
+		$name = substr($f, 0, strrpos($f, '.asset.php'));
+		return [camelToKebab($name), $name];
+	}, $files);
+	return $files;
 }
 
 function get_blocks() {

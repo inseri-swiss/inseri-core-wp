@@ -8,7 +8,7 @@ import { BehaviorSubject, Observable, combineLatest, distinctUntilChanged, map, 
 import { Option, none, some } from './option'
 import { reducer } from './reducer'
 import type { Action, Atom, BlockInfo, Nucleus, Root } from './types'
-import { initJsonValidator } from '../utils'
+import { initJsonValidator } from '../../utils'
 import { IconBuildingLighthouse } from '@tabler/icons-react'
 
 const FILTER_PRIVATE = '__'
