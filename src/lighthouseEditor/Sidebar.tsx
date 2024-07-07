@@ -24,8 +24,8 @@ import {
 	Text,
 	UnstyledButton,
 	createStyles,
-} from '../../components'
-import { Z_INDEX_ABOVE_ADMIN } from '../../utils'
+} from '../components'
+import { Z_INDEX_ABOVE_ADMIN } from '../utils'
 
 const miniStylesheet = [
 	{

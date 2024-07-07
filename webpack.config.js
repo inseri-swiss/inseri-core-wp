@@ -23,14 +23,14 @@ const tsChecker = new ForkTsCheckerWebpackPlugin({
 
 const initialEntrypoints = {
 	'inseri-core': {
-		import: './src/globalScript',
+		import: './src/lighthouse',
 		library: {
 			name: 'inseri',
 			type: 'window',
 		},
 	},
 	'inseri-core-editor': {
-		import: './src/globalScript/editor',
+		import: './src/lighthouseEditor',
 		library: {
 			name: 'inseriEditor',
 			type: 'window',
@@ -58,7 +58,6 @@ module.exports = {
 		new BundleAnalyzerPlugin({ analyzerMode: process.env.STATS || 'disabled' }),
 	],
 	externals: [
-		{ '@inseri/lighthouse': 'window.inseri.lighthouse' },
-		{ '@inseri/utils': 'window.inseri.utils' },
+		{ '@inseri/lighthouse': 'window.inseri' },
 	],
 }
