@@ -14,7 +14,7 @@
 		"allowSyntheticDefaultImports": true,
 		"baseUrl": "./src",
 		"paths": {
-			"@inseri/lighthouse": ["./bundles/lighthouse"],
+			"@inseri/lighthouse": ["./bundles/lighthouse"]
 		}
 	},
 	"include": ["./src"],
