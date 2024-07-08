@@ -1,7 +1,6 @@
 import { immer } from 'zustand/middleware/immer'
-import { updatePartially } from '../../utils'
+import { updatePartially, generateId } from '../../utils'
 import { Attributes } from './index'
-import { generateId } from '@inseri/utils'
 
 export interface GlobalState extends Attributes {
 	[i: string]: any

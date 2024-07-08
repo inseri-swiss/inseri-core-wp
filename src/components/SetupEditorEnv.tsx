@@ -1,4 +1,4 @@
-import { generateId, md5 } from '@inseri/utils'
+import { generateId, md5 } from '../utils'
 import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { dispatch, select, use, useSelect } from '@wordpress/data'

@@ -40,8 +40,8 @@
 		"html": false
 	},
 	"textdomain": "inseri-core",
-	"editorScript": ["file:./index.js", "inseri-core-editor"],
+	"editorScript": ["file:./index.js", "inseri-core-lighthouse-editor"],
 	"viewScript": ["file:./hydration.js"],
 	"style": ["file:./index.css"],
-	"script": "inseri-core"
+	"script": "inseri-core-lighthouse"
 }

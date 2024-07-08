@@ -1,11 +1,17 @@
 import { useWatch } from '@inseri/lighthouse'
 import { IconEyeOff } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
+import Ajv, { Schema } from 'ajv'
+import addFormats from 'ajv-formats'
+import { customAlphabet } from 'nanoid/non-secure'
 import type { PropsWithChildren } from 'react'
 import xmlFormatter from 'xml-formatter'
 import { StateCreator } from 'zustand'
 import { Overlay } from './components'
 import { ParamItem } from './components/ParamsTable'
+
+//@ts-ignore
+import jshashes from 'jshashes'
 
 export const generateQuerySelector = (name: string) => '.wp-block-' + name.replaceAll('/', '-')
 
@@ -416,3 +422,17 @@ export function HidingWrapper({ isSelected, isVisible, children }: PropsWithChil
 		</>
 	)
 }
+
+const alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+const nanoid = customAlphabet(alphabet, 21)
+export const generateId = (size?: number) => nanoid(size)
+
+const ajv = new Ajv({ allErrors: true, strict: false })
+addFormats(ajv)
+
+export function initJsonValidator<T = any>(schema: Schema) {
+	return ajv.compile<T>(schema)
+}
+
+const MD5instance = new jshashes.MD5()
+export const md5 = (s: string) => MD5instance.hex(s)

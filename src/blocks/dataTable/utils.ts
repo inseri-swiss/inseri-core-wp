@@ -1,4 +1,4 @@
-import { initJsonValidator } from '@inseri/utils'
+import { initJsonValidator } from '../../utils'
 
 export const configSchema = {
 	type: 'array',

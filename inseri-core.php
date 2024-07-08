@@ -40,23 +40,23 @@ $inseri_core_blueprint_builder = new inseri_core\Builder();
 $inseri_core_rest_api = new inseri_core\RestApi($inseri_core_blueprint_builder);
 
 /**
- * main script
+ * Bundles
  */
 add_action('init', function () {
 	global $wp_scripts;
 
-	$handle_path_pairs = [
-		['inseri-core', 'inseri-core'],
-		['inseri-core-editor', 'inseri-core-editor'],
-		['inseri-core-python-worker', 'blocks/python/worker'],
-		['inseri-core-javascript-worker', 'blocks/javascript/worker'],
-	];
+	$handle_path_pairs = array_merge(inseri_core\get_asset_files(), [
+		['python-worker', 'blocks/python/worker'],
+		['javascript-worker', 'blocks/javascript/worker'],
+	]);
+
 	foreach ($handle_path_pairs as [$handle, $path]) {
 		$asset_file = include plugin_dir_path(__FILE__) . "build/{$path}.asset.php";
-		wp_register_script($handle, plugins_url("build/{$path}.js", __FILE__), $asset_file['dependencies'], $asset_file['version']);
+		$new_handle = 'inseri-core-' . $handle;
+		wp_register_script($new_handle, plugins_url("build/{$path}.js", __FILE__), $asset_file['dependencies'], $asset_file['version']);
 	}
 
-	wp_localize_script('inseri-core', 'inseriApiSettings', [
+	wp_localize_script('inseri-core-lighthouse', 'inseriApiSettings', [
 		'root' => esc_url_raw(rest_url()),
 		'nonce' => wp_create_nonce('wp_rest'),
 		'pyWorker' => $wp_scripts->registered['inseri-core-python-worker']->src,

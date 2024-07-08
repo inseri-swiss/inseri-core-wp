@@ -1,6 +1,8 @@
 const defaultConfig = require('@wordpress/scripts/config/webpack.config')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const fs = require('fs')
+
+// eslint-disable-next-line  import/no-extraneous-dependencies
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 const isProduction = process.env.NODE_ENV === 'production'
@@ -21,22 +23,18 @@ const tsChecker = new ForkTsCheckerWebpackPlugin({
 	},
 })
 
-const initialEntrypoints = {
-	'inseri-core': {
-		import: './src/globalScript',
-		library: {
-			name: 'inseri',
-			type: 'window',
+const bundleEntrypoints = fs.readdirSync('./src/bundles').reduce((accumulator, item) => {
+	return {
+		...accumulator,
+		[item]: {
+			import: `./src/bundles/${item}`,
+			library: {
+				name: ['inseri', item],
+				type: 'window',
+			},
 		},
-	},
-	'inseri-core-editor': {
-		import: './src/globalScript/editor',
-		library: {
-			name: 'inseriEditor',
-			type: 'window',
-		},
-	},
-}
+	}
+}, {})
 
 const blockEntrypoints = fs.readdirSync('./src/blocks').reduce((accumulator, item) => {
 	const worker = fs.existsSync(`./src/blocks/${item}/worker.ts`) ? { [`blocks/${item}/worker`]: `./src/blocks/${item}/worker` } : {}
@@ -47,18 +45,15 @@ const blockEntrypoints = fs.readdirSync('./src/blocks').reduce((accumulator, ite
 		[`blocks/${item}/hydration`]: `./src/blocks/${item}/hydration`,
 		...worker,
 	}
-}, initialEntrypoints)
+}, {})
 
 module.exports = {
 	...defaultConfig,
-	entry: { ...blockEntrypoints },
+	entry: { ...bundleEntrypoints, ...blockEntrypoints },
 	plugins: [
 		...defaultConfig.plugins,
 		tsChecker,
 		new BundleAnalyzerPlugin({ analyzerMode: process.env.STATS || 'disabled' }),
 	],
-	externals: [
-		{ '@inseri/lighthouse': 'window.inseri.lighthouse' },
-		{ '@inseri/utils': 'window.inseri.utils' },
-	],
+	externals: { '@inseri/lighthouse': 'window?.inseri?.lighthouse' },
 }
