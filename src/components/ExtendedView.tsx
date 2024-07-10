@@ -72,7 +72,7 @@ const useStyles = createStyles(() => ({
 	},
 }))
 
-export function ExtendedView<T extends CommonCodeState>({ type }: { type: 'python' | 'javascript' }) {
+export function ExtendedView<T extends CommonCodeState>({ type }: { type: 'python' | 'javascript' | 'r' }) {
 	const {
 		blockName,
 		actions: stateActions,
@@ -113,6 +113,15 @@ export function ExtendedView<T extends CommonCodeState>({ type }: { type: 'pytho
 		['mod+Enter', () => runCode(code)],
 	])
 
+	let title = 'Python'
+
+	if (type === 'javascript') {
+		title = 'JavaScript'
+	}
+	if (type === 'r') {
+		title = 'R'
+	}
+
 	return (
 		<Modal
 			zIndex={Z_INDEX_ABOVE_ADMIN}
@@ -126,7 +135,7 @@ export function ExtendedView<T extends CommonCodeState>({ type }: { type: 'pytho
 			}}
 			title={
 				<Text fz="md" fw="bold">
-					{`${type === 'python' ? 'Python' : 'JavaScript'} Code${blockName ? ': ' + blockName : ''}`}
+					{`${title} Code${blockName ? ': ' + blockName : ''}`}
 				</Text>
 			}
 		>

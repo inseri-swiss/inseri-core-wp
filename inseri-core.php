@@ -50,6 +50,7 @@ add_action('init', function () {
 		['inseri-core-editor', 'inseri-core-editor'],
 		['inseri-core-python-worker', 'blocks/python/worker'],
 		['inseri-core-javascript-worker', 'blocks/javascript/worker'],
+		['inseri-core-r-code-worker', 'blocks/rCode/worker'],
 	];
 	foreach ($handle_path_pairs as [$handle, $path]) {
 		$asset_file = include plugin_dir_path(__FILE__) . "build/{$path}.asset.php";
@@ -61,6 +62,7 @@ add_action('init', function () {
 		'nonce' => wp_create_nonce('wp_rest'),
 		'pyWorker' => $wp_scripts->registered['inseri-core-python-worker']->src,
 		'jsWorker' => $wp_scripts->registered['inseri-core-javascript-worker']->src,
+		'jsWorker' => $wp_scripts->registered['inseri-core-r-code-worker']->src,
 	]);
 });
 
