@@ -47,7 +47,7 @@ export interface CommonCodeState {
 		updateState: (modifier: Partial<CommonCodeState>) => void
 		setInputValue: (name: string, val: any) => void
 		setInputEmpty: (name: string, isRemoved: boolean) => void
-		runCode: (code: string) => void
+		runCode: (code: string) => void | Promise<void>
 		terminate: () => void
 
 		addNewInput: () => void

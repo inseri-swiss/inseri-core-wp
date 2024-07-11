@@ -1,5 +1,5 @@
 import { InseriRoot, useDiscover } from '@inseri/lighthouse'
-import { IconLetterR, IconChevronLeft, IconWindowMaximize } from '@tabler/icons-react'
+import { IconChevronLeft, IconWindowMaximize } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow, ResizableBox, TextControl, ToggleControl, ToolbarButton, ToolbarGroup, Button as WPButton } from '@wordpress/components'
@@ -52,7 +52,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 
 	return (
 		<>
-			<ExtendedView type="python" />
+			<ExtendedView type="r" />
 			<BlockControls controls={[]}>
 				{isValueSet && (
 					<ToolbarGroup>
@@ -134,7 +134,6 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 			{isWizardMode ? (
 				<Box p="md" style={{ border: '1px solid #000' }}>
 					<Group mb="md" spacing={0}>
-						<IconLetterR size={28} />
 						<Text ml="xs" fz={24}>
 							{__('R Code', 'inseri-core')}
 						</Text>

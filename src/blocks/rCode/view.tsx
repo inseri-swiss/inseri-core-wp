@@ -1,7 +1,7 @@
 import { Nucleus, usePublish, useWatch } from '@inseri/lighthouse'
 import { usePrevious } from '@mantine/hooks'
-import { useCallback, useEffect } from '@wordpress/element'
-import { Action, Box, CodeEditor, Group, TopBar, useGlobalState } from '../../components'
+import { useEffect } from '@wordpress/element'
+import { Box, CodeEditor, Group, TopBar, useGlobalState } from '../../components'
 import { Attributes } from './index'
 import { GlobalState } from './state'
 
@@ -23,13 +23,14 @@ export default function View(props: ViewProps) {
 		inputRecord,
 		content,
 		inputs,
-		worker,
 		outputs,
 		isVisible,
 		autoTrigger,
 		workerStatus,
 		hasInputError,
 		inputRevision,
+		outputRevision,
+		outputRecord,
 	} = useGlobalState((state: GlobalState) => state)
 	const { setInputValue, setInputEmpty, updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
@@ -47,39 +48,11 @@ export default function View(props: ViewProps) {
 	const areOutputsReady = outputs.every((o) => o[1] !== '')
 
 	useEffect(() => {
-		if (areInputsReady) {
-			worker.postMessage({ type: 'SET_INPUTS', payload: inputRecord })
-		}
-	}, [inputRevision])
-
-	const outputKeys = outputs.map((o) => o[0])
-
-	useEffect(() => {
-		worker.postMessage({ type: 'SET_OUTPUTS', payload: outputKeys })
-	}, [outputKeys.join()])
-
-	const pyDispatcher = useCallback(
-		(message: MessageEvent<Action>) => {
-			if (message?.data?.type === 'SET_RESULTS') {
-				Object.entries(message.data.payload).forEach(([key, val]) => {
-					const contentType = outputs.find((o) => o[0] === key)![1]
-					let convertedData = val
-
-					if (convertedData instanceof Uint8Array) {
-						convertedData = new Blob([convertedData.buffer], { type: contentType })
-					}
-
-					publishRecord[key][0](convertedData, contentType)
-				})
-			}
-		},
-		[outputKeys.join('')]
-	)
-
-	useEffect(() => {
-		worker.addEventListener('message', pyDispatcher)
-		return () => worker.removeEventListener('message', pyDispatcher)
-	}, [pyDispatcher])
+		Object.entries(outputRecord).forEach(([key, val]) => {
+			const contentType = outputs.find((o) => o[0] === key)![1]
+			publishRecord[key][0](val, contentType)
+		})
+	}, [outputRevision])
 
 	const watchedCode = useWatch(inputCode, {
 		onBlockRemoved: () => updateState({ inputCode: '', isWizardMode: true, wizardStep: 1, mode: '' }),
