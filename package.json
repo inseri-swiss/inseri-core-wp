@@ -83,6 +83,7 @@
 		"react-use": "^17.5.0",
 		"recoil": "^0.7.7",
 		"rxjs": "^7.8.1",
+		"webr": "^0.4.0",
 		"xml-formatter": "^2.6.1",
 		"zustand": "^4.5.4"
 	}
