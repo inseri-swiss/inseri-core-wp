@@ -14,7 +14,7 @@ const convertRObject =
 	(env: REnvironment) =>
 	async (name: string): Promise<[string, any]> => {
 		const rVariable = await env.get(name)
-		let jsVariable: any = undefined
+		let jsVariable: any
 
 		if (isRDouble(rVariable) || isRInteger(rVariable) || isRRaw(rVariable)) {
 			jsVariable = await rVariable.toNumber()
@@ -35,10 +35,10 @@ const convertRObject =
 
 export const storeCreator = (initalState: Attributes) => {
 	const isValueSet = initalState.mode === 'editor' || (!!initalState.mode && !!initalState.inputCode)
-	const webR = new WebR({ interactive: false, channelType: 3 })
+	const newWebR = new WebR({ interactive: false, channelType: 3 })
 
 	return immer<GlobalState>((set, get) => {
-		webR.init().then(() => {
+		newWebR.init().then(() => {
 			set((state) => {
 				state.workerStatus = 'ready'
 			})
@@ -47,7 +47,7 @@ export const storeCreator = (initalState: Attributes) => {
 		return {
 			...initalState,
 
-			webR,
+			webR: newWebR,
 			outputRecord: {},
 			outputRevision: 0,
 
@@ -113,15 +113,18 @@ export const storeCreator = (initalState: Attributes) => {
 						const emptyRecord = Object.keys(inputRecord).reduce((acc, key) => ({ ...acc, [key]: null }), {})
 						env = await new webR.REnvironment(emptyRecord)
 
+						let message = 'trouble in converting the inputs'
 						if (error instanceof Error) {
-							let message = error.message
-							set((state) => {
-								state.stdStream = message
-							})
+							message = error.message
 						}
+
+						set((state) => {
+							state.stdStream = message
+						})
 					}
 
 					const shelter = await new webR.Shelter()
+					let stdStream = ''
 
 					try {
 						const capture = await shelter.captureR(code, { env })
@@ -130,6 +133,12 @@ export const storeCreator = (initalState: Attributes) => {
 							acc[name] = val
 							return acc
 						}, {} as any)
+
+						stdStream = capture.output
+							.filter((m) => m.type === 'stdout' || m.type === 'stderr')
+							.map((m) => m.data)
+							.filter(Boolean)
+							.join('\n')
 					} finally {
 						shelter.purge()
 					}
@@ -138,6 +147,7 @@ export const storeCreator = (initalState: Attributes) => {
 						state.workerStatus = 'ready'
 						state.outputRecord = outputRecord
 						state.outputRevision++
+						state.stdStream = stdStream
 					})
 				},
 
