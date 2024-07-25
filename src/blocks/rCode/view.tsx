@@ -12,6 +12,8 @@ interface ViewProps {
 	renderHiding?: (BlockComponent: JSX.Element) => JSX.Element
 }
 
+const IMG = 'plot'
+
 export default function View(props: ViewProps) {
 	const { isGutenbergEditor, renderResizable, renderHiding } = props
 	const {
@@ -45,7 +47,7 @@ export default function View(props: ViewProps) {
 		deps: [inputRevision, hasInputError, inputRecord, inputerr],
 	})
 
-	const imgOutputs = Array.from(Array(highestNoImgBlobs)).map((_v, idx) => ['img' + idx, 'image/jpeg'])
+	const imgOutputs = Array.from(Array(highestNoImgBlobs)).map((_v, idx) => [IMG + idx, 'image/jpeg'])
 	const areInputsReady = Object.values(hasInputError).every((b) => !b)
 	const publishRecord = usePublish([...outputs, ...imgOutputs].map((i) => ({ key: i[0], description: i[0] })))
 	const areOutputsReady = outputs.every((o) => o[1] !== '')
@@ -58,9 +60,9 @@ export default function View(props: ViewProps) {
 
 		for (let i = 0; i < highestNoImgBlobs; i++) {
 			if (i < imgBlobs.length) {
-				publishRecord['img' + i][0](imgBlobs[i], 'image/jpeg')
+				publishRecord[IMG + i][0](imgBlobs[i], 'image/jpeg')
 			} else {
-				publishRecord['img' + i][1]()
+				publishRecord[IMG + i][1]()
 			}
 		}
 	}, [outputRevision])

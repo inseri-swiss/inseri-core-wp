@@ -37,19 +37,23 @@ const convertRObject =
 
 export const storeCreator = (initalState: Attributes) => {
 	const isValueSet = initalState.mode === 'editor' || (!!initalState.mode && !!initalState.inputCode)
-	const newWebR = new WebR({ interactive: false, channelType: 3 })
 
 	return immer<GlobalState>((set, get) => {
-		newWebR.init().then(() => {
-			set((state) => {
-				state.workerStatus = 'ready'
+		const createWebR = () => {
+			const newWebR = new WebR({ interactive: false, channelType: 3 })
+			newWebR.init().then(() => {
+				set((state) => {
+					state.workerStatus = 'ready'
+				})
 			})
-		})
+
+			return newWebR
+		}
 
 		return {
 			...initalState,
 
-			webR: newWebR,
+			webR: createWebR(),
 			outputRecord: {},
 			outputRevision: 0,
 			imgBlobs: [],
@@ -153,7 +157,7 @@ export const storeCreator = (initalState: Attributes) => {
 
 						blobs = await Promise.all(
 							jpgFiles.map(async (f) => {
-								let content = await webR.FS.readFile(f)
+								const content = await webR.FS.readFile(f)
 								webR.FS.unlink(f)
 								return new Blob([content], { type: 'image/jpeg' })
 							})
@@ -176,10 +180,10 @@ export const storeCreator = (initalState: Attributes) => {
 				},
 
 				terminate: () => {
-					get().worker.terminate()
+					get().webR.close()
 					set((state) => {
 						state.workerStatus = 'initial'
-						//state.worker = createWorker(set)
+						state.webR = createWebR()
 					})
 				},
 
