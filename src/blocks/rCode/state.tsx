@@ -8,6 +8,8 @@ export interface GlobalState extends Attributes, CommonCodeState {
 	webR: WebR
 	outputRecord: Record<string, any>
 	outputRevision: number
+	imgBlobs: Blob[]
+	highestNoImgBlobs: number
 }
 
 const convertRObject =
@@ -50,6 +52,8 @@ export const storeCreator = (initalState: Attributes) => {
 			webR: newWebR,
 			outputRecord: {},
 			outputRevision: 0,
+			imgBlobs: [],
+			highestNoImgBlobs: 0,
 
 			worker: undefined,
 			workerStatus: 'initial',
@@ -125,9 +129,11 @@ export const storeCreator = (initalState: Attributes) => {
 
 					const shelter = await new webR.Shelter()
 					let stdStream = ''
+					let blobs: Blob[] = []
 
 					try {
-						const capture = await shelter.captureR(code, { env })
+						const newCode = `jpeg()\n ${code} \n dev.off()`
+						const capture = await shelter.captureR(newCode, { env })
 						const converter = convertRObject(env)
 						outputRecord = (await Promise.all(outputs.map((o) => converter(o[0])))).reduce((acc, [name, val]) => {
 							acc[name] = val
@@ -139,6 +145,19 @@ export const storeCreator = (initalState: Attributes) => {
 							.map((m) => m.data)
 							.filter(Boolean)
 							.join('\n')
+
+						const files = (await webR.FS.lookupPath('/home/web_user')).contents ?? []
+						const jpgFiles = Object.values(files)
+							.filter((f) => f.name.endsWith('.jpeg'))
+							.map((f) => '/home/web_user/' + f.name)
+
+						blobs = await Promise.all(
+							jpgFiles.map(async (f) => {
+								let content = await webR.FS.readFile(f)
+								webR.FS.unlink(f)
+								return new Blob([content], { type: 'image/jpeg' })
+							})
+						)
 					} finally {
 						shelter.purge()
 					}
@@ -148,6 +167,11 @@ export const storeCreator = (initalState: Attributes) => {
 						state.outputRecord = outputRecord
 						state.outputRevision++
 						state.stdStream = stdStream
+						state.imgBlobs = blobs
+
+						if (state.highestNoImgBlobs < blobs.length) {
+							state.highestNoImgBlobs = blobs.length
+						}
 					})
 				},
 
