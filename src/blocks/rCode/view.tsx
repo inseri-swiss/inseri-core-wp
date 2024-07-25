@@ -31,6 +31,8 @@ export default function View(props: ViewProps) {
 		inputRevision,
 		outputRevision,
 		outputRecord,
+		highestNoImgBlobs,
+		imgBlobs,
 	} = useGlobalState((state: GlobalState) => state)
 	const { setInputValue, setInputEmpty, updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
@@ -43,8 +45,9 @@ export default function View(props: ViewProps) {
 		deps: [inputRevision, hasInputError, inputRecord, inputerr],
 	})
 
+	const imgOutputs = Array.from(Array(highestNoImgBlobs)).map((_v, idx) => ['img' + idx, 'image/jpeg'])
 	const areInputsReady = Object.values(hasInputError).every((b) => !b)
-	const publishRecord = usePublish(outputs.map((i) => ({ key: i[0], description: i[0] })))
+	const publishRecord = usePublish([...outputs, ...imgOutputs].map((i) => ({ key: i[0], description: i[0] })))
 	const areOutputsReady = outputs.every((o) => o[1] !== '')
 
 	useEffect(() => {
@@ -52,6 +55,14 @@ export default function View(props: ViewProps) {
 			const contentType = outputs.find((o) => o[0] === key)![1]
 			publishRecord[key][0](val, contentType)
 		})
+
+		for (let i = 0; i < highestNoImgBlobs; i++) {
+			if (i < imgBlobs.length) {
+				publishRecord['img' + i][0](imgBlobs[i], 'image/jpeg')
+			} else {
+				publishRecord['img' + i][1]()
+			}
+		}
 	}, [outputRevision])
 
 	const watchedCode = useWatch(inputCode, {
