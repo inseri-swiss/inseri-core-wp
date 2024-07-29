@@ -1,7 +1,7 @@
+import { REnvironment, WebR } from 'webr'
 import { immer } from 'zustand/middleware/immer'
 import { CommonCodeState } from '../../components'
 import { Attributes } from './index'
-import { WebR, REnvironment, isRDouble, isRCharacter, isRList, isRInteger, isRRaw, isRLogical, isRComplex, isRSymbol, isRPairlist } from 'webr'
 
 export interface GlobalState extends Attributes, CommonCodeState {
 	worker: any
@@ -12,25 +12,39 @@ export interface GlobalState extends Attributes, CommonCodeState {
 	highestNoImgBlobs: number
 }
 
+const transformToJsValue = (wrapper: any) => {
+	if (wrapper.type === 'null') {
+		return null
+	}
+	if (wrapper.type === 'symbol') {
+		return wrapper.printname
+	}
+	if (wrapper.type === 'string') {
+		return wrapper.value
+	}
+	if (
+		wrapper.type === 'logical' ||
+		wrapper.type === 'integer' ||
+		wrapper.type === 'double' ||
+		wrapper.type === 'complex' ||
+		wrapper.type === 'character' ||
+		wrapper.type === 'raw'
+	) {
+		return wrapper.values
+	}
+	if (wrapper.type === 'list' || wrapper.type === 'pairlist' || wrapper.type === 'environment') {
+		return wrapper.values.map((v: any) => transformToJsValue(v))
+	}
+
+	return null
+}
+
 const convertRObject =
 	(env: REnvironment) =>
 	async (name: string): Promise<[string, any]> => {
 		const rVariable = await env.get(name)
-		let jsVariable: any
-
-		if (isRDouble(rVariable) || isRInteger(rVariable) || isRRaw(rVariable)) {
-			jsVariable = await rVariable.toNumber()
-		} else if (isRCharacter(rVariable) || isRSymbol(rVariable)) {
-			jsVariable = await rVariable.toString()
-		} else if (isRLogical(rVariable)) {
-			jsVariable = await rVariable.toBoolean()
-		} else if (isRComplex(rVariable)) {
-			jsVariable = await rVariable.toComplex()
-		} else if (isRList(rVariable) || isRPairlist(rVariable)) {
-			jsVariable = await rVariable.toArray()
-		} else {
-			jsVariable = await rVariable.toJs({ depth: 0 /*  infinite */ })
-		}
+		const wrapper = await rVariable.toJs()
+		const jsVariable = transformToJsValue(wrapper)
 
 		return [name, jsVariable]
 	}
