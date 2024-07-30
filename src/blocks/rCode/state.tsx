@@ -1,4 +1,4 @@
-import { REnvironment, WebR } from 'webr'
+import { REnvironment, WebR, isRList, isRCharacter, isRComplex, isRInteger, isRRaw, isRDouble, isRLogical, isRPairlist, isRSymbol } from 'webr'
 import { immer } from 'zustand/middleware/immer'
 import { CommonCodeState } from '../../components'
 import { Attributes } from './index'
@@ -12,42 +12,26 @@ export interface GlobalState extends Attributes, CommonCodeState {
 	highestNoImgBlobs: number
 }
 
-const transformToJsValue = (wrapper: any) => {
-	if (wrapper.type === 'null') {
-		return null
+const transformToJsValue = async (rVariable: any): Promise<any> => {
+	if (isRDouble(rVariable) || isRInteger(rVariable) || isRRaw(rVariable) || isRCharacter(rVariable) || isRLogical(rVariable) || isRComplex(rVariable)) {
+		const arr = await rVariable.toArray()
+
+		if (arr.length === 1) {
+			return arr[0]
+		}
+		return arr
 	}
-	if (wrapper.type === 'symbol') {
-		return wrapper.printname
-	}
-	if (wrapper.type === 'string') {
-		return wrapper.value
-	}
-	if (
-		wrapper.type === 'logical' ||
-		wrapper.type === 'integer' ||
-		wrapper.type === 'double' ||
-		wrapper.type === 'complex' ||
-		wrapper.type === 'character' ||
-		wrapper.type === 'raw'
-	) {
-		return wrapper.values
-	}
-	if (wrapper.type === 'list' || wrapper.type === 'pairlist' || wrapper.type === 'environment') {
-		return wrapper.values.map((v: any) => transformToJsValue(v))
+	if (isRSymbol(rVariable)) {
+		return await rVariable.toString()
 	}
 
-	return null
+	if (isRList(rVariable) || isRPairlist(rVariable)) {
+		const arr = await rVariable.toArray()
+		return await Promise.all(arr.map((e) => transformToJsValue(e)))
+	}
+
+	return await rVariable.toJs({ depth: 0 /*  infinite */ })
 }
-
-const convertRObject =
-	(env: REnvironment) =>
-	async (name: string): Promise<[string, any]> => {
-		const rVariable = await env.get(name)
-		const wrapper = await rVariable.toJs()
-		const jsVariable = transformToJsValue(wrapper)
-
-		return [name, jsVariable]
-	}
 
 export const storeCreator = (initalState: Attributes) => {
 	const isValueSet = initalState.mode === 'editor' || (!!initalState.mode && !!initalState.inputCode)
@@ -127,7 +111,7 @@ export const storeCreator = (initalState: Attributes) => {
 					const { webR, inputRecord, outputs } = get()
 
 					let outputRecord = {}
-					let env
+					let env: REnvironment
 
 					try {
 						env = await new webR.REnvironment(inputRecord)
@@ -150,10 +134,20 @@ export const storeCreator = (initalState: Attributes) => {
 					let blobs: Blob[] = []
 
 					try {
-						const newCode = `jpeg()\n ${code} \n dev.off()`
+						const newCode = `
+webr::shim_install()\n
+jpeg()\n
+${code} \n
+dev.off()
+`
 						const capture = await shelter.captureR(newCode, { env })
-						const converter = convertRObject(env)
-						outputRecord = (await Promise.all(outputs.map((o) => converter(o[0])))).reduce((acc, [name, val]) => {
+						const outputValues: [string, any][] = await Promise.all(
+							outputs.map(async ([name, _]) => {
+								const rVariable = await env.get(name)
+								return [name, await transformToJsValue(rVariable)]
+							})
+						)
+						outputRecord = outputValues.reduce((acc, [name, val]) => {
 							acc[name] = val
 							return acc
 						}, {} as any)
