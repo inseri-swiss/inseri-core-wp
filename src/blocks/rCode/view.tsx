@@ -35,6 +35,7 @@ export default function View(props: ViewProps) {
 		outputRecord,
 		highestNoImgBlobs,
 		imgBlobs,
+		jsonFiles,
 	} = useGlobalState((state: GlobalState) => state)
 	const { setInputValue, setInputEmpty, updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
@@ -47,9 +48,10 @@ export default function View(props: ViewProps) {
 		deps: [inputRevision, hasInputError, inputRecord, inputerr],
 	})
 
+	const jsonOutputs = jsonFiles.map(([name, _]) => [name, 'application/json'])
 	const imgOutputs = Array.from(Array(highestNoImgBlobs)).map((_v, idx) => [IMG + idx, 'image/jpeg'])
 	const areInputsReady = Object.values(hasInputError).every((b) => !b)
-	const publishRecord = usePublish([...outputs, ...imgOutputs].map((i) => ({ key: i[0], description: i[0] })))
+	const publishRecord = usePublish([...outputs, ...jsonOutputs, ...imgOutputs].map((i) => ({ key: i[0], description: i[0] })))
 	const areOutputsReady = outputs.every((o) => o[1] !== '')
 
 	useEffect(() => {
@@ -65,6 +67,11 @@ export default function View(props: ViewProps) {
 				publishRecord[IMG + i][1]()
 			}
 		}
+
+		jsonFiles.forEach(([key, jsonString]) => {
+			const obj = JSON.parse(jsonString)
+			publishRecord[key][0](obj, 'application/json')
+		})
 	}, [outputRevision])
 
 	const watchedCode = useWatch(inputCode, {
