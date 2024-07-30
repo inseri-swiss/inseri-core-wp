@@ -8,6 +8,7 @@ export interface GlobalState extends Attributes, CommonCodeState {
 	webR: WebR
 	outputRecord: Record<string, any>
 	outputRevision: number
+	jsonFiles: [string, string][]
 	imgBlobs: Blob[]
 	highestNoImgBlobs: number
 }
@@ -54,6 +55,7 @@ export const storeCreator = (initalState: Attributes) => {
 			webR: createWebR(),
 			outputRecord: {},
 			outputRevision: 0,
+			jsonFiles: [],
 			imgBlobs: [],
 			highestNoImgBlobs: 0,
 
@@ -132,6 +134,7 @@ export const storeCreator = (initalState: Attributes) => {
 					const shelter = await new webR.Shelter()
 					let stdStream = ''
 					let blobs: Blob[] = []
+					let jsonContents: [string, string][] = []
 
 					try {
 						const newCode = `
@@ -159,6 +162,21 @@ dev.off()
 							.join('\n')
 
 						const files = (await webR.FS.lookupPath('/home/web_user')).contents ?? []
+
+						const jsonFiles = Object.values(files).filter((f) => f.name.endsWith('.json'))
+
+						jsonContents = await Promise.all(
+							jsonFiles.map(async (f) => {
+								const path = '/home/web_user/' + f.name
+								const uint8array = await webR.FS.readFile(path)
+								const jsonString = new TextDecoder().decode(uint8array)
+
+								webR.FS.unlink(path)
+								const name = f.name.split('.')[0]
+								return [name, jsonString]
+							})
+						)
+
 						const jpgFiles = Object.values(files)
 							.filter((f) => f.name.endsWith('.jpeg'))
 							.map((f) => '/home/web_user/' + f.name)
@@ -180,6 +198,7 @@ dev.off()
 						state.outputRevision++
 						state.stdStream = stdStream
 						state.imgBlobs = blobs
+						state.jsonFiles = jsonContents
 
 						if (state.highestNoImgBlobs < blobs.length) {
 							state.highestNoImgBlobs = blobs.length
