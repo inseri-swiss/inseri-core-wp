@@ -118,6 +118,7 @@ export const CONTENT_TYPE_TO_EXT = [
 	{ ext: 'yml', value: 'application/x-yaml' },
 	{ ext: 'gif', value: 'image/gif' },
 	{ ext: 'jpg', value: 'image/jpeg' },
+	{ ext: 'jpeg', value: 'image/jpeg' },
 	{ ext: 'png', value: 'image/png' },
 	{ ext: 'webp', value: 'image/webp' },
 	{ ext: 'tiff', value: 'image/tiff' },

@@ -48,10 +48,12 @@ export default function View(props: ViewProps) {
 		deps: [inputRevision, hasInputError, inputRecord, inputerr],
 	})
 
-	const jsonOutputs = Object.keys(jsonFiles).map((k) => [k, k])
-	const imgOutputs = Array.from(Array(highestNoImgBlobs)).map((_v, idx) => [IMG + idx, 'image/jpeg'])
+	const normalOutputs = outputs.map((i) => ({ key: i[0], description: i[0] }))
+	const jsonOutputs = Object.keys(jsonFiles).map((i) => ({ key: i, description: i }))
+	const imgOutputs = Array.from(Array(highestNoImgBlobs)).map((_v, idx) => ({ key: IMG + idx, description: `${IMG} ${idx + 1}` }))
+
+	const publishRecord = usePublish([...normalOutputs, ...jsonOutputs, ...imgOutputs])
 	const areInputsReady = Object.values(hasInputError).every((b) => !b)
-	const publishRecord = usePublish([...outputs, ...jsonOutputs, ...imgOutputs].map((i) => ({ key: i[0], description: i[0] })))
 	const areOutputsReady = outputs.every((o) => o[1] !== '')
 
 	useEffect(() => {
@@ -62,7 +64,13 @@ export default function View(props: ViewProps) {
 
 		for (let i = 0; i < highestNoImgBlobs; i++) {
 			if (i < imgBlobs.length) {
-				publishRecord[IMG + i][0](imgBlobs[i], 'image/jpeg')
+				const blob = imgBlobs[i]
+
+				if (blob.type === 'image/svg+xml') {
+					blob.text().then((svgText) => publishRecord[IMG + i][0](svgText, blob.type))
+				} else {
+					publishRecord[IMG + i][0](blob, blob.type)
+				}
 			} else {
 				publishRecord[IMG + i][1]()
 			}
