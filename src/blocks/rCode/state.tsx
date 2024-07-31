@@ -8,7 +8,7 @@ export interface GlobalState extends Attributes, CommonCodeState {
 	webR: WebR
 	outputRecord: Record<string, any>
 	outputRevision: number
-	jsonFiles: [string, string][]
+	jsonFiles: Record<string, string | null>
 	imgBlobs: Blob[]
 	highestNoImgBlobs: number
 }
@@ -55,7 +55,7 @@ export const storeCreator = (initalState: Attributes) => {
 			webR: createWebR(),
 			outputRecord: {},
 			outputRevision: 0,
-			jsonFiles: [],
+			jsonFiles: {},
 			imgBlobs: [],
 			highestNoImgBlobs: 0,
 
@@ -134,7 +134,7 @@ export const storeCreator = (initalState: Attributes) => {
 					const shelter = await new webR.Shelter()
 					let stdStream = ''
 					let blobs: Blob[] = []
-					let jsonContents: [string, string][] = []
+					let jsonContents: Record<string, string> = {}
 
 					try {
 						const newCode = `
@@ -165,7 +165,7 @@ dev.off()
 
 						const jsonFiles = Object.values(files).filter((f) => f.name.endsWith('.json'))
 
-						jsonContents = await Promise.all(
+						const jsonPairs = await Promise.all(
 							jsonFiles.map(async (f) => {
 								const path = '/home/web_user/' + f.name
 								const uint8array = await webR.FS.readFile(path)
@@ -176,6 +176,7 @@ dev.off()
 								return [name, jsonString]
 							})
 						)
+						jsonContents = jsonPairs.reduce((acc, [name, content]) => ({ ...acc, [name]: content }), {})
 
 						const jpgFiles = Object.values(files)
 							.filter((f) => f.name.endsWith('.jpeg'))
@@ -197,13 +198,15 @@ dev.off()
 						shelter.purge()
 					}
 
+					const emptyRecord = Object.keys(get().jsonFiles).reduce((acc, key) => ({ ...acc, [key]: null }), {})
+
 					set((state) => {
 						state.workerStatus = 'ready'
 						state.outputRecord = outputRecord
 						state.outputRevision++
 						state.stdStream = stdStream
 						state.imgBlobs = blobs
-						state.jsonFiles = jsonContents
+						state.jsonFiles = { ...emptyRecord, ...jsonContents }
 
 						if (state.highestNoImgBlobs < blobs.length) {
 							state.highestNoImgBlobs = blobs.length
