@@ -48,7 +48,7 @@ export default function View(props: ViewProps) {
 		deps: [inputRevision, hasInputError, inputRecord, inputerr],
 	})
 
-	const jsonOutputs = jsonFiles.map(([name, _]) => [name, 'application/json'])
+	const jsonOutputs = Object.keys(jsonFiles).map((k) => [k, k])
 	const imgOutputs = Array.from(Array(highestNoImgBlobs)).map((_v, idx) => [IMG + idx, 'image/jpeg'])
 	const areInputsReady = Object.values(hasInputError).every((b) => !b)
 	const publishRecord = usePublish([...outputs, ...jsonOutputs, ...imgOutputs].map((i) => ({ key: i[0], description: i[0] })))
@@ -68,9 +68,17 @@ export default function View(props: ViewProps) {
 			}
 		}
 
-		jsonFiles.forEach(([key, jsonString]) => {
-			const obj = JSON.parse(jsonString)
-			publishRecord[key][0](obj, 'application/json')
+		Object.entries(jsonFiles).forEach(([key, jsonString]) => {
+			try {
+				if (jsonString) {
+					const obj = JSON.parse(jsonString)
+					publishRecord[key][0](obj, 'application/json')
+				} else {
+					publishRecord[key][1]()
+				}
+			} catch (error) {
+				publishRecord[key][1]()
+			}
 		})
 	}, [outputRevision])
 
