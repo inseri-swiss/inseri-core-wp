@@ -2,6 +2,7 @@ import { REnvironment, WebR, isRList, isRCharacter, isRComplex, isRInteger, isRR
 import { immer } from 'zustand/middleware/immer'
 import { CommonCodeState } from '../../components'
 import { Attributes } from './index'
+import { guessContentTypeByExtension } from '../../utils'
 
 export interface GlobalState extends Attributes, CommonCodeState {
 	worker: any
@@ -12,6 +13,8 @@ export interface GlobalState extends Attributes, CommonCodeState {
 	imgBlobs: Blob[]
 	highestNoImgBlobs: number
 }
+
+const WORK_DIR = '/home/web_user/'
 
 const transformToJsValue = async (rVariable: any): Promise<any> => {
 	if (isRDouble(rVariable) || isRInteger(rVariable) || isRRaw(rVariable) || isRCharacter(rVariable) || isRLogical(rVariable) || isRComplex(rVariable)) {
@@ -137,13 +140,9 @@ export const storeCreator = (initalState: Attributes) => {
 					let jsonContents: Record<string, string> = {}
 
 					try {
-						const newCode = `
-webr::shim_install()\n
-jpeg()\n
-${code} \n
-dev.off()
-`
+						const newCode = `webr::shim_install()\n ${code} \n`
 						const capture = await shelter.captureR(newCode, { env })
+
 						const outputValues: [string, any][] = await Promise.all(
 							outputs.map(async ([name, _]) => {
 								const rVariable = await env.get(name)
@@ -167,7 +166,7 @@ dev.off()
 
 						const jsonPairs = await Promise.all(
 							jsonFiles.map(async (f) => {
-								const path = '/home/web_user/' + f.name
+								const path = WORK_DIR + f.name
 								const uint8array = await webR.FS.readFile(path)
 								const jsonString = new TextDecoder().decode(uint8array)
 
@@ -178,15 +177,19 @@ dev.off()
 						)
 						jsonContents = jsonPairs.reduce((acc, [name, content]) => ({ ...acc, [name]: content }), {})
 
-						const jpgFiles = Object.values(files)
-							.filter((f) => f.name.endsWith('.jpeg'))
-							.map((f) => '/home/web_user/' + f.name)
+						const imgFiles = Object.values(files).filter(
+							(f) => f.name.endsWith('.pdf') || f.name.endsWith('.jpeg') || f.name.endsWith('.png') || f.name.endsWith('.svg')
+						)
 
 						blobs = await Promise.all(
-							jpgFiles.map(async (f) => {
-								const content = await webR.FS.readFile(f)
-								webR.FS.unlink(f)
-								return new Blob([content], { type: 'image/jpeg' })
+							imgFiles.map(async (f) => {
+								const path = WORK_DIR + f.name
+								const ext = f.name.split('.')[1]
+								const type = guessContentTypeByExtension(ext) ?? 'application/octet-stream'
+
+								const content = await webR.FS.readFile(path)
+								webR.FS.unlink(path)
+								return new Blob([content], { type })
 							})
 						)
 					} catch (error) {
