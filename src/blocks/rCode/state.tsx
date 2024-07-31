@@ -188,6 +188,11 @@ dev.off()
 								return new Blob([content], { type: 'image/jpeg' })
 							})
 						)
+					} catch (error) {
+						stdStream = 'An error has ocurred while executing the code.'
+						if (error instanceof Error) {
+							stdStream = error.message
+						}
 					} finally {
 						shelter.purge()
 					}
