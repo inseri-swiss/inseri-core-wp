@@ -107,6 +107,12 @@ export const storeCreator = (initalState: Attributes) => {
 				removeInput: (variable: string) => {
 					set((state) => {
 						delete state.inputs[variable]
+
+						state.hasInputError[variable] = false
+						const hasNoError = Object.values(state.hasInputError).every((b) => !b)
+						if (hasNoError) {
+							state.inputerr = ''
+						}
 					})
 				},
 
