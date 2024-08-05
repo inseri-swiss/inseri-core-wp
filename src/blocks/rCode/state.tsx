@@ -1,8 +1,8 @@
-import { REnvironment, WebR, isRList, isRCharacter, isRComplex, isRInteger, isRRaw, isRDouble, isRLogical, isRPairlist, isRSymbol } from 'webr'
+import { REnvironment, WebR, isRCharacter, isRComplex, isRDouble, isRInteger, isRList, isRLogical, isRPairlist, isRRaw, isRSymbol } from 'webr'
 import { immer } from 'zustand/middleware/immer'
 import { CommonCodeState } from '../../components'
-import { Attributes } from './index'
 import { guessContentTypeByExtension } from '../../utils'
+import { Attributes } from './index'
 
 export interface GlobalState extends Attributes, CommonCodeState {
 	worker: any
@@ -160,7 +160,7 @@ export const storeCreator = (initalState: Attributes) => {
 							.filter(Boolean)
 							.join('\n')
 
-						const files = (await webR.FS.lookupPath('/home/web_user')).contents ?? []
+						const files = (await webR.FS.lookupPath(WORK_DIR)).contents ?? []
 
 						const jsonFiles = Object.values(files).filter((f) => f.name.endsWith('.json'))
 
@@ -241,6 +241,12 @@ export const storeCreator = (initalState: Attributes) => {
 				removeInput: (variable: string) => {
 					set((state) => {
 						delete state.inputs[variable]
+
+						state.hasInputError[variable] = false
+						const hasNoError = Object.values(state.hasInputError).every((b) => !b)
+						if (hasNoError) {
+							state.inputerr = ''
+						}
 					})
 				},
 

@@ -5,6 +5,7 @@ import { useRef, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import type { AllotmentHandle } from 'allotment'
 import { Allotment } from 'allotment'
+import { COMMON_CONTENT_TYPES, Z_INDEX_ABOVE_ADMIN, isVariableValid } from '../utils'
 import {
 	ActionIcon,
 	Box,
@@ -20,7 +21,6 @@ import {
 	createStyles,
 	useGlobalState,
 } from './'
-import { COMMON_CONTENT_TYPES, Z_INDEX_ABOVE_ADMIN, isVariableValid } from '../utils'
 import { TopBar } from './TopBar'
 
 export interface CommonCodeState {
