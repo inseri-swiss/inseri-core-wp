@@ -157,13 +157,12 @@ export const datasourceStoreCreator = (initalState: BlockAttributes) => {
 					if (incomingBodyType === 'image') {
 						preparedBody = url
 					} else if (incomingBodyType === 'raw') {
-						const urlObject = URL.createObjectURL(new Blob([data]))
+						const urlObject = URL.createObjectURL(data)
 						const parts = url.split('/')
 						const lastPart = parts[parts.length - 1]
 						preparedBody = { url: urlObject, filename: lastPart }
 					} else {
-						const textBlob = new Blob([data])
-						preparedBody = await textBlob.text()
+						preparedBody = await data.text()
 					}
 
 					if (isBeautifyType(incomingBodyType) && typeof preparedBody === 'string') {

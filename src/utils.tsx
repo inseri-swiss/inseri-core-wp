@@ -33,7 +33,11 @@ export const mapParamsToObject = (params: ParamItem[]): Record<string, string> =
 		.reduce((acc, i) => ({ ...acc, [i.key]: i.value }), {})
 }
 
-export const mapObjectToParams = (obj: Record<string, string>): ParamItem[] => {
+export const mapObjectToParams = (obj: Record<string, string> | Headers): ParamItem[] => {
+	if (obj instanceof Headers) {
+		return new Array(...obj.entries()).map(([key, value]) => ({ key, value, isChecked: true }))
+	}
+
 	return Object.keys(obj).map((key) => ({ key, value: obj[key], isChecked: true }))
 }
 
@@ -60,6 +64,10 @@ export const formatCode = (type: string, code: string): [string?, string?] => {
 }
 
 export const getPropertyCaseInsensitive = (object: any, key: string) => {
+	if (object instanceof Headers) {
+		return object.get(key)
+	}
+
 	const index = Object.keys(object).find((k) => k.toLowerCase() === key.toLowerCase()) as string
 	return object[index]
 }

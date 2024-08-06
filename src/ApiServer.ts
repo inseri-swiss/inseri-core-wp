@@ -1,18 +1,21 @@
 import { __ } from '@wordpress/i18n'
-import type { AxiosResponse } from 'axios'
-import axios from 'axios'
 import { handleBody } from './utils'
 
 const MEDIA_ROUTE = 'wp/v2/media/'
 
 export const callMediaFile = async (url: string, responseContentType: string): Promise<[string?, any?]> => {
 	try {
-		const mediaResponse = await axios.get<Blob>(url, { responseType: 'blob' })
-		const responseBody = await handleBody(mediaResponse.data, responseContentType)
+		const response = await fetch(url)
 
-		return [undefined, responseBody]
+		if (response.ok) {
+			const blob = await response.blob()
+			const responseBody = await handleBody(blob, responseContentType)
+			return [undefined, responseBody]
+		}
+
+		return [response.statusText, undefined]
 	} catch (exception) {
-		if (exception instanceof axios.AxiosError) {
+		if (exception instanceof Error) {
 			return [exception.message, undefined]
 		}
 
@@ -33,19 +36,17 @@ export const fireWebApi = async (
 		const queries = new URLSearchParams(queryParams)
 		urlObject.search = queries.toString()
 
-		const response = await axios({
-			method,
-			url: urlObject.toString(),
-			headers,
-			data: body,
-			responseType: 'blob',
-		})
+		const response = await fetch(urlObject.toString(), { method, headers, body })
 
-		const responseBody = await handleBody(response.data, responseContentType)
+		if (response.ok) {
+			const blob = await response.blob()
+			const responseBody = await handleBody(blob, responseContentType)
+			return [undefined, responseBody]
+		}
 
-		return [undefined, responseBody]
+		return [response.statusText, undefined]
 	} catch (exception) {
-		if (exception instanceof axios.AxiosError) {
+		if (exception instanceof Error) {
 			return [exception.message, undefined]
 		}
 
@@ -53,56 +54,46 @@ export const fireWebApi = async (
 	}
 }
 
-export const handleTryRequest = async (method: string, url: string, queryParams: Record<string, string>, headers: Record<string, string>, body: any) => {
+export const handleTryRequest = async (
+	method: string,
+	url: string,
+	queryParams: Record<string, string>,
+	headers: Record<string, string>,
+	body: any
+): Promise<[string, Headers, Blob]> => {
 	try {
 		const urlObject = new URL(url)
 		const queries = new URLSearchParams(queryParams)
 		urlObject.search = queries.toString()
 
-		const response = await axios({
-			method,
-			url: urlObject.toString(),
-			headers,
-			data: body,
-			responseType: 'blob',
-		})
-
+		const response = await fetch(urlObject.toString(), { method, headers, body })
+		const blob = await response.blob()
 		const status = `${response.status} ${response.statusText}`
-		return [status, response.headers, response.data]
-	} catch (exception) {
-		if (exception instanceof axios.AxiosError && exception.response) {
-			const response = exception.response
-			const status = `${response.status} ${response.statusText}`
-			return [status, response.headers, response.data]
-		}
 
-		if (exception instanceof axios.AxiosError) {
-			return [exception.code, {}, '']
+		return [status, response.headers, blob]
+	} catch (exception) {
+		if (exception instanceof Error) {
+			return [exception.message, new Headers(), new Blob([''])]
 		}
 	}
 
-	return ['', {}, '']
+	return ['', new Headers(), new Blob([''])]
 }
 
-const handleRequest = async <T>(action: () => Promise<AxiosResponse<T>>): Promise<[string?, T?]> => {
+type HandledResponse<T> = [undefined, T] | [string, undefined]
+const handleRequest = async <T>(action: () => Promise<Response>): Promise<HandledResponse<T>> => {
 	try {
 		const response = await action()
-		return [undefined, response.data]
+
+		if (response.ok) {
+			const responseBody = await response.json()
+			return [undefined, responseBody]
+		}
+
+		return [response.statusText, undefined]
 	} catch (exception) {
-		if (exception instanceof axios.AxiosError && exception.response) {
-			const { data, status, statusText } = exception.response
-			let body = ''
-
-			if (data.message) {
-				body = data.message
-			} else if (typeof data === 'string') {
-				body = data
-			} else {
-				body = JSON.stringify(data)
-			}
-
-			const msg = `${status} ${statusText}: ${body}`
-			return [msg, undefined]
+		if (exception instanceof Error) {
+			return [exception.message, undefined]
 		}
 
 		return [__('Refresh the page and try it again.', 'inseri-core'), undefined]
@@ -128,11 +119,11 @@ export interface Media {
 	}
 }
 
-export const getAllMedia = async (ids: number[]): Promise<[string?, Media[]?]> => {
+export const getAllMedia = async (ids: number[]): Promise<HandledResponse<Media[]>> => {
 	const url = new URL(inseriApiSettings.root + MEDIA_ROUTE)
 	url.searchParams.append('include', ids.join(','))
 
-	const action = () => axios.get<Media[]>(url.toString())
+	const action = () => fetch(url.toString())
 	return handleRequest(action)
 }
 
@@ -156,18 +147,27 @@ export interface ZenodoRecord {
 	}
 }
 
-export const getZenodoRecord = async (recordId: string): Promise<[string?, ZenodoRecord?]> => {
-	const action = () => axios.get<ZenodoRecord>(RECORD_ROUTE + recordId)
+export const getZenodoRecord = async (recordId: string): Promise<HandledResponse<ZenodoRecord>> => {
+	const action = () => fetch(RECORD_ROUTE + recordId)
 	return handleRequest(action)
 }
 
 const EXPORT_ENABLED_ROUTE = 'inseri-core/v1/export-enabled/'
 
-export const enablePostExport = async (postId: number): Promise<[string?, string?]> => {
-	const action = () => axios.post(inseriApiSettings.root + EXPORT_ENABLED_ROUTE + postId, undefined, { headers: { 'X-WP-Nonce': inseriApiSettings.nonce } })
+export const enablePostExport = async (postId: number): Promise<HandledResponse<string>> => {
+	const action = () =>
+		fetch(inseriApiSettings.root + EXPORT_ENABLED_ROUTE + postId, {
+			method: 'POST',
+			headers: { 'X-WP-Nonce': inseriApiSettings.nonce },
+			body: undefined,
+		})
 	return handleRequest(action)
 }
-export const disablePostExport = async (postId: number): Promise<[string?, string?]> => {
-	const action = () => axios.delete(inseriApiSettings.root + EXPORT_ENABLED_ROUTE + postId, { headers: { 'X-WP-Nonce': inseriApiSettings.nonce } })
+export const disablePostExport = async (postId: number): Promise<HandledResponse<string>> => {
+	const action = () =>
+		fetch(inseriApiSettings.root + EXPORT_ENABLED_ROUTE + postId, {
+			method: 'DELETE',
+			headers: { 'X-WP-Nonce': inseriApiSettings.nonce },
+		})
 	return handleRequest(action)
 }
