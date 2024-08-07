@@ -15,7 +15,7 @@ import View from './view'
 
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { blockName, label, isWizardMode, files, isVisible, doi, doiError, isWizardLoading, record, hasWizardError } = useGlobalState(
+	const { metadata, label, isWizardMode, files, isVisible, doi, doiError, isWizardLoading, record, hasWizardError } = useGlobalState(
 		(state: GlobalState) => state
 	)
 	const { updateState, setDoi } = useGlobalState((state: GlobalState) => state.actions)
@@ -52,7 +52,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
-						<TextControl label="Block Name" value={blockName} onChange={(value) => updateState({ blockName: value })} />
+						<TextControl label="Block Name" value={metadata.name} onChange={(value) => updateState({ metadata: { name: value } })} />
 					</PanelRow>
 					<PanelRow>
 						<TextControl label="Label" value={label} onChange={(value) => updateState({ label: value })} />
@@ -147,7 +147,7 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes, clientId } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'zenodo'}>
-			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={config.name} clientId={clientId}>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.metadata.name} blockType={config.name} clientId={clientId}>
 				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(config.attributes)} setAttributes={setAttributes} initialState={attributes}>
 					<EditComponent {...props} />
 				</StateProvider>

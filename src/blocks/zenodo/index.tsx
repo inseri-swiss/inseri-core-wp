@@ -3,6 +3,7 @@ import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
+import { SelectItem } from '../../components'
 import json from './block.json'
 import Edit from './edit'
 
@@ -10,12 +11,51 @@ const { name, ...settings } = json as any
 
 export interface Attributes {
 	blockId: string
-	blockName: string
 	label: string
 	doi: string
 	files: string[]
 	selectedFile: string | null
 	isVisible: boolean
+	metadata: {
+		name: string
+	}
+}
+
+interface Attributes_V1 {
+	blockId: string
+	blockName: string
+	label: string
+	doi: string
+	files: SelectItem[]
+	selectedFile: string | null
+	isVisible: boolean
+}
+
+const v1 = {
+	attributes: settings.attributes,
+	supports: settings.supports,
+	save: ({ attributes }: BlockSaveProps<Attributes>) => {
+		return (
+			<div {...useBlockProps.save()} data-attributes={stringify(attributes)}>
+				is loading ...
+			</div>
+		)
+	},
+	migrate(attributes: Attributes_V1) {
+		const { blockName, ...rest } = attributes
+
+		return {
+			...rest,
+			files: attributes.files.map((f) => f.label),
+			selectedFile: attributes.files.find((f) => f.value === attributes.selectedFile)?.label ?? null,
+			metadata: {
+				name: blockName,
+			},
+		}
+	},
+	isEligible(attributes: Attributes_V1) {
+		return attributes.files.some((f) => !!f.label && !!f.value)
+	},
 }
 
 registerBlockType<Attributes>(name, {
@@ -29,4 +69,5 @@ registerBlockType<Attributes>(name, {
 		)
 	},
 	icon: <IconBooks style={{ fill: 'none' }} />,
+	deprecated: [v1],
 })
