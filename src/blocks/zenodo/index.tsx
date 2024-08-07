@@ -3,7 +3,6 @@ import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
-import { SelectItem } from '../../components'
 import json from './block.json'
 import Edit from './edit'
 
@@ -14,7 +13,7 @@ export interface Attributes {
 	blockName: string
 	label: string
 	doi: string
-	files: SelectItem[]
+	files: string[]
 	selectedFile: string | null
 	isVisible: boolean
 }

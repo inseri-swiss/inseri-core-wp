@@ -18,7 +18,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const { blockName, label, isWizardMode, files, isVisible, doi, doiError, isWizardLoading, record, hasWizardError } = useGlobalState(
 		(state: GlobalState) => state
 	)
-	const { updateState, setDoi, loadDoi } = useGlobalState((state: GlobalState) => state.actions)
+	const { updateState, setDoi } = useGlobalState((state: GlobalState) => state.actions)
 	const isValueSet = files.length > 0
 
 	useEffect(() => {
@@ -26,10 +26,6 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 			updateState({ isWizardMode: false })
 		}
 	}, [isSelected])
-
-	useEffect(() => {
-		loadDoi()
-	}, [])
 
 	const renderHiding = (children: JSX.Element) => (
 		<HidingWrapper isSelected={isSelected} isVisible={isVisible}>
@@ -114,17 +110,17 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 									<Group position="apart" key={f.key}>
 										<Checkbox
 											label={f.key}
-											checked={!!files.find((i) => i.label === f.key)}
+											checked={!!files.find((elem) => elem === f.key)}
 											onChange={(event) => {
 												let newFiles = []
 
 												if (event.currentTarget.checked) {
-													newFiles = [...files, { label: f.key, value: f.links.self }]
+													newFiles = [...files, f.key]
 												} else {
-													newFiles = files.filter((i) => i.label !== f.key)
+													newFiles = files.filter((elem) => elem !== f.key)
 												}
 
-												updateState({ files: newFiles, selectedFile: newFiles.length === 1 ? newFiles[0].value : null })
+												updateState({ files: newFiles, selectedFile: newFiles.length === 1 ? newFiles[0] : null })
 											}}
 										/>
 										<Text fz={12}>{getFormattedBytes(f.size ?? 0)}</Text>
