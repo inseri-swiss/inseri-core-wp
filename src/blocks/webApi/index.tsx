@@ -3,6 +3,7 @@ import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
+import { deprecateBlockName } from '../../components/deprecation'
 import { ParamItem } from '../../components/ParamsTable'
 import json from './block.json'
 import Edit from './edit'
@@ -16,7 +17,6 @@ export interface Attributes {
 	inputQueryParams: string
 	inputHeadersParams: string
 	inputBody: string
-	blockName: string
 	label: string
 	isVisible: boolean
 	autoTrigger: boolean
@@ -35,6 +35,9 @@ export interface Attributes {
 		textBody: string
 		paramsBody: ParamItem[]
 	}
+	metadata: {
+		name: string
+	}
 }
 
 registerBlockType<Attributes>(name, {
@@ -48,4 +51,5 @@ registerBlockType<Attributes>(name, {
 		)
 	},
 	icon: <IconApi style={{ fill: 'none' }} />,
+	deprecated: [deprecateBlockName(settings)],
 })

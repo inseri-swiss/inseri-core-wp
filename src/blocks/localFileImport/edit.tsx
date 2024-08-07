@@ -36,7 +36,7 @@ const useStyles = createStyles(() => ({
 }))
 
 function EditComponent({ isSelected }: BlockEditProps<Attributes>) {
-	const { blockName, actions, accepts, mainText, subText, multiple } = useGlobalState((state: GlobalState) => state)
+	const { metadata, actions, accepts, mainText, subText, multiple } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
 	const { multiSelectValues, label } = useStyles().classes
 
@@ -58,7 +58,13 @@ function EditComponent({ isSelected }: BlockEditProps<Attributes>) {
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
-						<TextControl label={__('Block Name', 'inseri-core')} value={blockName} onChange={(value) => updateState({ blockName: value })} />
+						<TextControl
+							label={__('Block Name', 'inseri-core')}
+							value={metadata.name}
+							onChange={(value) => {
+								updateState({ metadata: { name: value } })
+							}}
+						/>
 					</PanelRow>
 					<PanelRow>
 						<ToggleControl
@@ -99,7 +105,7 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes, clientId } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'localFileImport'}>
-			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={config.name} clientId={clientId}>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.metadata.name} blockType={config.name} clientId={clientId}>
 				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
 					<EditComponent {...props} />
 				</StateProvider>

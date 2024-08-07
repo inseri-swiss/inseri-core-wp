@@ -4,6 +4,7 @@ import type { BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import 'allotment/dist/style.css'
 import stringify from 'json-stable-stringify'
+import { deprecateBlockName } from '../../components/deprecation'
 import 'prismjs/themes/prism.css'
 import json from './block.json'
 import Edit from './edit'
@@ -15,7 +16,6 @@ export interface Attributes {
 	inputCode: string
 	inputs: Record<string, string>
 	outputs: [string /* key */, string /* contentType */][]
-	blockName: string
 	height: number
 	editable: boolean
 	content: string
@@ -23,6 +23,9 @@ export interface Attributes {
 	mode: 'editor' | 'viewer' | ''
 	isVisible: boolean
 	autoTrigger: boolean
+	metadata: {
+		name: string
+	}
 }
 
 registerBlockType<Attributes>(name, {
@@ -36,4 +39,5 @@ registerBlockType<Attributes>(name, {
 		)
 	},
 	icon: <IconBrandPython style={{ fill: 'none' }} />,
+	deprecated: [deprecateBlockName(settings)],
 })

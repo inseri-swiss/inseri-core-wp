@@ -89,7 +89,7 @@ const customSelectStyle: any = {
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 	const {
-		blockName,
+		metadata,
 		outputContenType,
 		inputMethodUrl,
 		inputQueryParams,
@@ -107,6 +107,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 	const { updateState } = useGlobalState((state: DatasourceState) => state.actions)
 	const { url, urlError, isMethodUrlOverridden } = parameters
 	const isValueSet = !parameters.urlError && !!requestParams.url && !!outputContenType
+	const blockName = metadata.name
 
 	const { pidLeftInputWrapper, pidRightInputWrapper } = useStyles().classes
 
@@ -254,7 +255,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						</Box>
 					</PanelRow>
 					<PanelRow>
-						<TextControl label="Block Name" value={blockName} onChange={(value) => updateState({ blockName: value })} />
+						<TextControl label="Block Name" value={blockName} onChange={(value) => updateState({ metadata: { name: value } })} />
 					</PanelRow>
 					<PanelRow>
 						<TextControl label="Action Text" value={label} onChange={(value) => updateState({ label: value })} />
@@ -352,7 +353,7 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	const { attributes, clientId } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'webApi'} addSuffixToInputs={['inputMethodUrl', 'inputQueryParams', 'inputHeadersParams', 'inputBody']}>
-			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name} clientId={clientId}>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.metadata.name} blockType={json.name} clientId={clientId}>
 				<StateProvider
 					stateCreator={datasourceStoreCreator}
 					initialState={props.attributes}

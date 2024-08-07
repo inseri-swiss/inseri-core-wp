@@ -38,8 +38,8 @@ export function SetupEditorEnv(props: Props) {
 			setAttributes({ blockId: generateId() })
 		}
 
-		if (!attributes.blockName) {
-			setAttributes({ blockName: `${baseBlockName}-${generateId(3)}` })
+		if (!attributes.metadata.name) {
+			setAttributes({ metadata: { name: `${baseBlockName}-${generateId(3)}` } })
 		}
 	}, [])
 

@@ -9,7 +9,7 @@ import { GlobalState, storeCreator } from './state'
 import View from './view'
 
 function EditComponent(_props: BlockEditProps<Attributes>) {
-	const { label, blockName, step, isRange, valueBoundaries, rangeBoundaries, initialValue, precision, advancedRange } = useGlobalState(
+	const { label, metadata, step, isRange, valueBoundaries, rangeBoundaries, initialValue, precision, advancedRange } = useGlobalState(
 		(state: GlobalState) => state
 	)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
@@ -25,8 +25,8 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 						<TextInput
 							styles={{ root: { width: '100%' } }}
 							label="Block Name"
-							value={blockName}
-							onChange={(event) => updateState({ blockName: event.target.value })}
+							value={metadata.name}
+							onChange={(event) => updateState({ metadata: { name: event.target.value } })}
 						/>
 					</PanelRow>
 					<PanelRow>
@@ -195,7 +195,7 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'slider'}>
 			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(config.attributes)} setAttributes={setAttributes} initialState={attributes}>
-				<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={config.name} clientId={clientId}>
+				<InseriRoot blockId={attributes.blockId} blockName={attributes.metadata.name} blockType={config.name} clientId={clientId}>
 					<EditComponent {...props} />
 				</InseriRoot>
 			</StateProvider>

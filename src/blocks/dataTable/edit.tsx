@@ -39,7 +39,7 @@ const extraOptionsWithLabel = [
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { inputColumns, inputData, blockName, isWizardMode, actions, options, extraOptions } = useGlobalState((state: GlobalState) => state)
+	const { inputColumns, inputData, metadata, isWizardMode, actions, options, extraOptions } = useGlobalState((state: GlobalState) => state)
 	const isValueSet = !!inputData
 	const { updateState } = actions
 
@@ -82,8 +82,8 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 						<TextInput
 							styles={{ root: { width: '100%' } }}
 							label="Block Name"
-							value={blockName}
-							onChange={(event) => updateState({ blockName: event.target.value })}
+							value={metadata.name}
+							onChange={(event) => updateState({ metadata: { name: event.target.value } })}
 						/>
 					</PanelRow>
 					<PanelRow>
@@ -191,7 +191,7 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes, clientId } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'dataTable'} addSuffixToInputs={['inputColumns', 'inputData']}>
-			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name} clientId={clientId}>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.metadata.name} blockType={json.name} clientId={clientId}>
 				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
 					<EditComponent {...props} />
 				</StateProvider>

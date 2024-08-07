@@ -36,7 +36,7 @@ const resizingHelps = {
 
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { blockName, inputKey, isWizardMode, actions, altText, caption, height, fit } = useGlobalState((state: GlobalState) => state)
+	const { metadata, inputKey, isWizardMode, actions, altText, caption, height, fit } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = actions
 
 	const isValueSet = !!inputKey
@@ -88,7 +88,13 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
-						<TextControl label={__('Block Name', 'inseri-core')} value={blockName} onChange={(value) => updateState({ blockName: value })} />
+						<TextControl
+							label={__('Block Name', 'inseri-core')}
+							value={metadata.name}
+							onChange={(value) => {
+								updateState({ metadata: { name: value } })
+							}}
+						/>
 					</PanelRow>
 					<PanelRow>
 						<TextControl label={__('Caption', 'inseri-core')} value={caption} onChange={(value) => updateState({ caption: value })} />
@@ -154,7 +160,7 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes, clientId } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'image'} addSuffixToInputs={['inputKey']}>
-			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name} clientId={clientId}>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.metadata.name} blockType={json.name} clientId={clientId}>
 				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
 					<EditComponent {...props} />
 				</StateProvider>
