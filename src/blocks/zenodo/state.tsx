@@ -23,7 +23,6 @@ export interface GlobalState extends Attributes {
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
 		setDoi: (doi: string) => Promise<void>
-		loadDoi: () => Promise<void>
 		chooseFile: (url: string | null) => Promise<void>
 		loadFile: () => Promise<void>
 	}
@@ -34,7 +33,7 @@ type Set = (nextStateOrUpdater: (state: Draft<GlobalState>) => void, shouldRepla
 export const storeCreator = (initalState: Attributes) => {
 	let doiCallback: any
 
-	const loadZenodoRecord = async (set: Set, doi: string, isInitialLoad: boolean = false) => {
+	const loadZenodoRecord = async (set: Set, doi: string, isInitiated: boolean = false) => {
 		if (doi.trim() && doi.startsWith(ZENODO_PREFIX)) {
 			set((state) => {
 				state.isWizardLoading = true
@@ -55,12 +54,12 @@ export const storeCreator = (initalState: Attributes) => {
 				set((state) => {
 					state.record = data
 
-					if (!isInitialLoad) {
-						const downloadLinks = data.files.map((f) => ({ label: f.key, value: f.links.self }))
+					if (!isInitiated) {
+						const downloadLinks = data.files.map((f) => f.key)
 						state.files = downloadLinks
 
 						if (downloadLinks.length === 1) {
-							state.selectedFile = downloadLinks[0].value
+							state.selectedFile = downloadLinks[0]
 						}
 					}
 				})
@@ -72,8 +71,8 @@ export const storeCreator = (initalState: Attributes) => {
 		}
 	}
 
-	const loadFile = async (set: Set, url: string) => {
-		const fileSplitted = url.split('.')
+	const innerLoadFile = async (set: Set, key: string, record: ZenodoRecord) => {
+		const fileSplitted = key.split('.')
 		const fileExt = fileSplitted[fileSplitted.length - 1].split('/')[0]
 		const contentType = guessContentTypeByExtension(fileExt) ?? ''
 
@@ -82,6 +81,7 @@ export const storeCreator = (initalState: Attributes) => {
 			state.mime = contentType
 		})
 
+		const url = record.files.find((f) => f.key === key)?.links.self ?? ''
 		const [err, data] = await callMediaFile(url, contentType)
 
 		set((state) => {
@@ -136,31 +136,32 @@ export const storeCreator = (initalState: Attributes) => {
 				}, 500)
 			},
 
-			loadDoi: async () => {
-				loadZenodoRecord(set, get().doi.trim(), true)
-			},
-
-			chooseFile: async (url: string | null) => {
+			chooseFile: async (key: string | null) => {
 				set((state) => {
-					state.selectedFile = url
+					state.selectedFile = key
 					state.hasError = false
 				})
 
-				if (!url) {
+				if (!key) {
 					set((state) => {
 						state.fileContent = null
 					})
 				}
 
-				if (url) {
-					loadFile(set, url)
+				if (key) {
+					innerLoadFile(set, key, get().record!)
 				}
 			},
 
 			loadFile: async () => {
-				const { selectedFile } = get()
+				if (!get().record) {
+					await loadZenodoRecord(set, get().doi.trim(), true)
+				}
+
+				const { selectedFile, record } = get()
+
 				if (selectedFile) {
-					loadFile(set, selectedFile)
+					innerLoadFile(set, selectedFile, record!)
 				}
 			},
 		},

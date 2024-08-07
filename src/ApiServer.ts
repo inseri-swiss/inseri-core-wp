@@ -148,7 +148,7 @@ export interface ZenodoRecord {
 }
 
 export const getZenodoRecord = async (recordId: string): Promise<HandledResponse<ZenodoRecord>> => {
-	const action = () => fetch(RECORD_ROUTE + recordId)
+	const action = () => fetch(RECORD_ROUTE + recordId, { headers: { Accept: 'application/vnd.zenodo.v1+json' } })
 	return handleRequest(action)
 }
 
