@@ -15,7 +15,7 @@ import View from './view'
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { inputKey, blockName, isWizardMode, mode, actions } = useGlobalState((state: GlobalState) => state)
+	const { inputKey, metadata, isWizardMode, mode, actions } = useGlobalState((state: GlobalState) => state)
 	const isValueSet = !!inputKey
 	const { updateState } = actions
 
@@ -57,7 +57,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
-						<TextControl label="Block Name" value={blockName} onChange={(value) => updateState({ blockName: value })} />
+						<TextControl label="Block Name" value={metadata.name} onChange={(value) => updateState({ metadata: { name: value } })} />
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
@@ -91,7 +91,7 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes, clientId } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'html'} addSuffixToInputs={['inputKey']}>
-			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name} clientId={clientId}>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.metadata.name} blockType={json.name} clientId={clientId}>
 				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
 					<EditComponent {...props} />
 				</StateProvider>

@@ -15,7 +15,7 @@ import View from './view'
 
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected, setAttributes, attributes } = props
-	const { blockId, blockName, inputKey, label, fileName } = attributes
+	const { blockId, metadata, inputKey, label, fileName } = attributes
 
 	const [isWizardMode, setWizardMode] = useRecoilState(wizardState(blockId))
 	const isValueSet = !!inputKey
@@ -45,7 +45,13 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
-						<TextControl label={__('Block Name', 'inseri-core')} value={blockName} onChange={(value) => setAttributes({ blockName: value })} />
+						<TextControl
+							label={__('Block Name', 'inseri-core')}
+							value={metadata.name}
+							onChange={(value) => {
+								setAttributes({ metadata: { name: value } })
+							}}
+						/>
 					</PanelRow>
 					<PanelRow>
 						<TextControl label={__('Label', 'inseri-core')} value={label} onChange={(value) => setAttributes({ label: value })} />
@@ -89,7 +95,7 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'download'} addSuffixToInputs={['inputKey']}>
 			<RecoilRoot>
-				<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name} clientId={clientId}>
+				<InseriRoot blockId={attributes.blockId} blockName={attributes.metadata.name} blockType={json.name} clientId={clientId}>
 					<EditComponent {...props} />
 				</InseriRoot>
 			</RecoilRoot>

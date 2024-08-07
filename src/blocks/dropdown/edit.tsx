@@ -14,7 +14,7 @@ import View from './view'
 
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes, isSelected } = props
-	const { inputKey, label, searchable, clearable, blockName } = attributes
+	const { inputKey, label, searchable, clearable, metadata } = attributes
 
 	const [isWizardMode, setWizardMode] = useState(!inputKey)
 	const isValueSet = !!inputKey
@@ -40,7 +40,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
-						<TextControl label="Block Name" value={blockName} onChange={(value) => setAttributes({ blockName: value })} />
+						<TextControl label="Block Name" value={metadata.name} onChange={(value) => setAttributes({ metadata: { name: value } })} />
 					</PanelRow>
 					<PanelRow>
 						<TextControl label="Label" value={label} onChange={(value) => setAttributes({ label: value })} />
@@ -86,7 +86,7 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	const { attributes, clientId } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'dropdown'} addSuffixToInputs={['inputKey']}>
-			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name} clientId={clientId}>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.metadata.name} blockType={json.name} clientId={clientId}>
 				<EditComponent {...props} />
 			</InseriRoot>
 		</SetupEditorEnv>

@@ -52,7 +52,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
-						<TextControl label="Block Name" value={metadata.name} onChange={(value) => updateState({ metadata: { name: value } })} />
+						<TextControl label="Block Name" value={metadata.name} onChange={(value) => updateState({ metadata: { ...metadata, name: value } })} />
 					</PanelRow>
 					<PanelRow>
 						<TextControl label="Label" value={label} onChange={(value) => updateState({ label: value })} />

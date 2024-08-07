@@ -3,6 +3,7 @@ import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
+import { deprecateBlockName } from '../../components/deprecation'
 import json from './block.json'
 import Edit from './edit'
 
@@ -11,10 +12,12 @@ const { name, ...settings } = json as any
 export interface Attributes {
 	blockId: string
 	inputKey: string
-	blockName: string
 	label: string
 	searchable: boolean
 	clearable: boolean
+	metadata: {
+		name: string
+	}
 }
 
 registerBlockType<Attributes>(name, {
@@ -28,4 +31,5 @@ registerBlockType<Attributes>(name, {
 		)
 	},
 	icon: <IconCaretDown style={{ fill: 'none' }} />,
+	deprecated: [deprecateBlockName(settings)],
 })

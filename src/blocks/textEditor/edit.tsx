@@ -16,7 +16,7 @@ import View from './view'
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
 
-	const { label, blockName, editable, isWizardMode, contentType, actions, isVisible } = useGlobalState((state: GlobalState) => state)
+	const { label, metadata, editable, isWizardMode, contentType, actions, isVisible } = useGlobalState((state: GlobalState) => state)
 	const { updateState, setContentType } = actions
 
 	const isValueSet = !!contentType
@@ -66,7 +66,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 			<InspectorControls key="setting">
 				<PanelBody>
 					<PanelRow>
-						<TextControl label="Block Name" value={blockName} onChange={(value) => updateState({ blockName: value })} />
+						<TextControl label="Block Name" value={metadata.name} onChange={(value) => updateState({ metadata: { name: value } })} />
 					</PanelRow>
 					<PanelRow>
 						<TextControl label="Label" value={label} onChange={(value) => updateState({ label: value })} />
@@ -127,7 +127,7 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'textEditor'}>
 			<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(config.attributes)} setAttributes={setAttributes} initialState={attributes}>
-				<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={config.name} clientId={clientId}>
+				<InseriRoot blockId={attributes.blockId} blockName={attributes.metadata.name} blockType={config.name} clientId={clientId}>
 					<EditComponent {...props} />
 				</InseriRoot>
 			</StateProvider>

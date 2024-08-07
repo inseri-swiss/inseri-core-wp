@@ -22,7 +22,7 @@ const EVENTS = [
 
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected } = props
-	const { blockName, inputFull, inputData, inputLayout, inputConfig, isWizardMode, actions, height, outputs } = useGlobalState((state: GlobalState) => state)
+	const { metadata, inputFull, inputData, inputLayout, inputConfig, isWizardMode, actions, height, outputs } = useGlobalState((state: GlobalState) => state)
 	const { updateState, setHeight } = actions
 
 	const isValueSet = !!inputFull
@@ -77,7 +77,13 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 			<InspectorControls>
 				<PanelBody>
 					<PanelRow>
-						<TextControl label={__('Block Name', 'inseri-core')} value={blockName} onChange={(value) => updateState({ blockName: value })} />
+						<TextControl
+							label={__('Block Name', 'inseri-core')}
+							value={metadata.name}
+							onChange={(value) => {
+								updateState({ metadata: { name: value } })
+							}}
+						/>
 					</PanelRow>
 					<PanelRow>
 						<div style={{ width: '100%' }}>
@@ -210,7 +216,7 @@ export default function Edit(props: BlockEditProps<Attributes>) {
 	const { setAttributes, attributes, clientId } = props
 	return (
 		<SetupEditorEnv {...props} baseBlockName={'plotly'} addSuffixToInputs={['inputFull', 'inputData', 'inputLayout', 'inputConfig']}>
-			<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name} clientId={clientId}>
+			<InseriRoot blockId={attributes.blockId} blockName={attributes.metadata.name} blockType={json.name} clientId={clientId}>
 				<StateProvider stateCreator={storeCreator} keysToSave={Object.keys(json.attributes)} setAttributes={setAttributes} initialState={attributes}>
 					<EditComponent {...props} />
 				</StateProvider>
