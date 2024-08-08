@@ -10,10 +10,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"blockName": {
-			"type": "string",
-			"default": ""
-		},
 		"height": {
 			"type": "integer",
 			"default": 150
@@ -37,6 +33,12 @@
 		"isVisible": {
 			"type": "boolean",
 			"default": true
+		},
+		"metadata": {
+			"type": "object",
+			"default": {
+				"name": ""
+			}
 		}
 	},
 	"supports": {

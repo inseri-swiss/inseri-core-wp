@@ -22,10 +22,6 @@
 			"type": "array",
 			"default": []
 		},
-		"blockName": {
-			"type": "string",
-			"default": ""
-		},
 		"mode": {
 			"type": "string",
 			"default": ""
@@ -53,6 +49,12 @@
 		"autoTrigger": {
 			"type": "boolean",
 			"default": false
+		},
+		"metadata": {
+			"type": "object",
+			"default": {
+				"name": ""
+			}
 		}
 	},
 	"supports": {

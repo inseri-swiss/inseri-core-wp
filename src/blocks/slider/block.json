@@ -10,10 +10,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"blockName": {
-			"type": "string",
-			"default": ""
-		},
 		"isRange": {
 			"type": "boolean",
 			"default": false
@@ -53,6 +49,12 @@
 		"advancedRange": {
 			"type": "boolean",
 			"default": false
+		},
+		"metadata": {
+			"type": "object",
+			"default": {
+				"name": ""
+			}
 		}
 	},
 	"supports": {

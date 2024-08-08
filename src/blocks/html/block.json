@@ -10,13 +10,15 @@
 			"type": "string",
 			"default": ""
 		},
-		"blockName": {
-			"type": "string",
-			"default": ""
-		},
 		"inputKey": {
 			"type": "string",
 			"default": ""
+		},
+		"metadata": {
+			"type": "object",
+			"default": {
+				"name": ""
+			}
 		}
 	},
 	"supports": {
