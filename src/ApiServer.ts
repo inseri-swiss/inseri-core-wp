@@ -3,7 +3,11 @@ import { handleBody } from './utils'
 
 const MEDIA_ROUTE = 'wp/v2/media/'
 
-export const callMediaFile = async (url: string, responseContentType: string): Promise<[string?, any?]> => {
+export const callMediaFile = async (url: string | undefined, responseContentType: string): Promise<[string?, any?]> => {
+	if (!url) {
+		return ['URL is empty', undefined]
+	}
+
 	try {
 		const response = await fetch(url)
 
