@@ -81,7 +81,7 @@ export const storeCreator = (initalState: Attributes) => {
 			state.mime = contentType
 		})
 
-		const url = record.files.find((f) => f.key === key)?.links.self ?? ''
+		const url = record.files.find((f) => f.key === key)?.links.self
 		const [err, data] = await callMediaFile(url, contentType)
 
 		set((state) => {
