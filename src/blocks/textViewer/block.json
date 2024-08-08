@@ -14,10 +14,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"blockName": {
-			"type": "string",
-			"default": ""
-		},
 		"height": {
 			"type": "integer",
 			"default": 150
@@ -29,6 +25,12 @@
 		"label": {
 			"type": "string",
 			"default": ""
+		},
+		"metadata": {
+			"type": "object",
+			"default": {
+				"name": ""
+			}
 		}
 	},
 	"supports": {

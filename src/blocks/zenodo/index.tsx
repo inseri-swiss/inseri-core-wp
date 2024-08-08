@@ -31,8 +31,16 @@ interface Attributes_V1 {
 	isVisible: boolean
 }
 
+const { metadata, ...attributesV1 } = settings.attributes
+
 const v1 = {
-	attributes: settings.attributes,
+	attributes: {
+		...attributesV1,
+		blockName: {
+			type: 'string',
+			default: '',
+		},
+	},
 	supports: settings.supports,
 	save: ({ attributes }: BlockSaveProps<Attributes>) => {
 		return (

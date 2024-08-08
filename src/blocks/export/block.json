@@ -10,13 +10,15 @@
 			"type": "string",
 			"default": ""
 		},
-		"blockName": {
-			"type": "string",
-			"default": ""
-		},
 		"postId": {
 			"type": "number",
 			"default": 0
+		},
+		"metadata": {
+			"type": "object",
+			"default": {
+				"name": ""
+			}
 		}
 	},
 	"supports": {

@@ -10,10 +10,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"blockName": {
-			"type": "string",
-			"default": ""
-		},
 		"inputColumns": {
 			"type": "string",
 			"default": ""
@@ -45,6 +41,12 @@
 				"enableRowClick": true,
 				"enableCellClick": true,
 				"enableEditing": false
+			}
+		},
+		"metadata": {
+			"type": "object",
+			"default": {
+				"name": ""
 			}
 		}
 	},

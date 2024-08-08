@@ -10,10 +10,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"blockName": {
-			"type": "string",
-			"default": ""
-		},
 		"inputKey": {
 			"type": "string",
 			"default": ""
@@ -25,6 +21,12 @@
 		"fileName": {
 			"type": "string",
 			"default": "file"
+		},
+		"metadata": {
+			"type": "object",
+			"default": {
+				"name": ""
+			}
 		}
 	},
 	"supports": {

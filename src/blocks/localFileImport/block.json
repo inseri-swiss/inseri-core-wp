@@ -10,10 +10,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"blockName": {
-			"type": "string",
-			"default": ""
-		},
 		"mainText": {
 			"type": "string",
 			"default": "Drag and drop a file or click here"
@@ -33,6 +29,12 @@
 		"height": {
 			"type": "integer",
 			"default": 150
+		},
+		"metadata": {
+			"type": "object",
+			"default": {
+				"name": ""
+			}
 		}
 	},
 	"supports": {

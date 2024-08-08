@@ -10,10 +10,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"blockName": {
-			"type": "string",
-			"default": ""
-		},
 		"inputKey": {
 			"type": "string",
 			"default": ""
@@ -33,6 +29,12 @@
 		"layout": {
 			"type": "string",
 			"default": "dagre"
+		},
+		"metadata": {
+			"type": "object",
+			"default": {
+				"name": ""
+			}
 		}
 	},
 	"supports": {

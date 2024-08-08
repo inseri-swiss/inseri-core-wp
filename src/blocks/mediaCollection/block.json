@@ -10,10 +10,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"blockName": {
-			"type": "string",
-			"default": ""
-		},
 		"label": {
 			"type": "string",
 			"default": "Choose a file"
@@ -29,6 +25,12 @@
 		"isVisible": {
 			"type": "boolean",
 			"default": true
+		},
+		"metadata": {
+			"type": "object",
+			"default": {
+				"name": ""
+			}
 		}
 	},
 	"supports": {

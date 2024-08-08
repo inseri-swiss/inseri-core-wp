@@ -10,10 +10,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"blockName": {
-			"type": "string",
-			"default": ""
-		},
 		"inputKey": {
 			"type": "string",
 			"default": ""
@@ -37,6 +33,12 @@
 		"height": {
 			"type": "integer",
 			"default": 200
+		},
+		"metadata": {
+			"type": "object",
+			"default": {
+				"name": ""
+			}
 		}
 	},
 	"supports": {

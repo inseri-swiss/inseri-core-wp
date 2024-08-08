@@ -10,10 +10,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"blockName": {
-			"type": "string",
-			"default": ""
-		},
 		"inputFull": {
 			"type": "string",
 			"default": ""
@@ -37,6 +33,12 @@
 		"outputs": {
 			"type": "array",
 			"default": []
+		},
+		"metadata": {
+			"type": "object",
+			"default": {
+				"name": ""
+			}
 		}
 	},
 	"supports": {

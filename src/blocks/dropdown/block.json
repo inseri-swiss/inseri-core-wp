@@ -14,10 +14,6 @@
 			"type": "string",
 			"default": ""
 		},
-		"blockName": {
-			"type": "string",
-			"default": ""
-		},
 		"label": {
 			"type": "string",
 			"default": "Choose an item"
@@ -29,6 +25,12 @@
 		"clearable": {
 			"type": "boolean",
 			"default": true
+		},
+		"metadata": {
+			"type": "object",
+			"default": {
+				"name": ""
+			}
 		}
 	},
 	"supports": {
