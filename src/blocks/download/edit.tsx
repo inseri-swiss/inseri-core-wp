@@ -2,7 +2,7 @@ import { InseriRoot, useDiscover } from '@inseri/lighthouse'
 import { IconFileDownload } from '@tabler/icons-react'
 import { BlockControls, InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
-import { PanelBody, PanelRow, TextControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
+import { PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, ToolbarGroup } from '@wordpress/components'
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
@@ -15,7 +15,7 @@ import View from './view'
 
 function EditComponent(props: BlockEditProps<Attributes>) {
 	const { isSelected, setAttributes, attributes } = props
-	const { blockId, metadata, inputKey, label, fileName } = attributes
+	const { blockId, metadata, inputKey, label, fileName, fileExt } = attributes
 
 	const [isWizardMode, setWizardMode] = useRecoilState(wizardState(blockId))
 	const isValueSet = !!inputKey
@@ -59,6 +59,24 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					<PanelRow>
 						<TextControl label={__('File Name', 'inseri-core')} value={fileName} onChange={(value) => setAttributes({ fileName: value })} />
 					</PanelRow>
+					<PanelRow>
+						<ToggleControl
+							label={__('Determine file extension automatically', 'inseri-core')}
+							checked={fileExt === undefined}
+							onChange={(checked) => setAttributes({ fileExt: checked ? undefined : '' })}
+						/>
+					</PanelRow>
+					{fileExt !== undefined && (
+						<PanelRow>
+							<TextControl
+								label={__('File Extension', 'inseri-core')}
+								value={fileExt ?? ''}
+								onChange={(value) => {
+									setAttributes({ fileExt: value })
+								}}
+							/>
+						</PanelRow>
+					)}
 				</PanelBody>
 			</InspectorControls>
 			{isWizardMode ? (
