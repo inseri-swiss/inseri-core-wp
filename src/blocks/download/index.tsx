@@ -14,6 +14,7 @@ export interface Attributes {
 	inputKey: string
 	label: string
 	fileName: string
+	fileExt: string | undefined
 	metadata: {
 		name: string
 	}

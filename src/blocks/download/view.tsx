@@ -8,7 +8,7 @@ import { downloadLinkState, extensionState, wizardState } from './state'
 
 export default function View(props: { attributes: Attributes; setAttributes?: (item: Partial<Attributes>) => void }) {
 	const { attributes, setAttributes } = props
-	const { blockId, inputKey, label, fileName } = attributes
+	const { blockId, inputKey, label, fileName, fileExt } = attributes
 
 	const [downloadLink, setDownloadLink] = useRecoilState(downloadLinkState(blockId))
 	const [extension, setExtension] = useRecoilState(extensionState(blockId))
@@ -52,7 +52,8 @@ export default function View(props: { attributes: Attributes; setAttributes?: (i
 		},
 	})
 
-	const fullFileName = fileName + (extension ? '.' + extension : '')
+	const preparedExt = fileExt ?? extension
+	const fullFileName = fileName + (preparedExt ? '.' + preparedExt : '')
 
 	return (
 		<Button style={{ color: '#fff' }} component="a" href={downloadLink} download={fullFileName} disabled={!isReady}>
