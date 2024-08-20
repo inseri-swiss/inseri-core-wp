@@ -21,7 +21,10 @@ The _label_ parameter allows changing it to something different from the default
 ### File name
 
 Set the name under which the file will be downloaded.
-The file extension will be added depending on the data type.
+
+### Determine file extension automatically
+
+By default the file extension will be added automatically depending on the data type. However this can be turned off and the file extension can be defined as desired.
 
 ## Examples
 
