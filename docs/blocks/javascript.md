@@ -12,7 +12,7 @@ As defined in the extended view.
 
 ## Input
 
-A JavaScript file or the user can directly write the code. It allows asynchronous behaviour and `await` is permitted within the main body of the code.
+A JavaScript file or the user can directly write the code. It allows asynchronous behavior and `await` is permitted within the main body of the code.
 
 Moreover in the extended view below it is possible to define input variables.
 
@@ -28,7 +28,7 @@ let product = a * b
 You can see that `a` and `b` are not defined in this script.
 On the top right you can set the inputs. Enter the variable name `a` and accept it with the `+` button. You can now choose any channel from your post. Repeat this with `b`. Input variables can be deleted with `x` next to the import.
 
-Outputs can be defined on the bottom left. Enter `sum` into the text field and accept ith with `+`. Now, choose a content type. For simple values as arrays or numbers, `JSON` is the best option.
+Outputs can be defined on the bottom left. Enter `sum` into the text field and accept it with `+`. Now, choose a content type. For simple values as arrays or numbers, `JSON` is the best option.
 Like inputs, output variables can be deleted with `x`.
 
 !!! warning
