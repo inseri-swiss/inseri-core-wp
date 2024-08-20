@@ -15,7 +15,7 @@ Beware that changes done in the playground will not be saved.
 
 ## Step 1: Create a new post
 
-Add a new post with the title "Image Selection", as presented in the figure below.
+Add a new post with the title "Hello World", as presented in the figure below.
 
 <figure markdown>
 ![Adding a new post in WordPress](../assets/new_post.png){width="700"}
@@ -44,12 +44,12 @@ Add a new post with the title "Image Selection", as presented in the figure belo
 
 ## Step 3: Add dropdown and image information to the text editor
 
-1. Now, copy the following snippet into the text editor. This will add two options ("UZH Acronym" and "UZH Logos") to the dropdown (see the "label" values below). Moreover the "value" values will be used to fetch the image and display it in Step 5.
+1. Now, copy the following snippet into the text editor. This will add two options ("inseri Logo" and "inseri Full Logo") to the dropdown (see the "label" values below). Moreover the "value" values will be used to fetch the image and display it in Step 5.
 
 ```json
 [
-	{ "label": "UZH Acronym", "value": "https://www.cd.uzh.ch/cd/dam/jcr:31f38b33-1619-4ba1-a21c-4dae47e9d0e5/UZH-Logo-Akronym.2020-01-15-11-51-14.gif" },
-	{ "label": "UZH Logos", "value": "https://www.cd.uzh.ch/dam/jcr:79ffe4ce-bbe9-498e-94a8-d7d5b66400b2/UZH_logo_pos_d_e.gif" }
+	{ "label": "inseri Logo", "value": "https://raw.githubusercontent.com/inseri-swiss/inseri-core-wp/main/docs/assets/inseri_logo.svg" },
+	{ "label": "inseri Full Logo", "value": "https://raw.githubusercontent.com/inseri-swiss/inseri-core-wp/main/docs/assets/inseri_logo_full.svg" }
 ]
 ```
 
@@ -58,7 +58,7 @@ Add a new post with the title "Image Selection", as presented in the figure belo
 1. Add the "Dropdown" block (like in Step 2.1.).
 2. Select the block source with the name "textEditor - content".
 3. Give the Dropdown block a simple name "dropdown" (like in Step 2.3.).
-4. Choose a value (e.g., "UZH Logos").
+4. Choose a value (e.g., "inseri Logo").
 
 !!! note
 
@@ -74,6 +74,7 @@ Add a new post with the title "Image Selection", as presented in the figure belo
         If you cannot see the block source, make sure that you did Step 4.4.
 
 3.  Give the Image Box block the name (like in Step 2.3.).
+4.  Set the Height to 200.
 
 ## Step 6: Data Flow
 
