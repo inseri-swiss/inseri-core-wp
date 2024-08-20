@@ -40,7 +40,11 @@ Add a new post with the title "Hello World", as presented in the figure below.
 
 !!! note
 
-    You can hide the text editor block if you want (the setting is below the "BLOCK NAME, and is called "Show block" that by default is enabled).
+    The same block name is displayed in the [WordPress List View](https://wordpress.org/documentation/article/list-view/){:target="\_blank"}.
+
+!!! note
+
+    You can hide the text editor block if you want (the setting is below the "BLOCK NAME", and is called "Show block" that by default is enabled).
 
 ## Step 3: Add dropdown and image information to the text editor
 

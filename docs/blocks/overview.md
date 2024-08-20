@@ -1,4 +1,4 @@
-inseri core provides interactive and executable blocks. These blocks are not isolated but they can receive input from and give output to compatible blocks.
+inseri core provides interactive and executable blocks. The blocks have names, which are integrated with the [WordPress List View](https://wordpress.org/documentation/article/list-view/){:target="\_blank"}, and are not isolated but they can receive input from and give output to compatible blocks.
 
 If you want to see their feature in practice please see the [inseri core blocks](https://inseri.swiss/showcase/#core-blocks){:target="\_blank"} on inseri.swiss.
 
