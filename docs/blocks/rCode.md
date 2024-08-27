@@ -8,7 +8,8 @@ To set the inputs and outputs for the script, select "open extended view" which 
 
 ## Output
 
-As defined in the extended view.
+As defined in the extended but limited to the objects that can be converted to JavaScript (see [here](https://docs.r-wasm.org/webr/latest/convert-r-to-js.html){:target="\_blank"}).</br>
+The generated files with the following extensions: `.jpg`, `.png`, `.svg`, `.pdf`, and `.json` are made available to other blocks that can use them as input.
 
 ## Input
 
