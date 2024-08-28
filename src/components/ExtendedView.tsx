@@ -35,6 +35,9 @@ export interface CommonCodeState {
 	inputRecord: Record<string, any>
 	inputRevision: number
 
+	outputRecord: Record<string, any>
+	outputRevision: number
+
 	isModalOpen: boolean
 	isWizardMode: boolean
 	selectedMode: 'editor' | 'viewer'

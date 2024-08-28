@@ -16,6 +16,10 @@ const createWorker = (set: (nextStateOrUpdater: (state: Draft<GlobalState>) => v
 			if (data.type === 'SET_STD_STREAM') {
 				state.stdStream = data.payload
 			}
+			if (data.type === 'SET_RESULTS') {
+				state.outputRecord = data.payload
+				state.outputRevision++
+			}
 		})
 	})
 
@@ -36,6 +40,9 @@ export const storeCreator = (initalState: Attributes) => {
 			hasInputError: {},
 			inputRecord: {},
 			inputRevision: 0,
+
+			outputRecord: {},
+			outputRevision: 0,
 
 			isModalOpen: false,
 			isWizardMode: !isValueSet,

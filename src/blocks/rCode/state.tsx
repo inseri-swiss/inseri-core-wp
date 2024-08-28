@@ -7,8 +7,6 @@ import { Attributes } from './index'
 export interface GlobalState extends Attributes, CommonCodeState {
 	worker: any
 	webR: WebR
-	outputRecord: Record<string, any>
-	outputRevision: number
 	jsonFiles: Record<string, string | null>
 	imgBlobs: Blob[]
 	highestNoImgBlobs: number
