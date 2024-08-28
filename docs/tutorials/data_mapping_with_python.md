@@ -91,9 +91,9 @@ Obviously, this is not yet complete because `data` is not defined anywhere in th
 <figcaption>Step 4: Execute automatically setting of the Python block</figcaption>
 </figure>
 
-!!! warning
+<!-- !!! warning
 
-    After adding the outputs please "Save Draft" in top right, "View Preview" in bottom left, and "Edit Post" in the top toolbar to continue editing. This is needed to have access to all outputs of the Python Code block. Otherwise the last output will not be available.
+    After adding the outputs please "Save Draft" in top right, "View Preview" in bottom left, and "Edit Post" in the top toolbar to continue editing. This is needed to have access to all outputs of the Python Code block. Otherwise the last output will not be available. -->
 
 ## Step 5: Add the Text Viewer blocks
 
