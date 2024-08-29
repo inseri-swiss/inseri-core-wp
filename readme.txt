@@ -58,6 +58,17 @@ Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inser
 6. Render HTML code
 
 == Changelog ==
+
+### [0.4.0](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.4.0)
+**Upgrade Notice**: Each post/page with a Zenodo block needs to be opened and re-saved.
+
+- BREAKING CHANGE: Zenodo block resolves file links every time
+- New: R Code block
+- Update: Download block supports custom file extension
+- Update: block names are visible in the list view
+- Update: pyodide 0.26.2
+- Update: diverse dependencies
+
 ### [0.3.8](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.3.8)
 - New: Export block
 - Update: blocks are now supported in the site editor
