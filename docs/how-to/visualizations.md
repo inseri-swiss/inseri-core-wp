@@ -12,6 +12,10 @@ If you already have your Plotly chart in a JSON format, you can easily add it us
 
 Please see [Python and Plotly](https://inseri.swiss/2023/06/python-and-plotly/){:target="\_blank"}.
 
+## How to use Plotly with R
+
+Please see [R and Plotly](https://inseri.swiss/2024/08/r-and-plotly/){:target="\_blank"}.
+
 ## How to use Matplotlib with Python
 
 Please see [Python and Matplotlib](https://inseri.swiss/2023/06/python-and-matplotlib/){:target="\_blank"}.
@@ -22,3 +26,7 @@ inseri supports both Plotly and Matplotlib. Which one you want to use is first o
 
 There are some differences: Matplotlib works with files which means it can be combined with a download block to reuse the result.
 Plotly offers more interactive options than a static image would, and
+
+## How to use ggplot2 with R
+
+Please see [R and Plotting](https://inseri.swiss/2024/08/r-and-plotting/){:target="\_blank"}.

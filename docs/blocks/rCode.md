@@ -50,10 +50,10 @@ The script will run automatically on load and any input change. If set to false,
 R Code block can be set to publicly editable. This may be interesting if you want to show calculations depending on certain parameters.
 After a page reload the changes in the code will be lost.
 
-<!-- ## How To
+## How To
 
 - [R Packages](../how-to/r_packages.md)
-- [Visualizations](../how-to/visualizations.md) -->
+- [Visualizations](../how-to/visualizations.md)
 
 ## Examples
 
