@@ -78,7 +78,11 @@
 	"supports": {
 		"html": false,
 		"align": true,
-		"alignWide": true
+		"alignWide": true,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
 	},
 	"textdomain": "inseri-core",
 	"editorScript": ["file:./index.js", "inseri-core-editor"],
