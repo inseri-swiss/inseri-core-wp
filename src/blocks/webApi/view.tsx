@@ -92,7 +92,7 @@ export default function View({ renderHiding }: ViewProps) {
 	])
 
 	const blockElement = (
-		<Box p="md">
+		<Box>
 			<Button variant="filled" disabled={!isCallReady} onClick={triggerRequest}>
 				{label}
 			</Button>

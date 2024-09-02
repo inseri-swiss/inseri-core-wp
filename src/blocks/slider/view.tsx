@@ -45,7 +45,7 @@ export default function View() {
 	}, [isRange, ...initialValue])
 
 	return (
-		<Box py={'md'}>
+		<Box py="xs">
 			{label.trim() && <Text fz={14}>{label}</Text>}
 			{SliderElement}
 		</Box>
