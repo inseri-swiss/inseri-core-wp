@@ -1,7 +1,7 @@
 import { usePublish } from '@inseri/lighthouse'
 import { Dropzone } from '@mantine/dropzone'
 import { IconCheck, IconDownload, IconX } from '@tabler/icons-react'
-import { useEffect } from '@wordpress/element'
+import { useEffect, useRef } from '@wordpress/element'
 import { ActionIcon, Button, Group, Stack, Text, createStyles, useGlobalState, useMantineTheme } from '../../components'
 import { guessContentTypeByExtension, handleBody } from '../../utils'
 import { GlobalState } from './state'
@@ -18,32 +18,24 @@ const useStyles = createStyles((theme) => ({
 			backgroundColor: theme.colors[theme.primaryColor][1],
 		},
 	},
-
-	hoveringWrapper: {
-		'&:hover': {
-			borderRadius: '1px',
-			boxShadow: '0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color)',
-		},
-	},
 }))
 
 interface ViewProps {
-	isGutenbergEditor?: boolean
-	isSelected?: boolean
 	renderResizable?: (EditorComponent: JSX.Element) => JSX.Element
 }
 
-export default function View({ renderResizable, isGutenbergEditor, isSelected }: ViewProps) {
+export default function View({ renderResizable }: ViewProps) {
 	const { accepts, mainText, subText, multiple, height, files, chosenFile } = useGlobalState((state: GlobalState) => state)
 	const { updateState, addFiles, removeFile } = useGlobalState((state: GlobalState) => state.actions)
 
-	const { itemButton, itemGroup, hoveringWrapper } = useStyles().classes
+	const { itemButton, itemGroup } = useStyles().classes
 	const [publishValue, publishEmpty] = usePublish('data', 'data provided by visitor')
 
 	const theme = useMantineTheme()
 	const primaryColor = theme.colors[theme.primaryColor][6]
 	const redColor = theme.colors.red[6]
 	const showDropZone = multiple || Object.keys(files).length === 0
+	const openRef = useRef<() => void>(null)
 
 	useEffect(() => {
 		if (chosenFile) {
@@ -67,8 +59,16 @@ export default function View({ renderResizable, isGutenbergEditor, isSelected }:
 	}, [chosenFile])
 
 	const Zone = (
-		<Dropzone p={0} multiple={multiple} onDrop={(newFiles) => addFiles(newFiles)} accept={accepts}>
-			<Group position="center" spacing="xl" style={{ height, pointerEvents: 'none' }}>
+		<Dropzone
+			p={0}
+			multiple={multiple}
+			onDrop={(newFiles) => addFiles(newFiles)}
+			accept={accepts}
+			activateOnClick={false}
+			openRef={openRef}
+			styles={{ inner: { pointerEvents: 'all' } }}
+		>
+			<Stack align="center" justify="center" spacing={0} style={{ height }}>
 				<Dropzone.Accept>
 					<IconDownload size={50} stroke={1.5} color={primaryColor} />
 				</Dropzone.Accept>
@@ -79,15 +79,13 @@ export default function View({ renderResizable, isGutenbergEditor, isSelected }:
 					<IconDownload size={50} stroke={1.5} />
 				</Dropzone.Idle>
 
-				<div>
-					<Text size="xl" inline>
-						{mainText}
-					</Text>
-					<Text size="sm" color="dimmed" inline mt={7}>
-						{subText}
-					</Text>
-				</div>
-			</Group>
+				<Text size="sm" inline mt="sm">
+					{subText}
+				</Text>
+				<Button mt="md" onClick={() => openRef.current?.()} style={{ pointerEvents: 'all' }}>
+					{mainText}
+				</Button>
+			</Stack>
 		</Dropzone>
 	)
 
@@ -96,7 +94,7 @@ export default function View({ renderResizable, isGutenbergEditor, isSelected }:
 	}
 
 	return (
-		<div style={{ padding: isGutenbergEditor ? '32px 24px' : undefined }} className={isGutenbergEditor && !isSelected ? hoveringWrapper : undefined}>
+		<div>
 			{showDropZone && (renderResizable ? renderResizable(Zone) : Zone)}
 			<Stack mt="xs" spacing="xs">
 				{Object.entries(files).map(([key, f]) => {

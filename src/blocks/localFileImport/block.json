@@ -12,11 +12,11 @@
 		},
 		"mainText": {
 			"type": "string",
-			"default": "Drag and drop a file or click here"
+			"default": "Select file"
 		},
 		"subText": {
 			"type": "string",
-			"default": "provide your file to process..."
+			"default": "Drag and drop here"
 		},
 		"accepts": {
 			"type": "array",
