@@ -89,14 +89,14 @@ function EditComponent({ isSelected }: BlockEditProps<Attributes>) {
 						/>
 					</PanelRow>
 					<PanelRow>
-						<TextareaControl label={__('Primary Text', 'inseri-core')} value={mainText} onChange={(value) => updateState({ mainText: value })} />
+						<TextareaControl label={__('Description', 'inseri-core')} value={subText} onChange={(value) => updateState({ subText: value })} />
 					</PanelRow>
 					<PanelRow>
-						<TextareaControl label={__('Secondary Text', 'inseri-core')} value={subText} onChange={(value) => updateState({ subText: value })} />
+						<TextareaControl label={__('Button Text', 'inseri-core')} value={mainText} onChange={(value) => updateState({ mainText: value })} />
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
-			<View renderResizable={renderResizable} isGutenbergEditor isSelected={isSelected} />
+			<View renderResizable={renderResizable} />
 		</>
 	)
 }
