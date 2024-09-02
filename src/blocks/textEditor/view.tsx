@@ -79,7 +79,7 @@ export default function View(props: ViewProps) {
 	}
 
 	const blockElement = (
-		<Box p="md">
+		<Box>
 			<Group spacing="xs" mb={4}>
 				{label.trim() && <Text fz={14}>{label}</Text>}
 				<div style={{ flex: 1 }} />

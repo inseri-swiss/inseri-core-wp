@@ -108,7 +108,7 @@ export default function View(props: ViewProps) {
 	)
 
 	const blockElement = (
-		<Box p="md">
+		<Box>
 			<Group position="apart" mb={4} pl="sm" spacing="xs">
 				<TopBar code={code} />
 			</Group>

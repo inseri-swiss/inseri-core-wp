@@ -36,7 +36,7 @@ export default function View({ isGutenbergEditor, isSelected }: ViewProps) {
 	const { wrapper } = useViewStyles().classes
 
 	return mode === 'code' ? (
-		<Box p="md">
+		<Box>
 			<CodeEditor type={'html'} value={value} />
 		</Box>
 	) : isEmpty ? (

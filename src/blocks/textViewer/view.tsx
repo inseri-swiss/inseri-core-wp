@@ -38,7 +38,7 @@ export default function View(props: ViewProps) {
 	const editorElement = <CodeEditor height={height} type={codeType} value={value} />
 
 	return (
-		<Box p="md">
+		<Box>
 			<Group spacing="xs" mb={4}>
 				{label.trim() && <Text fz={14}>{label}</Text>}
 				<div style={{ flex: 1 }} />

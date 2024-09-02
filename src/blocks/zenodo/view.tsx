@@ -29,7 +29,7 @@ export default function View({ renderHiding }: ViewProps) {
 	}, [isLoading, hasError, fileContent, mime])
 
 	const blockElement = (
-		<Box p="md">
+		<Box>
 			<Select
 				clearable
 				readOnly={files.length === 1}

@@ -27,7 +27,7 @@ export default function View(props: ViewProps) {
 	})
 
 	return (
-		<Box p="md">
+		<Box>
 			<Select
 				label={label}
 				data={data}
