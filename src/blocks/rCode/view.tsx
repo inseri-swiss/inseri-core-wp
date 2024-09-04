@@ -12,8 +12,6 @@ interface ViewProps {
 	renderHiding?: (BlockComponent: JSX.Element) => JSX.Element
 }
 
-const IMG = 'plot'
-
 export default function View(props: ViewProps) {
 	const { isGutenbergEditor, renderResizable, renderHiding } = props
 	const {
@@ -33,9 +31,7 @@ export default function View(props: ViewProps) {
 		inputRevision,
 		outputRevision,
 		outputRecord,
-		highestNoImgBlobs,
-		imgBlobs,
-		jsonFiles,
+		files,
 	} = useGlobalState((state: GlobalState) => state)
 	const { setInputValue, setInputEmpty, updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
@@ -49,10 +45,9 @@ export default function View(props: ViewProps) {
 	})
 
 	const normalOutputs = outputs.map((i) => ({ key: i[0], description: i[0] }))
-	const jsonOutputs = Object.keys(jsonFiles).map((i) => ({ key: i, description: i }))
-	const imgOutputs = Array.from(Array(highestNoImgBlobs)).map((_v, idx) => ({ key: IMG + idx, description: `${IMG} ${idx + 1}` }))
+	const fileOutputs = Object.keys(files).map((i) => ({ key: i, description: i }))
 
-	const publishRecord = usePublish([...normalOutputs, ...jsonOutputs, ...imgOutputs])
+	const publishRecord = usePublish([...normalOutputs, ...fileOutputs])
 	const areInputsReady = Object.values(hasInputError).every((b) => !b)
 	const areOutputsReady = outputs.every((o) => o[1] !== '')
 
@@ -62,29 +57,11 @@ export default function View(props: ViewProps) {
 			publishRecord[key][0](val, contentType)
 		})
 
-		for (let i = 0; i < highestNoImgBlobs; i++) {
-			if (i < imgBlobs.length) {
-				const blob = imgBlobs[i]
-
-				if (blob.type === 'image/svg+xml') {
-					blob.text().then((svgText) => publishRecord[IMG + i][0](svgText, blob.type))
-				} else {
-					publishRecord[IMG + i][0](blob, blob.type)
-				}
+		Object.entries(files).forEach(([key, pair]) => {
+			if (pair) {
+				const [type, data] = pair
+				publishRecord[key][0](data, type)
 			} else {
-				publishRecord[IMG + i][1]()
-			}
-		}
-
-		Object.entries(jsonFiles).forEach(([key, jsonString]) => {
-			try {
-				if (jsonString) {
-					const obj = JSON.parse(jsonString)
-					publishRecord[key][0](obj, 'application/json')
-				} else {
-					publishRecord[key][1]()
-				}
-			} catch (error) {
 				publishRecord[key][1]()
 			}
 		})
