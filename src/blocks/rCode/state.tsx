@@ -1,18 +1,18 @@
 import { REnvironment, WebR, isRCharacter, isRComplex, isRDouble, isRInteger, isRList, isRLogical, isRPairlist, isRRaw, isRSymbol } from 'webr'
 import { immer } from 'zustand/middleware/immer'
 import { CommonCodeState } from '../../components'
-import { guessContentTypeByExtension } from '../../utils'
+import { guessContentTypeByExtension, TEXTUAL_CONTENT_TYPES } from '../../utils'
 import { Attributes } from './index'
 
 export interface GlobalState extends Attributes, CommonCodeState {
 	worker: any
 	webR: WebR
-	jsonFiles: Record<string, string | null>
-	imgBlobs: Blob[]
-	highestNoImgBlobs: number
+	files: Record<string, [string, any] | null>
 }
 
 const WORK_DIR = '/home/web_user/'
+const textualContentTypes = TEXTUAL_CONTENT_TYPES.map((t) => t.value)
+const isTextualContentType = (c: string) => textualContentTypes.includes(c) || c.startsWith('text/')
 
 const transformToJsValue = async (rVariable: any): Promise<any> => {
 	if (isRDouble(rVariable) || isRInteger(rVariable) || isRRaw(rVariable) || isRCharacter(rVariable) || isRLogical(rVariable) || isRComplex(rVariable)) {
@@ -56,9 +56,7 @@ export const storeCreator = (initalState: Attributes) => {
 			webR: createWebR(),
 			outputRecord: {},
 			outputRevision: 0,
-			jsonFiles: {},
-			imgBlobs: [],
-			highestNoImgBlobs: 0,
+			files: {},
 
 			worker: undefined,
 			workerStatus: 'initial',
@@ -134,8 +132,7 @@ export const storeCreator = (initalState: Attributes) => {
 
 					const shelter = await new webR.Shelter()
 					let stdStream = ''
-					let blobs: Blob[] = []
-					let jsonContents: Record<string, string> = {}
+					let fileRecord: Record<string, [string, any]> = {}
 
 					try {
 						const newCode = `webr::shim_install()\n ${code} \n`
@@ -159,37 +156,29 @@ export const storeCreator = (initalState: Attributes) => {
 							.join('\n')
 
 						const files = (await webR.FS.lookupPath(WORK_DIR)).contents ?? []
-
-						const jsonFiles = Object.values(files).filter((f) => f.name.endsWith('.json'))
-
-						const jsonPairs = await Promise.all(
-							jsonFiles.map(async (f) => {
-								const path = WORK_DIR + f.name
-								const uint8array = await webR.FS.readFile(path)
-								const jsonString = new TextDecoder().decode(uint8array)
-
-								webR.FS.unlink(path)
-								const name = f.name.split('.')[0]
-								return [name, jsonString]
-							})
-						)
-						jsonContents = jsonPairs.reduce((acc, [name, content]) => ({ ...acc, [name]: content }), {})
-
-						const imgFiles = Object.values(files).filter(
-							(f) => f.name.endsWith('.pdf') || f.name.endsWith('.jpeg') || f.name.endsWith('.png') || f.name.endsWith('.svg')
-						)
-
-						blobs = await Promise.all(
-							imgFiles.map(async (f) => {
+						const fileTriples: [string, string, any][] = await Promise.all(
+							Object.values(files).map(async (f) => {
 								const path = WORK_DIR + f.name
 								const ext = f.name.split('.')[1]
 								const type = guessContentTypeByExtension(ext) ?? 'application/octet-stream'
 
-								const content = await webR.FS.readFile(path)
+								const uint8array = await webR.FS.readFile(path)
 								webR.FS.unlink(path)
-								return new Blob([content], { type })
+
+								let data: any = new Blob([uint8array], { type })
+
+								if (isTextualContentType(type)) {
+									data = await data.text()
+								}
+								if (ext === 'json') {
+									data = JSON.parse(data)
+								}
+
+								return [f.name, type, data]
 							})
 						)
+
+						fileRecord = fileTriples.reduce((acc, [name, type, data]) => ({ ...acc, [name]: [type, data] }), {})
 					} catch (error) {
 						stdStream = 'An error has ocurred while executing the code.'
 						if (error instanceof Error) {
@@ -199,19 +188,14 @@ export const storeCreator = (initalState: Attributes) => {
 						shelter.purge()
 					}
 
-					const emptyRecord = Object.keys(get().jsonFiles).reduce((acc, key) => ({ ...acc, [key]: null }), {})
+					const emptyRecord = Object.keys(get().files).reduce((acc, key) => ({ ...acc, [key]: null }), {})
 
 					set((state) => {
 						state.workerStatus = 'ready'
 						state.outputRecord = outputRecord
 						state.outputRevision++
 						state.stdStream = stdStream
-						state.imgBlobs = blobs
-						state.jsonFiles = { ...emptyRecord, ...jsonContents }
-
-						if (state.highestNoImgBlobs < blobs.length) {
-							state.highestNoImgBlobs = blobs.length
-						}
+						state.files = { ...emptyRecord, ...fileRecord }
 					})
 				},
 
