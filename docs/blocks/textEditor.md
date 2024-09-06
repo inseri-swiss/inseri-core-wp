@@ -2,6 +2,10 @@
 
 The Text Editor can be used to define values of a couple of text-based formats that can be chosen from the dropdown. This selection will be used for validation of the content and for controlling the type of data shared between blocks.
 
+!!! note
+
+    [unfiltered_html](https://wordpress.org/documentation/article/roles-and-capabilities/#unfiltered_html) security feature prevents the usage of iframes or certain code snippets. Please check the affected roles at [Capability vs. Role Table](https://wordpress.org/documentation/article/roles-and-capabilities/#capability-vs-role-table){:target="\_blank"}. For such a use case please consider the [Web API](webApi.md) block.
+
 ## Output
 
 The content of the block.
