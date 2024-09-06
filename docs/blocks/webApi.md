@@ -1,6 +1,6 @@
 # Web API
 
-With the Web API block, you can include data from an external source into your post.
+With the Web API block, you can call a web API to include data or computational results from an external source into your post.
 
 ## Output
 
