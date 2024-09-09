@@ -60,6 +60,10 @@ function retrievePyObjects(name: string): [string, any] {
 			return [name, null]
 		}
 
+		if (convertedData instanceof Uint8Array) {
+			convertedData = new Blob([convertedData])
+		}
+
 		return [name, convertedData]
 	} catch (error) {
 		const msg = error instanceof Error ? error.message : name + ': unknown type conversion error ocurred'
