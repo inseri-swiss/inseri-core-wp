@@ -63,13 +63,7 @@ export default function View(props: ViewProps) {
 	useEffect(() => {
 		Object.entries(outputRecord).forEach(([key, val]) => {
 			const contentType = outputs.find((o) => o[0] === key)![1]
-			let convertedData = val
-
-			if (convertedData instanceof Uint8Array) {
-				convertedData = new Blob([convertedData.buffer], { type: contentType })
-			}
-
-			publishRecord[key][0](convertedData, contentType)
+			publishRecord[key][0](val, contentType)
 		})
 	}, [outputRevision])
 
