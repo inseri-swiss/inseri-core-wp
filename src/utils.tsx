@@ -6,8 +6,9 @@ import xmlFormatter from 'xml-formatter'
 import { StateCreator } from 'zustand'
 import { Overlay } from './components'
 import { ParamItem } from './components/ParamsTable'
-import textMime from './textMIME.json'
-import generalMime from './generalMIME.json'
+import { COMMON_CONTENT_TYPES, CONTENT_TYPE_TO_EXT, TEXTUAL_CONTENT_TYPES, createFileRecord, guessContentTypeByExtension } from './workerUtils'
+
+export { COMMON_CONTENT_TYPES, CONTENT_TYPE_TO_EXT, TEXTUAL_CONTENT_TYPES, createFileRecord, guessContentTypeByExtension }
 
 export const generateQuerySelector = (name: string) => '.wp-block-' + name.replaceAll('/', '-')
 
@@ -72,20 +73,6 @@ export const getPropertyCaseInsensitive = (object: any, key: string) => {
 
 	const index = Object.keys(object).find((k) => k.toLowerCase() === key.toLowerCase()) as string
 	return object[index]
-}
-
-export const TEXTUAL_CONTENT_TYPES = textMime.map(({ ext, ...rest }) => ({ ...rest }))
-
-export const COMMON_CONTENT_TYPES = [...textMime, ...generalMime].map(({ ext, ...rest }) => ({ ...rest }))
-
-export const CONTENT_TYPE_TO_EXT = [...textMime, ...generalMime].flatMap((item) => item.ext.map((e) => ({ ext: e, value: item.value })))
-
-export const guessContentTypeByExtension = (extension: string) => {
-	const found = CONTENT_TYPE_TO_EXT.find((data) => extension === data.ext)
-	if (found) {
-		return found.value
-	}
-	return undefined
 }
 
 export const BODY_TYPE_TO_CONTENT_TYPE: Record<string, string> = {

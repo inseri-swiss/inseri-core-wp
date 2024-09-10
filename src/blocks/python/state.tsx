@@ -3,7 +3,9 @@ import { immer } from 'zustand/middleware/immer'
 import { Action, CommonCodeState } from '../../components'
 import { Attributes } from './index'
 
-export interface GlobalState extends Attributes, CommonCodeState {}
+export interface GlobalState extends Attributes, CommonCodeState {
+	files: Record<string, [string, any] | null>
+}
 
 const createWorker = (set: (nextStateOrUpdater: (state: Draft<GlobalState>) => void) => void) => {
 	const worker = new Worker(new URL(inseriApiSettings.pyWorker))
@@ -17,7 +19,10 @@ const createWorker = (set: (nextStateOrUpdater: (state: Draft<GlobalState>) => v
 				state.stdStream = data.payload
 			}
 			if (data.type === 'SET_RESULTS') {
+				const emptyRecord = Object.keys(state.files).reduce((acc, key) => ({ ...acc, [key]: null }), {})
+
 				state.outputRecord = data.payload
+				state.files = { ...emptyRecord, ...data.files }
 				state.outputRevision++
 			}
 		})
@@ -43,6 +48,7 @@ export const storeCreator = (initalState: Attributes) => {
 
 			outputRecord: {},
 			outputRevision: 0,
+			files: {},
 
 			isModalOpen: false,
 			isWizardMode: !isValueSet,

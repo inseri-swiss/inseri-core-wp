@@ -1,5 +1,6 @@
 import { PyodideInterface } from 'pyodide'
 import { Action } from '../../components'
+import { createFileRecord } from '../../workerUtils'
 
 // version must match with npm package version
 const BINARY_URL = 'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/'
@@ -12,6 +13,7 @@ let inputs: Record<string, any> = {}
 let outputs: string[] = []
 const stdBuffer: string[] = []
 
+const WORK_DIR = '/home/pyodide/'
 let areInputsInitiated = false
 
 onmessage = ({ data }: MessageEvent<Action>) => {
@@ -107,7 +109,11 @@ async function runCode(code: string) {
 				return acc
 			}, {} as any)
 
-			postMessage({ type: 'SET_RESULTS', payload: results })
+			const nodes = (await pyodide.FS.lookupPath(WORK_DIR)).node.contents ?? {}
+			const files = Object.values(nodes).filter((f: any) => pyodide?.FS.isFile(f.mode))
+			const fileRecord = await createFileRecord(files, WORK_DIR, pyodide)
+
+			postMessage({ type: 'SET_RESULTS', payload: results, files: fileRecord })
 		}
 	} catch (error) {
 		const msg = error instanceof Error ? error.message : 'unknown error ocurred'
