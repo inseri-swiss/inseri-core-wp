@@ -6,6 +6,8 @@ import xmlFormatter from 'xml-formatter'
 import { StateCreator } from 'zustand'
 import { Overlay } from './components'
 import { ParamItem } from './components/ParamsTable'
+import textMime from './textMIME.json'
+import generalMime from './generalMIME.json'
 
 export const generateQuerySelector = (name: string) => '.wp-block-' + name.replaceAll('/', '-')
 
@@ -72,76 +74,11 @@ export const getPropertyCaseInsensitive = (object: any, key: string) => {
 	return object[index]
 }
 
-export const TEXTUAL_CONTENT_TYPES = [
-	{ label: 'JSON', value: 'application/json' },
-	{ label: 'XML', value: 'application/xml' },
-	{ label: 'Text', value: 'text/plain' },
-	{ label: 'HTML', value: 'text/html' },
-	{ label: 'CSV', value: 'text/csv' },
-	{ label: 'Markdown', value: 'text/markdown' },
-	{ label: 'SVG', value: 'image/svg+xml' },
-	{ label: 'Python', value: 'text/x-python' },
-	{ label: 'R', value: 'text/x-r' },
-	{ label: 'JavaScript', value: 'application/javascript' },
-	{ label: 'TypeScript', value: 'application/typescript' },
-	{ label: 'SQL', value: 'application/sql' },
-	{ label: 'YAML', value: 'application/x-yaml' },
-]
+export const TEXTUAL_CONTENT_TYPES = textMime.map(({ ext, ...rest }) => ({ ...rest }))
 
-export const COMMON_CONTENT_TYPES = [
-	...TEXTUAL_CONTENT_TYPES,
-	{ label: 'GIF', value: 'image/gif' },
-	{ label: 'JPEG', value: 'image/jpeg' },
-	{ label: 'PNG', value: 'image/png' },
-	{ label: 'WebP', value: 'image/webp' },
-	{ label: 'TIFF', value: 'image/tiff' },
-	{ label: 'PDF', value: 'application/pdf' },
-	{ label: 'MP3', value: 'audio/mp3' },
-	{ label: 'WebM (audio)', value: 'audio/webm' },
-	{ label: 'MP4', value: 'video/mp4' },
-	{ label: 'WebM (video)', value: 'video/webm' },
-	{ label: 'MPEG', value: 'video/mpg' },
-	{ label: 'Zip', value: 'application/zip' },
-	{ label: 'TAR', value: 'application/x-tar' },
-	{ label: 'GZip', value: 'application/gzip' },
-	{ label: 'BZip2', value: 'application/x-bzip2' },
-	{ label: '7-Zip', value: 'application/x-7z-compressed' },
-	{ label: 'Form-urlencoded', value: 'application/x-www-form-urlencoded' },
-	{ label: 'Form-data', value: 'multipart/form-data' },
-]
+export const COMMON_CONTENT_TYPES = [...textMime, ...generalMime].map(({ ext, ...rest }) => ({ ...rest }))
 
-export const CONTENT_TYPE_TO_EXT = [
-	{ ext: 'json', value: 'application/json' },
-	{ ext: 'xml', value: 'application/xml' },
-	{ ext: 'txt', value: 'text/plain' },
-	{ ext: 'html', value: 'text/html' },
-	{ ext: 'csv', value: 'text/csv' },
-	{ ext: 'md', value: 'text/markdown' },
-	{ ext: 'svg', value: 'image/svg+xml' },
-	{ ext: 'py', value: 'text/x-python' },
-	{ ext: 'r', value: 'text/x-r' },
-	{ ext: 'js', value: 'application/javascript' },
-	{ ext: 'ts', value: 'application/typescript' },
-	{ ext: 'sql', value: 'application/sql' },
-	{ ext: 'yml', value: 'application/x-yaml' },
-	{ ext: 'gif', value: 'image/gif' },
-	{ ext: 'jpg', value: 'image/jpeg' },
-	{ ext: 'jpeg', value: 'image/jpeg' },
-	{ ext: 'png', value: 'image/png' },
-	{ ext: 'webp', value: 'image/webp' },
-	{ ext: 'tiff', value: 'image/tiff' },
-	{ ext: 'pdf', value: 'application/pdf' },
-	{ ext: 'mp3', value: 'audio/mp3' },
-	{ ext: 'webm', value: 'audio/webm' },
-	{ ext: 'mp4', value: 'video/mp4' },
-	{ ext: 'webm', value: 'video/webm' },
-	{ ext: 'mpg', value: 'video/mpg' },
-	{ ext: 'zip', value: 'application/zip' },
-	{ ext: 'tar', value: 'application/x-tar' },
-	{ ext: 'gz', value: 'application/gzip' },
-	{ ext: 'bz2', value: 'application/x-bzip2' },
-	{ ext: '7z', value: 'application/x-7z-compressed' },
-]
+export const CONTENT_TYPE_TO_EXT = [...textMime, ...generalMime].flatMap((item) => item.ext.map((e) => ({ ext: e, value: item.value })))
 
 export const guessContentTypeByExtension = (extension: string) => {
 	const found = CONTENT_TYPE_TO_EXT.find((data) => extension === data.ext)
