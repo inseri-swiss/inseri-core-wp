@@ -1,7 +1,7 @@
 import { REnvironment, WebR, isRCharacter, isRComplex, isRDouble, isRInteger, isRList, isRLogical, isRPairlist, isRRaw, isRSymbol } from 'webr'
 import { immer } from 'zustand/middleware/immer'
 import { CommonCodeState } from '../../components'
-import { guessContentTypeByExtension, TEXTUAL_CONTENT_TYPES } from '../../utils'
+import { createFileRecord } from '../../utils'
 import { Attributes } from './index'
 
 export interface GlobalState extends Attributes, CommonCodeState {
@@ -11,8 +11,6 @@ export interface GlobalState extends Attributes, CommonCodeState {
 }
 
 const WORK_DIR = '/home/web_user/'
-const textualContentTypes = TEXTUAL_CONTENT_TYPES.map((t) => t.value)
-const isTextualContentType = (c: string) => textualContentTypes.includes(c) || c.startsWith('text/')
 
 const transformToJsValue = async (rVariable: any): Promise<any> => {
 	if (isRDouble(rVariable) || isRInteger(rVariable) || isRRaw(rVariable) || isRCharacter(rVariable) || isRLogical(rVariable) || isRComplex(rVariable)) {
@@ -155,30 +153,9 @@ export const storeCreator = (initalState: Attributes) => {
 							.filter(Boolean)
 							.join('\n')
 
-						const files = (await webR.FS.lookupPath(WORK_DIR)).contents ?? []
-						const fileTriples: [string, string, any][] = await Promise.all(
-							Object.values(files).map(async (f) => {
-								const path = WORK_DIR + f.name
-								const ext = f.name.split('.')[1]
-								const type = guessContentTypeByExtension(ext) ?? 'application/octet-stream'
-
-								const uint8array = await webR.FS.readFile(path)
-								webR.FS.unlink(path)
-
-								let data: any = new Blob([uint8array], { type })
-
-								if (isTextualContentType(type)) {
-									data = await data.text()
-								}
-								if (ext === 'json') {
-									data = JSON.parse(data)
-								}
-
-								return [f.name, type, data]
-							})
-						)
-
-						fileRecord = fileTriples.reduce((acc, [name, type, data]) => ({ ...acc, [name]: [type, data] }), {})
+						const nodes = (await webR.FS.lookupPath(WORK_DIR)).contents ?? {}
+						const files = Object.values(nodes).filter((f) => !f.isFolder)
+						fileRecord = await createFileRecord(files, WORK_DIR, webR)
 					} catch (error) {
 						stdStream = 'An error has ocurred while executing the code.'
 						if (error instanceof Error) {

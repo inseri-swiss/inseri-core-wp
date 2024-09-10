@@ -32,6 +32,7 @@ export default function View(props: ViewProps) {
 		inputRevision,
 		outputRecord,
 		outputRevision,
+		files,
 	} = useGlobalState((state: GlobalState) => state)
 	const { setInputValue, setInputEmpty, updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
@@ -44,8 +45,11 @@ export default function View(props: ViewProps) {
 		deps: [inputRevision, hasInputError, inputRecord, inputerr],
 	})
 
+	const normalOutputs = outputs.map((i) => ({ key: i[0], description: i[0] }))
+	const fileOutputs = Object.keys(files).map((i) => ({ key: i, description: i }))
+
 	const areInputsReady = Object.values(hasInputError).every((b) => !b)
-	const publishRecord = usePublish(outputs.map((i) => ({ key: i[0], description: i[0] })))
+	const publishRecord = usePublish([...normalOutputs, ...fileOutputs])
 	const areOutputsReady = outputs.every((o) => o[1] !== '')
 
 	useEffect(() => {
@@ -64,6 +68,15 @@ export default function View(props: ViewProps) {
 		Object.entries(outputRecord).forEach(([key, val]) => {
 			const contentType = outputs.find((o) => o[0] === key)![1]
 			publishRecord[key][0](val, contentType)
+		})
+
+		Object.entries(files).forEach(([key, pair]) => {
+			if (pair) {
+				const [type, data] = pair
+				publishRecord[key][0](data, type)
+			} else {
+				publishRecord[key][1]()
+			}
 		})
 	}, [outputRevision])
 
