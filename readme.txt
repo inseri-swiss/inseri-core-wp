@@ -59,6 +59,9 @@ Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inser
 
 == Changelog ==
 
+### [0.4.1](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.4.1)
+- Update: Files, which are created within a Python block, are shared with other blocks.
+
 ### [0.4.0](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.4.0)
 **Upgrade Notice**: Each post/page with a Zenodo block needs to be opened and re-saved.
 
