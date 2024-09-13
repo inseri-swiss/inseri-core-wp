@@ -17,11 +17,6 @@ For more details please see [Pyodide - Installing packages](https://pyodide.org/
 
 ## How to install requests package
 
-`requests` package is available in inseri core ≥ 0.3.5.
-
-### For inseri core < 0.3.5
-
-`requests` package is not available in Pyodide. However you can fetch a given url using the `pyodide.http` built-in module. </br>
-For more details please see [pyodide.http API](https://pyodide.org/en/stable/usage/api/python-api/http.html){:target="\_blank"}.
+`requests` package is available in inseri core ≥ 0.3.5. If you use an older older version, please update.
 
 For a fully working example see [Python and Requests Package](https://inseri.swiss/2023/08/python-and-requests/){:target="\_blank"}.
