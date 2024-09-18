@@ -3,7 +3,7 @@ import { usePrevious } from 'react-use'
 import { BlockIdContext, blockStoreSubject, onNext } from './core'
 import { none, some } from './option'
 
-type Publish<T> = (value: T, contentType: string) => void
+type Publish<T> = (value: T, contentType: string, initial?: boolean) => void
 type SetEmpty = () => void
 export type Actions<T> = [Publish<T>, SetEmpty]
 
@@ -58,8 +58,8 @@ function useInternalPublish(blockId: string, keys: string[], descriptions: strin
 		if (blockId?.trim() && blockStore[blockId]) {
 			const callbackMap = keys.reduce(
 				(acc, key) => {
-					const publish = (value: any, contentType: string) => {
-						onNext({ type: 'set-value', payload: { blockId, key, content: some({ contentType, value }) } })
+					const publish = (value: any, contentType: string, initial?: boolean) => {
+						onNext({ type: 'set-value', payload: { blockId, key, content: some({ contentType, value }), initial } })
 					}
 					const setEmpty = () => {
 						onNext({ type: 'set-value', payload: { blockId, key, content: none } })
