@@ -1,5 +1,6 @@
+import isDeepEqualReact from 'fast-deep-equal/react'
 import { createContext } from '@wordpress/element'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, distinctUntilChanged } from 'rxjs'
 import { some } from './option'
 import type { Action, Root } from './types'
 import { reducer } from './reducer'
@@ -29,5 +30,5 @@ export function onNext(action: Action) {
 
 if (process.env.NODE_ENV !== 'production') {
 	// eslint-disable-next-line no-console
-	blockStoreSubject.subscribe((root) => console.log('#lighthouse:', root))
+	blockStoreSubject.pipe(distinctUntilChanged((prev, current) => isDeepEqualReact(prev, current))).subscribe((root) => console.log('#lighthouse:', root))
 }
