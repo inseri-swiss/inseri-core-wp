@@ -21,7 +21,7 @@
 	},
 	"devDependencies": {
 		"@prettier/plugin-php": "^0.22.2",
-		"@types/cytoscape": "^3.21.7",
+		"@types/cytoscape": "^3.21.8",
 		"@types/json-stable-stringify": "^1.0.36",
 		"@types/lodash.clonedeep": "^4.5.9",
 		"@types/prismjs": "^1.26.4",
@@ -32,7 +32,7 @@
 		"@wordpress/env": "^10.8.0",
 		"@wordpress/eslint-plugin": "^19.2.0",
 		"@wordpress/scripts": "^27.9.0",
-		"eslint": "^8.57.0",
+		"eslint": "^8.57.1",
 		"eslint-plugin-prettier": "^5.2.1",
 		"fork-ts-checker-webpack-plugin": "^9.0.2",
 		"prettier": "^3.3.3",
