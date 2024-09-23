@@ -14,7 +14,7 @@ function initReactComponents() {
 			const attributes = JSON.parse(item.dataset.attributes)
 			createRoot(item!).render(
 				<InseriThemeProvider>
-					<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={json.name}>
+					<InseriRoot blockId={attributes.blockId} blockName={attributes.metadata.name} blockType={json.name}>
 						<StateProvider stateCreator={storeCreator} initialState={attributes}>
 							<View />
 						</StateProvider>

@@ -15,7 +15,7 @@ function initReactComponents() {
 			createRoot(item!).render(
 				<InseriThemeProvider>
 					<RecoilRoot>
-						<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={config.name}>
+						<InseriRoot blockId={attributes.blockId} blockName={attributes.metadata.name} blockType={config.name}>
 							<View attributes={attributes} />
 						</InseriRoot>
 					</RecoilRoot>
