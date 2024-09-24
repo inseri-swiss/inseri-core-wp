@@ -15,7 +15,8 @@ interface ViewProps {
 
 export default function View(props: ViewProps) {
 	const { isGutenbergEditor, renderResizable, renderHiding } = props
-	const { height, editable, contentType, label, content, isVisible } = useGlobalState((state: GlobalState) => state)
+	const { height, editable, contentType, label, isVisible } = useGlobalState((state: GlobalState) => state)
+	const content = useGlobalState((state: GlobalState) => decodeURIComponent(state.content))
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 
 	const [publishValue, publishEmpty] = usePublish('content', 'content')
@@ -52,7 +53,7 @@ export default function View(props: ViewProps) {
 		dispatchValue(debouncedCode)
 
 		if (isGutenbergEditor) {
-			updateState({ content: debouncedCode })
+			updateState({ content: encodeURIComponent(debouncedCode) })
 		}
 	}, [debouncedCode])
 

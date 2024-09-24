@@ -48,7 +48,6 @@ export function DetailViewBody() {
 		queryParams,
 		headerParams,
 		bodyType: requestBodyType,
-		textBody,
 		paramsBody,
 		urlError,
 		bodyError,
@@ -58,6 +57,7 @@ export function DetailViewBody() {
 		isQueryParamsOverridden,
 		isBodyOverridden,
 	} = useGlobalState((state: DatasourceState) => state.parameters)
+	const textBody = useGlobalState((state: DatasourceState) => decodeURIComponent(state.parameters.textBody))
 	const { status, headerParams: responseHeaders, body: responseBody, bodyType: responseBodyType } = useGlobalState((state: DatasourceState) => state.response)
 
 	const [debouncedUrl] = useDebouncedValue(url, 500)
@@ -70,7 +70,7 @@ export function DetailViewBody() {
 		updateState({ parameters: { bodyError: error } })
 
 		if (formattedCode) {
-			updateState({ requestParams: { textBody: formattedCode } })
+			updateState({ requestParams: { textBody: encodeURIComponent(formattedCode) } })
 		}
 	}
 
@@ -204,7 +204,10 @@ export function DetailViewBody() {
 											value={textBody}
 											onChange={(val) => {
 												if (!isBodyOverridden) {
-													updateState({ requestParams: { textBody: val }, parameters: { bodyError: '', textBody: val } })
+													updateState({
+														requestParams: { textBody: encodeURIComponent(val) },
+														parameters: { bodyError: '', textBody: val },
+													})
 												}
 											}}
 										/>

@@ -80,7 +80,6 @@ export function ExtendedView<T extends CommonCodeState>({ type }: { type: 'pytho
 		blockName,
 		actions: stateActions,
 		isModalOpen,
-		content,
 		stdStream,
 		newInputVarName,
 		newOutputVarName,
@@ -89,6 +88,8 @@ export function ExtendedView<T extends CommonCodeState>({ type }: { type: 'pytho
 		inputCode,
 		mode,
 	} = useGlobalState((state: T) => state)
+
+	const content = useGlobalState((state: T) => decodeURIComponent(state.content))
 	const { updateState, runCode, addNewInput, chooseInput, removeInput, addNewOutput, chooseContentType, removeOutput } = stateActions
 	const [isEditorVisible, setEditorVisible] = useState(true)
 	const [isInputsVisible, setInputsVisible] = useState(true)
@@ -156,7 +157,7 @@ export function ExtendedView<T extends CommonCodeState>({ type }: { type: 'pytho
 									value={code}
 									onChange={(val) => {
 										if (mode === 'editor') {
-											updateState({ content: val })
+											updateState({ content: encodeURIComponent(val) })
 										}
 									}}
 									onKeyDown={(event) => {
