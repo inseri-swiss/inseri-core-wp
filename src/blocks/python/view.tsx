@@ -21,7 +21,6 @@ export default function View(props: ViewProps) {
 		mode,
 		inputCode,
 		inputRecord,
-		content,
 		inputs,
 		worker,
 		outputs,
@@ -34,6 +33,8 @@ export default function View(props: ViewProps) {
 		outputRevision,
 		files,
 	} = useGlobalState((state: GlobalState) => state)
+
+	const content = useGlobalState((state: GlobalState) => decodeURIComponent(state.content))
 	const { setInputValue, setInputEmpty, updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
 	const prevWorkerStatus = usePrevious(workerStatus)
@@ -108,7 +109,7 @@ export default function View(props: ViewProps) {
 			value={code}
 			onChange={(val) => {
 				if (isEditable && mode === 'editor') {
-					updateState({ content: val })
+					updateState({ content: encodeURIComponent(val) })
 				}
 			}}
 		/>
