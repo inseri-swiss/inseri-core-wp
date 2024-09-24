@@ -2,12 +2,16 @@
 namespace inseri_core;
 
 function extend_upload_mimes($mimes) {
+	$mimes['md|markdown'] = 'text/markdown';
+	$mimes['htm|html'] = 'text/html';
 	$mimes['py'] = 'text/x-python';
 	$mimes['r'] = 'text/x-r';
+	$mimes['js'] = 'text/javascript';
 	$mimes['json'] = 'application/json';
+	$mimes['jsonld'] = 'application/ld+json';
 	$mimes['yml|yaml'] = 'application/x-yaml';
+	$mimes['toml'] = 'application/toml';
 	$mimes['sql'] = 'application/sql';
-	$mimes['md'] = 'text/markdown';
 	$mimes['svg|svgz'] = 'image/svg+xml';
 
 	return $mimes;

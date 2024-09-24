@@ -1,5 +1,6 @@
 [
 	{ "label": "JSON", "value": "application/json", "ext": ["json"] },
+	{ "label": "JSON-LD", "value": "application/ld+json", "ext": ["jsonld"] },
 	{ "label": "XML", "value": "application/xml", "ext": ["xml"] },
 	{ "label": "Text", "value": "text/plain", "ext": ["txt"] },
 	{ "label": "HTML", "value": "text/html", "ext": ["html", "htm"] },
@@ -11,5 +12,6 @@
 	{ "label": "JavaScript", "value": "text/javascript", "ext": ["js", "mjs", "cjs"] },
 	{ "label": "TypeScript", "value": "application/typescript", "ext": ["ts"] },
 	{ "label": "SQL", "value": "application/sql", "ext": ["sql"] },
-	{ "label": "YAML", "value": "application/yaml", "ext": ["yml", "yaml"] }
+	{ "label": "YAML", "value": "application/yaml", "ext": ["yml", "yaml"] },
+	{ "label": "TOML", "value": "application/toml", "ext": ["toml"] }
 ]
