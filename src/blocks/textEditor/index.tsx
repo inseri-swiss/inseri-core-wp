@@ -3,7 +3,7 @@ import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
-import { deprecateBlockName } from '../../components/deprecation'
+import { deprecateBlockName, deprecateUnescapedCode } from '../../components/deprecation'
 import json from './block.json'
 import Edit from './edit'
 import './style.scss'
@@ -34,5 +34,5 @@ registerBlockType<Attributes>(name, {
 		)
 	},
 	icon: <IconEdit style={{ fill: 'none' }} />,
-	deprecated: [deprecateBlockName(settings)],
+	deprecated: [deprecateUnescapedCode(settings), deprecateBlockName(settings)],
 })

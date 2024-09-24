@@ -4,7 +4,7 @@ import type { BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import 'allotment/dist/style.css'
 import stringify from 'json-stable-stringify'
-import { deprecateBlockName } from '../../components/deprecation'
+import { deprecateBlockName, deprecateUnescapedCode } from '../../components/deprecation'
 import 'prismjs/themes/prism.css'
 import json from './block.json'
 import Edit from './edit'
@@ -39,5 +39,5 @@ registerBlockType<Attributes>(name, {
 		)
 	},
 	icon: <IconBrandJavascript style={{ fill: 'none' }} />,
-	deprecated: [deprecateBlockName(settings)],
+	deprecated: [deprecateUnescapedCode(settings), deprecateBlockName(settings)],
 })

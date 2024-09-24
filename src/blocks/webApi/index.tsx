@@ -40,6 +40,35 @@ export interface Attributes {
 	}
 }
 
+const deprecateUnescapedCode = {
+	attributes: {
+		...settings.attributes,
+		requestParams: {
+			...settings.attributes.requestParams,
+			textBody: decodeURIComponent(settings.attributes.requestParams.textBody),
+		},
+	},
+	supports: settings.supports,
+	save: ({ attributes }: any) => {
+		return (
+			<div {...useBlockProps.save()} data-attributes={stringify(attributes)}>
+				is loading ...
+			</div>
+		)
+	},
+	migrate: (attributes: any) => ({
+		...attributes,
+		requestParams: {
+			...attributes.requestParams,
+			textBody: encodeURIComponent(attributes.requestParams.textBody),
+		},
+	}),
+	isEligible: (attributes: any) => {
+		const textBody = attributes?.requestParams?.textBody
+		return typeof textBody === 'string' && decodeURIComponent(textBody) === textBody
+	},
+}
+
 registerBlockType<Attributes>(name, {
 	...settings,
 	edit: Edit,
@@ -51,5 +80,5 @@ registerBlockType<Attributes>(name, {
 		)
 	},
 	icon: <IconApi style={{ fill: 'none' }} />,
-	deprecated: [deprecateBlockName(settings)],
+	deprecated: [deprecateUnescapedCode, deprecateBlockName(settings)],
 })
