@@ -11,7 +11,7 @@ export default function View() {
 			style={{ color: '#fff' }}
 			leftIcon={showIcon && <IconShare style={{ fill: 'none' }} size="1rem" />}
 			onClick={() => {
-				const url = window.location.href
+				const url = window.location.href.split('#')[0]
 				const combinedUrl = `${url}#${exportAsJson()}`
 				navigator.clipboard.writeText(combinedUrl)
 			}}
