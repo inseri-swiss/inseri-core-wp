@@ -24,7 +24,7 @@ export interface GlobalState extends Attributes {
 		updateState: (modifier: Partial<GlobalState>) => void
 		setDoi: (doi: string) => Promise<void>
 		chooseFile: (url: string | null) => Promise<void>
-		loadFile: () => Promise<void>
+		loadFile: (selectedFile: string | null) => Promise<void>
 	}
 }
 
@@ -141,27 +141,21 @@ export const storeCreator = (initalState: Attributes) => {
 					state.selectedFile = key
 					state.hasError = false
 				})
-
-				if (!key) {
-					set((state) => {
-						state.fileContent = null
-					})
-				}
-
-				if (key) {
-					innerLoadFile(set, key, get().record!)
-				}
 			},
 
-			loadFile: async () => {
+			loadFile: async (selectedFile) => {
 				if (!get().record) {
 					await loadZenodoRecord(set, get().doi.trim(), true)
 				}
 
-				const { selectedFile, record } = get()
+				const { record } = get()
 
 				if (selectedFile) {
 					innerLoadFile(set, selectedFile, record!)
+				} else {
+					set((state) => {
+						state.fileContent = null
+					})
 				}
 			},
 		},

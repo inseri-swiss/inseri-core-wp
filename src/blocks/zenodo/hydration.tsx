@@ -16,7 +16,7 @@ function initReactComponents() {
 				<InseriThemeProvider>
 					<InseriRoot blockId={attributes.blockId} blockName={attributes.metadata.name} blockType={config.name}>
 						<StateProvider stateCreator={storeCreator} initialState={attributes}>
-							<View />
+							<View attributes={attributes} />
 						</StateProvider>
 					</InseriRoot>
 				</InseriThemeProvider>

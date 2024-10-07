@@ -137,7 +137,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					)}
 				</Stack>
 			) : (
-				<View renderHiding={renderHiding} />
+				<View renderHiding={renderHiding} attributes={props.attributes} />
 			)}
 		</>
 	)
