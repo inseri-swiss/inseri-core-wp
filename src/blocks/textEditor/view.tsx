@@ -1,4 +1,4 @@
-import { usePublish } from '@inseri/lighthouse'
+import { usePublish, useRestorableState } from '@inseri/lighthouse'
 import { useDebouncedValue } from '@mantine/hooks'
 import { IconEye, IconPencil } from '@tabler/icons-react'
 import { useEffect, useMemo, useState } from '@wordpress/element'
@@ -26,7 +26,7 @@ export default function View(props: ViewProps) {
 		return getBodyTypeByContenType(contentType) ?? 'text'
 	}, [contentType])
 
-	const [code, setCode] = useState(content)
+	const [code, setCode] = useRestorableState('code', content)
 	const [hasSyntaxError, setSyntaxError] = useState(false)
 	const [debouncedCode] = useDebouncedValue(code, 500)
 
