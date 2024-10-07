@@ -32,3 +32,6 @@ if (process.env.NODE_ENV !== 'production') {
 	// eslint-disable-next-line no-console
 	blockStoreSubject.pipe(distinctUntilChanged((prev, current) => isDeepEqualReact(prev, current))).subscribe((root) => console.log('#lighthouse:', root))
 }
+
+export const restorableDataRoot: Record<string, Record<string, any>> = {}
+export const restorableDispatchRoot: Record<string, Record<string, (data: any) => void>> = {}
