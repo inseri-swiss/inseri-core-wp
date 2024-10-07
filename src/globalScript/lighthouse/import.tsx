@@ -1,22 +1,11 @@
 import { initJsonValidator } from '../utils'
-import { onNext } from './core'
-import { some } from './option'
+import { restorableDispatchRoot } from './core'
 
 const schema = {
 	type: 'object',
 	additionalProperties: {
 		type: 'object',
-		additionalProperties: {
-			type: 'object',
-			required: [
-				'contentType',
-				'value',
-			],
-			properties: {
-				contentType: { type: 'string' },
-				value: {},
-			},
-		},
+		additionalProperties: {},
 	},
 }
 
@@ -47,10 +36,9 @@ function importFromUrl(hash: string) {
 
 	Object.entries(jsonContent).forEach((blockEntry: any) => {
 		const [blockId, block] = blockEntry
-		Object.entries(block).forEach((atomEntry: any) => {
-			const [key, atom] = atomEntry
-			const { contentType, value } = atom
-			onNext({ type: 'set-value', payload: { blockId, key, content: some({ contentType, value }) } })
+		Object.entries(block).forEach((slice: any) => {
+			const [key, value] = slice
+			restorableDispatchRoot[blockId][key](value)
 		})
 	})
 }
