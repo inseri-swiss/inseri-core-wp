@@ -29,7 +29,7 @@
 		"@types/wordpress__block-editor": "^11.5.14",
 		"@types/wordpress__blocks": "^12.5.14",
 		"@types/wordpress__edit-post": "^7.5.7",
-		"@wordpress/env": "^10.8.0",
+		"@wordpress/env": "^10.9.0",
 		"@wordpress/eslint-plugin": "^19.2.0",
 		"@wordpress/scripts": "^27.9.0",
 		"eslint": "^8.57.1",
