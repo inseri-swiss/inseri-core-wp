@@ -20,6 +20,9 @@ export function useRestorableState<T>(key: string, initialState: T | (() => T)):
 
 	if (!restorableDataRoot[blockId]) {
 		restorableDataRoot[blockId] = {}
+	}
+
+	if (!restorableDispatchRoot[blockId]) {
 		restorableDispatchRoot[blockId] = {}
 	}
 
