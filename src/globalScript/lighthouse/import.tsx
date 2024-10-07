@@ -1,5 +1,5 @@
 import { initJsonValidator } from '../utils'
-import { restorableDispatchRoot } from './core'
+import { restorableDispatchRoot, restorableDataRoot } from './core'
 
 const schema = {
 	type: 'object',
@@ -38,7 +38,13 @@ function importFromUrl(hash: string) {
 		const [blockId, block] = blockEntry
 		Object.entries(block).forEach((slice: any) => {
 			const [key, value] = slice
-			restorableDispatchRoot[blockId][key](value)
+
+			if (restorableDispatchRoot[blockId]?.[key]) {
+				restorableDispatchRoot[blockId][key](value)
+			} else {
+				const old = restorableDataRoot[blockId]
+				restorableDataRoot[blockId] = { ...old, [key]: value }
+			}
 		})
 	})
 }
