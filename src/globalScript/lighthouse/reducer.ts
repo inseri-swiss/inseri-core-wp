@@ -56,10 +56,12 @@ export function reducer(base: Root, action: Action) {
 			break
 		case 'set-value':
 			{
-				const { key, content } = action.payload
+				const { key, content, initial } = action.payload
 				const wrapper = blockSlice.atoms[key]
-				blockSlice.atoms[key] = { description: wrapper.description, content }
-				base[blockId] = blockSlice
+				if (!initial || wrapper.content.isEmpty()) {
+					blockSlice.atoms[key] = { description: wrapper.description, content }
+					base[blockId] = blockSlice
+				}
 			}
 			break
 	}

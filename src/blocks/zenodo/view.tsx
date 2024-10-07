@@ -1,4 +1,4 @@
-import { usePublish } from '@inseri/lighthouse'
+import { usePublish, useRestorableState } from '@inseri/lighthouse'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { Box, Loader, Select, useGlobalState } from '../../components'
@@ -6,16 +6,18 @@ import { GlobalState } from './state'
 
 interface ViewProps {
 	renderHiding?: (BlockComponent: JSX.Element) => JSX.Element
+	attributes: Record<string, any>
 }
 
-export default function View({ renderHiding }: ViewProps) {
-	const { label, selectedFile, files, isLoading, hasError, fileContent, mime, isVisible } = useGlobalState((state: GlobalState) => state)
+export default function View({ renderHiding, attributes }: ViewProps) {
+	const { label, files, isLoading, hasError, fileContent, mime, isVisible } = useGlobalState((state: GlobalState) => state)
 	const { chooseFile, loadFile } = useGlobalState((state: GlobalState) => state.actions)
 	const [publish, setEmpty] = usePublish('file', 'file')
+	const [selectedFile, setSelectedFile] = useRestorableState('selectedFile', attributes.selectedFile)
 
 	useEffect(() => {
-		loadFile()
-	}, [])
+		loadFile(selectedFile)
+	}, [selectedFile])
 
 	useEffect(() => {
 		setTimeout(() => {
@@ -36,7 +38,10 @@ export default function View({ renderHiding }: ViewProps) {
 				label={label}
 				value={selectedFile}
 				data={files}
-				onChange={(val) => chooseFile(val)}
+				onChange={(val) => {
+					setSelectedFile(val)
+					chooseFile(val)
+				}}
 				rightSection={isLoading && <Loader p="xs" />}
 				error={hasError ? __('An error has occurred.', 'inseri-core') : null}
 			/>

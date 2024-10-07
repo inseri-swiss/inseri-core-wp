@@ -14,11 +14,11 @@ function initReactComponents() {
 			const attributes = JSON.parse(item.dataset.attributes)
 			createRoot(item!).render(
 				<InseriThemeProvider>
-					<InseriRoot blockId={attributes.blockId} blockName={attributes.metadata?.name ?? ''} blockType={config.name}>
-						<StateProvider stateCreator={storeCreator} initialState={attributes}>
-							<View attributes={attributes} />
-						</StateProvider>
-					</InseriRoot>
+					<StateProvider stateCreator={storeCreator} initialState={attributes}>
+						<InseriRoot blockId={attributes.blockId} blockName={attributes.blockName} blockType={config.name}>
+							<View />
+						</InseriRoot>
+					</StateProvider>
 				</InseriThemeProvider>
 			)
 		})

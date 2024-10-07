@@ -1,0 +1,42 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 2,
+	"name": "inseri-core/share",
+	"title": "Share",
+	"category": "inseri",
+	"description": "Share a page using your customized parameters.",
+	"attributes": {
+		"blockId": {
+			"type": "string",
+			"default": ""
+		},
+		"text": {
+			"type": "string",
+			"default": "Share page"
+		},
+		"showIcon": {
+			"type": "boolean",
+			"default": true
+		},
+		"metadata": {
+			"type": "object",
+			"default": {
+				"name": ""
+			}
+		}
+	},
+	"supports": {
+		"html": false,
+		"align": true,
+		"alignWide": true,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		}
+	},
+	"textdomain": "inseri-core",
+	"editorScript": ["file:./index.js", "inseri-core-editor"],
+	"viewScript": ["file:./hydration.js"],
+	"style": ["file:./index.css"],
+	"script": "inseri-core"
+}

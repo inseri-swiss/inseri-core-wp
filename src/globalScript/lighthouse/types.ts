@@ -78,6 +78,7 @@ interface SetValueAction {
 		blockId: string
 		key: string
 		content: Option<any>
+		initial?: boolean
 	}
 }
 
