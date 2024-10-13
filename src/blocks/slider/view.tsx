@@ -1,5 +1,4 @@
-import { usePublish } from '@inseri/lighthouse'
-import { useEffect, useState } from '@wordpress/element'
+import { usePublish, useRestorableState } from '@inseri/lighthouse'
 import { Box, RangeSlider, Slider, Text, useGlobalState } from '../../components'
 import { GlobalState } from './state'
 
@@ -8,7 +7,7 @@ export default function View() {
 	const [minVal, maxVal] = valueBoundaries
 	const [minRange, maxRange] = rangeBoundaries
 
-	const [data, setData] = useState<number[]>([])
+	const [data, setData] = useRestorableState<number[]>('selected', initialValue)
 	const [publishValue] = usePublish('selected', isRange ? 'range value' : 'slider value')
 	const publish = (input: any) => publishValue(input, 'application/json')
 
@@ -35,14 +34,6 @@ export default function View() {
 	) : (
 		<Slider min={minVal} max={maxVal} step={step} precision={precision} value={data[0]} onChange={updateData} />
 	)
-
-	useEffect(() => {
-		if (isRange) {
-			updateData(initialValue)
-		} else {
-			updateData(initialValue[0])
-		}
-	}, [isRange, ...initialValue])
 
 	return (
 		<Box py="xs">
