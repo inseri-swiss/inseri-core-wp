@@ -26,7 +26,7 @@ export interface GlobalState extends Attributes {
 
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
-		loadMedias: () => Promise<void>
+		loadMedias: (id: string | null) => Promise<void>
 		chooseFile: (id: string | null) => Promise<void>
 	}
 }
@@ -87,8 +87,8 @@ export const storeCreator = (initalState: Attributes) => {
 					updatePartially(state, modifier)
 				}),
 
-			loadMedias: async () => {
-				const { fileIds, selectedFileId } = get()
+			loadMedias: async (id: string | null) => {
+				const { fileIds } = get()
 				const [err, medias] = await getAllMedia(fileIds)
 
 				if (medias) {
@@ -97,7 +97,7 @@ export const storeCreator = (initalState: Attributes) => {
 						state.files = newFiles
 					})
 
-					const file = newFiles.find((f) => f.value === selectedFileId)
+					const file = newFiles.find((f) => f.value === id)
 					if (file) {
 						loadFile(set, file)
 					}
