@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n'
 import { Box, Select } from '../../components'
 import { Attributes } from './index'
-import { useWatch, usePublish, Nucleus } from '@inseri/lighthouse'
+import { useWatch, usePublish, Nucleus, useRestorableState } from '@inseri/lighthouse'
 import { isValueValid } from './utils'
 
 interface ViewProps {
@@ -14,6 +14,7 @@ export default function View(props: ViewProps) {
 	const { attributes, setAttributes, setWizardMode } = props
 	const { inputKey, label, searchable, clearable } = attributes
 	const [publishValue, publishEmpty] = usePublish('selected', __('chosen value', 'inseri-core'))
+	const [key, setKey] = useRestorableState<string | null>('selection', null)
 
 	const data = useWatch(inputKey, {
 		onNone: () => [] as any[],
@@ -31,7 +32,10 @@ export default function View(props: ViewProps) {
 			<Select
 				label={label}
 				data={data}
+				value={key}
 				onChange={(item) => {
+					setKey(item)
+
 					if (item) {
 						publishValue(item, 'application/json')
 					} else {
