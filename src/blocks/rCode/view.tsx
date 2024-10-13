@@ -1,4 +1,4 @@
-import { Nucleus, usePublish, useWatch } from '@inseri/lighthouse'
+import { Nucleus, usePublish, useRestorableState, useWatch } from '@inseri/lighthouse'
 import { usePrevious } from '@mantine/hooks'
 import { useEffect } from '@wordpress/element'
 import { Box, CodeEditor, Group, TopBar, useGlobalState } from '../../components'
@@ -34,6 +34,8 @@ export default function View(props: ViewProps) {
 	} = useGlobalState((state: GlobalState) => state)
 
 	const content = useGlobalState((state: GlobalState) => decodeURIComponent(state.content))
+	const [cachedContent, setCachedContent] = useRestorableState('code', content)
+
 	const { setInputValue, setInputEmpty, updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
 	const prevWorkerStatus = usePrevious(workerStatus)
@@ -74,7 +76,7 @@ export default function View(props: ViewProps) {
 		onSome: ({ value, contentType }: Nucleus<any>) => (contentType.includes('python') ? value : ''),
 	})
 
-	const code = mode === 'viewer' ? watchedCode : content
+	const code = mode === 'viewer' ? watchedCode : cachedContent
 
 	// must be the last useEffect
 	useEffect(() => {
@@ -85,7 +87,7 @@ export default function View(props: ViewProps) {
 		areInputsReady,
 		areOutputsReady,
 		inputRevision,
-		content,
+		cachedContent,
 		workerStatus,
 	])
 
@@ -97,6 +99,7 @@ export default function View(props: ViewProps) {
 			onChange={(val) => {
 				if (isEditable && mode === 'editor') {
 					updateState({ content: encodeURIComponent(val) })
+					setCachedContent(val)
 				}
 			}}
 		/>
