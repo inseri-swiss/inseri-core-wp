@@ -1,25 +1,13 @@
-import { Actions, Nucleus, usePublish, useWatch } from '@inseri/lighthouse'
+import { Nucleus, usePublish, useRestorableState, useWatch } from '@inseri/lighthouse'
 import { useState } from '@wordpress/element'
 import cloneDeep from 'lodash.clonedeep'
 import Plot from 'react-plotly.js'
 import { Box, useGlobalState } from '../../components'
 import { GlobalState } from './state'
+import { useDeepCompareEffect } from 'react-use'
 
 const simpleEventTransform = (event: Plotly.PlotHoverEvent | Plotly.PlotHoverEvent | Plotly.PlotSelectionEvent) => {
 	return event.points.map(({ curveNumber, data, x, y, pointIndex }) => ({ curveNumber, data, x, y, pointIndex }))
-}
-
-const propagateIfSet = (eventType: string, outputs: [string, string][], recordUpdater: Record<string, Actions<any>>) => (val: any) => {
-	const isSet = outputs.some((o) => o[0] === eventType)
-	if (isSet) {
-		let processedVal = val
-
-		if (eventType === 'onClick' || eventType === 'onHover') {
-			processedVal = simpleEventTransform(val)
-		}
-
-		recordUpdater[eventType][0](processedVal, 'application/json')
-	}
 }
 
 const prepareLayout = (newLayout: any) => {
@@ -43,7 +31,26 @@ export default function View({ renderResizable }: ViewProps) {
 	const [layout, setLayout] = useState<any>({})
 	const [config, setConfig] = useState<any>({ responsive: true })
 
+	const [clickedData, setClickedData] = useRestorableState<any>('click', null)
+	const [hoveredData, setHoveredData] = useRestorableState<any>('hover', null)
+
 	const publishRecord = usePublish(outputs.map((i) => ({ key: i[0], description: i[1] })))
+
+	useDeepCompareEffect(() => {
+		const publish = publishRecord.onClick?.[0]
+
+		if (clickedData && publish) {
+			publish(clickedData, 'application/json')
+		}
+	}, [clickedData])
+
+	useDeepCompareEffect(() => {
+		const publish = publishRecord.onHover?.[0]
+
+		if (hoveredData && publish) {
+			publish(hoveredData, 'application/json')
+		}
+	}, [hoveredData])
 
 	useWatch(
 		{ inputFull, inputData, inputLayout, inputConfig },
@@ -86,6 +93,9 @@ export default function View({ renderResizable }: ViewProps) {
 		}
 	)
 
+	const isSetClicked = outputs.some((o) => o[0] === 'onClick')
+	const isSetHover = outputs.some((o) => o[0] === 'onHover')
+
 	const preparedData = data.length === 0 ? full.data : data
 	const preparedLayout = Object.keys(layout).length === 0 ? full.layout : layout
 
@@ -98,8 +108,16 @@ export default function View({ renderResizable }: ViewProps) {
 			useResizeHandler={true}
 			style={{ width: '100%', height: '100%' }}
 			// events
-			onClick={propagateIfSet('onClick', outputs, publishRecord)}
-			onHover={propagateIfSet('onHover', outputs, publishRecord)}
+			onClick={(event) => {
+				if (isSetClicked) {
+					setClickedData(simpleEventTransform(event))
+				}
+			}}
+			onHover={(event) => {
+				if (isSetHover) {
+					setHoveredData(simpleEventTransform(event))
+				}
+			}}
 		/>
 	)
 
