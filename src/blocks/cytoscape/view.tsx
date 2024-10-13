@@ -1,6 +1,7 @@
-import { Nucleus, usePublish, useWatch } from '@inseri/lighthouse'
+import { Nucleus, usePublish, useRestorableState, useWatch } from '@inseri/lighthouse'
 import { IconCircleOff } from '@tabler/icons-react'
 import { useCallback } from '@wordpress/element'
+import { useDeepCompareEffect } from 'react-use'
 import { CytoscapeComponent, Group, Text, useGlobalState } from '../../components'
 import { GlobalState } from './state'
 
@@ -11,9 +12,16 @@ interface ViewProps {
 export default function View({ renderResizable }: ViewProps) {
 	const { inputKey, height, layout, styleKey, layoutKey } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
+	const [node, setNode] = useRestorableState<any>('select', null)
 
 	const [publish] = usePublish('select', 'node/edge selection')
-	const onSelect = useCallback((event: any, type: string) => publish({ _type: type, ...event }, 'application/json'), [])
+	const onSelect = useCallback((event: any, type: string) => setNode({ _type: type, ...event }), [])
+
+	useDeepCompareEffect(() => {
+		if (node) {
+			publish(node, 'application/json')
+		}
+	}, [node])
 
 	const watchRecord = useWatch(
 		{ inputKey, styleKey, layoutKey },
