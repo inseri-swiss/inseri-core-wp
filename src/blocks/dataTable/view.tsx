@@ -1,4 +1,4 @@
-import { usePublish, useWatch } from '@inseri/lighthouse'
+import { usePublish, useRestorableState, useWatch } from '@inseri/lighthouse'
 import { useMemo, useState } from '@wordpress/element'
 import cloneDeep from 'lodash.clonedeep'
 import type { MRT_ColumnFiltersState as ColumnFiltersState, MRT_SortingState as SortingState } from 'mantine-react-table'
@@ -24,6 +24,9 @@ export default function View() {
 			.map(([key]) => ({ accessorKey: key, header: key }))
 	}, [data[0]])
 
+	const [selectedRow, setSelectedRow] = useRestorableState<any>('row', null)
+	const [selectedCell, setSelectedCell] = useRestorableState<any>('cell', null)
+
 	const [publishRow] = usePublish('row', 'selected row')
 	const [publishCell] = usePublish('cell', 'selected cell')
 	const [publishTable] = usePublish('table', 'filtered and sorted table')
@@ -32,6 +35,18 @@ export default function View() {
 	const [globalFilter, setGlobalFilter] = useState('')
 	const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 	const [isFullScreen, setIsFullScreen] = useState(false)
+
+	useDeepCompareEffect(() => {
+		if (selectedRow) {
+			publishRow(selectedRow, 'application/json')
+		}
+	}, [selectedRow])
+
+	useDeepCompareEffect(() => {
+		if (selectedCell) {
+			publishCell(selectedCell, 'application/json')
+		}
+	}, [selectedCell])
 
 	useWatch(
 		{ inputColumns, inputData },
@@ -70,7 +85,7 @@ export default function View() {
 
 		mantineTableBodyRowProps: enableRowClick
 			? ({ row }) => ({
-					onClick: (_event) => publishRow(row.original, 'application/json'),
+					onClick: (_event) => setSelectedRow(row.original),
 					sx: { cursor: 'pointer' },
 				})
 			: undefined,
@@ -80,7 +95,7 @@ export default function View() {
 					onDoubleClick: (_event) => {
 						const accessorKey = cell.column.id
 						const cellContent = accessorKey.split('.').reduce((a, b) => a[b], row.original as any)
-						publishCell({ accessorKey, row: row.original, cell: cellContent }, 'application/json')
+						setSelectedCell({ accessorKey, row: row.original, cell: cellContent })
 					},
 					sx: { cursor: 'pointer' },
 				})
