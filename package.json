@@ -47,7 +47,7 @@
 		"@mantine/dates": "^6.0.22",
 		"@mantine/dropzone": "^6.0.22",
 		"@mantine/hooks": "^6.0.21",
-		"@samvera/clover-iiif": "^2.10.1",
+		"@samvera/clover-iiif": "^2.10.2",
 		"@tabler/icons-react": "^2.47.0",
 		"@wordpress/block-editor": "^12.26.0",
 		"@wordpress/blocks": "^12.31.0",
