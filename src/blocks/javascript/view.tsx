@@ -34,7 +34,7 @@ export default function View(props: ViewProps) {
 	} = useGlobalState((state: GlobalState) => state)
 
 	const content = useGlobalState((state: GlobalState) => decodeURIComponent(state.content))
-	const [cachedContent, setCachedContent] = useRestorableState('code', content)
+	const [cachedContent, setCachedContent] = useRestorableState('code', content, !editable)
 
 	const { setInputValue, setInputEmpty, updateState, runCode } = useGlobalState((state: GlobalState) => state.actions)
 	const isEditable = (editable || isGutenbergEditor) && mode === 'editor'
