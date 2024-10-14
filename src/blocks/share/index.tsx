@@ -12,6 +12,7 @@ const { name, ...settings } = json as any
 export interface Attributes {
 	blockId: string
 	text: string
+	copiedText: string
 	showIcon: boolean
 	metadata: {
 		name: string
