@@ -2,21 +2,29 @@ import { exportAsJson } from '@inseri/lighthouse'
 import { Button, useGlobalState } from '../../components'
 import { GlobalState } from './state'
 import { IconShare } from '@tabler/icons-react'
+import { useClipboard } from '@mantine/hooks'
 
-export default function View() {
-	const { text, showIcon } = useGlobalState((state: GlobalState) => state)
+interface Prop {
+	getPermalink?: () => string
+}
+
+export default function View({ getPermalink }: Prop) {
+	const { text, copiedText, showIcon } = useGlobalState((state: GlobalState) => state)
+	const clipboard = useClipboard({ timeout: 750 })
 
 	return (
 		<Button
-			style={{ color: '#fff' }}
+			style={{ color: !clipboard.copied ? '#fff' : undefined }}
 			leftIcon={showIcon && <IconShare style={{ fill: 'none' }} size="1rem" />}
+			variant={clipboard.copied ? 'outline' : 'filled'}
 			onClick={() => {
-				const url = window.location.href.split('#')[0]
+				const base = getPermalink ? getPermalink() : window.location.href
+				const url = base.split('#')[0]
 				const combinedUrl = `${url}#${exportAsJson()}`
-				navigator.clipboard.writeText(combinedUrl)
+				clipboard.copy(combinedUrl)
 			}}
 		>
-			{text}
+			{clipboard.copied ? copiedText : text}
 		</Button>
 	)
 }

@@ -2,14 +2,17 @@ import { InseriRoot } from '@inseri/lighthouse'
 import { InspectorControls } from '@wordpress/block-editor'
 import type { BlockEditProps } from '@wordpress/blocks'
 import { PanelBody, PanelRow } from '@wordpress/components'
-import { Box, SetupEditorEnv, StateProvider, Switch, TextInput, useGlobalState } from '../../components'
+import { select } from '@wordpress/data'
+import { Box, Group, SetupEditorEnv, StateProvider, Switch, TextInput, useGlobalState } from '../../components'
 import config from './block.json'
 import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
 import View from './view'
 
+const getPermalink = () => select('core/editor').getPermalink()
+
 function EditComponent(_props: BlockEditProps<Attributes>) {
-	const { metadata, text, showIcon } = useGlobalState((state: GlobalState) => state)
+	const { metadata, text, copiedText, showIcon } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 
 	return (
@@ -25,15 +28,24 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 						/>
 					</PanelRow>
 					<PanelRow>
-						<TextInput
-							mt="md"
-							styles={{ root: { width: '100%' } }}
-							label="Button Text"
-							value={text}
-							onChange={(value) => {
-								updateState({ text: value.target.value })
-							}}
-						/>
+						<Group mt="md" styles={{ root: { width: '100%' } }}>
+							<TextInput
+								styles={{ root: { flex: 1 } }}
+								label="Primary Text"
+								value={text}
+								onChange={(value) => {
+									updateState({ text: value.target.value })
+								}}
+							/>
+							<TextInput
+								styles={{ root: { flex: 1 } }}
+								label="Copied Text"
+								value={copiedText}
+								onChange={(value) => {
+									updateState({ copiedText: value.target.value })
+								}}
+							/>
+						</Group>
 					</PanelRow>
 					<PanelRow>
 						<Box mt="md" style={{ width: '100%' }}>
@@ -48,7 +60,7 @@ function EditComponent(_props: BlockEditProps<Attributes>) {
 				</PanelBody>
 			</InspectorControls>
 
-			<View />
+			<View getPermalink={getPermalink} />
 		</>
 	)
 }
