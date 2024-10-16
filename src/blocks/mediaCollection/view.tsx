@@ -24,13 +24,9 @@ interface ViewProps {
 
 export default function View({ renderHiding }: ViewProps) {
 	const { label, selectedFileId, files, isLoading, hasError, fileContent, mime, isVisible } = useGlobalState((state: GlobalState) => state)
-	const { loadMedias, chooseFile } = useGlobalState((state: GlobalState) => state.actions)
+	const { chooseFile } = useGlobalState((state: GlobalState) => state.actions)
 	const [publishValue, publishEmpty] = usePublish('file', 'file')
 	const [key, setKey] = useRestorableState<string | null>('file', selectedFileId)
-
-	useEffect(() => {
-		loadMedias(key)
-	}, [])
 
 	useEffect(() => {
 		chooseFile(key)

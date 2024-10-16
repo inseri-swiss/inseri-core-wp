@@ -15,7 +15,7 @@ window.addEventListener('hashchange', (_event) => {
 	importFromUrl(location.hash)
 })
 
-window.addEventListener('load', async () => {
+document.addEventListener('DOMContentLoaded', () => {
 	importFromUrl(location.hash)
 })
 

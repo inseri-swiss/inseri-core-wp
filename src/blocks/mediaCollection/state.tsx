@@ -1,4 +1,3 @@
-import type { Draft } from 'immer'
 import { immer } from 'zustand/middleware/immer'
 import { callMediaFile, getAllMedia, Media } from '../../ApiServer'
 import { updatePartially } from '../../utils'
@@ -26,7 +25,6 @@ export interface GlobalState extends Attributes {
 
 	actions: {
 		updateState: (modifier: Partial<GlobalState>) => void
-		loadMedias: (id: string | null) => Promise<void>
 		chooseFile: (id: string | null) => Promise<void>
 	}
 }
@@ -48,30 +46,7 @@ const transformToFile = (file: Media): File => {
 	return { value: String(file.id), label: file.title.rendered, url: file.source_url, mime: file.mime_type, thumbnail }
 }
 
-type Set = (nextStateOrUpdater: (state: Draft<GlobalState>) => void, shouldReplace?: boolean | undefined) => void
-
 export const storeCreator = (initalState: Attributes) => {
-	const loadFile = async (set: Set, file: File) => {
-		set((state) => {
-			state.isLoading = true
-			state.mime = file.mime
-		})
-
-		const [err, data] = await callMediaFile(file.url, file.mime)
-
-		set((state) => {
-			if (data) {
-				state.fileContent = data
-			}
-
-			if (err) {
-				state.hasError = true
-			}
-
-			state.isLoading = false
-		})
-	}
-
 	return immer<GlobalState>((set, get) => ({
 		...initalState,
 		isWizardMode: initalState.fileIds.length === 0,
@@ -87,42 +62,56 @@ export const storeCreator = (initalState: Attributes) => {
 					updatePartially(state, modifier)
 				}),
 
-			loadMedias: async (id: string | null) => {
-				const { fileIds } = get()
-				const [err, medias] = await getAllMedia(fileIds)
-
-				if (medias) {
-					const newFiles = medias.map(transformToFile)
-					set((state) => {
-						state.files = newFiles
-					})
-
-					const file = newFiles.find((f) => f.value === id)
-					if (file) {
-						loadFile(set, file)
-					}
-				}
-				if (err) {
-					set((state) => {
-						state.hasError = true
-					})
-				}
-			},
 			chooseFile: async (id: string | null) => {
 				set((state) => {
 					state.selectedFileId = id
 					state.hasError = false
+
+					if (!id) {
+						state.fileContent = null
+					}
 				})
 
-				if (!id) {
-					set((state) => {
-						state.fileContent = null
-					})
+				const retrievedState = get()
+				const { fileIds } = retrievedState
+				let { files } = retrievedState
+
+				if (files.length === 0) {
+					const [err, medias] = await getAllMedia(fileIds)
+
+					if (medias) {
+						files = medias.map(transformToFile)
+						set((state) => {
+							state.files = files
+						})
+					}
+					if (err) {
+						set((state) => {
+							state.hasError = true
+						})
+					}
 				}
 
-				const file = get().files.find((f) => f.value === id)
+				const file = files.find((f) => f.value === id)
 				if (file) {
-					loadFile(set, file)
+					set((state) => {
+						state.isLoading = true
+						state.mime = file.mime
+					})
+
+					const [err, data] = await callMediaFile(file.url, file.mime)
+
+					set((state) => {
+						if (data) {
+							state.fileContent = data
+						}
+
+						if (err) {
+							state.hasError = true
+						}
+
+						state.isLoading = false
+					})
 				}
 			},
 		},
