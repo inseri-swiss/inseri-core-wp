@@ -13,7 +13,7 @@ export default function View({ renderHiding, attributes }: ViewProps) {
 	const { label, files, isLoading, hasError, fileContent, mime, isVisible } = useGlobalState((state: GlobalState) => state)
 	const { chooseFile, loadFile } = useGlobalState((state: GlobalState) => state.actions)
 	const [publish, setEmpty] = usePublish('file', 'file')
-	const [selectedFile, setSelectedFile] = useRestorableState('selectedFile', attributes.selectedFile)
+	const [selectedFile, setSelectedFile] = useRestorableState('selectedFile', attributes.selectedFile, !isVisible)
 
 	useEffect(() => {
 		loadFile(selectedFile)

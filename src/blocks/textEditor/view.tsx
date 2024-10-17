@@ -26,7 +26,7 @@ export default function View(props: ViewProps) {
 		return getBodyTypeByContenType(contentType) ?? 'text'
 	}, [contentType])
 
-	const [code, setCode] = useRestorableState('code', content, !editable)
+	const [code, setCode] = useRestorableState('code', content, !editable || !isVisible)
 	const [hasSyntaxError, setSyntaxError] = useState(false)
 	const [debouncedCode] = useDebouncedValue(code, 500)
 
