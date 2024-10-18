@@ -23,6 +23,7 @@ nav:
       - 'blocks/plotly.md'
       - 'blocks/python.md'
       - 'blocks/rCode.md'
+      - 'blocks/share.md'
       - 'blocks/slider.md'
       - 'blocks/textEditor.md'
       - 'blocks/textViewer.md'
