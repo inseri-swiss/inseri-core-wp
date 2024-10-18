@@ -28,6 +28,6 @@ Whether to display the share symbol display on the button. By default it is enab
 
 ## Examples
 
-[Export Block](https://inseri.swiss/2024/10/share-block/) on inseri.swiss.
+[Share Block](https://inseri.swiss/2024/10/share-block/) on inseri.swiss.
 
 [Posts on inseri.swiss](https://inseri.swiss/tag/share/) that make use of the Export block.
