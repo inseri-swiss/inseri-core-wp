@@ -4,7 +4,7 @@ Tags: gutenberg, interactive, JavaScript, Plotly, Python
 Requires at least: 5.6
 Tested up to: 6.6.2
 Requires PHP: 5.6
-Stable tag: 0.4.2
+Stable tag: 0.4.3
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -59,6 +59,10 @@ Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inser
 6. Render HTML code
 
 == Changelog ==
+### [0.4.3](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.4.3)
+- New: Share block
+- Update: clover-iiif dependency
+
 ### [0.4.2](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v0.4.2)
 - Fix: HTML code can be used by less privileged users
 - Fix: block names are displayed when published
