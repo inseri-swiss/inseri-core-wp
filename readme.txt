@@ -31,6 +31,7 @@ As a result, inseri core introduces scientific and interactive Gutenberg blocks 
 - **[Plotly Chart Block](https://docs.inseri.swiss/blocks/plotly/)**: It visualizes the data of another block using Plotly.
 - **[Python Code Block](https://docs.inseri.swiss/blocks/python/)**: Guests can run Python code with data from other blocks with the use of Pyodide and the result of the execution is made available to other blocks.
 - **[R Code Block](https://docs.inseri.swiss/blocks/rCode/)**: Guests can run R code with data from other blocks with the use of WebR and the result of the execution is made available to other blocks.
+- **[Share Block](https://docs.inseri.swiss/blocks/share/)**: Guests can share the state of a page with other visitors, allowing them to reproduce it.
 - **[Slider Block](https://docs.inseri.swiss/blocks/slider/)**: It gives guests the possibility to choose a value or a range within a specified boundaries.
 - **[Text Editor Block](https://docs.inseri.swiss/blocks/textEditor/)**: It allows to share text content like JSON or XML with other blocks.
 - **[Text Viewer Block](https://docs.inseri.swiss/blocks/textViewer/)**: It displays text content like JSON or XML from other block.
