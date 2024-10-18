@@ -12,7 +12,7 @@
 		},
 		"text": {
 			"type": "string",
-			"default": "Share page"
+			"default": "Share"
 		},
 		"copiedText": {
 			"type": "string",
