@@ -16,7 +16,7 @@ No input.
 
 ### Primary Text
 
-The text displayed on the button. The default value is "Share page".
+The text displayed on the button. The default value is "Share".
 
 ### Copied Text
 
