@@ -8,6 +8,13 @@ By clicking on the `Export` button, a zip archive will be downloaded locally. Un
 
     The Media Library content is not supported. Therefore it is not compatible with the [Media Collection Block](mediaCollection.md).
 
+!!! warning
+
+    This block is not compatible with WordPress [Synced Patterns](https://wordpress.org/news/2023/07/synced-patterns-the-evolution-of-reusable-blocks/):
+
+    - the Export block doesn't work properly if it's part of a synced pattern
+    - a synced pattern cannot be exported to allow its reuse because the corresponding XML only contains a reference to the original content and not the content itself
+
 ## Output
 
 No output.
