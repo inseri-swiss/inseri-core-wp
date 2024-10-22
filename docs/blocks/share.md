@@ -4,6 +4,20 @@ The Share block enables the guests to share the state of a page with other visit
 
 By clicking on the Share button, a URL containing the state details is copied to the clipboard.
 
+The feature is available for the following blocks:
+
+- [Cytoscape](../blocks/cytoscape.md){:target="\_blank"}
+- [Data Table](../blocks/dataTable.md){:target="\_blank"}
+- [Dropdown](../blocks/dropdown.md){:target="\_blank"}
+- [JavaScript Code block](../blocks/javascript.md){:target="\_blank"}
+- [Media Collection block](../blocks/mediaCollection.md){:target="\_blank"}
+- [Plotly Chart block](../blocks/plotly.md){:target="\_blank"}
+- [Python Code block](../blocks/python.md){:target="\_blank"}
+- [R Code block](../blocks/rCode.md){:target="\_blank"}
+- [Slider block](../blocks/slider.md){:target="\_blank"}
+- [Text Editor block](../blocks/textEditor.md){:target="\_blank"}
+- [Zenodo Repository block](../blocks/zenodo.md){:target="\_blank"}
+
 ## Output
 
 No output.
