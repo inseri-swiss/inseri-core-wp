@@ -31,10 +31,11 @@ nav:
       - 'blocks/zenodo.md'
   - 'Features':
       - 'features/open_citable.md'
+      - 'features/publicly_editable.md'
+      - 'features/block_duplication.md'
       - 'features/sidebar.md'
       - 'features/hide_invisible_blocks.md'
       - 'features/data_flow.md'
-      - 'features/block_duplication.md'
   - 'How to':
       - 'how-to/playground.md'
       - 'how-to/visualizations.md'
