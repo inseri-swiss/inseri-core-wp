@@ -31,6 +31,7 @@ nav:
       - 'blocks/zenodo.md'
   - 'Features':
       - 'features/open_citable.md'
+      - 'features/share_state.md'
       - 'features/publicly_editable.md'
       - 'features/block_duplication.md'
       - 'features/sidebar.md'
