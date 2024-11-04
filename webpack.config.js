@@ -49,6 +49,10 @@ const blockEntrypoints = fs.readdirSync('./src/blocks').reduce((accumulator, ite
 	}
 }, initialEntrypoints)
 
+if (process.env.DISABLE_MINIMIZE === 'true') {
+	defaultConfig.optimization.minimizer = []
+}
+
 module.exports = {
 	...defaultConfig,
 	entry: { ...blockEntrypoints },
