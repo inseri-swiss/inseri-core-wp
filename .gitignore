@@ -28,8 +28,6 @@ venv/
 # dotenv environment variables file
 .env
 
-.wp-env.json
-
 # Apple desktop services store
 .DS_store
 
@@ -43,3 +41,6 @@ Pipfile.lock
 
 # mkdocs
 site/
+
+# test results
+artifacts/

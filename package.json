@@ -17,7 +17,9 @@
 		"start": "wp-scripts start",
 		"start:hot": "wp-scripts start --hot",
 		"bump": "node bump-version",
-		"analyze": "STATS=static npx webpack --profile"
+		"analyze": "STATS=static npx webpack --profile",
+		"test:e2e": "wp-scripts test-playwright",
+		"test:e2e:debug": "wp-scripts test-playwright --debug"
 	},
 	"devDependencies": {
 		"@prettier/plugin-php": "^0.22.2",
