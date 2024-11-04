@@ -14,7 +14,7 @@ jobs:
 
       - run: npm ci
       - run: npm run lint
-      - run: npm run build
+      - run: DISABLE_MINIMIZE=true npm run build
 
       - uses: actions/upload-artifact@v4
         with:
