@@ -19,10 +19,26 @@ on:
 
 jobs:
   build:
-    name: Create artifact
-    uses: ./.github/workflows/build.yml
-    with:
-      checkout-ref: ${{ inputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.version }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm run build
+      - run: npm run plugin-zip
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ready-zip
+          path: inseri-core.zip
+          retention-days: 14
 
   deploy:
     name: Deploy to WordPress.org

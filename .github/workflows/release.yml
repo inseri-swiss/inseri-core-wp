@@ -6,19 +6,25 @@ on:
       - 'v*'
 
 jobs:
-  build:
-    uses: ./.github/workflows/build.yml
-    with:
-      checkout-ref: ${{ github.ref_name }}
-
   release:
-    needs: build
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm run build
+      - run: npm run plugin-zip
+
+      - uses: actions/upload-artifact@v4
         with:
           name: ready-zip
+          path: inseri-core.zip
+          retention-days: 14
 
       - uses: softprops/action-gh-release@v2
         with:
@@ -27,7 +33,7 @@ jobs:
 
   deploy:
     name: Deploy to WordPress.org
-    needs: [build, release]
+    needs: release
     uses: ./.github/workflows/deploy-wp.yml
     secrets: inherit
     with:
