@@ -1,0 +1,40 @@
+name: 'E2E Tests'
+
+on:
+  workflow_dispatch:
+    inputs:
+      wpVersion:
+        description: 'Enter WP version (eg 6.6)'
+        required: false
+        type: string
+        default: ''
+      phpVersion:
+        description: 'Enter PHP version (eg 8.2)'
+        required: false
+        type: string
+        default: '8.2'
+
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps
+
+      # https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-json
+      - uses: godaddy-wordpress/setup-wp-env@v1
+        with:
+          core: ${{ inputs.wpVersion != '' && format('WordPress/WordPress#{0}', inputs.wpVersion) || null }}
+          phpVersion: ${{ inputs.phpVersion }}
+          plugins: '["."]'
+
+      - run: npm run test:e2e
