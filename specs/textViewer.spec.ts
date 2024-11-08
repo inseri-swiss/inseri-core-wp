@@ -5,10 +5,10 @@ test.describe('Text Viewer', () => {
 		await admin.createNewPost()
 	})
 
-	test('should create instance', async ({ editor, page }) => {
+	test('should create instance in editor', async ({ editor, page }) => {
 		await editor.insertBlock({ name: 'inseri-core/text-viewer' })
 
-		expect(page.getByLabel('Editor content').getByText('Text Viewer')).toHaveText('Text Viewer')
+		expect(page.getByLabel('Editor content').getByText('Text Viewer')).toBeVisible()
 		expect(page.getByRole('img').nth(2)).toHaveClass(/tabler-icon-file-typography/)
 	})
 })
