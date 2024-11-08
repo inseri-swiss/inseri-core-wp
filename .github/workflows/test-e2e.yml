@@ -19,6 +19,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      # trenary ${{ condition && if-value || else-value }}
+      INSERI_WP_CORE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.wpVersion != '' && format('WordPress/WordPress#{0}', github.event.inputs.wpVersion) || '' }}
+      INSERI_WP_PHP: ${{  github.event_name == 'workflow_dispatch' && github.event.inputs.phpVersion || '8.2' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,12 +33,6 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npx playwright install --with-deps
-
-      # https://developer.wordpress.org/block-editor/reference-guides/packages/packages-env/#wp-env-json
-      - uses: godaddy-wordpress/setup-wp-env@v1
-        with:
-          core: ${{ inputs.wpVersion != '' && format('WordPress/WordPress#{0}', inputs.wpVersion) || null }}
-          phpVersion: ${{ inputs.phpVersion }}
-          plugins: '["."]'
-
+      - run: npm run wp:set-config
+      - run: npx wp-env start
       - run: npm run test:e2e
