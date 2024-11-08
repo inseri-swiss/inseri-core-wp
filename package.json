@@ -16,7 +16,8 @@
 		"plugin-zip": "wp-scripts plugin-zip",
 		"start": "wp-scripts start",
 		"start:hot": "wp-scripts start --hot",
-		"bump": "node bump-version",
+		"bump": "node scripts/bump-version.js",
+		"wp:set-config": "node scripts/wp-env-config.js",
 		"analyze": "STATS=static npx webpack --profile",
 		"test:e2e": "wp-scripts test-playwright",
 		"test:e2e:debug": "wp-scripts test-playwright --debug"
