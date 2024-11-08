@@ -1,4 +1,7 @@
 {
 	"core": null,
-	"plugins": ["."]
+	"plugins": ["."],
+	"mappings": {
+		"inseri-backup": "./specs/data"
+	}
 }
