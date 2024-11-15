@@ -1,6 +1,6 @@
 # Python Code
 
-It allows to run Python code in the browser.
+It allows to run Python code in the browser using [Pyodide](https://pyodide.org/en/stable/){:target="\_blank"}.
 
 This block allows multiple inputs and outputs. This makes it interesting to tie the behaviors of different blocks together.
 
