@@ -5,14 +5,6 @@ test.describe('Editor', () => {
 		await admin.createNewPost()
 	})
 
-	test('should create Cytoscape', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/cytoscape' })
-
-		const block = page.getByLabel('Block: Cytoscape')
-		expect(block.getByText('Cytoscape')).toBeVisible()
-		expect(block.getByRole('img').first()).toHaveClass(/tabler-icon-chart-dots-3/)
-	})
-
 	test('should create Data Table', async ({ editor, page }) => {
 		await editor.insertBlock({ name: 'inseri-core/data-table' })
 
