@@ -44,10 +44,9 @@ test.describe('TextEditor', () => {
 		await viewerBlock.getByText('Text Editor').click()
 
 		await editorBlock.locator('textarea').first().fill('hello world')
+		await page.waitForTimeout(500)
 
-		await editor.publishPost()
 		const newPage = await editor.openPreviewPage()
-
 		viewerBlock = newPage.locator(viewerSelector).first()
 		editorBlock = newPage.locator(editorSelector).first()
 
@@ -80,10 +79,9 @@ test.describe('TextEditor', () => {
 		await viewerBlock.getByText('Text Editor').click()
 
 		await editorBlock.locator('textarea').first().fill('hello world')
+		await page.waitForTimeout(500)
 
-		await editor.publishPost()
 		const newPage = await editor.openPreviewPage()
-
 		viewerBlock = newPage.locator(viewerSelector).first()
 		editorBlock = newPage.locator(editorSelector).first()
 
