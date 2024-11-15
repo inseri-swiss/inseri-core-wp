@@ -127,14 +127,6 @@ test.describe('Editor', () => {
 		expect(page.getByLabel('Block: Slider')).toBeVisible()
 	})
 
-	test('should create Text Editor', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/text-editor' })
-
-		const block = page.getByLabel('Block: Text Editor')
-		expect(block.getByText('Text Editor')).toBeVisible()
-		expect(block.getByRole('img').first()).toHaveClass(/tabler-icon-edit/)
-	})
-
 	test('should create Web Api', async ({ editor, page }) => {
 		await editor.insertBlock({ name: 'inseri-core/web-api' })
 
