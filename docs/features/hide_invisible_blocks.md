@@ -2,7 +2,7 @@
 
 This feature is available in the [inseri Sidebar](../features/sidebar.md){:target="\_blank"} and it hides all invisible blocks. Therefore it enables in edit mode an experience similar to the published mode, so as it is experienced by the guests.
 
-inseri core provides the following blocks that can be hidden:
+inseri core provides the following blocks that support this feature:
 
 - [JavaScript Code block](../blocks/javascript.md){:target="\_blank"}
 - [Media Collection block](../blocks/mediaCollection.md){:target="\_blank"} when only one file is desired
