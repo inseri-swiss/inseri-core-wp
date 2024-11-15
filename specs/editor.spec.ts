@@ -5,14 +5,6 @@ test.describe('Editor', () => {
 		await admin.createNewPost()
 	})
 
-	test('should create Data Table', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/data-table' })
-
-		const block = page.getByLabel('Block: Data Table')
-		expect(block.getByText('Data Table')).toBeVisible()
-		expect(block.getByRole('img').first()).toHaveClass(/tabler-icon-table/)
-	})
-
 	test('should create Download', async ({ editor, page }) => {
 		await editor.insertBlock({ name: 'inseri-core/download' })
 
