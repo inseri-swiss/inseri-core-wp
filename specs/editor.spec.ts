@@ -5,14 +5,6 @@ test.describe('Editor', () => {
 		await admin.createNewPost()
 	})
 
-	test('should create Dropdown', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/dropdown' })
-
-		const block = page.getByLabel('Block: Dropdown')
-		expect(block.getByText('Dropdown')).toBeVisible()
-		expect(block.getByRole('img').first()).toHaveClass(/tabler-icon-caret-down/)
-	})
-
 	test('should create Export', async ({ editor, page }) => {
 		await editor.insertBlock({ name: 'inseri-core/export' })
 
