@@ -42,7 +42,7 @@ test.describe('TextViewer', () => {
 		await viewerBlock.getByText('Text Editor').click()
 
 		await editorBlock.locator('textarea').first().fill('hello world')
-		await page.waitForTimeout(500)
+		await page.waitForTimeout(500) // wait for auto-save
 
 		const newPage = await editor.openPreviewPage()
 		viewerBlock = newPage.locator(viewerSelector).first()
@@ -79,8 +79,7 @@ test.describe('TextViewer', () => {
 		editorBlock = newPage.locator(editorSelector).first()
 
 		await editorBlock.locator('textarea').first().fill('Hola Mundo!')
-		await page.waitForTimeout(500) // explicit wait needed
-		await expect(viewerBlock.locator('textarea').first()).toHaveText('Hola Mundo!')
+		await expect(viewerBlock.locator('textarea').first()).toHaveText('Hola Mundo!', { timeout: 1000 })
 
 		await newPage.close()
 	})
