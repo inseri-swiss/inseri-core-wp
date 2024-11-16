@@ -44,7 +44,7 @@ test.describe('TextEditor', () => {
 		await viewerBlock.getByText('Text Editor').click()
 
 		await editorBlock.locator('textarea').first().fill('hello world')
-		await page.waitForTimeout(500)
+		await page.waitForTimeout(500) // wait for auto-save
 
 		const newPage = await editor.openPreviewPage()
 		viewerBlock = newPage.locator(viewerSelector).first()
@@ -53,7 +53,7 @@ test.describe('TextEditor', () => {
 		await expect(editorBlock.getByText('MyEditor')).toBeVisible()
 		await expect(editorBlock.getByRole('img').filter()).toHaveClass(/tabler-icon-eye/)
 
-		await editorBlock.locator('textarea').first().fill('Hola Mundo!') // try to  enter nonsense
+		await editorBlock.locator('textarea').first().fill('Hola Mundo!') // try to enter nonsense
 		await expect(editorBlock.locator('textarea').first()).toHaveText('hello world')
 		await expect(viewerBlock.locator('textarea').first()).toHaveText('hello world')
 
@@ -78,9 +78,6 @@ test.describe('TextEditor', () => {
 		await viewerBlock.getByPlaceholder('Search for blocks, content type,').click()
 		await viewerBlock.getByText('Text Editor').click()
 
-		await editorBlock.locator('textarea').first().fill('hello world')
-		await page.waitForTimeout(500)
-
 		const newPage = await editor.openPreviewPage()
 		viewerBlock = newPage.locator(viewerSelector).first()
 		editorBlock = newPage.locator(editorSelector).first()
@@ -88,8 +85,7 @@ test.describe('TextEditor', () => {
 		await expect(editorBlock.getByRole('img').filter()).toHaveClass(/tabler-icon-pencil/)
 
 		await editorBlock.locator('textarea').first().fill('Hola Mundo!')
-		await page.waitForTimeout(500) // explicit wait needed
-		await expect(viewerBlock.locator('textarea').first()).toHaveText('Hola Mundo!')
+		await expect(viewerBlock.locator('textarea').first()).toHaveText('Hola Mundo!', { timeout: 1000 })
 
 		await newPage.close()
 	})
