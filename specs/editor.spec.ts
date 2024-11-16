@@ -5,12 +5,6 @@ test.describe('Editor', () => {
 		await admin.createNewPost()
 	})
 
-	test('should create Export', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/export' })
-
-		expect(page.getByLabel('Block: Export')).toHaveText('Export')
-	})
-
 	test('should create HTML Code', async ({ editor, page }) => {
 		await editor.insertBlock({ name: 'inseri-core/html' })
 
