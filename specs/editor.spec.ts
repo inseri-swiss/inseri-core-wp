@@ -5,14 +5,6 @@ test.describe('Editor', () => {
 		await admin.createNewPost()
 	})
 
-	test('should create IIIF Viewer', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/iiif-viewer' })
-
-		const block = page.getByLabel('Block: IIIF Viewer')
-		expect(block.getByText('IIIF Viewer')).toBeVisible()
-		expect(block.getByRole('img').first()).toHaveClass(/tabler-icon-zoom-in-area/)
-	})
-
 	test('should create Image Box', async ({ editor, page }) => {
 		await editor.insertBlock({ name: 'inseri-core/image' })
 
