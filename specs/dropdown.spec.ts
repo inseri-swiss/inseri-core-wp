@@ -12,7 +12,7 @@ test.describe('Dropdown', () => {
 
 		await editorBlock.getByLabel('Choose a format').click()
 		await editorBlock.getByRole('option', { name: 'JSON', exact: true }).click()
-		await editorBlock.locator('textarea').first().fill(`[ "one", "two", "three" ]`)
+		await editorBlock.locator('textarea').fill(`[ "one", "two", "three" ]`)
 
 		await editor.insertBlock({ name: 'inseri-core/dropdown' })
 		let dropdown = page.locator(dropdownSelector).first()
@@ -34,7 +34,7 @@ test.describe('Dropdown', () => {
 		await viewerBlock.getByPlaceholder('Search for blocks, content type,').click()
 		await viewerBlock.getByText('Dropdown', { exact: true }).click()
 
-		await expect(viewerBlock.locator('textarea').first()).toHaveText(`"three"`)
+		await expect(viewerBlock.locator('textarea')).toHaveText(`"three"`)
 
 		const newPage = await editor.openPreviewPage()
 		await newPage.waitForEvent('load')
@@ -44,7 +44,7 @@ test.describe('Dropdown', () => {
 
 		await dropdown.getByLabel('Choose an item').click()
 		await dropdown.getByRole('option', { name: 'one' }).click()
-		await expect(viewerBlock.locator('textarea').first()).toHaveText(`"one"`)
+		await expect(viewerBlock.locator('textarea')).toHaveText(`"one"`)
 
 		await newPage.close()
 	})

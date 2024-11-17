@@ -19,8 +19,8 @@ test.describe('TextViewer', () => {
 		await block.getByRole('option', { name: 'core - blocks JSON inseri' }).click()
 
 		await expect(block.getByText('MyViewer')).toBeVisible()
-		await expect(block.getByRole('img').filter()).toHaveClass(/tabler-icon-eye/)
-		await expect(block.locator('textarea').first()).toHaveText(/"blockName"/)
+		await expect(block.getByRole('img')).toHaveClass(/tabler-icon-eye/)
+		await expect(block.locator('textarea')).toHaveText(/"blockName"/)
 	})
 
 	test('should have label, icon, text when published', async ({ admin, editor, page }) => {
@@ -41,15 +41,15 @@ test.describe('TextViewer', () => {
 		await viewerBlock.getByPlaceholder('Search for blocks, content type,').click()
 		await viewerBlock.getByText('Text Editor').click()
 
-		await editorBlock.locator('textarea').first().fill('hello world')
+		await editorBlock.locator('textarea').fill('hello world')
 		await page.waitForTimeout(500) // wait for auto-save
 
 		const newPage = await editor.openPreviewPage()
 		viewerBlock = newPage.locator(viewerSelector).first()
 
 		await expect(viewerBlock.getByText('MyViewer')).toBeVisible()
-		await expect(viewerBlock.getByRole('img').filter()).toHaveClass(/tabler-icon-eye/)
-		await expect(viewerBlock.locator('textarea').first()).toHaveText('hello world')
+		await expect(viewerBlock.getByRole('img')).toHaveClass(/tabler-icon-eye/)
+		await expect(viewerBlock.locator('textarea')).toHaveText('hello world')
 
 		await newPage.close()
 	})
@@ -72,14 +72,14 @@ test.describe('TextViewer', () => {
 		await viewerBlock.getByPlaceholder('Search for blocks, content type,').click()
 		await viewerBlock.getByText('Text Editor').click()
 
-		await editorBlock.locator('textarea').first().fill('hello world')
+		await editorBlock.locator('textarea').fill('hello world')
 
 		const newPage = await editor.openPreviewPage()
 		viewerBlock = newPage.locator(viewerSelector).first()
 		editorBlock = newPage.locator(editorSelector).first()
 
-		await editorBlock.locator('textarea').first().fill('Hola Mundo!')
-		await expect(viewerBlock.locator('textarea').first()).toHaveText('Hola Mundo!', { timeout: 1000 })
+		await editorBlock.locator('textarea').fill('Hola Mundo!')
+		await expect(viewerBlock.locator('textarea')).toHaveText('Hola Mundo!', { timeout: 1000 })
 
 		await newPage.close()
 	})

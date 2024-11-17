@@ -19,7 +19,7 @@ test.describe('IIIF Viewer', () => {
 
 		await editorBlock.getByLabel('Choose a format').click()
 		await editorBlock.getByRole('option', { name: 'Text' }).click()
-		await editorBlock.locator('textarea').first().fill(manifest)
+		await editorBlock.locator('textarea').fill(manifest)
 
 		await iiifBlock.getByPlaceholder('Search for blocks, content type,').click()
 		await iiifBlock.getByText('Text Editor').click()

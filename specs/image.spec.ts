@@ -23,7 +23,7 @@ test.describe('Image', () => {
 
 		await editorBlock.getByLabel('Choose a format').click()
 		await editorBlock.getByRole('option', { name: 'Text' }).click()
-		await editorBlock.locator('textarea').first().fill(imageUrl)
+		await editorBlock.locator('textarea').fill(imageUrl)
 
 		await imageBlock.getByPlaceholder('Search for blocks, content type,').click()
 		await imageBlock.getByText('Text Editor').click()

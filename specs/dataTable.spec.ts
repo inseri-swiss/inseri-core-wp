@@ -11,7 +11,7 @@ test.describe('DataTable', () => {
 
 		await editorBlock.getByLabel('Choose a format').click()
 		await editorBlock.getByRole('option', { name: 'JSON', exact: true }).click()
-		await editorBlock.locator('textarea').first().fill(`[ {"a": "A", "b": 28}, {"a": "B", "b": 55} ]`)
+		await editorBlock.locator('textarea').fill(`[ {"a": "A", "b": 28}, {"a": "B", "b": 55} ]`)
 
 		await editor.insertBlock({ name: 'inseri-core/data-table' })
 		let tableBlock = page.locator(tableSelector).first()
