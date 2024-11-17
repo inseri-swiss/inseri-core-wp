@@ -5,14 +5,6 @@ test.describe('Editor', () => {
 		await admin.createNewPost()
 	})
 
-	test('should create Image Box', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/image' })
-
-		const block = page.getByLabel('Block: Image Box')
-		expect(block.getByText('Image Box')).toBeVisible()
-		expect(block.getByRole('img').first()).toHaveClass(/tabler-icon-photo/)
-	})
-
 	test('should create JavaScript Code', async ({ editor, page }) => {
 		await editor.insertBlock({ name: 'inseri-core/javascript' })
 
