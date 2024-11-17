@@ -5,14 +5,6 @@ test.describe('Editor', () => {
 		await admin.createNewPost()
 	})
 
-	test('should create JavaScript Code', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/javascript' })
-
-		const block = page.getByLabel('Block: JavaScript Code')
-		expect(block.getByText('JavaScript Code')).toBeVisible()
-		expect(block.getByRole('img').first()).toHaveClass(/tabler-icon-brand-javascript/)
-	})
-
 	test('should create Local File Import', async ({ editor, page }) => {
 		await editor.insertBlock({ name: 'inseri-core/file-drop' })
 

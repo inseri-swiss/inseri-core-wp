@@ -21,7 +21,7 @@ test.describe('HTML', () => {
 
 		await editorBlock.getByLabel('Choose a format').click()
 		await editorBlock.getByRole('option', { name: 'HTML' }).click()
-		await editorBlock.locator('textarea').first().fill(`<h2>Hello Park</h2>`)
+		await editorBlock.locator('textarea').fill(`<h2>Hello Park</h2>`)
 
 		await htmlBlock.getByPlaceholder('Search for blocks, content type,').click()
 		await htmlBlock.getByText('Text Editor').click()
@@ -32,7 +32,7 @@ test.describe('HTML', () => {
 		htmlBlock = newPage.locator(htmlSelector).first()
 		editorBlock = newPage.locator(editorSelector).first()
 
-		await editorBlock.locator('textarea').first().fill(`<h2>Hello Underworld</h2>`)
+		await editorBlock.locator('textarea').fill(`<h2>Hello Underworld</h2>`)
 		await expect(htmlBlock.locator('h2').first()).toHaveText('Hello Underworld', { timeout: 1000 })
 
 		await newPage.close()
