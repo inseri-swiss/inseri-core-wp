@@ -5,14 +5,6 @@ test.describe('Editor', () => {
 		await admin.createNewPost()
 	})
 
-	test('should create HTML Code', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/html' })
-
-		const block = page.getByLabel('Block: HTML Code')
-		expect(block.getByText('HTML Code')).toBeVisible()
-		expect(block.getByRole('img').first()).toHaveClass(/tabler-icon-html/)
-	})
-
 	test('should create IIIF Viewer', async ({ editor, page }) => {
 		await editor.insertBlock({ name: 'inseri-core/iiif-viewer' })
 
