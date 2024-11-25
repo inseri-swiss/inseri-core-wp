@@ -4,7 +4,7 @@ const mediaSelector = '.wp-block-inseri-core-media-collection'
 const viewerSelector = '.wp-block-inseri-core-text-viewer'
 
 test.describe('MediaCollection', () => {
-	test('should have label, button, one file in editor/published', async ({ admin, editor, page }) => {
+	test('should have label, button, one file in editor', async ({ admin, editor, page }) => {
 		await admin.createNewPost()
 
 		await editor.insertBlock({ name: 'inseri-core/media-collection' })
