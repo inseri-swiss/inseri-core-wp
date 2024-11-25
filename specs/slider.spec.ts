@@ -4,15 +4,15 @@ const viewerSelector = '.wp-block-inseri-core-text-viewer'
 const sliderSelector = '.wp-block-inseri-core-slider'
 
 async function moveRepeatly(page: any, key: string, count: number) {
-	const moveToRight: Promise<void>[] = []
+	const moves: Promise<void>[] = []
 	for (let i = 0; i < count; i++) {
-		moveToRight.push(page.keyboard.press(key))
+		moves.push(page.keyboard.press(key))
 	}
 
-	return Promise.all(moveToRight)
+	return Promise.all(moves)
 }
 
-test.describe('TextViewer', () => {
+test.describe('Slider', () => {
 	test('should have slider in editor/published', async ({ admin, editor, page }) => {
 		await admin.createNewPost()
 
