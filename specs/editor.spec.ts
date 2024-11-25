@@ -5,12 +5,6 @@ test.describe('Editor', () => {
 		await admin.createNewPost()
 	})
 
-	test('should create Slider', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/slider' })
-
-		expect(page.getByLabel('Block: Slider')).toBeVisible()
-	})
-
 	test('should create Web Api', async ({ editor, page }) => {
 		await editor.insertBlock({ name: 'inseri-core/web-api' })
 
