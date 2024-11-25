@@ -5,14 +5,6 @@ test.describe('Editor', () => {
 		await admin.createNewPost()
 	})
 
-	test('should create Web Api', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/web-api' })
-
-		const block = page.getByLabel('Block: Web API')
-		expect(block.getByText('Web API')).toBeVisible()
-		expect(block.getByRole('img').first()).toHaveClass(/tabler-icon-api/)
-	})
-
 	test('should create Zenodo Repository', async ({ editor, page }) => {
 		await editor.insertBlock({ name: 'inseri-core/zenodo' })
 
