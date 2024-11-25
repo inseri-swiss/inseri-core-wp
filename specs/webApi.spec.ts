@@ -4,7 +4,10 @@ const viewerSelector = '.wp-block-inseri-core-text-viewer'
 const editorSelector = '.wp-block-inseri-core-text-editor'
 const webApiSelector = '.wp-block-inseri-core-web-api'
 
-const methodUrlContent = `{"method":"POST", "url":"https://raw.githubusercontent.com/inseri-swiss/inseri-core-wp/refs/heads/main/README.md"}`
+const readmeURL = 'https://raw.githubusercontent.com/inseri-swiss/inseri-core-wp/refs/heads/main/README.md'
+const licenseURL = 'https://raw.githubusercontent.com/inseri-swiss/inseri-core-wp/refs/heads/main/LICENSE'
+
+const methodUrlContent = `{"method":"POST", "url":"${readmeURL}"}`
 const queryContent = `{"query1":"param1", "query2":"param2"}`
 const headerContent = `{"headerA":"valA", "headerB":"valB"}`
 const bodyContent = `my useful body`
@@ -22,7 +25,7 @@ test.describe('WebApi', () => {
 		await expect(webBlock.getByText('Web API')).toBeVisible()
 		await expect(webBlock.getByRole('img').first()).toHaveClass(/tabler-icon-api/)
 
-		await webBlock.getByPlaceholder('URL').fill('https://raw.githubusercontent.com/inseri-swiss/inseri-core-wp/refs/heads/main/LICENSE')
+		await webBlock.getByPlaceholder('URL').fill(licenseURL)
 		await webBlock.getByPlaceholder('In which format is the data').click()
 		await webBlock.getByRole('option', { name: 'Text' }).click()
 		await webBlock.getByRole('button', { name: 'Finish' }).click()
@@ -78,20 +81,20 @@ test.describe('WebApi', () => {
 		await editorBody.locator('textarea').fill(bodyContent)
 		await page.getByLabel('Block Name').fill('MyBody')
 
-		await webBlock.getByPlaceholder('URL').fill('https://raw.githubusercontent.com/inseri-swiss/inseri-core-wp/refs/heads/main/LICENSE')
+		await webBlock.getByPlaceholder('URL').fill(licenseURL)
 		await webBlock.getByPlaceholder('In which format is the data').click()
 		await webBlock.getByRole('option', { name: 'Text' }).click()
 		await webBlock.getByRole('button', { name: 'Finish' }).click()
 
 		await page.getByLabel('Configure the settings').click()
 
-		await expect(page.getByPlaceholder('Enter your URL')).toHaveValue('https://raw.githubusercontent.com/inseri-swiss/inseri-core-wp/refs/heads/main/LICENSE')
+		await expect(page.getByPlaceholder('Enter your URL')).toHaveValue(licenseURL)
 		await expect(page.getByLabel('HTTP Method')).toHaveValue('GET')
 
 		await page.getByLabel('Override method and URL').click()
 		await page.getByText('MyMethodUrl - content').click()
 
-		await expect(page.getByPlaceholder('Enter your URL')).toHaveValue('https://raw.githubusercontent.com/inseri-swiss/inseri-core-wp/refs/heads/main/README.md')
+		await expect(page.getByPlaceholder('Enter your URL')).toHaveValue(readmeURL)
 		await expect(page.getByLabel('HTTP Method')).toHaveValue('POST')
 
 		await page.getByLabel('Extend query params').click()
