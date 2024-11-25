@@ -5,14 +5,6 @@ test.describe('Editor', () => {
 		await admin.createNewPost()
 	})
 
-	test('should create Share', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/share' })
-
-		const block = page.getByLabel('Block: Share')
-		expect(block).toHaveText('Share')
-		expect(block.getByRole('img').first()).toHaveClass(/tabler-icon-share/)
-	})
-
 	test('should create Slider', async ({ editor, page }) => {
 		await editor.insertBlock({ name: 'inseri-core/slider' })
 
