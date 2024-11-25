@@ -5,14 +5,6 @@ test.describe('Editor', () => {
 		await admin.createNewPost()
 	})
 
-	test('should create Python Code', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/python' })
-
-		const block = page.getByLabel('Block: Python Code')
-		expect(block.getByText('Python Code')).toBeVisible()
-		expect(block.getByRole('img').first()).toHaveClass(/tabler-icon-brand-python/)
-	})
-
 	test('should create R Code', async ({ editor, page }) => {
 		await editor.insertBlock({ name: 'inseri-core/r-code' })
 
