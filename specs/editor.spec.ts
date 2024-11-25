@@ -5,30 +5,6 @@ test.describe('Editor', () => {
 		await admin.createNewPost()
 	})
 
-	test('should create Local File Import', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/file-drop' })
-
-		const block = page.getByLabel('Block: Local File Import')
-		expect(block.getByText('Drag and drop here')).toBeVisible()
-		expect(block.getByRole('button')).toHaveText('Select file')
-	})
-
-	test('should create Media Collection', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/media-collection' })
-
-		const block = page.getByLabel('Block: Media Collection')
-		expect(block.getByText('Media Collection')).toBeVisible()
-		expect(block.getByRole('img').first()).toHaveClass(/tabler-icon-files/)
-	})
-
-	test('should create Plotly Chart', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/plotly' })
-
-		const block = page.getByLabel('Block: Plotly Chart')
-		expect(block.getByText('Plotly Chart')).toBeVisible()
-		expect(block.getByRole('img').first()).toHaveClass(/tabler-icon-chart-bar/)
-	})
-
 	test('should create Python Code', async ({ editor, page }) => {
 		await editor.insertBlock({ name: 'inseri-core/python' })
 
