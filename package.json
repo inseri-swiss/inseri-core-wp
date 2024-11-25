@@ -19,7 +19,7 @@
 		"bump": "node scripts/bump-version.js",
 		"wp:set-config": "node scripts/wp-env-config.js",
 		"analyze": "STATS=static npx webpack --profile",
-		"test:init": "wp-env run tests-cli wp plugin install wordpress-importer --activate && wp-env run tests-cli wp import /var/www/html/inseri-backup/ --authors=create",
+		"test:init": "wp-env run tests-cli sh -c \"wp media import /var/www/html/inseri-backup/*\"",
 		"test:e2e": "wp-scripts test-playwright",
 		"test:e2e:debug": "wp-scripts test-playwright --debug"
 	},

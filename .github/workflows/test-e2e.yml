@@ -35,4 +35,5 @@ jobs:
       - run: npx playwright install --with-deps
       - run: npm run wp:set-config
       - run: npx wp-env start
+      - run: npm run test:init
       - run: npm run test:e2e
