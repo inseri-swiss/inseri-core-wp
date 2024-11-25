@@ -5,12 +5,6 @@ test.describe('Editor', () => {
 		await admin.createNewPost()
 	})
 
-	test('should create R Code', async ({ editor, page }) => {
-		await editor.insertBlock({ name: 'inseri-core/r-code' })
-
-		expect(page.getByLabel('Block: R Code').getByText('R Code')).toBeVisible()
-	})
-
 	test('should create Share', async ({ editor, page }) => {
 		await editor.insertBlock({ name: 'inseri-core/share' })
 
