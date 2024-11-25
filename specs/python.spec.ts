@@ -1,19 +1,24 @@
 import { test, expect } from '@wordpress/e2e-test-utils-playwright'
 
-const codeSelector = '.wp-block-inseri-core-javascript'
+const codeSelector = '.wp-block-inseri-core-python'
 const editorSelector = '.wp-block-inseri-core-text-editor'
 const viewerSelector = '.wp-block-inseri-core-text-viewer'
-const code = 'let bar = foo.map((i)=> i.length)'
+const code = 'bar = list(map(lambda x: len(x), foo))'
+const codeFile = `
+f = open("hello.txt", "w")
+f.write("Poseidon is the God of the horses.")
+f.close()
+`
 
-test.describe('Javascript', () => {
+test.describe('Python', () => {
 	test('should have title, icon, input, output in editor/published', async ({ admin, editor, page }) => {
 		await admin.createNewPost()
 
-		await editor.insertBlock({ name: 'inseri-core/javascript' })
+		await editor.insertBlock({ name: 'inseri-core/python' })
 		let codeBlock = page.locator(codeSelector).first()
 
-		expect(codeBlock.getByText('JavaScript Code')).toBeVisible()
-		expect(codeBlock.getByRole('img').first()).toHaveClass(/tabler-icon-brand-javascript/)
+		expect(codeBlock.getByText('Python Code')).toBeVisible()
+		expect(codeBlock.getByRole('img').first()).toHaveClass(/tabler-icon-brand-python/)
 
 		await editor.insertBlock({ name: 'inseri-core/text-editor' })
 		await editor.insertBlock({ name: 'inseri-core/text-viewer' })
@@ -48,7 +53,7 @@ test.describe('Javascript', () => {
 		await codeBlock.getByRole('button', { name: 'Run' }).click()
 
 		await viewerBlock.getByPlaceholder('Search for blocks, content type,').click()
-		await viewerBlock.getByText('JavaScript Code').click()
+		await viewerBlock.getByText('Python Code').click()
 
 		await expect(viewerBlock.locator('textarea')).toHaveText('[6,3,8]')
 
@@ -58,6 +63,33 @@ test.describe('Javascript', () => {
 
 		await codeBlock.getByRole('button', { name: 'Run' }).click()
 		await expect(viewerBlock.locator('textarea')).toHaveText('[6,3,8]')
+
+		await newPage.close()
+	})
+
+	test('should output file in editor/published', async ({ admin, editor, page }) => {
+		await admin.createNewPost()
+
+		await editor.insertBlock({ name: 'inseri-core/python' })
+		let codeBlock = page.locator(codeSelector).first()
+
+		await editor.insertBlock({ name: 'inseri-core/text-viewer' })
+		let viewerBlock = page.locator(viewerSelector).first()
+
+		await codeBlock.getByRole('button', { name: 'Write Code' }).click()
+		await codeBlock.locator('textarea').fill(codeFile)
+		await codeBlock.getByRole('button', { name: 'Run' }).click()
+
+		await viewerBlock.getByPlaceholder('Search for blocks, content type,').click()
+		await viewerBlock.getByText('Python Code').click()
+		await expect(viewerBlock.locator('textarea')).toHaveText('Poseidon is the God of the horses.')
+
+		const newPage = await editor.openPreviewPage()
+		codeBlock = newPage.locator(codeSelector).first()
+		viewerBlock = newPage.locator(viewerSelector).first()
+
+		await codeBlock.getByRole('button', { name: 'Run' }).click()
+		await expect(viewerBlock.locator('textarea')).toHaveText('Poseidon is the God of the horses.')
 
 		await newPage.close()
 	})
