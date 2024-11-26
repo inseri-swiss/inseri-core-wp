@@ -135,11 +135,11 @@ function ListItem({ isSelected, block, onClick, onHover, isHovered }: ListItemPr
 	)
 }
 
-function AccordionControl({ onClick, ...rest }: AccordionControlProps & { onClick?: () => void }) {
+function AccordionControl({ onClick, label, ...rest }: AccordionControlProps & { onClick?: () => void; label?: string }) {
 	return (
 		<Box sx={{ display: 'flex', alignItems: 'center' }}>
 			{onClick ? (
-				<ActionIcon w={50} onClick={onClick}>
+				<ActionIcon w={50} onClick={onClick} aria-label={label}>
 					<IconWindowMaximize style={{ fill: 'none', color: '#000' }} />
 				</ActionIcon>
 			) : (
@@ -297,9 +297,11 @@ function SideBar() {
 
 			<Accordion chevronPosition="right" multiple value={openItems} onChange={setOpenItems}>
 				<Accordion.Item value="blocks">
-					<AccordionControl>{__('inseri Blocks', 'inseri-core')}</AccordionControl>
+					<AccordionControl id="inseri-blocklist-title" role="heading">
+						{__('inseri Blocks', 'inseri-core')}
+					</AccordionControl>
 					<Accordion.Panel style={{ height: blockHeight, overflow: 'auto', padding: 0 }}>
-						<Stack>
+						<Stack aria-labelledby="inseri-blocklist-title">
 							{blocks.map((b) => (
 								<ListItem
 									key={b.id}
@@ -314,7 +316,9 @@ function SideBar() {
 					</Accordion.Panel>
 				</Accordion.Item>
 				<Accordion.Item value="chart">
-					<AccordionControl onClick={() => setModalOpen(true)}>{__('Data Flow Chart', 'inseri-core')}</AccordionControl>
+					<AccordionControl onClick={() => setModalOpen(true)} label="maximize the chart">
+						{__('Data Flow Chart', 'inseri-core')}
+					</AccordionControl>
 					<Accordion.Panel>
 						<CytoscapeComponent
 							elements={chartData}
