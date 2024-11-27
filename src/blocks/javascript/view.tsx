@@ -69,7 +69,7 @@ export default function View(props: ViewProps) {
 			let convertedData = val
 
 			if (convertedData instanceof Uint8Array) {
-				convertedData = new Blob([convertedData.buffer], { type: contentType })
+				convertedData = new Blob([convertedData], { type: contentType })
 			}
 
 			publishRecord[key][0](convertedData, contentType)
