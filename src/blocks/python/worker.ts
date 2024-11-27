@@ -3,7 +3,7 @@ import { Action } from '../../components'
 import { createFileRecord } from '../../workerUtils'
 
 // version must match with npm package version
-const BINARY_URL = 'https://cdn.jsdelivr.net/pyodide/v0.26.3/full/'
+const BINARY_URL = 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/'
 
 importScripts(BINARY_URL + 'pyodide.js')
 declare function loadPyodide(opt: any): Promise<PyodideInterface>
