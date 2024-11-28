@@ -42,7 +42,7 @@ export function flattenToRawItem(root: Root): RawValueItem[] {
 					blockId,
 					...restBlock,
 					...atom,
-					contentType: atom.content.isDefined() ? atom.content.get().contentType : '-',
+					contentType: atom.content?.isDefined() ? atom.content.get().contentType : '-',
 				}
 			})
 	)
@@ -79,7 +79,7 @@ const filterByContentType = (contentTypeFilter: string | ((contentType: string) 
 		compareContentType = contentTypeFilter
 	}
 
-	return rawItems.filter((item) => item.content.exists((nucleus) => compareContentType(nucleus.contentType)))
+	return rawItems.filter((item) => item.content?.exists((nucleus) => compareContentType(nucleus.contentType)))
 }
 
 const filterByJsonSchemas = (jsonSchemas: Schema[]) => {
@@ -87,7 +87,7 @@ const filterByJsonSchemas = (jsonSchemas: Schema[]) => {
 
 	return (rawItems: RawValueItem[]) => {
 		return rawItems.filter((item) => {
-			return jsonValidators.some((check) => item.content.exists((nucleus) => check(nucleus.value)))
+			return jsonValidators.some((check) => item.content?.exists((nucleus) => check(nucleus.value)))
 		})
 	}
 }
@@ -118,7 +118,7 @@ export function useDiscover(ops: DiscoverOptions): DiscoveredItem[] {
 			.subscribe(setState)
 
 		return () => sub.unsubscribe()
-	}, [ops])
+	}, [ops, blockId])
 
 	return state
 }

@@ -18,7 +18,7 @@ export function useRestorableState<T>(key: string, initialState: T | (() => T), 
 		return initialState
 	})
 
-	if (!readonly) {
+	if (!blockId && !readonly) {
 		if (!restorableDataRoot[blockId]) {
 			restorableDataRoot[blockId] = {}
 		}

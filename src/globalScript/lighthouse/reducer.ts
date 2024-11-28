@@ -5,6 +5,10 @@ export function reducer(base: Root, action: Action) {
 	base = { ...base }
 	const { blockId } = action.payload
 
+	if (!blockId) {
+		return base
+	}
+
 	let blockSlice = { ...base[blockId] }
 	blockSlice.atoms = { ...blockSlice.atoms }
 

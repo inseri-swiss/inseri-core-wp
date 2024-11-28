@@ -122,7 +122,7 @@ function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?:
 			const edgesToRemove = Object.fromEntries(idLongKeyPairs.map(([id, _key]) => [id, null]))
 			edgesSubject.next(edgesToRemove as any)
 		}
-	}, [longKeys.join(), names.join()])
+	}, [longKeys.join(), names.join(), subscribersBlockId])
 
 	return state
 }

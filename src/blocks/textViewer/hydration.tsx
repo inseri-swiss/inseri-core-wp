@@ -1,6 +1,6 @@
 import { InseriRoot } from '@inseri/lighthouse'
 import domReady from '@wordpress/dom-ready'
-import { createRoot } from '@wordpress/element'
+import { hydrateRoot } from '@wordpress/element'
 import { InseriThemeProvider, StateProvider } from '../../components'
 import { generateQuerySelector } from '../../utils'
 import config from './block.json'
@@ -12,7 +12,9 @@ function initReactComponents() {
 	if (items) {
 		Array.from(items).forEach((item: any) => {
 			const attributes = JSON.parse(item.dataset.attributes)
-			createRoot(item!).render(
+
+			hydrateRoot(
+				item!,
 				<InseriThemeProvider>
 					<InseriRoot blockId={attributes.blockId} blockName={attributes.metadata?.name ?? ''} blockType={config.name}>
 						<StateProvider stateCreator={storeCreator} initialState={attributes}>

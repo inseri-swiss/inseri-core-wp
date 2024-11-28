@@ -35,48 +35,43 @@ const getDescArrayByKeys =
 function useInternalPublish(blockId: string, keys: string[], descriptions: string[]): Record<string, Actions<any>> {
 	const blockStore = blockStoreSubject.getValue()
 	const joinedBlockIds = Object.keys(blockStore).join()
+	keys = blockId ? keys : []
 	const prevKeys = usePrevious(keys) ?? []
 
 	useEffect(() => {
-		if (blockId?.trim() && blockStore[blockId]) {
-			const descByKey = new Map(keys.map((item, idx) => [item, descriptions[idx]]))
-			const existingKeys = new Set(prevKeys)
-			const newKeys = new Set(keys)
+		const descByKey = new Map(keys.map((item, idx) => [item, descriptions[idx]]))
+		const existingKeys = new Set(prevKeys)
+		const newKeys = new Set(keys)
 
-			const keysToRemove = Array.from(new Set([...existingKeys].filter((x) => !newKeys.has(x))))
-			const keysToAdd = Array.from(new Set([...newKeys].filter((x) => !existingKeys.has(x))))
-			const keysToUpdate = Array.from(new Set([...newKeys].filter((x) => existingKeys.has(x))))
+		const keysToRemove = Array.from(new Set([...existingKeys].filter((x) => !newKeys.has(x))))
+		const keysToAdd = Array.from(new Set([...newKeys].filter((x) => !existingKeys.has(x))))
+		const keysToUpdate = Array.from(new Set([...newKeys].filter((x) => existingKeys.has(x))))
 
-			const descGetter = getDescArrayByKeys(descByKey)
-			onNext({ type: 'add-value-infos', payload: { blockId, keys: keysToAdd, descriptions: descGetter(keysToAdd) } })
-			onNext({ type: 'update-value-infos', payload: { blockId, keys: keysToUpdate, descriptions: descGetter(keysToUpdate) } })
-			onNext({ type: 'remove-value-infos', payload: { blockId, keys: keysToRemove } })
-		}
-	}, [keys.join(), descriptions.join(), joinedBlockIds])
+		const descGetter = getDescArrayByKeys(descByKey)
+		onNext({ type: 'add-value-infos', payload: { blockId, keys: keysToAdd, descriptions: descGetter(keysToAdd) } })
+		onNext({ type: 'update-value-infos', payload: { blockId, keys: keysToUpdate, descriptions: descGetter(keysToUpdate) } })
+		onNext({ type: 'remove-value-infos', payload: { blockId, keys: keysToRemove } })
+	}, [keys.join(), descriptions.join(), joinedBlockIds, blockId])
 
 	return useMemo(() => {
-		if (blockId?.trim() && blockStore[blockId]) {
-			const callbackMap = keys.reduce(
-				(acc, key) => {
-					const publish = (value: any, contentType: string) => {
-						onNext({ type: 'set-value', payload: { blockId, key, content: some({ contentType, value }) } })
-					}
-					const setEmpty = () => {
-						onNext({ type: 'set-value', payload: { blockId, key, content: none } })
-					}
+		const callbackMap = keys.reduce(
+			(acc, key) => {
+				const publish = (value: any, contentType: string) => {
+					onNext({ type: 'set-value', payload: { blockId, key, content: some({ contentType, value }) } })
+				}
+				const setEmpty = () => {
+					onNext({ type: 'set-value', payload: { blockId, key, content: none } })
+				}
 
-					acc[key] = [publish, setEmpty]
+				acc[key] = [publish, setEmpty]
 
-					return acc
-				},
-				{} as Record<string, Actions<any>>
-			)
+				return acc
+			},
+			{} as Record<string, Actions<any>>
+		)
 
-			return callbackMap
-		}
-
-		return {}
-	}, [keys.join(), joinedBlockIds])
+		return callbackMap
+	}, [keys.join(), joinedBlockIds, blockId])
 }
 
 export { usePublish }
