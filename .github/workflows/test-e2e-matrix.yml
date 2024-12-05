@@ -1,0 +1,39 @@
+name: Tests
+
+on:
+  pull_request:
+
+jobs:
+  e2e_tests:
+    name: >
+      E2E - ${{
+        format(
+          'WP{0} + PHP{1}',
+          matrix.wp,
+          matrix.php
+        )
+      }}
+    uses: ./.github/workflows/test-e2e.yml
+    strategy:
+      fail-fast: false
+      matrix:
+        wp: # Test against Prev-Prev Major, Prev-Major, and current Major release versions.
+          - '6.5'
+          - '6.6'
+          - '6.7'
+        php: # Test against minimum and latest PHP versions.
+          - '7.4'
+          - '8.3'
+    with:
+      wpVersion: ${{matrix.wp}}
+      phpVersion: ${{matrix.php}}
+    concurrency:
+      group: >
+        ${{
+          format(
+            'e2e-WP{0}-PHP{1}',
+            matrix.wp,
+            matrix.php
+          )
+        }}
+      cancel-in-progress: true
