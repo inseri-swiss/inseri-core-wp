@@ -1,4 +1,4 @@
-name: 'E2E Tests'
+name: E2E Tests
 
 on:
   workflow_dispatch:
@@ -14,15 +14,26 @@ on:
         type: string
         default: '8.2'
 
-  pull_request:
+  workflow_call:
+    inputs:
+      wpVersion:
+        description: 'Enter WP version (eg 6.6)'
+        required: false
+        type: string
+        default: ''
+      phpVersion:
+        description: 'Enter PHP version (eg 8.2)'
+        required: false
+        type: string
+        default: '8.2'
 
 jobs:
   test:
     runs-on: ubuntu-latest
     env:
       # trenary ${{ condition && if-value || else-value }}
-      INSERI_WP_CORE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.wpVersion != '' && format('WordPress/WordPress#{0}', github.event.inputs.wpVersion) || '' }}
-      INSERI_WP_PHP: ${{  github.event_name == 'workflow_dispatch' && github.event.inputs.phpVersion || '8.2' }}
+      INSERI_WP_CORE: ${{ inputs.wpVersion != '' && format('WordPress/WordPress#{0}', inputs.wpVersion) || '' }}
+      INSERI_WP_PHP: ${{ inputs.phpVersion }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
