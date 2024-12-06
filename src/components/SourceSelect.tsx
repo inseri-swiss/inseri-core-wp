@@ -65,8 +65,8 @@ interface Props extends SelectProps {
 	selectValue: string | null
 	activeTab: string | null
 	tabs: string[]
-	onSelectChange(value: string | null): void
-	setActiveTab(value: string | null): void
+	onSelectChange: (value: string | null) => void
+	setActiveTab: (value: string | null) => void
 }
 
 export function SourceSelect(props: Props) {

@@ -28,7 +28,7 @@ interface ThProps {
 	children: React.ReactNode
 	reversed: boolean
 	sorted: boolean
-	onSort(): void
+	onSort: () => void
 }
 
 export function SortableTh({ className, children, reversed, sorted, onSort }: ThProps) {
