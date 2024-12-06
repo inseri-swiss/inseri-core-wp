@@ -84,6 +84,7 @@ markdown_extensions:
 plugins:
   - glightbox
   - search
+  - privacy
   - redirects:
       redirect_maps:
         'how-to/packages.md': 'how-to/python_packages.md'
