@@ -3,6 +3,15 @@
 	"rules": {
 		"no-nested-ternary": "off",
 		"react-hooks/exhaustive-deps": "off",
-		"import/no-unresolved": [2, { "ignore": ["^@inseri/"] }]
-	}
+		"import/no-unresolved": [2, { "ignore": ["^@inseri/"] }],
+		"@typescript-eslint/no-unused-vars": [
+			"error",
+			{
+				"argsIgnorePattern": "^_",
+				"varsIgnorePattern": "^_",
+				"caughtErrorsIgnorePattern": "^_",
+				"ignoreRestSiblings": true,
+			},
+		],
+	},
 }

@@ -57,8 +57,8 @@ const initState =
 const NullFn = () => null
 const IdentityFn = (a: Nucleus<any>) => a.value
 
-function useWatch<A = any, B = any>(key: string, ops?: WatchOps): B | null
-function useWatch<A = any, B = any>(keys: Record<string, string>, ops?: WatchOps): Record<string, B | null>
+function useWatch<A = any, B = any>(key: string, ops?: WatchOps): B | null // eslint-disable-line @typescript-eslint/no-unused-vars
+function useWatch<A = any, B = any>(keys: Record<string, string>, ops?: WatchOps): Record<string, B | null> // eslint-disable-line @typescript-eslint/no-unused-vars
 function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?: WatchOps<A, B>): any {
 	const onBlockRemoved = ops?.onBlockRemoved
 	const isRecord = typeof keys !== 'string'
