@@ -46,7 +46,7 @@
 		"webpack-bundle-analyzer": "^4.10.2"
 	},
 	"dependencies": {
-		"@emotion/react": "^11.13.5",
+		"@emotion/react": "^11.14.0",
 		"@mantine/core": "^6.0.22",
 		"@mantine/dates": "^6.0.22",
 		"@mantine/dropzone": "^6.0.22",
