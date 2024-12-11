@@ -1,7 +1,7 @@
 import { usePublish, useRestorableState } from '@inseri/lighthouse'
 import { useEffect } from '@wordpress/element'
 import { useUpdateEffect } from 'react-use'
-import { Box, RangeSlider, Slider, Text } from '../../components'
+import { Box, RangeSlider, Slider, Text } from '@mantine/core'
 import { useGlobalState } from '../../components/StateProvider'
 import { GlobalState } from './state'
 

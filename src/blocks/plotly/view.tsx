@@ -2,7 +2,7 @@ import { Nucleus, usePublish, useRestorableState, useWatch } from '@inseri/light
 import { useState } from '@wordpress/element'
 import cloneDeep from 'lodash.clonedeep'
 import Plot from 'react-plotly.js'
-import { Box } from '../../components'
+import { Box } from '@mantine/core'
 import { useGlobalState } from '../../components/StateProvider'
 import { GlobalState } from './state'
 import { useDeepCompareEffect } from 'react-use'

@@ -1,7 +1,7 @@
 import { Nucleus, usePublish, useRestorableState, useWatch } from '@inseri/lighthouse'
 import { usePrevious } from '@mantine/hooks'
 import { useEffect } from '@wordpress/element'
-import { Box, Group } from '../../components'
+import { Box, Group } from '@mantine/core'
 import { CodeEditor } from '../../components/CodeEditor'
 import { useGlobalState } from '../../components/StateProvider'
 import { TopBar } from '../../components/TopBar'

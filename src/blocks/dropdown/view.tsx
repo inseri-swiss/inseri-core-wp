@@ -1,7 +1,7 @@
 import { Nucleus, usePublish, useRestorableState, useWatch } from '@inseri/lighthouse'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Box, Select } from '../../components'
+import { Box, Select } from '@mantine/core'
 import { Attributes } from './index'
 import { isValueValid } from './utils'
 

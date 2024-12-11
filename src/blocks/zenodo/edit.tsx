@@ -6,7 +6,7 @@ import { PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, Toolbar
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Button, Checkbox, Group, Loader, Stack, Text, TextInput } from '../../components'
+import { Button, Checkbox, Group, Loader, Stack, Text, TextInput } from '@mantine/core'
 import { SetupEditorEnv } from '../../components/SetupEditorEnv'
 import { StateProvider, useGlobalState } from '../../components/StateProvider'
 import { HidingWrapper, getFormattedBytes } from '../../utils'

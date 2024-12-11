@@ -1,7 +1,7 @@
 import { useDisclosure } from '@mantine/hooks'
 import { IconEye, IconPencil, IconPlayerPlay, IconX } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
-import { Button, Group, Kbd, Loader, Popover, Text, Tooltip } from '../components'
+import { Button, Group, Kbd, Loader, Popover, Text, Tooltip } from '@mantine/core'
 import { useGlobalState } from '../components/StateProvider'
 import { CommonCodeState } from './ExtendedView'
 

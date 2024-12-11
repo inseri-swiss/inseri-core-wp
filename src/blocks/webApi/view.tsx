@@ -1,7 +1,7 @@
 import { Nucleus, usePublish, useWatch } from '@inseri/lighthouse'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Box, Button, Text } from '../../components'
+import { Box, Button, Text } from '@mantine/core'
 import { useGlobalState } from '../../components/StateProvider'
 import { DatasourceState } from './AdminState'
 

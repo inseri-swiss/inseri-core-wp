@@ -3,7 +3,7 @@ import { useBlockProps } from '@wordpress/block-editor'
 import type { BlockSaveProps } from '@wordpress/blocks'
 import { registerBlockType } from '@wordpress/blocks'
 import stringify from 'json-stable-stringify'
-import { SelectItem } from '../../components'
+import { SelectItem } from '@mantine/core'
 import json from './block.json'
 import Edit from './edit'
 

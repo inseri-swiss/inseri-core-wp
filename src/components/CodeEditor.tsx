@@ -1,6 +1,6 @@
 import { highlight, languages } from 'prismjs'
 import Editor from 'react-simple-code-editor'
-import { createStyles } from '../components'
+import { createStyles } from '@mantine/core'
 
 // before a language can be highlighted, it must be imported as follows
 import 'prismjs/components/prism-json'

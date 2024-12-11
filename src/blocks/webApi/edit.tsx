@@ -7,7 +7,7 @@ import { PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, Toolbar
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { useMap } from 'react-use'
-import { Box, Button, Group, Modal, Select, Stack, Text, TextInput, createStyles, getStylesRef } from '../../components'
+import { Box, Button, Group, Modal, Select, Stack, Text, TextInput, createStyles, getStylesRef } from '@mantine/core'
 import { SourceSelect } from '../../components/SourceSelect'
 import { SetupEditorEnv } from '../../components/SetupEditorEnv'
 import { StateProvider, useGlobalState } from '../../components/StateProvider'

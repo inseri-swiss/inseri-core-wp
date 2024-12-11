@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n'
-import { Button, createStyles, Group, Select, TextInput, getStylesRef } from './index'
+import { Button, createStyles, Group, Select, TextInput, getStylesRef } from '@mantine/core'
 import { HTTP_METHODS } from '../utils'
 
 const useStyles = createStyles((theme) => ({

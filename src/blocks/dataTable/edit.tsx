@@ -6,7 +6,7 @@ import { PanelBody, PanelRow, ToolbarButton, ToolbarGroup } from '@wordpress/com
 import { useEffect, useState } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { edit } from '@wordpress/icons'
-import { Button, Group, Stack, Switch, Text, TextInput } from '../../components'
+import { Button, Group, Stack, Switch, Text, TextInput } from '@mantine/core'
 import { SourceSelect } from '../../components/SourceSelect'
 import { SetupEditorEnv } from '../../components/SetupEditorEnv'
 import { StateProvider, useGlobalState } from '../../components/StateProvider'
