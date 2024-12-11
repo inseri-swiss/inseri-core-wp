@@ -23,7 +23,7 @@ import {
 	Text,
 	UnstyledButton,
 	createStyles,
-} from '../../components'
+} from '@mantine/core'
 import { CytoscapeComponent } from '../../components/Cytoscape'
 import { Z_INDEX_ABOVE_ADMIN } from '../../utils'
 

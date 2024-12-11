@@ -1,7 +1,7 @@
 import { usePublish, useRestorableState } from '@inseri/lighthouse'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Box, Loader, Select } from '../../components'
+import { Box, Loader, Select } from '@mantine/core'
 import { useGlobalState } from '../../components/StateProvider'
 import { GlobalState } from './state'
 

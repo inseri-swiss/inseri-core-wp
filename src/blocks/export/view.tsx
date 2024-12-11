@@ -1,4 +1,4 @@
-import { Button } from '../../components'
+import { Button } from '@mantine/core'
 import { useGlobalState } from '../../components/StateProvider'
 import { GlobalState } from './state'
 

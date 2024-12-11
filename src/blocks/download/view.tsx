@@ -1,7 +1,7 @@
 import { Nucleus, useWatch } from '@inseri/lighthouse'
 import stringify from 'json-stable-stringify'
 import { useRecoilState, useSetRecoilState } from 'recoil'
-import { Button } from '../../components'
+import { Button } from '@mantine/core'
 import { CONTENT_TYPE_TO_EXT } from '../../utils'
 import { Attributes } from './index'
 import { downloadLinkState, extensionState, wizardState } from './state'

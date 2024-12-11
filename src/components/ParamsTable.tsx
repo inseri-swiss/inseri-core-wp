@@ -1,6 +1,6 @@
 import { IconX } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
-import { ActionIcon, Checkbox, createStyles, Table, TextInput, getStylesRef } from './index'
+import { ActionIcon, Checkbox, createStyles, Table, TextInput, getStylesRef } from '@mantine/core'
 
 const useStyles = createStyles((theme) => ({
 	table: {

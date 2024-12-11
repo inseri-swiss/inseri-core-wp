@@ -2,7 +2,7 @@ import { Nucleus, usePublish, useRestorableState, useWatch } from '@inseri/light
 import { IconCircleOff } from '@tabler/icons-react'
 import { useCallback } from '@wordpress/element'
 import { useDeepCompareEffect } from 'react-use'
-import { Group, Text } from '../../components'
+import { Group, Text } from '@mantine/core'
 import { useGlobalState } from '../../components/StateProvider'
 import { CytoscapeComponent } from '../../components/Cytoscape'
 import { GlobalState } from './state'

@@ -4,7 +4,7 @@ import { __ } from '@wordpress/i18n'
 import type { PropsWithChildren } from 'react'
 import xmlFormatter from 'xml-formatter'
 import { StateCreator } from 'zustand'
-import { Overlay } from './components'
+import { Overlay } from '@mantine/core'
 import { ParamItem } from './components/ParamsTable'
 import { COMMON_CONTENT_TYPES, CONTENT_TYPE_TO_EXT, TEXTUAL_CONTENT_TYPES, createFileRecord, guessContentTypeByExtension } from './workerUtils'
 
