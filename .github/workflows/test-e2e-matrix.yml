@@ -31,9 +31,10 @@ jobs:
       group: >
         ${{
           format(
-            'e2e-WP{0}-PHP{1}',
+            'e2e-WP{0}-PHP{1}-{2}',
             matrix.wp,
-            matrix.php
+            matrix.php,
+            github.ref_name
           )
         }}
       cancel-in-progress: true
