@@ -1,7 +1,8 @@
 import { Nucleus, useWatch } from '@inseri/lighthouse'
 import { IconCircleOff } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
-import { Group, Text, useGlobalState } from '../../components'
+import { Group, Text } from '../../components'
+import { useGlobalState } from '../../components/StateProvider'
 import { GlobalState } from './state'
 //@ts-ignore
 import Viewer from '@samvera/clover-iiif/viewer' // eslint-disable-line import/no-unresolved

@@ -1,7 +1,8 @@
 import { usePublish, useRestorableState } from '@inseri/lighthouse'
 import { useEffect } from '@wordpress/element'
 import { useUpdateEffect } from 'react-use'
-import { Box, RangeSlider, Slider, Text, useGlobalState } from '../../components'
+import { Box, RangeSlider, Slider, Text } from '../../components'
+import { useGlobalState } from '../../components/StateProvider'
 import { GlobalState } from './state'
 
 export default function View() {

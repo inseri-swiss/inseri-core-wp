@@ -1,4 +1,5 @@
-import { Button, useGlobalState } from '../../components'
+import { Button } from '../../components'
+import { useGlobalState } from '../../components/StateProvider'
 import { GlobalState } from './state'
 
 export default function View() {
