@@ -1,7 +1,7 @@
 import { InseriRoot } from '@inseri/lighthouse'
 import domReady from '@wordpress/dom-ready'
 import { createRoot } from '@wordpress/element'
-import { InseriThemeProvider } from '../../components'
+import { InseriThemeProvider } from '../../components/InseriThemeProvider'
 import { generateQuerySelector } from '../../utils'
 import json from './block.json'
 import View from './view'
