@@ -10,7 +10,6 @@ import { useMap } from 'react-use'
 import {
 	Box,
 	Button,
-	ContentTypeSelect,
 	Group,
 	Modal,
 	Select,
@@ -24,6 +23,7 @@ import {
 	getStylesRef,
 	useGlobalState,
 } from '../../components'
+import { ContentTypeSelect } from '../../components/ContentTypeSelect'
 import { DetailViewBody } from '../../components/DetailViewBody'
 import { COMMON_CONTENT_TYPES, HidingWrapper, PERSISTENT_IDS, Z_INDEX_ABOVE_ADMIN } from '../../utils'
 import { DatasourceState, datasourceStoreCreator } from './AdminState'

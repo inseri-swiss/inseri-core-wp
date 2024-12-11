@@ -1,6 +1,7 @@
 import type { Draft } from 'immer'
 import { immer } from 'zustand/middleware/immer'
-import { Action, CommonCodeState } from '../../components'
+import { CommonCodeState } from '../../components/ExtendedView'
+import { type Action } from '../../components/WorkerActions'
 import { Attributes } from './index'
 
 export interface GlobalState extends Attributes, CommonCodeState {

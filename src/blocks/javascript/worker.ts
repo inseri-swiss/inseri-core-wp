@@ -1,4 +1,4 @@
-import { Action } from '../../components'
+import { type Action } from '../../components/WorkerActions'
 
 let inputs: Record<string, any> = {}
 let outputs: string[] = []

@@ -1,6 +1,6 @@
 import { REnvironment, WebR, isRCharacter, isRComplex, isRDouble, isRInteger, isRList, isRLogical, isRPairlist, isRRaw, isRSymbol } from 'webr'
 import { immer } from 'zustand/middleware/immer'
-import { CommonCodeState } from '../../components'
+import { CommonCodeState } from '../../components/ExtendedView'
 import { createFileRecord } from '../../utils'
 import { Attributes } from './index'
 

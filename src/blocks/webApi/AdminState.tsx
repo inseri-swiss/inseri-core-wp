@@ -1,7 +1,6 @@
 import { __ } from '@wordpress/i18n'
 import { immer } from 'zustand/middleware/immer'
 import { fireWebApi, handleTryRequest } from '../../ApiServer'
-import {} from '../../components/DetailViewBody'
 import { ParamItem } from '../../components/ParamsTable'
 import {
 	BODY_TYPE_TO_CONTENT_TYPE,
