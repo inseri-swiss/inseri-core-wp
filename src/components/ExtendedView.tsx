@@ -6,21 +6,8 @@ import { __ } from '@wordpress/i18n'
 import type { AllotmentHandle } from 'allotment'
 import { Allotment } from 'allotment'
 import { COMMON_CONTENT_TYPES, Z_INDEX_ABOVE_ADMIN, isVariableValid } from '../utils'
-import {
-	ActionIcon,
-	Box,
-	Button,
-	CodeEditor,
-	Group,
-	Modal,
-	SelectWithAction,
-	SourceSelectWithAction,
-	Stack,
-	Text,
-	TextInput,
-	createStyles,
-	useGlobalState,
-} from './'
+import { ActionIcon, Box, Button, CodeEditor, Group, Modal, Stack, Text, TextInput, createStyles, useGlobalState } from './'
+import { SelectWithAction, SourceSelectWithAction } from './SelectWithAction'
 import { TopBar } from './TopBar'
 
 export interface CommonCodeState {

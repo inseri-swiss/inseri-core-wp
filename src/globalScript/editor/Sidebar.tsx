@@ -13,7 +13,6 @@ import {
 	AccordionControlProps,
 	ActionIcon,
 	Box,
-	CytoscapeComponent,
 	Group,
 	Modal,
 	NumberInput,
@@ -25,6 +24,7 @@ import {
 	UnstyledButton,
 	createStyles,
 } from '../../components'
+import { CytoscapeComponent } from '../../components/Cytoscape'
 import { Z_INDEX_ABOVE_ADMIN } from '../../utils'
 
 const miniStylesheet = [

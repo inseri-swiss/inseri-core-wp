@@ -1,5 +1,5 @@
 import { PyodideInterface } from 'pyodide'
-import { Action } from '../../components'
+import { type Action } from '../../components/WorkerActions'
 import { createFileRecord } from '../../workerUtils'
 
 // version must match with npm package version
