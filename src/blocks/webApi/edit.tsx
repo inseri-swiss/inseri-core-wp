@@ -7,22 +7,8 @@ import { PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, Toolbar
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
 import { useMap } from 'react-use'
-import {
-	Box,
-	Button,
-	Group,
-	Modal,
-	Select,
-	SetupEditorEnv,
-	SourceSelect,
-	Stack,
-	StateProvider,
-	Text,
-	TextInput,
-	createStyles,
-	getStylesRef,
-	useGlobalState,
-} from '../../components'
+import { Box, Button, Group, Modal, Select, SetupEditorEnv, SourceSelect, Stack, Text, TextInput, createStyles, getStylesRef } from '../../components'
+import { StateProvider, useGlobalState } from '../../components/StateProvider'
 import { ContentTypeSelect } from '../../components/ContentTypeSelect'
 import { DetailViewBody } from '../../components/DetailViewBody'
 import { COMMON_CONTENT_TYPES, HidingWrapper, PERSISTENT_IDS, Z_INDEX_ABOVE_ADMIN } from '../../utils'

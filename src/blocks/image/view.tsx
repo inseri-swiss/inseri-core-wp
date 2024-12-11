@@ -1,7 +1,8 @@
 import { Nucleus, useWatch } from '@inseri/lighthouse'
 import { IconCircleOff, IconPhotoOff } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
-import { Box, Group, Text, useGlobalState } from '../../components'
+import { Box, Group, Text } from '../../components'
+import { useGlobalState } from '../../components/StateProvider'
 import { GlobalState } from './state'
 
 interface ViewProps {

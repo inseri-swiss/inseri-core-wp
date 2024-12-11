@@ -1,7 +1,8 @@
 import { usePublish, useRestorableState } from '@inseri/lighthouse'
 import { forwardRef, useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { Box, Group, Image, Loader, Select, Text, useGlobalState } from '../../components'
+import { Box, Group, Image, Loader, Select, Text } from '../../components'
+import { useGlobalState } from '../../components/StateProvider'
 import { GlobalState } from './state'
 
 interface ItemProps extends React.ComponentPropsWithoutRef<'div'> {

@@ -1,5 +1,6 @@
 import { exportAsJson } from '@inseri/lighthouse'
-import { Button, useGlobalState } from '../../components'
+import { Button } from '../../components'
+import { useGlobalState } from '../../components/StateProvider'
 import { GlobalState } from './state'
 import { IconShare } from '@tabler/icons-react'
 import { useClipboard } from '@mantine/hooks'
