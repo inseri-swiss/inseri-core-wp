@@ -1,5 +1,6 @@
 import { __ } from '@wordpress/i18n'
-import { ActionIcon, createStyles, Group, Select, SelectProps, getStylesRef, SourceSelectItem } from '.'
+import { ActionIcon, createStyles, Group, Select, SelectProps, getStylesRef } from '.'
+import { SourceSelectItem } from './SourceSelect'
 import { COMMON_CONTENT_TYPES } from '../utils'
 
 const useStyles = createStyles((theme) => ({

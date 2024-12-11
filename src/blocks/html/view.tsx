@@ -1,7 +1,8 @@
 import { useWatch, Nucleus } from '@inseri/lighthouse'
 import { IconCircleOff } from '@tabler/icons-react'
 import { __ } from '@wordpress/i18n'
-import { Box, CodeEditor, Group, Text, createStyles } from '../../components'
+import { Box, Group, Text, createStyles } from '../../components'
+import { CodeEditor } from '../../components/CodeEditor'
 import { useGlobalState } from '../../components/StateProvider'
 import { GlobalState } from './state'
 
