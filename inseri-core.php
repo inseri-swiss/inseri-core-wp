@@ -2,8 +2,8 @@
 /**
  * Plugin Name:       inseri core
  * Description:       Scientific and Interactive Gutenberg Blocks to facilitate Open Science
- * Requires at least: 5.6
- * Requires PHP:      5.6
+ * Requires at least: 6.3
+ * Requires PHP:      7.4
  * Version:           1.0.0
  * Author:            inseri.swiss
  * Author URI:        https://inseri.swiss
