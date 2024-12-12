@@ -14,7 +14,7 @@
 <a href="https://inseri.swiss/about/#roadmap"><img src="https://img.shields.io/badge/view-roadmap-blue" alt="roadmap"></a>
 </p>
 
-[inseri core](https://wordpress.org/plugins/inseri-core/) is a WordPress plugin developed as part of inseri.swiss swissuniversities project – Programme Open Science.
+[inseri core](https://wordpress.org/plugins/inseri-core/) is a WordPress plugin developed as part of inseri.swiss swissuniversities project – Programme Open Science I (2021-2024).
 
 inseri core introduces scientific and interactive Gutenberg blocks to facilitate open science.
 

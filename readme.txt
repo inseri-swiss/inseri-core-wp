@@ -12,9 +12,9 @@ Scientific and Interactive Gutenberg Blocks to facilitate Open Science
 
 == Description ==
 
-The vision of inseri is to enable scholars to design web pages without any prior knowledge. So that they can publish their research findings in an open, citable and interactive way in combination with own their data or any public data repository. Through interactivity, everyone is encouraged to play around with the parameters or use their own data to explore the research findings.
+The vision of inseri is to enable scholars to design and publish interactive and executable online content without requiring web development skills. So that they can publish with ease the research findings in an open, citable and interactive way for effortless reuse by any researcher or the general public. Through interactivity, everyone is encouraged to edit the parameters, use own data, or reuse publicly published data to explore the research findings.
 
-As a result, inseri core introduces scientific and interactive Gutenberg blocks to facilitate open access. The inseri core blocks are not isolated elements but they can receive input from and give output to other blocks. A typical example would start with a Text Editor block containing the configuration for a Dropdown block. By selecting one option in the Dropdown block would provide a Web API block with the parameters to retrieve data from an external source. Using a Python Code block, the web API response could then be transformed into a suitable data format for a Plotly Chart block.
+As a result, inseri core introduces scientific and interactive Gutenberg blocks to facilitate open access and open science communication. The inseri core blocks are not isolated elements but they can receive input from and give output to other blocks. A typical example would start with a Text Editor block containing the configuration for a Dropdown block. By selecting one option in the Dropdown block would provide a Web API block with the parameters to retrieve data from an external source. Using a Python Code block, the web API response could then be transformed into a suitable data format for a Plotly Chart block.
 
 ## Blocks:
 - **[Cytoscape Block](https://docs.inseri.swiss/blocks/cytoscape/)**: It displays network diagram using the data of another block with Cytoscape.
@@ -38,16 +38,18 @@ As a result, inseri core introduces scientific and interactive Gutenberg blocks 
 - **[Web API Block](https://docs.inseri.swiss/blocks/webApi/)**: It enables to call a web API and to share this data with other blocks.
 - **[Zenodo Repository Block](https://docs.inseri.swiss/blocks/zenodo/)**: Using a DOI, a dataset can be loaded from Zenodo.org and shared with other blocks.
 
-More information about the project can be found at [inseri.swiss](https://inseri.swiss).
+inseri name comes from the Latin _insero_ which means **to sow, to plant** but also **to insert**.
 
-Detailed documentation is available at [docs.inseri.swiss](https://docs.inseri.swiss/).
+- More information about the project can be found at [inseri.swiss/about](https://inseri.swiss/about).
+- For examples and showcases see [inseri.swiss](https://inseri.swiss).
+- Detailed documentation is available at [docs.inseri.swiss](https://docs.inseri.swiss/).
+- Try out our [Playground](https://inseri.swiss/playground/).
+- For Ideas and Questions please use [GitHub Discussions](https://github.com/inseri-swiss/inseri-core-wp/discussions).
+- Bug and Issue reports are welcome on [GitHub Issues](https://github.com/inseri-swiss/inseri-core-wp/issues).
+- The development takes place on [GitHub](https://github.com/inseri-swiss/inseri-core-wp).
 
-For ideas and questions please use [GitHub Discussions](https://github.com/inseri-swiss/inseri-core-wp/discussions).
-
-The development takes place on [GitHub](https://github.com/inseri-swiss/inseri-core-wp).
-
-Bug reports are welcome on [GitHub issues](https://github.com/inseri-swiss/inseri-core-wp/issues).
-
+Do you want to get regular notifications? **Watch** the [GitHub](https://github.com/inseri-swiss/inseri-core-wp) repository!<br/>
+Do you want to show your interest? **Star** the [GitHub](https://github.com/inseri-swiss/inseri-core-wp) repository and **Follow** [inseri.swiss](https://github.com/inseri-swiss/) organization!
 
 == Screenshots ==
 

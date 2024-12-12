@@ -2,7 +2,7 @@
 
 **Scientific and Interactive Gutenberg Blocks for WordPress to facilitate Open Science**
 
-[inseri core](https://wordpress.org/plugins/inseri-core/){:target="\_blank"} is a WordPress plugin developed as part of inseri.swiss swissuniversities project – Programme Open Science.
+[inseri core](https://wordpress.org/plugins/inseri-core/){:target="\_blank"} is a WordPress plugin developed as part of inseri.swiss swissuniversities project – Programme Open Science I (2021-2024).
 
 inseri core introduces scientific and interactive Gutenberg blocks to facilitate open science.
 
