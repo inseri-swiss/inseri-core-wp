@@ -1,4 +1,4 @@
-# inseri core <sup>beta</sub>
+# inseri core
 
 **Scientific and Interactive Gutenberg Blocks for WordPress to facilitate Open Science**
 
