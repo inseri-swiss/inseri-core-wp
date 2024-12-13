@@ -13,7 +13,7 @@
 		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
 		"packages-update": "wp-scripts packages-update",
-		"plugin-zip": "wp-scripts plugin-zip",
+		"plugin-zip": "wp-scripts plugin-zip --no-root-folder",
 		"start": "wp-scripts start",
 		"start:hot": "wp-scripts start --hot",
 		"bump": "node scripts/bump-version.js",
