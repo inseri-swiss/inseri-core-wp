@@ -2,6 +2,11 @@ const defaultConfig = require('@wordpress/scripts/config/webpack.config')
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const fs = require('fs')
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+// eslint-disable-next-line import/no-extraneous-dependencies
+const webpack = require('webpack')
+
+const packageLock = require('./package-lock.json')
+const pyodideVersion = packageLock.packages['node_modules/pyodide'].version
 
 const isProduction = process.env.NODE_ENV === 'production'
 const configOverwrite = isProduction
@@ -60,6 +65,9 @@ module.exports = {
 		...defaultConfig.plugins,
 		tsChecker,
 		new BundleAnalyzerPlugin({ analyzerMode: process.env.STATS || 'disabled' }),
+		new webpack.EnvironmentPlugin({
+			PYODIDE_VERSION: pyodideVersion,
+		}),
 	],
 	externals: [
 		{ '@inseri/lighthouse': 'window.inseri.lighthouse' },
