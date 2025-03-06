@@ -2,7 +2,7 @@
 Contributors: inseriswiss
 Tags: gutenberg, interactive, JavaScript, Plotly, Python
 Requires at least: 6.3
-Tested up to: 6.7.1
+Tested up to: 6.7.2
 Requires PHP: 7.4
 Stable tag: 1.0.1
 License: GPL-3.0-or-later
@@ -61,6 +61,11 @@ Do you want to show your interest? **Star** the [GitHub](https://github.com/inse
 6. Render HTML code
 
 == Changelog ==
+### [1.010](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v1.0.1)
+- Update: pyodide 0.27.3
+- Update: diverse dependencies
+
+
 ### [1.0.0](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v1.0.0)
 - Update: pyodide 0.26.4
 - Update: diverse dependencies
