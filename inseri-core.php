@@ -4,7 +4,7 @@
  * Description:       Scientific and Interactive Gutenberg Blocks to facilitate Open Science
  * Requires at least: 6.3
  * Requires PHP:      7.4
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            inseri.swiss
  * Author URI:        https://inseri.swiss
  * License:           GPL-3.0-or-later
