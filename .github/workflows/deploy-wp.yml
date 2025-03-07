@@ -40,6 +40,11 @@ jobs:
           unzip inseri-core.zip -d zip-content
           ls -lA zip-content
 
+      - name: Install svn
+        run: |
+          sudo apt-get update
+          sudo apt-get install subversion
+
       - name: Checkout from WordPress.org
         run: |
           svn co http://svn.wp-plugins.org/inseri-core wp/inseri-core
