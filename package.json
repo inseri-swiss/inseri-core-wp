@@ -80,7 +80,7 @@
 		"mantine-react-table": "^1.3.4",
 		"nanoid": "^5.1.2",
 		"plotly.js": "^2.35.3",
-		"prismjs": "^1.29.0",
+		"prismjs": "^1.30.0",
 		"pyodide": "^0.27.3",
 		"react-plotly.js": "^2.6.0",
 		"react-simple-code-editor": "^0.14.1",
