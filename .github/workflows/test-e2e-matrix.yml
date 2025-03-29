@@ -23,7 +23,7 @@ jobs:
           - '6.7'
         php: # Test against minimum and latest PHP versions.
           - '7.4'
-          - '8.3'
+          - '8.4'
     with:
       wpVersion: ${{matrix.wp}}
       phpVersion: ${{matrix.php}}
