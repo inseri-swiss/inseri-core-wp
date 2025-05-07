@@ -2,7 +2,7 @@
 Contributors: inseriswiss
 Tags: gutenberg, interactive, JavaScript, Plotly, Python
 Requires at least: 6.3
-Tested up to: 6.7.2
+Tested up to: 6.8.1
 Requires PHP: 7.4
 Stable tag: 1.0.1
 License: GPL-3.0-or-later
