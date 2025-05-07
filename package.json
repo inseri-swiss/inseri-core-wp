@@ -24,7 +24,7 @@
 		"test:e2e:debug": "wp-scripts test-playwright --debug"
 	},
 	"devDependencies": {
-		"@prettier/plugin-php": "^0.22.2",
+		"@prettier/plugin-php": "^0.22.4",
 		"@types/cytoscape": "^3.21.9",
 		"@types/json-stable-stringify": "^1.2.0",
 		"@types/lodash.clonedeep": "^4.5.9",
