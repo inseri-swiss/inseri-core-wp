@@ -39,7 +39,7 @@
 		"@wordpress/scripts": "^30.0.6",
 		"eslint": "^8.57.1",
 		"eslint-plugin-prettier": "^5.4.0",
-		"fork-ts-checker-webpack-plugin": "^9.0.2",
+		"fork-ts-checker-webpack-plugin": "^9.1.0",
 		"prettier": "^3.5.3",
 		"prettier-plugin-multiline-arrays": "^3.0.6",
 		"typescript": "^5.8.3",
