@@ -19,7 +19,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ inputs.version }}
 
@@ -30,7 +30,7 @@ jobs:
           echo "VERSION=${TAG#v}" >> $GITHUB_ENV
 
       - name: Download plugin
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           name: ready-zip
 
