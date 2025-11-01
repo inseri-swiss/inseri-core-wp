@@ -25,7 +25,7 @@ jobs:
         with:
           ref: ${{ inputs.version }}
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
@@ -34,7 +34,7 @@ jobs:
       - run: npm run build
       - run: npm run plugin-zip
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: ready-zip
           path: inseri-core.zip
