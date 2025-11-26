@@ -1,5 +1,5 @@
 site_name: Documentation for inseri core
-site_url: https://docs.inseri.swiss/
+site_url: https://inseri-swiss.github.io/inseri-core-wp/
 repo_url: https://github.com/inseri-swiss/inseri-core-wp
 nav:
   - 'Home': 'index.md'
@@ -65,7 +65,7 @@ theme:
 extra:
   social:
     - icon: material/home
-      link: https://docs.inseri.swiss/
+      link: https://inseri-swiss.github.io/inseri-core-wp/
     - icon: material/arrow-top-right
       link: https://inseri.swiss/
 
