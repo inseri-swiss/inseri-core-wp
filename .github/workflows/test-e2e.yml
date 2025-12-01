@@ -35,8 +35,8 @@ jobs:
       INSERI_WP_CORE: ${{ inputs.wpVersion != '' && format('WordPress/WordPress#{0}', inputs.wpVersion) || '' }}
       INSERI_WP_PHP: ${{ inputs.phpVersion }}
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
