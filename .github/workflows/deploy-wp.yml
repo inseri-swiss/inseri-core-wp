@@ -30,7 +30,7 @@ jobs:
           echo "VERSION=${TAG#v}" >> $GITHUB_ENV
 
       - name: Download plugin
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           name: ready-zip
 
