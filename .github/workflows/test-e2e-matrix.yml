@@ -18,9 +18,9 @@ jobs:
       fail-fast: false
       matrix:
         wp: # Test against Prev-Prev Major, Prev-Major, and current Major release versions.
-          - '6.6'
           - '6.7'
           - '6.8'
+          - '6.9'
         php: # Test against minimum and latest PHP versions.
           - '7.4'
           - '8.4'
