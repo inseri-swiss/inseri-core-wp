@@ -5,11 +5,11 @@ For this we have to join a couple of inseri blocks.
 
 If you have no experience with inseri, please start with our [Hello World](./hello_world.md).
 
-For the final experience, please [click here](https://inseri.swiss/2023/03/data-mapping-with-python/){:target="\_blank"}.
+For the final experience, please [click here](https://zi.uzh.ch/whp/science-it/inseri/2023/03/data-mapping-with-python/){:target="\_blank"}.
 
 ## Step 1: Create a new post
 
-On your inseri instance or in the [inseri Playground](https://playground.inseri.swiss){:target="\_blank"} (remember, your changes will not be saved there), add a new post and give it a title.
+On your inseri instance or in the [inseri Playground](https://zi.uzh.ch/whp/science-it/inseri/playground/){:target="\_blank"} (remember, your changes will not be saved there), add a new post and give it a title.
 In this example, we call the post "Data Mapping with Python". You can type this at "Add title...".
 
 ## Step 2: Add the Web API block
@@ -119,4 +119,4 @@ If you change the web-API block to execute automatically, the content will appea
 
 ## Overview
 
-The Data Flow Chart provides a nice overview. You can see it also at the bottom of the [Data Mapping with Python](https://inseri.swiss/2023/03/data-mapping-with-python/){:target="\_blank"}.
+The Data Flow Chart provides a nice overview. You can see it also at the bottom of the [Data Mapping with Python](https://zi.uzh.ch/whp/science-it/inseri/2023/03/data-mapping-with-python/){:target="\_blank"}.

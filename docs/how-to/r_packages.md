@@ -10,5 +10,5 @@ When a package is missing it is downloaded from the default webR binary package 
 library(plotly)
 ```
 
-For a fully working example see [R and Plotly](https://inseri.swiss/2024/08/r-and-plotly/){:target="\_blank"}.</br>
+For a fully working example see [R and Plotly](https://zi.uzh.ch/whp/science-it/inseri/2024/08/r-and-plotly/){:target="\_blank"}.</br>
 For more details please see [WebR - Installing R Packages](https://docs.r-wasm.org/webr/latest/packages.html){:target="\_blank"}.

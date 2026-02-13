@@ -25,6 +25,6 @@ No input.
 
 ## Examples
 
-[Export Block](https://inseri.swiss/2024/06/export-block/) on inseri.swiss.
+[Export Block](https://zi.uzh.ch/whp/science-it/inseri/2024/06/export-block/) on the project website.
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/export/) that make use of the Export block.
+[Posts on the project website](https://zi.uzh.ch/whp/science-it/inseri/tag/export/) that make use of the Export block.

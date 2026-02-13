@@ -44,7 +44,7 @@ nav:
       - 'how-to/python_packages.md'
       - 'how-to/r_packages.md'
       - 'how-to/deposit_content.md'
-  - 'inseri.swiss ↗': https://inseri.swiss/
+  - 'inseri ↗': https://zi.uzh.ch/whp/science-it/inseri/
 
 theme:
   name: material
@@ -67,7 +67,7 @@ extra:
     - icon: material/home
       link: https://inseri-swiss.github.io/inseri-core-wp/
     - icon: material/arrow-top-right
-      link: https://inseri.swiss/
+      link: https://zi.uzh.ch/whp/science-it/inseri/
 
 markdown_extensions:
   - pymdownx.highlight:

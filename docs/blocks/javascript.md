@@ -56,6 +56,6 @@ After a page reload the changes in the code will be lost.
 
 ## Examples
 
-[JavaScript Code Block](https://inseri.swiss/2024/04/javascript-code-block/) on inseri.swiss.
+[JavaScript Code Block](https://zi.uzh.ch/whp/science-it/inseri/2024/04/javascript-code-block/) on the project website.
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/javascript-code/) that make use of the JavaScript Code block.
+[Posts on the project website](https://zi.uzh.ch/whp/science-it/inseri/tag/javascript-code/) that make use of the JavaScript Code block.

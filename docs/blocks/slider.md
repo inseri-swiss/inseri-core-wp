@@ -34,6 +34,6 @@ Define a lower bound (Range Min) and an upper bound (Range Max) for the range it
 
 ## Examples
 
-[Slider Block](https://inseri.swiss/2024/02/slider-block/) on inseri.swiss.
+[Slider Block](https://zi.uzh.ch/whp/science-it/inseri/2024/02/slider-block/) on the project website.
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/slider/) that make use of the slider block.
+[Posts on the project website](https://zi.uzh.ch/whp/science-it/inseri/tag/slider/) that make use of the slider block.

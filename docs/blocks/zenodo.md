@@ -24,6 +24,6 @@ The block can be hidden from readers but its content is still available as input
 
 ## Examples
 
-[Zenodo Repository Block](https://inseri.swiss/2023/04/zenodo-repository-block/) on inseri.swiss.
+[Zenodo Repository Block](https://zi.uzh.ch/whp/science-it/inseri/2023/04/zenodo-repository-block/) on the project website.
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/zenodo-repository/) that make use of the zenodo repository block.
+[Posts on the project website](https://zi.uzh.ch/whp/science-it/inseri/tag/zenodo-repository/) that make use of the zenodo repository block.

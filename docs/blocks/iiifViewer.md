@@ -30,6 +30,6 @@ Height is dynamic.
 
 ## Examples
 
-[IIIF Viewer Block](https://inseri.swiss/2023/10/iiif-viewer-block/) on inseri.swiss.
+[IIIF Viewer Block](https://zi.uzh.ch/whp/science-it/inseri/2023/10/iiif-viewer-block/) on the project website.
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/iiif-viewer/) that make use of the text viewer block.
+[Posts on the project website](https://zi.uzh.ch/whp/science-it/inseri/tag/iiif-viewer/) that make use of the text viewer block.

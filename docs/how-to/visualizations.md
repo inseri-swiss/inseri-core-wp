@@ -10,15 +10,15 @@ If you already have your Plotly chart in a JSON format, you can easily add it us
 
 ## How to use Plotly with Python
 
-Please see [Python and Plotly](https://inseri.swiss/2023/06/python-and-plotly/){:target="\_blank"}.
+Please see [Python and Plotly](https://zi.uzh.ch/whp/science-it/inseri/2023/06/python-and-plotly/){:target="\_blank"}.
 
 ## How to use Plotly with R
 
-Please see [R and Plotly](https://inseri.swiss/2024/08/r-and-plotly/){:target="\_blank"}.
+Please see [R and Plotly](https://zi.uzh.ch/whp/science-it/inseri/2024/08/r-and-plotly/){:target="\_blank"}.
 
 ## How to use Matplotlib with Python
 
-Please see [Python and Matplotlib](https://inseri.swiss/2023/06/python-and-matplotlib/){:target="\_blank"}.
+Please see [Python and Matplotlib](https://zi.uzh.ch/whp/science-it/inseri/2023/06/python-and-matplotlib/){:target="\_blank"}.
 
 ## Plotly or Matplotlib
 
@@ -29,4 +29,4 @@ Plotly offers more interactive options than a static image would, and
 
 ## How to use ggplot2 with R
 
-Please see [R and Plotting](https://inseri.swiss/2024/08/r-and-plotting/){:target="\_blank"}.
+Please see [R and Plotting](https://zi.uzh.ch/whp/science-it/inseri/2024/08/r-and-plotting/){:target="\_blank"}.

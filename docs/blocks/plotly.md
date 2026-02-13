@@ -114,6 +114,6 @@ Other blocks can listen to `hover`, `click` events from this block.
 
 ## Examples
 
-[Plotly Chart Block](https://inseri.swiss/2023/03/plotly-chart-block/) on inseri.swiss.
+[Plotly Chart Block](https://zi.uzh.ch/whp/science-it/inseri/2023/03/plotly-chart-block/) on the project website.
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/plotly-chart/) that make use of the Plotly chart block.
+[Posts on the project website](https://zi.uzh.ch/whp/science-it/inseri/tag/plotly-chart/) that make use of the Plotly chart block.

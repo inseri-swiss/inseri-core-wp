@@ -66,6 +66,6 @@ The web API will be called initially and on changes of the inputs.
 
 ## Examples
 
-[Web API Block](https://inseri.swiss/2023/01/web-api-block/) on inseri.swiss.
+[Web API Block](https://zi.uzh.ch/whp/science-it/inseri/2023/01/web-api-block/) on the project website.
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/web-api/) that make use of the web API block.
+[Posts on the project website](https://zi.uzh.ch/whp/science-it/inseri/tag/web-api/) that make use of the web API block.

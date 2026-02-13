@@ -28,6 +28,6 @@ By default the file extension will be added automatically depending on the data 
 
 ## Examples
 
-[Download Block](https://inseri.swiss/2023/03/download-block/) in inseri.swiss.
+[Download Block](https://zi.uzh.ch/whp/science-it/inseri/2023/03/download-block/) on the project website.
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/download/) that make use of the download block.
+[Posts on the project website](https://zi.uzh.ch/whp/science-it/inseri/tag/download/) that make use of the download block.

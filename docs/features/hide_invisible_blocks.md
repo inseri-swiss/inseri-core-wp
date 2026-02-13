@@ -12,7 +12,7 @@ inseri core provides the following blocks that support this feature:
 - [Web API block](../blocks/webApi.md){:target="\_blank"}
 - [Zenodo Repository block](../blocks/zenodo.md){:target="\_blank"} when only one file is desired
 
-As a concrete example, please see below how to hide the Text Editor block from the [Hello World](https://inseri.swiss/2023/02/hello-world/){:target="\_blank"}.
+As a concrete example, please see below how to hide the Text Editor block from the [Hello World](https://zi.uzh.ch/whp/science-it/inseri/2023/02/hello-world/){:target="\_blank"}.
 
 <figure markdown>
 ![invisible blocks](../assets/invisible_blocks.gif)

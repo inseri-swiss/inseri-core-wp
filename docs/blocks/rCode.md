@@ -59,6 +59,6 @@ After a page reload the changes in the code will be lost.
 
 ## Examples
 
-[R Code Block using WebR](https://inseri.swiss/2024/08/r-code-block-using-webr) on inseri.swiss.
+[R Code Block using WebR](https://zi.uzh.ch/whp/science-it/inseri/2024/08/r-code-block-using-webr) on the project website.
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/r-code/) that make use of the R Code block.
+[Posts on the project website](https://zi.uzh.ch/whp/science-it/inseri/tag/r-code/) that make use of the R Code block.

@@ -59,6 +59,6 @@ After a page reload the changes in the code will be lost.
 
 ## Examples
 
-[Python Code Block using Pyodide](https://inseri.swiss/2023/02/python-code-block-using-pyodide/) on inseri.swiss.
+[Python Code Block using Pyodide](https://zi.uzh.ch/whp/science-it/inseri/2023/02/python-code-block-using-pyodide/) on the project website.
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/python-code/) that make use of the Python Code block.
+[Posts on the project website](https://zi.uzh.ch/whp/science-it/inseri/tag/python-code/) that make use of the Python Code block.
