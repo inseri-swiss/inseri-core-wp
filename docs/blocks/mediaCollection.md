@@ -40,6 +40,6 @@ File URL: Location of the file after upload.
 
 ## Examples
 
-[Media Collection and Image Box Blocks](https://inseri.swiss/2023/01/media-collection-and-image-box-blocks/) on inseri.swiss.
+[Media Collection and Image Box Blocks](https://zi.uzh.ch/whp/science-it/inseri/2023/01/media-collection-and-image-box-blocks/) on the project website.
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/media-collection/) that make use of the zenodo repository block.
+[Posts on the project website](https://zi.uzh.ch/whp/science-it/inseri/tag/media-collection/) that make use of the zenodo repository block.

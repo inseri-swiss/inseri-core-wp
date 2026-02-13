@@ -16,4 +16,4 @@ inseri core provides the following blocks that can be hidden:
 - [Text Editor block](../blocks/textEditor.md){:target="\_blank"}
 - [Zenodo Repository block](../blocks/zenodo.md){:target="\_blank"}
 
-As a concrete example, please see [Share Block](https://inseri.swiss/2024/10/share-block/){:target="\_blank"}.
+As a concrete example, please see [Share Block](https://zi.uzh.ch/whp/science-it/inseri/2024/10/share-block/){:target="\_blank"}.

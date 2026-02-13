@@ -46,6 +46,6 @@ The row virtualization should be enabled for very long tables. It should provide
 
 ## Examples
 
-[Data Table Block](https://inseri.swiss/2024/02/data-table-block/) on inseri.swiss.
+[Data Table Block](https://zi.uzh.ch/whp/science-it/inseri/2024/02/data-table-block/) on the project website.
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/data-table/) that make use of the data table block.
+[Posts on the project website](https://zi.uzh.ch/whp/science-it/inseri/tag/data-table/) that make use of the data table block.

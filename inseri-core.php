@@ -6,7 +6,7 @@
  * Requires PHP:      7.4
  * Version:           1.0.4-beta
  * Author:            inseri.swiss
- * Author URI:        https://inseri.swiss
+ * Author URI:        https://zi.uzh.ch/whp/science-it/inseri/
  * License:           GPL-3.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain:       inseri-core

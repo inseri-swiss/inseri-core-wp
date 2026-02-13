@@ -12,6 +12,6 @@ The HTML Code block expects HTML from any block as input.
 
 ## Examples
 
-[HTML Code Block](https://inseri.swiss/2023/03/html-code-block/) on inseri.swiss.
+[HTML Code Block](https://zi.uzh.ch/whp/science-it/inseri/2023/03/html-code-block/) on the project website.
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/html-code/) that make use of the HTML block.
+[Posts on the project website](https://zi.uzh.ch/whp/science-it/inseri/tag/html-code/) that make use of the HTML block.

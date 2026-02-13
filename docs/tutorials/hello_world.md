@@ -5,11 +5,11 @@ This tutorial allows you to chain multiple inseri blocks, with the specific exam
 - Adding predefined images in dropdown menu
 - Allowing the end user to select the images to display
 
-For the final product, please [click here](https://inseri.swiss/2023/02/hello-world/){:target="\_blank"}.
+For the final product, please [click here](https://zi.uzh.ch/whp/science-it/inseri/2023/02/hello-world/){:target="\_blank"}.
 
 ## Step 0: Initialize your inseri instance
 
-Start [inseri Playground](https://playground.inseri.swiss){:target="\_blank"} or your WordPress instance. In your WordPress instance make sure [`inseri-core`](https://wordpress.org/plugins/inseri-core/){:target="\_blank"} plugin is installed (it is already instsalled in the inseri playground).
+Start [inseri Playground](https://zi.uzh.ch/whp/science-it/inseri/playground/){:target="\_blank"} or your WordPress instance. In your WordPress instance make sure [`inseri-core`](https://wordpress.org/plugins/inseri-core/){:target="\_blank"} plugin is installed (it is already instsalled in the inseri playground).
 
 Beware that changes done in the playground will not be saved.
 
@@ -98,4 +98,4 @@ where the corresponding image will load after the selection.
 
 ## Overview
 
-The Data Flow Chart (see Step 6) provides a nice overview. You can see it also at the bottom of the [Hello World](https://inseri.swiss/2023/02/hello-world/){:target="\_blank"}.
+The Data Flow Chart (see Step 6) provides a nice overview. You can see it also at the bottom of the [Hello World](https://zi.uzh.ch/whp/science-it/inseri/2023/02/hello-world/){:target="\_blank"}.

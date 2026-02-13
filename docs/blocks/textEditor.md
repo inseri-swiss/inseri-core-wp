@@ -26,6 +26,6 @@ Visitors of the page can play with the content. This can be useful in combinatio
 
 ## Examples
 
-[Text Editor and Text Viewer Blocks](https://inseri.swiss/2022/12/text-editor-and-text-viewer-blocks/) on inseri.swiss.
+[Text Editor and Text Viewer Blocks](https://zi.uzh.ch/whp/science-it/inseri/2022/12/text-editor-and-text-viewer-blocks/) on the project website.
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/text-editor/) that make use of the text editor.
+[Posts on the project website](https://zi.uzh.ch/whp/science-it/inseri/tag/text-editor/) that make use of the text editor.

@@ -12,11 +12,11 @@ import micropip
 await micropip.install('plotly');
 ```
 
-For a fully working example see [Python and Plotly](https://inseri.swiss/2023/06/python-and-plotly/){:target="\_blank"}.</br>
+For a fully working example see [Python and Plotly](https://zi.uzh.ch/whp/science-it/inseri/2023/06/python-and-plotly/){:target="\_blank"}.</br>
 For more details please see [Pyodide - Installing packages](https://pyodide.org/en/stable/usage/loading-packages.html#installing-packages){:target="\_blank"}.
 
 ## How to install requests package
 
 `requests` package is available in inseri core ≥ 0.3.5. If you use an older older version, please update.
 
-For a fully working example see [Python and Requests Package](https://inseri.swiss/2023/08/python-and-requests/){:target="\_blank"}.
+For a fully working example see [Python and Requests Package](https://zi.uzh.ch/whp/science-it/inseri/2023/08/python-and-requests/){:target="\_blank"}.

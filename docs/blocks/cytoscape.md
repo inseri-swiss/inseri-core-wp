@@ -60,6 +60,6 @@ Replace `layout` from [Cytoscape.js - Elements JSON](https://js.cytoscape.org/#n
 
 ## Examples
 
-[Cytoscape Block](https://inseri.swiss/2023/11/cytoscape-block/) on inseri.swiss.
+[Cytoscape Block](https://zi.uzh.ch/whp/science-it/inseri/2023/11/cytoscape-block/) on the project website.
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/cytoscape/) that make use of the Plotly chart block.
+[Posts on the project website](https://zi.uzh.ch/whp/science-it/inseri/tag/cytoscape/) that make use of the Plotly chart block.

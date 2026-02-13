@@ -58,6 +58,6 @@ Allow the selection to be reset to undefined.
 
 ## Examples
 
-[Dropdown Block](https://inseri.swiss/2022/12/dropdown-block/) on inseri.swiss.
+[Dropdown Block](https://zi.uzh.ch/whp/science-it/inseri/2022/12/dropdown-block/) on the project website.
 
-[Posts on inseri.swiss](https://inseri.swiss/tag/dropdown/) that make use of the dropdown block.
+[Posts on the project website](https://zi.uzh.ch/whp/science-it/inseri/tag/dropdown/) that make use of the dropdown block.
