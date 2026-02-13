@@ -61,7 +61,7 @@ Do you want to show your interest? **Star** the [GitHub](https://github.com/inse
 6. Render HTML code
 
 == Changelog ==
-### [1.0.4](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v1.0.3)
+### [1.0.4](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v1.0.4)
 - Update: pyodide 0.28.3
 - Update: diverse dependencies
 
