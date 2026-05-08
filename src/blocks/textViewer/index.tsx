@@ -11,6 +11,7 @@ import './style.scss'
 const { name, ...settings } = json as any
 
 export interface Attributes {
+	[key: string]: any
 	blockId: string
 	inputKey: string
 	height: number

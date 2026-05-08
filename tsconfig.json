@@ -12,6 +12,7 @@
 		"noUnusedParameters": true,
 		"allowJs": true,
 		"allowSyntheticDefaultImports": true,
+		"types": ["node"],
 		"baseUrl": "./src",
 		"paths": {
 			"@inseri/lighthouse": ["./globalScript/lighthouse"],

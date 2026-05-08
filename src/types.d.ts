@@ -8,6 +8,16 @@ declare module '*.svg' {
 	export = value
 }
 
+declare module '*.css' {
+	const content: any
+	export default content
+}
+
+declare module '*.scss' {
+	const content: any
+	export default content
+}
+
 declare const inseriApiSettings: {
 	root: string
 	nonce: string

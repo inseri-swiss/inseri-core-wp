@@ -1,6 +1,6 @@
 import Ajv, { Schema } from 'ajv'
 import addFormats from 'ajv-formats'
-import produce from 'immer'
+import { produce } from 'immer'
 import { customAlphabet } from 'nanoid/non-secure'
 
 //@ts-ignore

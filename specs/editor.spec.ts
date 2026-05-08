@@ -23,8 +23,13 @@ test.describe('Editor', () => {
 		await firstViewer.click()
 		await firstEditor.click({ modifiers: ['Shift'] })
 
-		await firstEditor.press('Control+C')
-		await page.getByLabel('Empty block; start writing or').press('Control+V')
+		const isMac = process.platform === 'darwin'
+		const modifier = isMac ? 'Meta' : 'Control'
+
+		await page.keyboard.press(`${modifier}+C`)
+		const emptyBlock = page.getByLabel('Empty block; start writing or')
+		await emptyBlock.click()
+		await page.keyboard.press(`${modifier}+V`)
 
 		const secondViewer = page.locator(viewerSelector).nth(1)
 		const secondEditor = page.locator(editorSelector).nth(1)

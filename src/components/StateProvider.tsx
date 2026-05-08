@@ -47,12 +47,12 @@ export function StateProvider<INIT, STATE extends INIT>({ initialState, children
 	return <StateContext.Provider value={storeRef.current}>{children}</StateContext.Provider>
 }
 
-export function useGlobalState<S, T>(selector: (state: S) => T, equalityFn?: (left: T, right: T) => boolean): T {
+export function useGlobalState<S, T>(selector: (state: S) => T): T {
 	const store = useContext(StateContext)
 
 	if (!store) {
 		throw new Error('Missing StateContext.Provider in the tree')
 	}
 
-	return useStore(store, selector, equalityFn)
+	return useStore(store, selector)
 }

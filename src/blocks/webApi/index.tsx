@@ -11,6 +11,7 @@ import Edit from './edit'
 const { name, ...settings } = json as any
 
 export interface Attributes {
+	[key: string]: any
 	blockId: string
 	outputContenType: string
 	inputMethodUrl: string

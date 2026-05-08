@@ -6,7 +6,7 @@ import { PanelBody, PanelRow, TextControl, ToggleControl, ToolbarButton, Toolbar
 import { useDispatch as useWpDispatch } from '@wordpress/data'
 import { useEffect } from '@wordpress/element'
 import { __ } from '@wordpress/i18n'
-import { edit } from '@wordpress/icons'
+import { pencil as edit } from '@wordpress/icons'
 import { SetupEditorEnv } from '../../components/SetupEditorEnv'
 import { StateProvider, useGlobalState } from '../../components/StateProvider'
 import { HidingWrapper } from '../../utils'

@@ -22,7 +22,8 @@ The input corresponds to the `elements` objects from [Cytoscape.js - Elements JS
 	{ "data": { "id": "cd", "source": "c", "target": "d" } },
 	{ "data": { "id": "ef", "source": "e", "target": "f" } },
 	{ "data": { "id": "ac", "source": "a", "target": "c" } },
-	{ "data": { "id": "be", "source": "b", "target": "e" } }]
+	{ "data": { "id": "be", "source": "b", "target": "e" } }
+]
 ```
 
 ## Parameters

@@ -63,7 +63,7 @@ function retrievePyObjects(name: string): [string, any] {
 		}
 
 		if (convertedData instanceof Uint8Array) {
-			convertedData = new Blob([convertedData])
+			convertedData = new Blob([convertedData as any])
 		}
 
 		return [name, convertedData]
