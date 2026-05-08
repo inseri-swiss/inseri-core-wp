@@ -23,13 +23,13 @@ test.describe('DataTable', () => {
 		await tableBlock.getByText('Text Editor').click()
 		await tableBlock.getByRole('button', { name: 'Finish' }).click()
 
-		expect(await tableBlock.getByRole('row').count()).toEqual(3) // including title bar
+		await expect(tableBlock.locator('tr')).toHaveCount(3) // including title bar
 
 		const newPage = await editor.openPreviewPage()
 		await newPage.waitForEvent('load')
 		tableBlock = newPage.locator(tableSelector).first()
 
-		expect(await tableBlock.locator('tr').count()).toEqual(3) // including title bar
+		await expect(tableBlock.locator('tr')).toHaveCount(3) // including title bar
 		await newPage.close()
 	})
 })

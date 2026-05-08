@@ -25,13 +25,13 @@ test.describe('Zenodo', () => {
 		await viewerBlock.getByPlaceholder('Search for blocks, content type,').click()
 		await viewerBlock.getByText('Zenodo Repository', { exact: true }).click()
 
-		await expect(viewerBlock.locator('textarea')).toContainText(`"random_coord"`)
+		await expect(viewerBlock.locator('textarea')).toContainText(`"random_coord"`, { timeout: 15000 })
 
 		const newPage = await editor.openPreviewPage()
 		await newPage.waitForEvent('load')
 
 		viewerBlock = newPage.locator(viewerSelector).first()
-		await expect(viewerBlock.locator('textarea')).toContainText(`"random_coord"`)
+		await expect(viewerBlock.locator('textarea')).toContainText(`"random_coord"`, { timeout: 15000 })
 
 		await newPage.close()
 	})

@@ -64,7 +64,7 @@ export default function View({ renderResizable, imageRef, isSelected }: ViewProp
 			}
 		: {}
 
-	let errorText = __('Failed to load', 'inser-core')
+	let errorText: string = __('Failed to load', 'inser-core')
 	if (altText) {
 		errorText += ': ' + altText
 	}

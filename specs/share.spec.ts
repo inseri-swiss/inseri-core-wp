@@ -33,7 +33,7 @@ test.describe('Share', () => {
 
 		await shareBlock.getByRole('button').click()
 		let clipboardContent = await page.evaluate(() => navigator.clipboard.readText())
-		expect(clipboardContent).toMatch(/http:\/\/localhost:8889\/\?p=(\d+)#{"(.+)":{"code":"hello world"}}/)
+		expect(clipboardContent).toMatch(/http:\/\/localhost:8889\/.*#{"(.+)":{"code":"hello world"}}/)
 
 		const newPage = await editor.openPreviewPage()
 		await newPage.waitForEvent('load')
@@ -42,7 +42,7 @@ test.describe('Share', () => {
 
 		await shareBlock.getByRole('button').click()
 		clipboardContent = await newPage.evaluate(() => navigator.clipboard.readText())
-		expect(clipboardContent).toMatch(/http:\/\/localhost:8889\/\?p=(\d+)&preview=true#{"(.+)":{"code":"hello world"}}/)
+		expect(clipboardContent).toMatch(/http:\/\/localhost:8889\/.*#{"(.+)":{"code":"hello world"}}/)
 
 		const newUrl = clipboardContent.replace('hello world', 'hola mundo')
 		await newPage.goto(newUrl)

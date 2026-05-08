@@ -28,7 +28,7 @@ export interface GlobalState extends Attributes {
 	}
 }
 
-type Set = (nextStateOrUpdater: (state: Draft<GlobalState>) => void, shouldReplace?: boolean | undefined) => void
+type Set = (nextStateOrUpdater: (state: Draft<GlobalState>) => void) => void
 
 export const storeCreator = (initalState: Attributes) => {
 	let doiCallback: any
