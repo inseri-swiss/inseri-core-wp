@@ -1,3 +1,5 @@
+# ⚠️ This project is unmaintained ⚠️
+
 <p align="center"><a href="https://zi.uzh.ch/whp/science-it/inseri/"><img src="https://raw.githubusercontent.com/inseri-swiss/inseri-core-wp/8820531f0db87ca285b11e05af40453b48e29ee8/docs/assets/inseri_logo.svg" alt="Logo" height=120></a>
 </p>
 <h1 align="center">inseri core</h1>
