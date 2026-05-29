@@ -1,6 +1,6 @@
 === Scientific and Interactive Blocks - inseri core ===
 Contributors: inseriswiss
-Tags: gutenberg, interactive, JavaScript, Plotly, Python
+Tags: adopt-me, interactive, JavaScript, Plotly, Python
 Requires at least: 6.3
 Tested up to: 6.9.1
 Requires PHP: 7.4
@@ -11,6 +11,8 @@ License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Scientific and Interactive Gutenberg Blocks to facilitate Open Science
 
 == Description ==
+
+**⚠️ This project is unmaintained. ⚠️**
 
 The vision of inseri is to enable scholars to design and publish interactive and executable online content without requiring web development skills. So that they can publish with ease the research findings in an open, citable and interactive way for effortless reuse by any researcher or the general public. Through interactivity, everyone is encouraged to edit the parameters, use own data, or reuse publicly published data to explore the research findings.
 

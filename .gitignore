@@ -44,3 +44,5 @@ site/
 
 # test results
 artifacts/
+
+.cache/

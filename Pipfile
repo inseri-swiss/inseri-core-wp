@@ -4,10 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-mkdocs = "*"
 mkdocs-material = "*"
 mkdocs-glightbox = "*"
 mkdocs-redirects = "*"
+click = "*"
+mkdocs = "<2.0"
+selectolax = "*"
 
 [dev-packages]
 

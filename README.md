@@ -1,4 +1,4 @@
-⚠️ This project is unmaintained ⚠️
+# ⚠️ This project is unmaintained ⚠️
 
 <p align="center"><a href="https://zi.uzh.ch/whp/science-it/inseri/"><img src="https://raw.githubusercontent.com/inseri-swiss/inseri-core-wp/8820531f0db87ca285b11e05af40453b48e29ee8/docs/assets/inseri_logo.svg" alt="Logo" height=120></a>
 </p>
@@ -15,7 +15,6 @@
 <a href="https://github.com/inseri-swiss/inseri-core-wp/issues"><img src="https://img.shields.io/github/issues-raw/inseri-swiss/inseri-core-wp?color=blue" alt="issues"></a>
 <a href="https://zi.uzh.ch/whp/science-it/inseri/about/#roadmap"><img src="https://img.shields.io/badge/view-roadmap-blue" alt="roadmap"></a>
 </p>
-
 
 [inseri core](https://wordpress.org/plugins/inseri-core/) is a WordPress plugin developed as part of inseri.swiss swissuniversities project – Programme Open Science I (2021-2024).
 
