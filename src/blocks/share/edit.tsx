@@ -13,7 +13,7 @@ import View from './view'
 
 const getPermalink = () => select('core/editor').getPermalink()
 
-function EditComponent(_props: BlockEditProps<Attributes>) {
+function EditComponent() {
 	const { metadata, text, copiedText, showIcon } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 

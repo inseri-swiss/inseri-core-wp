@@ -16,11 +16,11 @@ const includeChildrendIds = (clientIds: string[], childParentPairs: [string, str
 	const result: string[] = [...clientIds]
 
 	clientIds.forEach((id) => {
-		let children: string[] = childParentPairs.filter(([_c, parent]) => parent === id).map((t) => t[0])
+		let children: string[] = childParentPairs.filter(([, parent]) => parent === id).map((t) => t[0])
 
 		while (children.length > 0) {
 			result.push(...children)
-			children = children.flatMap((pid) => childParentPairs.filter(([_c, parent]) => parent === pid).map((t) => t[0]))
+			children = children.flatMap((pid) => childParentPairs.filter(([, parent]) => parent === pid).map((t) => t[0]))
 		}
 	})
 
@@ -79,15 +79,15 @@ export function SetupEditorEnv(props: Props) {
 
 			const inputEntries = addSuffixToInputs
 				.map((k) => [k, ...attributesObj[k].split('/')])
-				.filter(([_kn, inputBlockId, _fk]) => !!inputBlockId)
-				.filter(([_kn, inputBlockId, _fk]) => selectedBlockIds.includes(inputBlockId) || selectedBlockIds.includes(inputBlockId + suffix))
+				.filter(([, inputBlockId]) => !!inputBlockId)
+				.filter(([, inputBlockId]) => selectedBlockIds.includes(inputBlockId) || selectedBlockIds.includes(inputBlockId + suffix))
 				.map(([keyName, inputBlockId, fieldKey]) => [keyName, inputBlockId + suffix + '/' + fieldKey])
 
 			const inputRecordEntries = addSuffixToInputRecord.map((k) => {
 				const entries = Object.entries(attributesObj[k])
 					.map(([name, inputKey]: any) => [name, ...inputKey.split('/')])
-					.filter(([_kn, inputBlockId, _fk]) => !!inputBlockId)
-					.filter(([_kn, inputBlockId, _fk]) => selectedBlockIds.includes(inputBlockId) || selectedBlockIds.includes(inputBlockId + suffix))
+					.filter(([, inputBlockId]) => !!inputBlockId)
+					.filter(([, inputBlockId]) => selectedBlockIds.includes(inputBlockId) || selectedBlockIds.includes(inputBlockId + suffix))
 					.map(([keyName, inputBlockId, fieldKey]) => [keyName, inputBlockId + suffix + '/' + fieldKey])
 
 				const newlyUpdatedRecord = { ...attributesObj[k], ...Object.fromEntries(entries) }

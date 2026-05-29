@@ -89,7 +89,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 					labels={{ title: 'Media Collection' }}
 					icon={<IconFiles style={{ fill: 'none' }} />}
 					onError={(err) => createErrorNotice(err, { type: 'snackbar' })}
-					onHTMLDrop={(_html: string) => {}}
+					onHTMLDrop={() => {}}
 				></MediaPlaceholder>
 			) : (
 				<View renderHiding={renderHiding} />

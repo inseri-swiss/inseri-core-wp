@@ -49,7 +49,7 @@ export const formatCode = (type: string, code: string): [string?, string?] => {
 		try {
 			const formattedJson = JSON.stringify(JSON.parse(code), null, 2)
 			return [undefined, formattedJson]
-		} catch (exception) {
+		} catch {
 			return [__('invalid JSON', 'inseri-core'), undefined]
 		}
 	}
@@ -58,7 +58,7 @@ export const formatCode = (type: string, code: string): [string?, string?] => {
 		try {
 			const formattedXml = xmlFormatter(code, XML_FORMAT_OPTION)
 			return [undefined, formattedXml]
-		} catch (exception) {
+		} catch {
 			return [__('invalid XML', 'inseri-core'), undefined]
 		}
 	}

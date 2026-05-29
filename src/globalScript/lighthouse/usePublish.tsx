@@ -13,14 +13,21 @@ function usePublish<T = any>(key: string, description: string): Actions<T>
 function usePublish<T = any>(keys: KeyDescPack[]): Record<string, Actions<T>>
 function usePublish(keys: string | KeyDescPack[], maybeDescription?: string): any {
 	const preparedKeys = typeof keys === 'string' ? [keys] : (keys as KeyDescPack[]).map((i) => i.key)
-	const preparedDescs = !!maybeDescription ? [maybeDescription] : typeof keys !== 'string' ? (keys as KeyDescPack[]).map((i) => i.description) : []
+
+	let preparedDescs: string[] = []
+	if (maybeDescription) {
+		preparedDescs = [maybeDescription]
+	} else if (typeof keys !== 'string') {
+		preparedDescs = (keys as KeyDescPack[]).map((i) => i.description)
+	}
+
 	const blockId = useContext(BlockIdContext)
 
 	const result = useInternalPublish(blockId, preparedKeys, preparedDescs)
 
 	if (typeof keys === 'string') {
 		const firstAction = Object.values(result)[0]
-		return firstAction ? firstAction : [(_val: any, _ct: any) => {}, () => {}]
+		return firstAction ? firstAction : [() => {}, () => {}]
 	}
 
 	return result

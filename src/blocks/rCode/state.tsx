@@ -137,7 +137,7 @@ export const storeCreator = (initalState: Attributes) => {
 						const capture = await shelter.captureR(newCode, { env })
 
 						const outputValues: [string, any][] = await Promise.all(
-							outputs.map(async ([name, _]) => {
+							outputs.map(async ([name]) => {
 								const rVariable = await env.get(name)
 								return [name, await transformToJsValue(rVariable)]
 							})

@@ -11,7 +11,7 @@ const schema = {
 
 const isValidJson = initJsonValidator(schema)
 
-window.addEventListener('hashchange', (_event) => {
+window.addEventListener('hashchange', () => {
 	importFromUrl(location.hash)
 })
 
@@ -25,7 +25,7 @@ function importFromUrl(hash: string) {
 	let jsonContent
 	try {
 		jsonContent = JSON.parse(decodeURIComponent(hashContent))
-	} catch (error) {
+	} catch {
 		// if hashtag is not json, simply skip
 		return
 	}

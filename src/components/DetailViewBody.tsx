@@ -92,10 +92,64 @@ export function DetailViewBody() {
 			if (debouncedUrl) {
 				new URL(debouncedUrl)
 			}
-		} catch (exception) {
+		} catch {
 			updateState({ parameters: { urlError: __('invalid URL', 'inseri-core') } })
 		}
 	}, [debouncedUrl])
+
+	let requestBodyElement = (
+		<Box mt="sm">
+			{bodyError && (
+				<Text mt="xs" color="red" size="sm">
+					{bodyError}
+				</Text>
+			)}
+			<CodeEditor
+				maxHeight={500}
+				type={requestBodyType}
+				value={textBody}
+				onChange={(val) => {
+					if (!isBodyOverridden) {
+						updateState({
+							requestParams: { textBody: encodeURIComponent(val) },
+							parameters: { bodyError: '', textBody: val },
+						})
+					}
+				}}
+			/>
+		</Box>
+	)
+
+	if (requestBodyType === 'none') {
+		requestBodyElement = (
+			<Group m="lg">
+				<IconCircleOff size={24} color="gray" />
+				<Text size="md" color="gray">
+					{__('no body', 'inseri-core')}
+				</Text>
+			</Group>
+		)
+	} else if (isFormType(requestBodyType)) {
+		requestBodyElement = (
+			<ParamsTable
+				items={paramsBody}
+				onItemsChange={(val) => {
+					updateState({ requestParams: { paramsBody: val }, parameters: { paramsBody: val } })
+				}}
+			/>
+		)
+	}
+
+	let responseBodyElement = <CodeEditor maxHeight={500} type={responseBodyType} value={responseBody} />
+	if (responseBodyType === 'image') {
+		responseBodyElement = <img style={{ maxWidth: '100%' }} src={responseBody} alt={__('response image', 'inseri-core')} />
+	} else if (responseBodyType === 'raw') {
+		responseBodyElement = (
+			<Button classNames={{ root: primaryBtn }} component="a" href={responseBody.url} download={responseBody.filename}>
+				{__('Download File', 'inseri-core')}
+			</Button>
+		)
+	}
 
 	return (
 		<div className={whiteBox}>
@@ -179,42 +233,7 @@ export function DetailViewBody() {
 										</Button>
 									)}
 								</Group>
-								{requestBodyType === 'none' ? (
-									<Group m="lg">
-										<IconCircleOff size={24} color="gray" />
-										<Text size="md" color="gray">
-											{__('no body', 'inseri-core')}
-										</Text>
-									</Group>
-								) : isFormType(requestBodyType) ? (
-									<ParamsTable
-										items={paramsBody}
-										onItemsChange={(val) => {
-											updateState({ requestParams: { paramsBody: val }, parameters: { paramsBody: val } })
-										}}
-									/>
-								) : (
-									<Box mt="sm">
-										{bodyError && (
-											<Text mt="xs" color="red" size="sm">
-												{bodyError}
-											</Text>
-										)}
-										<CodeEditor
-											maxHeight={500}
-											type={requestBodyType}
-											value={textBody}
-											onChange={(val) => {
-												if (!isBodyOverridden) {
-													updateState({
-														requestParams: { textBody: encodeURIComponent(val) },
-														parameters: { bodyError: '', textBody: val },
-													})
-												}
-											}}
-										/>
-									</Box>
-								)}
+								{requestBodyElement}
 							</Tabs.Panel>
 						</Tabs>
 					</Accordion.Panel>
@@ -246,15 +265,7 @@ export function DetailViewBody() {
 							</Tabs.Panel>
 
 							<Tabs.Panel value="body" py="sm" px="md">
-								{responseBodyType === 'image' ? (
-									<img style={{ maxWidth: '100%' }} src={responseBody} alt={__('response image', 'inseri-core')} />
-								) : responseBodyType === 'raw' ? (
-									<Button classNames={{ root: primaryBtn }} component="a" href={responseBody.url} download={responseBody.filename}>
-										{__('Download File', 'inseri-core')}
-									</Button>
-								) : (
-									<CodeEditor maxHeight={500} type={responseBodyType} value={responseBody} />
-								)}
+								{responseBodyElement}
 							</Tabs.Panel>
 						</Tabs>
 					</Accordion.Panel>

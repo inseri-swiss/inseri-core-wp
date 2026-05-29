@@ -13,7 +13,7 @@ import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
 import View from './view'
 
-function EditComponent(_props: BlockEditProps<Attributes>) {
+function EditComponent() {
 	const { metadata } = useGlobalState((state: GlobalState) => state)
 	const { updateState } = useGlobalState((state: GlobalState) => state.actions)
 

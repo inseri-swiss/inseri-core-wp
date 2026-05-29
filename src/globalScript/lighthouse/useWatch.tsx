@@ -106,7 +106,7 @@ function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?:
 		const valueObs: Observable<[string, B | null]>[] = splitTheKey(keysByName).map((triple) =>
 			blockStoreSubject.pipe(
 				map((root) => transformToOptionTuple<A>(root, triple as [string, string, string])),
-				distinctUntilChanged(([_, a], [__, b]) => a.equals(b, (i1, i2) => i1.contentType === i2.contentType && i1.value === i2.value)),
+				distinctUntilChanged(([, a], [, b]) => a.equals(b, (i1, i2) => i1.contentType === i2.contentType && i1.value === i2.value)),
 				map(foldValues<A, B>(noneRef, someRef))
 			)
 		)
@@ -119,7 +119,7 @@ function useWatch<A = any, B = any>(keys: string | Record<string, string>, ops?:
 			onBlockRemovedSubs.forEach((s) => s.unsubscribe())
 			valueSubscription.unsubscribe()
 
-			const edgesToRemove = Object.fromEntries(idLongKeyPairs.map(([id, _key]) => [id, null]))
+			const edgesToRemove = Object.fromEntries(idLongKeyPairs.map(([id]) => [id, null]))
 			edgesSubject.next(edgesToRemove as any)
 		}
 	}, [longKeys.join(), names.join()])

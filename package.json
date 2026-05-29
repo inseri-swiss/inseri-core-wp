@@ -9,7 +9,7 @@
 	},
 	"scripts": {
 		"build": "wp-scripts build",
-		"lint": "prettier --check . && wp-scripts lint-js",
+		"lint": "prettier --check . && wp-scripts lint-js --quiet --ignore-pattern \".venv/\"",
 		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
 		"packages-update": "wp-scripts packages-update",

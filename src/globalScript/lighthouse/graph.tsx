@@ -12,11 +12,11 @@ interface Edge {
 
 export const edgesSubject = new BehaviorSubject<Record<string, Edge>>({})
 const edgesToValuesObs = edgesSubject.pipe(
-	scan((acc, curr) => Object.fromEntries(Object.entries({ ...acc, ...curr }).filter(([_k, v]) => !!v))),
+	scan((acc, curr) => Object.fromEntries(Object.entries({ ...acc, ...curr }).filter(([, v]) => !!v))),
 	map((record) => Object.values(record).map((edge) => ({ data: edge })))
 )
 const edgesToBlockObs = edgesSubject.pipe(
-	scan((acc, curr) => Object.fromEntries(Object.entries({ ...acc, ...curr }).filter(([_k, v]) => !!v))),
+	scan((acc, curr) => Object.fromEntries(Object.entries({ ...acc, ...curr }).filter(([, v]) => !!v))),
 	map((record) => Object.fromEntries(Object.entries(record).map(([k, v]) => [k, { ...v, source: v.source.split('/')[0] }]))),
 	map((record) => Object.values(record).map((edge) => ({ data: edge })))
 )

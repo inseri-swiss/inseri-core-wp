@@ -59,7 +59,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 		</ResizableBox>
 	)
 
-	const unselectedEvents = EVENTS.filter((e) => outputs.every(([key, _]) => key !== e.value))
+	const unselectedEvents = EVENTS.filter((e) => outputs.every(([key]) => key !== e.value))
 
 	return (
 		<>

@@ -1,6 +1,5 @@
 import { useWatch, Nucleus } from '@inseri/lighthouse'
 import { IconCircleOff } from '@tabler/icons-react'
-import { __ } from '@wordpress/i18n'
 import { Box, Group, Text, createStyles } from '@mantine/core'
 import { CodeEditor } from '../../components/CodeEditor'
 import { useGlobalState } from '../../components/StateProvider'
@@ -37,26 +36,34 @@ export default function View({ isGutenbergEditor, isSelected }: ViewProps) {
 	})
 	const { wrapper } = useViewStyles().classes
 
-	return mode === 'code' ? (
-		<Box>
-			<CodeEditor type={'html'} value={value} />
-		</Box>
-	) : isEmpty ? (
-		<Group
-			align="center"
-			position="center"
-			style={{
-				background: '#F8F9FA',
-				color: '#868E96',
-				padding: '8px',
-			}}
-		>
-			<IconCircleOff size={40} />
-			<Text size="xl" align="center">
-				{altText}
-			</Text>
-		</Group>
-	) : (
+	if (mode === 'code') {
+		return (
+			<Box>
+				<CodeEditor type={'html'} value={value} />
+			</Box>
+		)
+	}
+
+	if (isEmpty) {
+		return (
+			<Group
+				align="center"
+				position="center"
+				style={{
+					background: '#F8F9FA',
+					color: '#868E96',
+					padding: '8px',
+				}}
+			>
+				<IconCircleOff size={40} />
+				<Text size="xl" align="center">
+					{altText}
+				</Text>
+			</Group>
+		)
+	}
+
+	return (
 		<div
 			className={isGutenbergEditor && !isSelected ? wrapper : undefined}
 			style={{ minHeight: isGutenbergEditor ? '50px' : undefined }}

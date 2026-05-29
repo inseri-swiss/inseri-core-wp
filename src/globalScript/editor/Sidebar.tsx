@@ -116,7 +116,12 @@ function ListItem({ isSelected, block, onClick, onHover, isHovered }: ListItemPr
 		onHover(hovered)
 	}, [hovered])
 
-	const computedClassName = isSelected ? classes.activeCard : isHovered ? cx(classes.card, classes.isHovered) : classes.card
+	let computedClassName = classes.card
+	if (isSelected) {
+		computedClassName = classes.activeCard
+	} else if (isHovered) {
+		computedClassName = cx(classes.card, classes.isHovered)
+	}
 
 	return (
 		<UnstyledButton ref={ref as any} className={computedClassName} onClick={onClick}>

@@ -21,7 +21,7 @@ export default function View() {
 	const alternativeColumns = useMemo(() => {
 		const first = data[0] ?? []
 		return Object.entries(first)
-			.filter(([_, val]) => typeof val !== 'object')
+			.filter(([, val]) => typeof val !== 'object')
 			.map(([key]) => ({ accessorKey: key, header: key }))
 	}, [data[0]])
 
@@ -86,14 +86,14 @@ export default function View() {
 
 		mantineTableBodyRowProps: enableRowClick
 			? ({ row }) => ({
-					onClick: (_event) => setSelectedRow(row.original),
+					onClick: () => setSelectedRow(row.original),
 					sx: { cursor: 'pointer' },
 				})
 			: undefined,
 
 		mantineTableBodyCellProps: enableCellClick
 			? ({ cell, row }) => ({
-					onDoubleClick: (_event) => {
+					onDoubleClick: () => {
 						const accessorKey = cell.column.id
 						const cellContent = accessorKey.split('.').reduce((a, b) => a[b], row.original as any)
 						setSelectedCell({ accessorKey, row: row.original, cell: cellContent })

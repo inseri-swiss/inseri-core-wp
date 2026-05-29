@@ -117,7 +117,7 @@ function EditComponent(props: BlockEditProps<Attributes>) {
 			if (debouncedUrl) {
 				new URL(debouncedUrl)
 			}
-		} catch (exception) {
+		} catch {
 			updateState({ parameters: { urlError: __('invalid URL', 'inseri-core') } })
 		}
 	}, [debouncedUrl])

@@ -33,7 +33,7 @@ export interface DiscoveredItem {
 export function flattenToRawItem(root: Root): RawValueItem[] {
 	return Object.entries(root).flatMap(([blockId, block]) =>
 		Object.entries(block.atoms)
-			.filter(([_, atom]) => !!atom)
+			.filter(([, atom]) => !!atom)
 			.map(([atomKey, atom]) => {
 				const { atoms, ...restBlock } = block
 				return {

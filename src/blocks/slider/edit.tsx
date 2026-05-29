@@ -10,7 +10,7 @@ import { Attributes } from './index'
 import { GlobalState, storeCreator } from './state'
 import View from './view'
 
-function EditComponent(_props: BlockEditProps<Attributes>) {
+function EditComponent() {
 	const { label, metadata, step, isRange, valueBoundaries, rangeBoundaries, initialValue, precision, advancedRange } = useGlobalState(
 		(state: GlobalState) => state
 	)

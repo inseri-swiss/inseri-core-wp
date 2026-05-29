@@ -42,7 +42,7 @@ export default function View({ renderResizable }: ViewProps) {
 		}
 	)
 
-	const found = Object.entries(watchRecord).find(([_k, v]) => v.isEmpty) ?? ['', { isEmpty: false, altText: '' }]
+	const found = Object.entries(watchRecord).find(([, v]) => v.isEmpty) ?? ['', { isEmpty: false, altText: '' }]
 	const { isEmpty, altText } = found[1]
 
 	const graphElement = isEmpty ? (

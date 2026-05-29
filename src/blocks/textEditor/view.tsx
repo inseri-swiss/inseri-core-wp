@@ -38,7 +38,7 @@ export default function View(props: ViewProps) {
 		if (contentType.match('/json') && newValue.trim().length > 0) {
 			try {
 				publishValue(JSON.parse(newValue), contentType)
-			} catch (error) {
+			} catch {
 				setSyntaxError(true)
 				publishEmpty()
 			}
