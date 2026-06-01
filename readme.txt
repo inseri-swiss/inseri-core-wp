@@ -2,9 +2,9 @@
 Contributors: inseriswiss
 Tags: adopt-me, interactive, JavaScript, Plotly, Python
 Requires at least: 6.3
-Tested up to: 6.9.1
+Tested up to: 7.0.0
 Requires PHP: 7.4
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -63,6 +63,11 @@ Do you want to show your interest? **Star** the [GitHub](https://github.com/inse
 6. Render HTML code
 
 == Changelog ==
+### [1.0.6](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v1.0.6)
+- Update: Status to ⚠️ UNMAINTAINED ⚠️
+- Update: Tag adopt-me
+- Update: diverse dependencies
+
 ### [1.0.5](https://github.com/inseri-swiss/inseri-core-wp/releases/tag/v1.0.5)
 - Update: Live Preview and metadata
 

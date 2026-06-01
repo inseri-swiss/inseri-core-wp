@@ -1,6 +1,6 @@
 {
 	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
-	"preferredVersions": { "php": "8.2", "wp": "6.9" },
+	"preferredVersions": { "php": "8.2", "wp": "7.0" },
 	"steps": [
 		{ "step": "login", "username": "admin", "password": "password" },
 		{
